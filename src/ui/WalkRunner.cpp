@@ -12,6 +12,8 @@
 #include <QTimer>
 #include <QWidget>
 
+#include <windows.h>
+
 #include <climits>
 #include <cstdio>
 
@@ -95,6 +97,13 @@ void WalkRunner::start() {
 
 void WalkRunner::next() {
     if (!window_ || at_ >= steps_.size()) {
+        // The walk ran on the owner's desktop without taking the focus from the owner's work.
+        if (window_) {
+            const bool ours = GetForegroundWindow() == HWND(window_->winId());
+            check(!ours, QStringLiteral("the owner's focus untouched"),
+                  ours ? QStringLiteral("AvLoop is the foreground window")
+                       : QStringLiteral("another program holds the focus"));
+        }
         log(failures_ ? QStringLiteral("WALK FAILED (%1)").arg(failures_) : QStringLiteral("WALK PASSED"));
         emit finished(failures_);
         return;
@@ -131,12 +140,12 @@ int WalkRunner::run(const QJsonObject& step) {
         return delay_ + 200;
     }
     if (what == QLatin1String("resize")) {
-        window_->showNormal();
-        window_->resize(step.value(QStringLiteral("w")).toInt(1280), step.value(QStringLiteral("h")).toInt(720));
+        placeQuietly(window_,
+                     QSize(step.value(QStringLiteral("w")).toInt(1280), step.value(QStringLiteral("h")).toInt(720)));
         return delay_ + 200;
     }
     if (what == QLatin1String("maximize")) {
-        window_->showMaximized();
+        placeQuietly(window_, {});
         return delay_ + 300;
     }
     if (auto it = extraSteps().find(what); it != extraSteps().end()) return (*it)(*this, step);

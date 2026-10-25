@@ -19,6 +19,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QSettings>
+#include <QSurfaceFormat>
 #include <QTemporaryDir>
 #include <QTimer>
 
@@ -46,6 +47,12 @@ int main(int argc, char** argv) {
     clock.start();
     applyScaleArgument(argc, argv);
     QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+    // The canvas and the renderer draw with OpenGL 3.3 core (spec §3.6).
+    QSurfaceFormat gl = QSurfaceFormat::defaultFormat();
+    gl.setRenderableType(QSurfaceFormat::OpenGL);
+    gl.setVersion(3, 3);
+    gl.setProfile(QSurfaceFormat::CoreProfile);
+    QSurfaceFormat::setDefaultFormat(gl);
     QApplication app(argc, argv);
     QApplication::setOrganizationName(avloop::AppInfo::organization());
     QApplication::setApplicationName(avloop::AppInfo::name());
@@ -66,9 +73,11 @@ int main(int argc, char** argv) {
     const QCommandLineOption tool(QStringLiteral("tool"), QStringLiteral("The active tool."), QStringLiteral("id"));
     const QCommandLineOption scale(QStringLiteral("scale"), QStringLiteral("Display scale factor."),
                                    QStringLiteral("factor"));
+    const QCommandLineOption project(QStringLiteral("project"), QStringLiteral("A project to open."),
+                                     QStringLiteral("file.avloop"));
     const QCommandLineOption memLog(QStringLiteral("mem-log"), QStringLiteral("Log memory every second."),
                                     QStringLiteral("file"));
-    cli.addOptions({shot, walk, walkOut, theme, tool, scale, memLog});
+    cli.addOptions({shot, walk, walkOut, theme, tool, scale, project, memLog});
     cli.addPositionalArgument(QStringLiteral("file"), QStringLiteral("A video or project to open."));
     cli.process(app);
 
@@ -86,12 +95,19 @@ int main(int argc, char** argv) {
 
     avloop::media::DiskCache::removeStaleSessions();
     avloop::MainWindow window;
+    // A lab run never takes the focus from the owner's work (their typing must not land in a walk).
+    if (lab) window.setAttribute(Qt::WA_ShowWithoutActivating);
     if (cli.isSet(tool)) window.selectTool(cli.value(tool));
     QObject::connect(&window, &avloop::MainWindow::firstShown, &window, [&] {
         if (lab) say(QStringLiteral("startup: %1 ms").arg(clock.elapsed()));
     });
     window.showMaximized();
-    if (!cli.positionalArguments().isEmpty()) window.openFiles(cli.positionalArguments());
+    // A lab window fills the work area without taking the focus (SWP_NOACTIVATE): the look of maximized.
+    if (lab) avloop::WalkRunner::placeQuietly(&window, {});
+    if (cli.isSet(project))
+        window.openProject(cli.value(project));
+    else if (!cli.positionalArguments().isEmpty())
+        window.openFiles(cli.positionalArguments());
 
     // --mem-log: one line a second — ms since start, Private Bytes, VRAM, cache (MB).
     QFile memFile;
@@ -118,7 +134,7 @@ int main(int argc, char** argv) {
     if (cli.isSet(shot)) {
         const QString file = cli.value(shot);
         QTimer::singleShot(800, &window, [&window, file] {
-            const bool ok = window.grab().save(file, "PNG");
+            const bool ok = avloop::WalkRunner::grabWidget(&window).save(file, "PNG");
             say(QStringLiteral("%1 shot %2").arg(ok ? QStringLiteral("PASS") : QStringLiteral("FAIL"), file));
             window.close();
             QApplication::exit(ok ? 0 : 1);

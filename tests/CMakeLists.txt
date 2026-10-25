@@ -20,6 +20,9 @@ endfunction()
 
 avloop_add_test(theme RESOURCES SOURCES test-theme.cpp LIBS avloop_ui)
 avloop_add_test(icons RESOURCES SOURCES test-icons.cpp LIBS avloop_ui)
+foreach(_t geometry commands project-json)
+    avloop_add_test(${_t} SOURCES test-${_t}.cpp LIBS avloop_core)
+endforeach()
 
 # The media tests read the lab's samples (tools/media/make-samples.mjs); a missing sample skips its case.
 foreach(_t probe decoder-seek memory)

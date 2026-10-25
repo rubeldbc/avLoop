@@ -1,5 +1,2 @@
-PASSED walk-import.mjs (31 s)
-PASSED walk-seek.mjs (24 s)
 PASSED walk-open.json (10 s)
-PASSED walk-memory-decode.mjs (27 s)
 PHASE WALKS PASSED

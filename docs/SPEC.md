@@ -6,6 +6,31 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-003 — The canvas and the Selection (AV-003, 2026-10-26)
+
+- The canvas is an OpenGL 3.3 core widget over an unbounded scene in pixels: the video drawn by the transform shader
+  (`render/Shaders`, shared with the renderer) as a mipmapped premultiplied texture, a checkerboard (16 px, two dark
+  greys) where it is transparent, the scene around it `bg`; tool overlays painted by QPainter. Without OpenGL 3.3 the
+  same picture is painted by QPainter.
+- On load the video stands at 100% with its top-left at (0,0) (reading R-18) and the view fits it; the fit holds
+  through resizes until the user zooms or pans.
+- Zoom (Z): a click zooms in a step about the point (10, 25, 33, 50, 67, 100, 150, 200, 300, 400, 800%), Alt+click
+  out, a drag zooms to the rectangle; options Fit, 100%, 200% and the zoom %. In every tool: Ctrl+wheel zooms about the
+  cursor, the wheel pans up/down, Shift+wheel across, a middle-drag pans; Ctrl+0 Fit, Ctrl+1 100%, Ctrl+= / Ctrl+- zoom.
+  Hand (H): a drag pans. The view never enters Undo.
+- Selection (V): a drag inside the video moves it; a corner handle scales it keeping its ratio about the opposite
+  corner, Alt about the centre (5–1000%). The video's border is a blue-white dashed line with four white handles,
+  shown while the Selection is active (reading R-20).
+- The options bar shows the active tool's row. Selection: X, Y (the centre), Scale % (step 0.1), W, H (locked: they
+  set the scale; unlocked: shown only — R-2), Lock, Fit, Fill, Center (on the crop; without one, the video's own frame
+  at 100% — R-19), Flip H, Flip V, Reset; a yellow warning beside Scale when the output is upscaled ("Upscaled: output
+  may look soft"). Every number is a StepSpinBox: the wheel and ↑/↓ step, Shift ten times, Enter commits.
+- Undo/Redo (Ctrl+Z; Ctrl+Y or Ctrl+Shift+Z; the ☰ menu): 200 steps of values; one drag is one step; typing or the
+  wheel in one field within 500 ms is one step; a new video clears it.
+- `.avloop` version 1 is read and written (source, transform, view; unknown keys kept at every level; the source found
+  by its path, then its path relative to the project file; a newer version refused); `avloop.exe --project <file>`
+  and a dropped `.avloop` open one (the file's menus and dialogs: AV-010).
+
 ### D-002 — The media (AV-002, 2026-10-26)
 
 - A file opens by its content (probesize 50 MB, analyzeduration 10 s), never by its extension: the Open button and

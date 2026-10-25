@@ -3,6 +3,7 @@
   "settle": 600,
   "steps": [
     { "label": "S1: the window opens maximized with only three buttons in the top bar" },
+    { "do": "expect", "probe": "window.frame", "contains": "frame" },
     { "do": "expect", "probe": "window.maximized", "eq": true },
     { "do": "expect", "probe": "topbar.buttons", "eq": "Open,Preview,Export" },
     { "do": "expect", "probe": "window.title", "eq": "AvLoop" },

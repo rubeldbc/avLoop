@@ -7,12 +7,16 @@
 #include <QJsonArray>
 #include <QMenu>
 #include <QMouseEvent>
+#include <QOpenGLWidget>
+#include <QPainter>
 #include <QPixmap>
 #include <QTest>
 #include <QTimer>
 #include <QToolButton>
 #include <QWheelEvent>
 #include <QWidget>
+
+#include <windows.h>
 
 #include <climits>
 #include <cmath>
@@ -59,6 +63,37 @@ QString text(const QVariant& v) {
 }
 
 } // namespace
+
+void WalkRunner::placeQuietly(QWidget* window, const QSize& client) {
+    const HWND hwnd = HWND(window->winId());
+    constexpr UINT kQuiet = SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER;
+    if (client.isEmpty()) {
+        RECT area{};
+        SystemParametersInfoW(SPI_GETWORKAREA, 0, &area, 0);
+        SetWindowPos(hwnd, nullptr, area.left, area.top, area.right - area.left, area.bottom - area.top, kQuiet);
+        return;
+    }
+    RECT outer{};
+    RECT inner{};
+    GetWindowRect(hwnd, &outer);
+    GetClientRect(hwnd, &inner);
+    const int frameW = (outer.right - outer.left) - (inner.right - inner.left);
+    const int frameH = (outer.bottom - outer.top) - (inner.bottom - inner.top);
+    const qreal dpr = window->devicePixelRatioF();
+    SetWindowPos(hwnd, nullptr, 0, 0, int(std::lround(client.width() * dpr)) + frameW,
+                 int(std::lround(client.height() * dpr)) + frameH, kQuiet | SWP_NOMOVE);
+}
+
+QPixmap WalkRunner::grabWidget(QWidget* widget) {
+    if (auto* gl = qobject_cast<QOpenGLWidget*>(widget)) return QPixmap::fromImage(gl->grabFramebuffer());
+    QPixmap pm = widget->grab();
+    QPainter p(&pm);
+    for (QOpenGLWidget* gl : widget->findChildren<QOpenGLWidget*>()) {
+        if (!gl->isVisible()) continue;
+        p.drawImage(QRect(gl->mapTo(widget, QPoint(0, 0)), gl->size()), gl->grabFramebuffer());
+    }
+    return pm;
+}
 
 QPoint WalkRunner::point(QWidget* widget, const QJsonObject& step, const QString& key) const {
     const QJsonValue v = step.value(key);
@@ -129,7 +164,18 @@ int WalkRunner::stepWheel(const QJsonObject& step) {
     return delay_;
 }
 
+void WalkRunner::ensureActive() {
+    // Shortcuts and menus need Qt's active window. A walk runs on the owner's desktop while the owner works: it never
+    // takes the system's focus (the owner's typing must not land here), it sets Qt's own notion of the active window.
+    if (!window_ || QApplication::activeWindow() == window_) return;
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_DEPRECATED
+    QApplication::setActiveWindow(window_);
+    QT_WARNING_POP
+}
+
 int WalkRunner::stepKey(const QJsonObject& step) {
+    ensureActive();
     const QKeySequence seq = QKeySequence::fromString(step.value(QStringLiteral("keys")).toString());
     if (seq.isEmpty()) {
         check(false, QStringLiteral("key"), QStringLiteral("cannot read \"%1\"").arg(step.value("keys").toString()));
@@ -161,7 +207,7 @@ int WalkRunner::stepShot(const QJsonObject& step) {
         check(false, QStringLiteral("shot"), QStringLiteral("no widget \"%1\"").arg(step.value("on").toString()));
         return -1;
     }
-    QPixmap pm = w->grab();
+    QPixmap pm = grabWidget(w);
     const int maxWidth = step.value(QStringLiteral("maxWidth")).toInt(0);
     if (maxWidth > 0 && pm.width() > maxWidth) pm = pm.scaledToWidth(maxWidth, Qt::SmoothTransformation);
     const QString file = QDir(out_).filePath(step.value(QStringLiteral("file")).toString());
@@ -193,9 +239,9 @@ int WalkRunner::stepExpect(const QJsonObject& step) {
         wanted = QStringLiteral("= %1").arg(eq.isString() ? eq.toString() : text(eq.toVariant()));
     }
     if (step.contains(QStringLiteral("near"))) {
-        const QJsonArray near = step.value(QStringLiteral("near")).toArray();
-        ok = ok && std::abs(value.toDouble() - near.at(0).toDouble()) <= near.at(1).toDouble();
-        wanted = QStringLiteral("≈ %1 ± %2").arg(near.at(0).toDouble()).arg(near.at(1).toDouble());
+        const QJsonArray within = step.value(QStringLiteral("near")).toArray();
+        ok = ok && std::abs(value.toDouble() - within.at(0).toDouble()) <= within.at(1).toDouble();
+        wanted = QStringLiteral("≈ %1 ± %2").arg(within.at(0).toDouble()).arg(within.at(1).toDouble());
     }
     if (step.contains(QStringLiteral("min")))
         ok = ok && value.toDouble() >= step.value(QStringLiteral("min")).toDouble();
@@ -229,6 +275,7 @@ int WalkRunner::stepWaitFor(const QJsonObject& step) {
 }
 
 int WalkRunner::stepMenu(const QJsonObject& step) {
+    ensureActive();
     menuPath_.clear();
     for (const QJsonValue& v : step.value(QStringLiteral("path")).toArray())
         menuPath_ << v.toString();

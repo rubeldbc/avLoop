@@ -95,6 +95,14 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     of AvLoop's own was not asked for. Every other family of §3.9 opens.
 16. **R-16** Until a crop exists the working size is the display size with its long side capped at 1920 (spec §3.7.3:
     a 4K source is scaled down right after decoding); the renderer sets it from the crop and scale from AV-007.
+17. **R-17** `src/core` links Qt Gui for `QUndoStack`/`QUndoCommand` only (Qt 6 moved them out of Widgets); spec §3.2's
+    "Qt Core only" holds for everything else, and §11.2 names `QUndoStack`.
+18. **R-18** "Reset: 100%, (0,0)" (§6.2) and "on load the video sits at (0,0)" (§3.3) put the video's top-left at (0,0)
+    — the project file's example (x 960, y 540 for 1920×1080) agrees.
+19. **R-19** Fit, Fill and Center with no crop act on the video's own frame at 100% (0,0,w,h): with no crop the export
+    is the video rectangle itself (R-8), so there is nothing else to fit to.
+20. **R-20** The video's dashed border and its handles show while the Selection is active (the owner's mock draws them
+    so); the crop's outline (AV-004) shows in every tool.
 
 ## 4. What is not built
 

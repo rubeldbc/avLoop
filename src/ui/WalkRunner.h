@@ -3,6 +3,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QObject>
+#include <QPixmap>
 #include <QPointF>
 #include <QPointer>
 #include <QStringList>
@@ -41,6 +42,12 @@ public:
     WalkRunner(QWidget* window, QString script, QString outDir, QObject* parent = nullptr);
 
     static void addStep(const QString& name, WalkStep step);
+    // A picture of a widget as it looks: QWidget::grab() leaves out what QPainter drew on a QOpenGLWidget, so each
+    // visible one is drawn in again from its own framebuffer.
+    static QPixmap grabWidget(QWidget* widget);
+    // Sizes a window without ever activating it — the owner works on this desktop while walks run: the client size
+    // in logical px, or the whole work area when empty (the look of a maximized window).
+    static void placeQuietly(QWidget* window, const QSize& client);
 
     void start();
     int failures() const { return failures_; }
@@ -71,6 +78,7 @@ private:
     int stepMenu(const QJsonObject& step);
     void menuNext();
     QPoint point(QWidget* widget, const QJsonObject& step, const QString& key) const;
+    void ensureActive();
 
     QPointer<QWidget> window_;
     QString script_;

@@ -1,15 +1,18 @@
 #include "ui/MainWindow.h"
 
 #include "core/AppInfo.h"
+#include "core/Project.h"
 #include "media/DecodeWorker.h"
 #include "media/DiskCache.h"
 #include "media/FrameCache.h"
 #include "ui/WalkRunner.h"
+#include "ui/canvas/Canvas.h"
 #include "ui/canvas/DropZone.h"
 #include "ui/panels/SidePanel.h"
 #include "ui/theme/IconFactory.h"
 #include "ui/theme/Theme.h"
 #include "ui/timeline/Transport.h"
+#include "ui/tools/ToolManager.h"
 
 #include <QAction>
 #include <QButtonGroup>
@@ -17,6 +20,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QScreen>
 #include <QSettings>
 #include <QSplitter>
 #include <QStackedWidget>
@@ -83,10 +87,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     canvasStack_->setAttribute(Qt::WA_StyledBackground);
     dropZone_ = new DropZone(canvasStack_);
     canvasStack_->addWidget(dropZone_);
-    framePreview_ = new QLabel(canvasStack_);
-    framePreview_->setObjectName(QStringLiteral("FramePreview"));
-    framePreview_->setAlignment(Qt::AlignCenter);
-    canvasStack_->addWidget(framePreview_);
+    project_ = new Project(this);
+    canvas_ = new Canvas(project_, canvasStack_);
+    canvasStack_->addWidget(canvas_);
     connect(dropZone_, &DropZone::openRequested, this, &MainWindow::chooseFile);
     connect(dropZone_, &DropZone::filesDropped, this, &MainWindow::openFiles);
     canvasLayout->addWidget(canvasStack_, 1);
@@ -113,6 +116,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
     buildStatusBar();
     buildMenu();
+    buildCanvasTools();
     registerProbes();
     registerMediaProbes();
     restoreLayout();
@@ -208,6 +212,7 @@ QWidget* MainWindow::buildRail() {
         b->setToolTip(QStringLiteral("%1 (%2)").arg(tool.name, tool.key.toString(QKeySequence::NativeText)));
         b->setProperty("toolId", tool.id);
         toolGroup_->addButton(b);
+        connect(b, &QToolButton::clicked, this, [this, id = tool.id] { selectTool(id); });
         // The key switches at once (a button's own shortcut would animate a click for 100 ms first).
         auto* key = new QAction(b);
         key->setShortcut(tool.key);
@@ -257,7 +262,24 @@ void MainWindow::buildStatusBar() {
 }
 
 void MainWindow::registerProbes() {
-    WalkProbes::add(QStringLiteral("window.maximized"), [this] { return isMaximized(); });
+    // Maximized — or, in a lab run that never takes the focus, covering the work area as maximized would.
+    WalkProbes::add(QStringLiteral("window.maximized"), [this] {
+        const QRect area = screen() ? screen()->availableGeometry() : QRect();
+        return isMaximized() || (!area.isEmpty() && frameGeometry().adjusted(-12, -12, 12, 12).contains(area));
+    });
+    WalkProbes::add(QStringLiteral("window.frame"), [this] {
+        const QRect f = frameGeometry();
+        const QRect a = screen() ? screen()->availableGeometry() : QRect();
+        return QStringLiteral("frame %1,%2 %3x%4 · work area %5,%6 %7x%8")
+            .arg(f.x())
+            .arg(f.y())
+            .arg(f.width())
+            .arg(f.height())
+            .arg(a.x())
+            .arg(a.y())
+            .arg(a.width())
+            .arg(a.height());
+    });
     WalkProbes::add(QStringLiteral("window.title"), [this] { return windowTitle(); });
     WalkProbes::add(QStringLiteral("window.size"),
                     [this] { return QStringLiteral("%1x%2").arg(width()).arg(height()); });
@@ -279,6 +301,7 @@ void MainWindow::registerProbes() {
 void MainWindow::selectTool(const QString& id) {
     for (QAbstractButton* b : toolGroup_->buttons())
         if (b->property("toolId").toString() == id) b->setChecked(true);
+    if (tools_) tools_->activate(id);
 }
 
 QString MainWindow::activeTool() const {

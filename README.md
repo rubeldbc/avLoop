@@ -38,6 +38,12 @@ frame rate and quality, and a preview that shows exactly what will be exported.
   FFV1 and uncompressed. A file that cannot be opened says why. (Animated WebP: no FFmpeg decodes it — convert it first.)
 - **Frame-accurate decoding on the GPU** (D3D11VA, with a software fallback): phone rotation turned upright,
   anamorphic pixels made square, interlaced video deinterlaced, HDR tone-mapped to SDR, alpha kept.
+- **A GPU canvas** (OpenGL): zoom about the cursor (10–800%), pan with the wheel, a middle-drag or the Hand; Fit with
+  Ctrl+0, 100% with Ctrl+1. Transparent parts show a checkerboard.
+- **The Selection tool** moves the video and scales it by its corner handles (Alt: about the centre), never
+  distorting it; the options bar sets X, Y, Scale and W/H exactly, with Fit, Fill, Center, Flip H/V and Reset, and warns
+  when the output would be upscaled.
+- **Undo and Redo** for every change (200 steps; one drag is one step).
 - **Memory under control**: a bounded frame cache (1.5 GB by default) with a disk spill; the status bar shows the
   source, the GPU and RAM / VRAM / cache use.
 - `avloop-cli probe <video>` and `avloop-cli frame <video> --at N -o x.png` for scripts; `avloop-cli version` shows the
@@ -47,16 +53,15 @@ frame rate and quality, and a preview that shows exactly what will be exported.
 
 Built in this order (each line is a phase of [the plan](phases/26-10-26-034934-AvLoop/control/01_PHASE_DEPENDENCY_GRAPH.md)):
 
-1. **Canvas and Selection**: zoom, pan, move and scale the video behind the crop frame.
-2. **Crop tools**: rectangle, rounded rectangle, ellipse; aspect ratios (1:1, 16:9, 9:16, 4:5, custom …); feather.
-3. **Timeline**: thumbnails, In/Out, frame-accurate playback.
-4. **Loop engine**: Simple, Crossfade (inside the range), Ping-pong, Ping-pong with a smooth turn; Speed; frame rate with
+1. **Crop tools**: rectangle, rounded rectangle, ellipse; aspect ratios (1:1, 16:9, 9:16, 4:5, custom …); feather.
+2. **Timeline**: thumbnails, In/Out, frame-accurate playback.
+3. **Loop engine**: Simple, Crossfade (inside the range), Ping-pong, Ping-pong with a smooth turn; Speed; frame rate with
    Nearest, Frame Blend or Motion Interpolation.
-5. **One renderer** for preview and export, on the GPU with a CPU fallback of the same result.
-6. **Preview window**: Live and Encoded, the seam marked, Around seam, backgrounds.
-7. **Export**: VP9/VP8 alpha WebM, quality presets, target file size, verification.
-8. **Projects** (`.avloop`), Undo/Redo, presets, autosave, settings.
-9. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
+4. **One renderer** for preview and export, on the GPU with a CPU fallback of the same result.
+5. **Preview window**: Live and Encoded, the seam marked, Around seam, backgrounds.
+6. **Export**: VP9/VP8 alpha WebM, quality presets, target file size, verification.
+7. **Projects** (`.avloop`), Undo/Redo, presets, autosave, settings.
+8. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
 
 ## Using a loop in OBS
 
@@ -90,6 +95,9 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 | Open a video | Ctrl+O |
 | Selection · Crop: Rectangle · Rounded · Ellipse | V · M · U · E |
 | Hand · Zoom | H · Z |
+| Undo · Redo | Ctrl+Z · Ctrl+Y (Ctrl+Shift+Z) |
+| Zoom: Fit · 100% · in · out | Ctrl+0 · Ctrl+1 · Ctrl+= · Ctrl+- |
+| Zoom about the cursor · pan | Ctrl+wheel · wheel (Shift: across), middle-drag |
 | In · Out · Keyframe tools | I · O · K |
 
 ## Project structure

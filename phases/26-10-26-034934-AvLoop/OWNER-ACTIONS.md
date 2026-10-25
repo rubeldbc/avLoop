@@ -27,3 +27,4 @@ read and open for a veto later; an answer that differs changes the reading in it
 | 18 | **R-8** One crop; none = the whole video. | `README.md` §3 8. | Decided by the agent (spec §13.2); open for a veto |
 | 19 | **R-15** Animated WebP refused (no FFmpeg decodes it). | `README.md` §3 15; AV-002. | Decided by the agent (AV-002); open for a veto — a WebP decoder of AvLoop's own would be a new item |
 | 20 | **R-16** The working size before a crop. | `README.md` §3 16; AV-002. | Decided by the agent (AV-002); open for a veto |
+| 21 | **R-17 … R-20** QUndoStack in core; Reset at (0,0); Fit without a crop; the border with the Selection. | `README.md` §3 17 … 20; AV-003. | Decided by the agent (AV-003); open for a veto |

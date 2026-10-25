@@ -1,9 +1,12 @@
 # AvLoop's modules (spec §3.2): core (Qt Core only) → media (FFmpeg) → render → export → ui → app / cli.
 
 add_library(avloop_core STATIC
-    core/AppInfo.h core/AppInfo.cpp core/Rational.h)
+    core/AppInfo.h core/AppInfo.cpp core/Rational.h
+    core/Geometry.h core/Geometry.cpp core/VideoTransform.h core/VideoTransform.cpp
+    core/Project.h core/Project.cpp core/Commands.h core/ProjectJson.h core/ProjectJson.cpp)
 target_include_directories(avloop_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/generated)
-target_link_libraries(avloop_core PUBLIC Qt6::Core PRIVATE avloop_warnings)
+# Qt Gui only for QUndoStack/QUndoCommand, which Qt 6 moved there from Widgets (spec §11.2).
+target_link_libraries(avloop_core PUBLIC Qt6::Core Qt6::Gui PRIVATE avloop_warnings)
 
 add_library(avloop_media STATIC
     media/FfmpegPtr.h media/MediaInfo.h media/MediaProbe.h media/MediaProbe.cpp
@@ -16,8 +19,12 @@ target_link_libraries(avloop_media
     PUBLIC avloop_core Qt6::Core
     PRIVATE FFmpeg::avformat FFmpeg::avcodec FFmpeg::avutil FFmpeg::swscale FFmpeg::avfilter dxgi psapi avloop_warnings)
 
+add_library(avloop_render STATIC
+    render/Shaders.h render/Shaders.cpp)
+target_link_libraries(avloop_render PUBLIC avloop_core avloop_media Qt6::Gui Qt6::OpenGL PRIVATE avloop_warnings)
+
 add_library(avloop_ui STATIC
-    ui/MainWindow.h ui/MainWindow.cpp ui/MainMenu.cpp ui/MainWindowActions.cpp
+    ui/MainWindow.h ui/MainWindow.cpp ui/MainMenu.cpp ui/MainWindowActions.cpp ui/MainWindowCanvas.cpp
     ui/WalkRunner.h ui/WalkRunner.cpp ui/WalkSteps.cpp
     ui/theme/Theme.h ui/theme/Theme.cpp
     ui/theme/IconFactory.h ui/theme/IconFactory.cpp
@@ -25,9 +32,14 @@ add_library(avloop_ui STATIC
     ui/panels/Section.h ui/panels/Section.cpp
     ui/panels/SidePanel.h ui/panels/SidePanel.cpp
     ui/canvas/DropZone.h ui/canvas/DropZone.cpp
+    ui/canvas/Canvas.h ui/canvas/Canvas.cpp ui/canvas/CanvasView.cpp ui/canvas/CanvasGl.cpp ui/canvas/CanvasGlState.h ui/canvas/CanvasOverlay.cpp
+    ui/tools/Tool.h ui/tools/ToolManager.h ui/tools/ToolManager.cpp
+    ui/tools/SelectionTool.cpp ui/tools/ZoomTool.cpp ui/tools/HandTool.cpp
+    ui/options/OptionsBar.h ui/options/OptionsBar.cpp ui/options/SelectionOptions.cpp ui/options/ZoomOptions.cpp
+    ui/widgets/StepSpinBox.h ui/widgets/StepSpinBox.cpp
     ui/timeline/Transport.h ui/timeline/Transport.cpp)
 target_link_libraries(avloop_ui
-    PUBLIC avloop_core avloop_media Qt6::Widgets Qt6::Svg Qt6::OpenGLWidgets Qt6::Test Qt6::Concurrent
+    PUBLIC avloop_core avloop_media avloop_render Qt6::Widgets Qt6::Svg Qt6::OpenGLWidgets Qt6::Test Qt6::Concurrent
     PRIVATE avloop_warnings)
 
 set(AVLOOP_RC "")

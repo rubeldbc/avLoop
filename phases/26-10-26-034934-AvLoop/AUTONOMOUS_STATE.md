@@ -8,9 +8,9 @@ words: *"I want to build a piece of software called AvLoop. Its main job is to t
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: AV-003
-Next eligible: AV-003 (in progress)
-Completed: 2 of 16
+Active phase: AV-004
+Next eligible: AV-004 (in progress)
+Completed: 3 of 16
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -60,5 +60,6 @@ where `--shot` and `--walk` open their window for seconds and close it.
 ## Completion record
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-003** DONE 2026-10-26 — The canvas and the Selection (D-003): the OpenGL 3.3 canvas with the shared transform shader, Zoom/Hand, the Selection with handles and options bar, StepSpinBox, the model with Undo (200 steps, merging), .avloop v1 read/write; lab walks never take focus; 8 test suites, walk-selection 75 steps PASSED. Record: `execution/AV-003-EXECUTION.md`.
 - **AV-002** DONE 2026-10-26 — The media (D-002, AVADR-0002): any video opened by content, frame-accurate decoding with D3D11VA and software fallback, normalization (rotation, SAR, bwdif, HDR tone-map, alpha), the bounded RAM cache with disk spill, status bar and --mem-log, avloop-cli probe/frame, 40 samples; 5 test suites, 4 walks PASSED (200 seeks exact sw+hw, memory +16 MB). Record: `execution/AV-002-EXECUTION.md`.
 - **AV-001** DONE 2026-10-26 — The ground (D-001): the CMake/MSVC/Qt 6.8.3/FFmpeg 7.1.5 LGPL build with its gates, the maximized shell with the §5 layout, Navy and Black from one token table, 43 own icons and avloop.ico, --shot/--walk, avloop-cli version (licence gate), CI, open-source files, README v1; 2 test suites, walk-shell PASSED. Record: `execution/AV-001-EXECUTION.md`.

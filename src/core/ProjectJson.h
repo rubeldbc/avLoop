@@ -1,0 +1,33 @@
+#pragma once
+
+#include "core/Project.h"
+
+#include <QJsonObject>
+#include <QString>
+
+namespace avloop {
+
+// Everything a project holds, as a value: what a file is read into, what is saved, what an export snapshots.
+struct ProjectData {
+    SourceInfo source;
+    QString relativePath; // the source relative to the project file, as read
+    VideoTransform transform;
+    ViewState view;
+    QJsonObject original; // the JSON as read: unknown keys are written back unchanged (spec §11.1)
+};
+
+// The `.avloop` file (spec §11.1): UTF-8 JSON, "format": "avloop", "version": 1; times in seconds, geometry in scene
+// px. Keys are never renamed (spec §2.7); a format change bumps the version with a migration (AV-010).
+namespace projectjson {
+
+constexpr int kVersion = 1;
+
+QJsonObject toJson(const ProjectData& data, const QString& projectPath = {});
+// Fails on another format or a newer version, with a message that says so.
+bool fromJson(const QJsonObject& json, ProjectData& data, QString* error, const QString& projectPath = {});
+
+bool save(const ProjectData& data, const QString& path, QString* error); // atomic (QSaveFile)
+bool load(const QString& path, ProjectData& data, QString* error);
+
+} // namespace projectjson
+} // namespace avloop

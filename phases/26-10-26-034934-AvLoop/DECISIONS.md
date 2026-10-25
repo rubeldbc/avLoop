@@ -43,3 +43,7 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-14 | Encoder and muxer built by AV-008, reused by AV-009 | Encoded preview precedes Export in the order | `README.md` §3 |
 | R-15 | An animated WebP is refused with a plain message | no FFmpeg (7.1, 8.1) decodes it; no decoder of our own was asked for | `README.md` §3; AV-002 |
 | R-16 | The working size before a crop: the display size, long side ≤ 1920 | spec §3.7.3, no full 4K frames kept | `README.md` §3; AV-002 |
+| R-17 | `src/core` links Qt Gui for QUndoStack only | Qt 6 moved it there; §11.2 names it | `README.md` §3; AV-003 |
+| R-18 | Reset and load: the video's top-left at (0,0), 100% | §3.3, §6.2 and §11.1's example agree | `README.md` §3; AV-003 |
+| R-19 | Fit/Fill/Center without a crop act on the video's 100% frame | no crop = the video rectangle (R-8) | `README.md` §3; AV-003 |
+| R-20 | The video border and handles show with the Selection only | the owner's mock | `README.md` §3; AV-003 |

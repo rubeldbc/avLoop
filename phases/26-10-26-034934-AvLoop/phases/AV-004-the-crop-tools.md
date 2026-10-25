@@ -1,7 +1,7 @@
 ---
 phase: AV-004
 title: "The crop tools"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 4
 track: A
 checkpoint_id: CP-A1

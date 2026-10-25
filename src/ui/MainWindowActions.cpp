@@ -9,6 +9,7 @@
 #include "media/MediaProbe.h"
 #include "media/SystemMemory.h"
 #include "ui/WalkRunner.h"
+#include "ui/canvas/Canvas.h"
 #include "ui/canvas/DropZone.h"
 #include "ui/widgets/Toast.h"
 
@@ -37,6 +38,22 @@ QString gigabytes(std::int64_t bytes) {
     return QString::number(double(bytes) / (1LL << 30), 'f', 1);
 }
 
+SourceInfo sourceInfoOf(const media::MediaInfo& m) {
+    SourceInfo s;
+    s.path = m.path;
+    s.width = m.width;
+    s.height = m.height;
+    s.fps = m.avgFps;
+    s.duration = m.duration;
+    s.frameCount = m.frameCount;
+    s.hasAlpha = m.hasAlpha;
+    const QFileInfo fi(m.path);
+    s.fileSize = fi.size();
+    s.modified = fi.lastModified();
+    s.stream = m.streamIndex;
+    return s;
+}
+
 } // namespace
 
 void MainWindow::chooseFile() {
@@ -51,7 +68,28 @@ void MainWindow::chooseFile() {
 }
 
 void MainWindow::openFiles(const QStringList& paths) {
-    if (!paths.isEmpty()) openVideo(paths.first());
+    if (paths.isEmpty()) return;
+    if (paths.first().endsWith(QLatin1String(".avloop"), Qt::CaseInsensitive))
+        openProject(paths.first());
+    else
+        openVideo(paths.first());
+}
+
+void MainWindow::openProject(const QString& path) {
+    ProjectData loaded;
+    QString error;
+    if (!projectjson::load(path, loaded, &error)) {
+        Toast::post(centralWidget(), tr("Cannot open %1: %2").arg(QFileInfo(path).fileName(), error),
+                    Toast::Kind::Error, 8000);
+        return;
+    }
+    if (!QFileInfo::exists(loaded.source.path)) {
+        Toast::post(centralWidget(), tr("The project's video was not found: %1").arg(loaded.source.path),
+                    Toast::Kind::Error, 8000);
+        return;
+    }
+    pendingProject_ = loaded;
+    openVideo(loaded.source.path);
 }
 
 void MainWindow::openVideo(const QString& path) {
@@ -77,6 +115,15 @@ void MainWindow::probed(const QString& path, const std::optional<media::MediaInf
     }
     closeVideo();
     video_ = info;
+    const SourceInfo source = sourceInfoOf(*info);
+    if (pendingProject_ && QFileInfo(pendingProject_->source.path) == QFileInfo(path)) {
+        ProjectData restored = *pendingProject_;
+        restored.source = source;
+        project_->restore(restored);
+    } else {
+        project_->setSource(source);
+    }
+    pendingProject_.reset();
     media::Decoder::Options options;
     options.hardware =
         QSettings().value(QStringLiteral("performance/hardwareDecoding"), QStringLiteral("auto")).toString() !=
@@ -108,7 +155,7 @@ void MainWindow::closeVideo() {
     worker_.reset();
     video_.reset();
     shownFrame_ = {};
-    framePreview_->clear();
+    canvas_->setFrame({});
     canvasStack_->setCurrentWidget(dropZone_);
     videoState_ = QStringLiteral("none");
 }
@@ -120,11 +167,8 @@ void MainWindow::showFrame(const media::Frame& frame) {
         Toast::post(centralWidget(), lastError_, Toast::Kind::Error, 8000);
         return;
     }
-    const QImage image =
-        QImage(frame.data.get(), frame.width, frame.height, frame.stride, QImage::Format_RGBA8888_Premultiplied).copy();
-    const QSize area = canvasStack_->size() - QSize(40, 40);
-    framePreview_->setPixmap(QPixmap::fromImage(image.scaled(area, Qt::KeepAspectRatio, Qt::SmoothTransformation)));
-    canvasStack_->setCurrentWidget(framePreview_);
+    canvasStack_->setCurrentWidget(canvas_);
+    canvas_->setFrame(frame);
     shownFrame_ = QSize(frame.width, frame.height);
     videoState_ = QStringLiteral("ready");
     updateStatus();

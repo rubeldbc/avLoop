@@ -1,5 +1,6 @@
-walk walk-shell.json: 52 steps
+walk walk-shell.json: 53 steps
 -- S1: the window opens maximized with only three buttons in the top bar
+PASS expect window.frame: frame 8,0 1904x1024 · work area 0,0 1920x1032
 PASS expect window.maximized: true
 PASS expect topbar.buttons: Open,Preview,Export
 PASS expect window.title: AvLoop
@@ -14,7 +15,7 @@ PASS expect tool.active: select
 PASS expect tool.active: crop-rect
 PASS expect tool.active: crop-round
 PASS expect tool.active: crop-ellipse
-PASS shot rail-ellipse-active.png: 40x800 px
+PASS shot rail-ellipse-active.png: 40x784 px
 PASS expect tool.active: hand
 PASS expect tool.active: zoom
 PASS expect tool.active: in
@@ -24,18 +25,19 @@ PASS expect tool.active: select
 -- a click on the rail
 PASS expect tool.active: crop-ellipse
 -- the theme switches from the menu without a restart
-PASS shot main-navy.png: 1920x1009 px
+PASS shot main-navy.png: 1904x993 px
      menu: Theme
      menu: Black
 PASS expect theme: black
-PASS shot main-black.png: 1920x1009 px
+PASS shot main-black.png: 1904x993 px
      menu: Theme
      menu: Navy
 PASS expect theme: navy
 -- a section collapses and opens again
-PASS shot side-crop-closed.png: 260x951 px
+PASS shot side-crop-closed.png: 260x935 px
 -- the minimum size, then maximized again
 PASS expect window.size: 1280x720
 PASS shot min-1280x720.png: 1280x720 px
 PASS expect window.maximized: true
+PASS the owner's focus untouched: another program holds the focus
 WALK PASSED

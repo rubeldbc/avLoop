@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/ProjectJson.h"
 #include "media/MediaInfo.h"
 
 #include <QMainWindow>
@@ -26,7 +27,10 @@ class DiskCache;
 class FrameCache;
 } // namespace media
 
+class Canvas;
 class DropZone;
+class Project;
+class ToolManager;
 class SidePanel;
 class Transport;
 
@@ -55,6 +59,10 @@ public:
     void openFiles(const QStringList& paths);
     void openVideo(const QString& path);
     void closeVideo();
+    // A project file (spec §11.1): its source opened, then the rest restored (the file's UX is AV-010's).
+    void openProject(const QString& path);
+    Project* project() const { return project_; }
+    Canvas* canvas() const { return canvas_; }
     media::FrameCache* frameCache() const { return cache_.get(); }
     QString videoState() const { return videoState_; }
 
@@ -83,6 +91,8 @@ private:
     void showFrame(const media::Frame& frame);
     void updateStatus();
     void registerMediaProbes();
+    // MainWindowCanvas.cpp
+    void buildCanvasTools();
 
     QToolButton* menuButton_ = nullptr;
     QMenu* menu_ = nullptr;
@@ -102,7 +112,10 @@ private:
     QLabel* gpuLabel_ = nullptr;
     QLabel* memoryLabel_ = nullptr;
     QWidget* exportArea_ = nullptr;
-    QLabel* framePreview_ = nullptr; // the frame until the canvas (AV-003)
+    Project* project_ = nullptr;
+    Canvas* canvas_ = nullptr;
+    ToolManager* tools_ = nullptr;
+    std::optional<ProjectData> pendingProject_; // read, waiting for its source to open
     bool shownOnce_ = false;
 
     std::unique_ptr<media::DiskCache> disk_;

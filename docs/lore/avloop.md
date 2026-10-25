@@ -52,3 +52,28 @@ end of its section.
   Write tool. (AV-002)
 - **A memory walk compares like with like**: Private Bytes and VRAM swing with the video open (D3D11 surfaces); the
   growth is the later rounds' peaks against the first round's, not a peak against an arbitrary moment. (AV-002)
+
+## The canvas (Qt and OpenGL)
+
+- **`QWidget::grab()` leaves out what QPainter drew on a QOpenGLWidget**: the GL clear and draws are in the picture,
+  the painter's overlay is not (on screen it shows; `grabFramebuffer()` has it). Rule: walks and `--shot` take pictures
+  through `WalkRunner::grabWidget`, which draws each visible QOpenGLWidget's own framebuffer in again. (AV-003)
+- **A new Qt module needs its DLL in build\bin**: windeployqt ran once at AV-001 and the OpenGL modules were missing —
+  the app exited with 0xC0000135 and no message. Rule: `scripts\build.ps1` runs windeployqt after every build. (AV-003)
+- **Python's text mode writes CRLF on Windows**: files edited by a Python script turned CRLF and multi-line edits by
+  pattern stopped matching. Rule: scripted edits go through Node (`fs.writeFileSync` keeps LF) or the Edit tool;
+  `.gitattributes` stores LF. (AV-003)
+- **QUndoStack lives in Qt Gui in Qt 6**: the core links Qt Gui for it alone (reading R-17); no other Gui class enters
+  `src/core`. (AV-003)
+- **A walk must never take the system's focus**: it runs on the owner's desktop while the owner works; a walk that
+  raised its window caught the owner's real keystrokes ("I" switched the tool to In), and a plain `showMaximized()`
+  took the foreground in 2 of 3 lab starts. Rule: lab windows show without activating (`WA_ShowWithoutActivating`),
+  are sized by `SetWindowPos(SWP_NOACTIVATE)` (`WalkRunner::placeQuietly`: the work area for "maximized"), key and
+  menu steps set only Qt's own active window, and every walk ends with the check "the owner's focus untouched". No
+  exploratory loops of window launches either: each one lands on the owner's screen. (AV-003)
+- **Windows' resize borders are invisible**: a window filling the work area reports a frame 8 px inside it on each
+  side. Rule: "covers the work area" allows 12 px. (AV-003)
+- **windows.h defines `near` and `far`** (empty macros): a variable named `near` stopped compiling the moment a file
+  included it. Rule: no identifiers `near`, `far`; `NOMINMAX` is already set. (AV-003)
+- **A drag in scene px lands on whole view pixels**: at a fit zoom of 1.62 a 100 px scene move came out 99.4. Rule:
+  canvas expectations allow one view pixel (±1 scene px at fit zooms). (AV-003)

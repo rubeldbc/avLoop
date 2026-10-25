@@ -61,7 +61,8 @@ Invoke-Native 'cmake' @('--build', $BuildDir)
 
 $bin = Join-Path $BuildDir 'bin'
 $exe = Join-Path $bin 'avloop.exe'
-if ((Test-Path $exe) -and -not (Test-Path (Join-Path $bin 'platforms'))) {
+# Every build: a new Qt module (OpenGL at AV-003) needs its DLL beside the exe; windeployqt copies only what changed.
+if (Test-Path $exe) {
     Invoke-Native (Join-Path $qt 'bin\windeployqt.exe') @('--no-translations', '--no-system-d3d-compiler', '--no-opengl-sw', '--no-compiler-runtime', $exe) | Out-Null
 }
 if ($Sanitize) {
