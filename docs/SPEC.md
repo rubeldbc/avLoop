@@ -6,7 +6,30 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
-(none yet)
+### D-001 — The ground (AV-001, 2026-10-26)
+
+- The repository builds with `scripts\fetch-deps.ps1` (FFmpeg n7.1.5 LGPL shared, pinned by SHA-256, newest-7.1
+  fallback) and `scripts\build.ps1` (MSVC v143 by vswhere, Ninja, Qt 6.8.3; `/W4 /WX /permissive- /utf-8`; outputs in
+  `build\bin` with windeployqt's Qt DLLs and the FFmpeg DLLs). `avloop-cli version` prints FFmpeg's version,
+  configuration and licence ("LGPL version 3 or later") and fails on `--enable-gpl` or `--enable-nonfree`.
+- `avloop.exe` opens maximized (minimum 1280×720; the normal geometry and both splitters remembered in
+  `%APPDATA%\AvLoop\AvLoop.ini`): the 36 px top bar (☰, the logo, *AvLoop*, Open | the options bar's slot | Preview,
+  Export — the only three buttons), the 40 px tool rail (nine tools in four groups; tooltips "Name (Key)"; V M U E H Z I
+  O K switch at once; the active tool orange), the canvas area with the drop zone (dashed, Open video…), the 260 px
+  side panel (a preset row; Crop, Loop, Output, Quality sections, collapsible, state remembered), the timeline area
+  (transport row: Go to In, Prev, Play, Next, Go to Out, Loop; the time readout) and the 22 px status bar. Open,
+  Preview, Export and the transport are disabled until a video can be opened (AV-002 on).
+- The ☰ menu lists New, Open Project…, Save, Save As…, Recent, Undo, Redo, Batch Queue…, Loop Finder…, Theme (Navy,
+  Black), Settings…, Keyboard shortcuts, About AvLoop, Exit; Theme and Exit work, the rest wait for their phases.
+- Navy (default) and Black come from one token table (`Theme.cpp`) into `resources/themes/app.qss` + the theme's own
+  file, written with `@token` placeholders only; the switch needs no restart.
+- 43 icons of spec §5.3 drawn by the app (24×24, stroke 1.75, `currentColor`), recoloured per state (normal text2,
+  hover text, active accent, disabled 40%) and rendered per device pixel ratio; the app icon `avloop.ico` (16 … 256)
+  made from `avloop.svg` by `tools/icons/iconbake.cpp`; every window uses it.
+- The lab: `--shot <png>`, `--walk <script> --walk-out <dir>`, `--theme`, `--tool`, `--scale`; lab runs keep their
+  settings in a temporary folder.
+
+(sections below: the owner's specification as written)
 
 ## 1. Summary
 

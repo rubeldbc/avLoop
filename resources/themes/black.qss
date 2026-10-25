@@ -1,0 +1,11 @@
+/* Black: its own rules after app.qss. Tokens only. On near-black panels the hover needs the stronger border. */
+
+QToolButton:hover {
+    border-color: @text2;
+}
+#DropZoneTitle {
+    color: @text;
+}
+#DropZoneHint {
+    color: @text2;
+}

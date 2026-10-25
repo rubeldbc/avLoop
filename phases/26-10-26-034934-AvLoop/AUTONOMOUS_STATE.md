@@ -8,9 +8,9 @@ words: *"I want to build a piece of software called AvLoop. Its main job is to t
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: AV-001
-Next eligible: AV-001 (in progress)
-Completed: 0 of 16
+Active phase: AV-002
+Next eligible: AV-002 (in progress)
+Completed: 1 of 16
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -60,4 +60,4 @@ where `--shot` and `--walk` open their window for seconds and close it.
 ## Completion record
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
-- (none yet — the programme is planned)
+- **AV-001** DONE 2026-10-26 — The ground (D-001): the CMake/MSVC/Qt 6.8.3/FFmpeg 7.1.5 LGPL build with its gates, the maximized shell with the §5 layout, Navy and Black from one token table, 43 own icons and avloop.ico, --shot/--walk, avloop-cli version (licence gate), CI, open-source files, README v1; 2 test suites, walk-shell PASSED. Record: `execution/AV-001-EXECUTION.md`.

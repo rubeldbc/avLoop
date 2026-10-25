@@ -1,0 +1,12 @@
+# Text files are stored with LF and checked out with LF, so clang-format, Node and the gates see the same bytes on
+# every machine. PowerShell scripts and the installer script keep CRLF for Windows' own tools.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.iss text eol=crlf
+*.rc text eol=crlf
+
+# Binaries
+*.png binary
+*.ico binary
+*.webm binary
+*.mp4 binary

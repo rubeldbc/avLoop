@@ -1,0 +1,10 @@
+{
+  "delay": 120,
+  "settle": 800,
+  "log": false,
+  "steps": [
+    { "label": "README: the main window (docs/screenshots, each PNG under 300 KB)" },
+    { "do": "expect", "probe": "window.maximized", "eq": true },
+    { "do": "shot", "file": "main-window.png", "maxWidth": 1600 }
+  ]
+}

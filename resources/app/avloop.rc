@@ -1,0 +1,2 @@
+// The executable's icon (spec §5.3): avloop.ico, made from avloop.svg by tools/icons/iconbake.cpp.
+IDI_ICON1 ICON "avloop.ico"

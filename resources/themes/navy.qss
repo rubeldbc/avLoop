@@ -1,0 +1,11 @@
+/* Navy (the default theme): its own rules after app.qss. Tokens only. */
+
+QMenu {
+    border-color: @border;
+}
+#DropZoneTitle {
+    color: @text;
+}
+#DropZoneHint {
+    color: @text2;
+}

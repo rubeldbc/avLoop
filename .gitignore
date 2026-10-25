@@ -1,0 +1,28 @@
+# Builds and deployments
+/build*/
+/out/
+/deploy/
+/installer/Output/
+/.vs/
+/.cache/
+CMakeUserPresets.json
+
+# Fetched dependencies (scripts/fetch-deps.ps1)
+/third_party/
+
+# Generated test media (tools/media/make-samples.mjs)
+/samples/
+
+# Node
+node_modules/
+
+# Editors and OS
+*.user
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+
+# Crash and log leftovers
+*.dmp
+*.part

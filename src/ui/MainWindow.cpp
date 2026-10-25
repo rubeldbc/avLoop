@@ -1,0 +1,301 @@
+#include "ui/MainWindow.h"
+
+#include "core/AppInfo.h"
+#include "ui/WalkRunner.h"
+#include "ui/canvas/DropZone.h"
+#include "ui/panels/SidePanel.h"
+#include "ui/theme/IconFactory.h"
+#include "ui/theme/Theme.h"
+#include "ui/timeline/Transport.h"
+
+#include <QAction>
+#include <QButtonGroup>
+#include <QCloseEvent>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QSettings>
+#include <QSplitter>
+#include <QStackedWidget>
+#include <QStatusBar>
+#include <QTimer>
+#include <QToolButton>
+#include <QVBoxLayout>
+
+namespace avloop {
+
+namespace {
+
+QFrame* separator(const QString& name, Qt::Orientation orientation, QWidget* parent) {
+    auto* line = new QFrame(parent);
+    line->setObjectName(name);
+    line->setAttribute(Qt::WA_StyledBackground);
+    if (orientation == Qt::Vertical)
+        line->setFixedSize(1, 20);
+    else
+        line->setFixedSize(24, 1);
+    return line;
+}
+
+} // namespace
+
+QList<MainWindow::ToolInfo> MainWindow::tools() {
+    return {
+        {QStringLiteral("select"), QStringLiteral("tool-select"), tr("Selection"), QKeySequence(Qt::Key_V)},
+        {QStringLiteral("crop-rect"), QStringLiteral("tool-crop-rect"), tr("Crop: Rectangle"), QKeySequence(Qt::Key_M)},
+        {QStringLiteral("crop-round"), QStringLiteral("tool-crop-round"), tr("Crop: Rounded"), QKeySequence(Qt::Key_U)},
+        {QStringLiteral("crop-ellipse"), QStringLiteral("tool-crop-ellipse"), tr("Crop: Ellipse"),
+         QKeySequence(Qt::Key_E)},
+        {QStringLiteral("hand"), QStringLiteral("tool-hand"), tr("Hand"), QKeySequence(Qt::Key_H)},
+        {QStringLiteral("zoom"), QStringLiteral("tool-zoom"), tr("Zoom"), QKeySequence(Qt::Key_Z)},
+        {QStringLiteral("in"), QStringLiteral("tool-in"), tr("In"), QKeySequence(Qt::Key_I)},
+        {QStringLiteral("out"), QStringLiteral("tool-out"), tr("Out"), QKeySequence(Qt::Key_O)},
+        {QStringLiteral("keyframe"), QStringLiteral("tool-keyframe"), tr("Keyframe"), QKeySequence(Qt::Key_K)},
+    };
+}
+
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
+    setObjectName(QStringLiteral("MainWindow"));
+    setWindowTitle(AppInfo::name());
+    setMinimumSize(1280, 720);
+
+    auto* central = new QWidget(this);
+    auto* column = new QVBoxLayout(central);
+    column->setContentsMargins(0, 0, 0, 0);
+    column->setSpacing(0);
+    column->addWidget(buildTopBar());
+
+    auto* canvasRow = new QWidget(central);
+    auto* canvasLayout = new QHBoxLayout(canvasRow);
+    canvasLayout->setContentsMargins(0, 0, 0, 0);
+    canvasLayout->setSpacing(0);
+    canvasLayout->addWidget(buildRail());
+    canvasStack_ = new QStackedWidget(canvasRow);
+    canvasStack_->setObjectName(QStringLiteral("CanvasArea"));
+    canvasStack_->setAttribute(Qt::WA_StyledBackground);
+    dropZone_ = new DropZone(canvasStack_);
+    dropZone_->openButton()->setEnabled(false);
+    canvasStack_->addWidget(dropZone_);
+    canvasLayout->addWidget(canvasStack_, 1);
+
+    centreSplit_ = new QSplitter(Qt::Vertical, central);
+    centreSplit_->setObjectName(QStringLiteral("split.centre"));
+    centreSplit_->setChildrenCollapsible(false);
+    centreSplit_->setHandleWidth(1);
+    centreSplit_->addWidget(canvasRow);
+    centreSplit_->addWidget(buildTimelineArea());
+    centreSplit_->setStretchFactor(0, 1);
+
+    side_ = new SidePanel(central);
+    side_->setMinimumWidth(220);
+    mainSplit_ = new QSplitter(Qt::Horizontal, central);
+    mainSplit_->setObjectName(QStringLiteral("split.main"));
+    mainSplit_->setChildrenCollapsible(false);
+    mainSplit_->setHandleWidth(1);
+    mainSplit_->addWidget(centreSplit_);
+    mainSplit_->addWidget(side_);
+    mainSplit_->setStretchFactor(0, 1);
+    column->addWidget(mainSplit_, 1);
+    setCentralWidget(central);
+
+    buildStatusBar();
+    buildMenu();
+    registerProbes();
+    restoreLayout();
+    selectTool(QStringLiteral("select"));
+}
+
+MainWindow::~MainWindow() = default;
+
+QWidget* MainWindow::buildTopBar() {
+    auto* bar = new QWidget(this);
+    bar->setObjectName(QStringLiteral("TopBar"));
+    bar->setAttribute(Qt::WA_StyledBackground);
+    bar->setFixedHeight(36);
+    auto* row = new QHBoxLayout(bar);
+    row->setContentsMargins(8, 0, 8, 0);
+    row->setSpacing(8);
+
+    menuButton_ = new QToolButton(bar);
+    menuButton_->setObjectName(QStringLiteral("menu.button"));
+    menuButton_->setIcon(IconFactory::icon(QStringLiteral("menu")));
+    menuButton_->setIconSize(QSize(18, 18));
+    menuButton_->setToolTip(tr("Menu"));
+    menuButton_->setAutoRaise(true);
+    menuButton_->setPopupMode(QToolButton::InstantPopup);
+    row->addWidget(menuButton_);
+
+    auto* logo = new QLabel(bar);
+    logo->setPixmap(IconFactory::appIcon().pixmap(QSize(20, 20)));
+    auto* title = new QLabel(AppInfo::name(), bar);
+    title->setObjectName(QStringLiteral("AppTitle"));
+    row->addWidget(logo);
+    row->addWidget(title);
+    row->addSpacing(6);
+
+    open_ = new QPushButton(IconFactory::icon(QStringLiteral("open")), tr("Open"), bar);
+    open_->setObjectName(QStringLiteral("topbar.open"));
+    open_->setToolTip(tr("Open a video or project (Ctrl+O)"));
+    open_->setEnabled(false);
+    row->addWidget(open_);
+    row->addWidget(separator(QStringLiteral("TopBarSeparator"), Qt::Vertical, bar));
+
+    options_ = new QStackedWidget(bar);
+    options_->setObjectName(QStringLiteral("OptionsBar"));
+    options_->addWidget(new QWidget(options_));
+    row->addWidget(options_, 1);
+    row->addWidget(separator(QStringLiteral("TopBarSeparator"), Qt::Vertical, bar));
+
+    preview_ = new QPushButton(IconFactory::icon(QStringLiteral("preview")), tr("Preview"), bar);
+    preview_->setObjectName(QStringLiteral("topbar.preview"));
+    preview_->setToolTip(tr("Preview (F5)"));
+    preview_->setEnabled(false);
+    export_ = new QPushButton(IconFactory::icon(QStringLiteral("export"), IconTone::OnAccent), tr("Export"), bar);
+    export_->setObjectName(QStringLiteral("topbar.export"));
+    export_->setProperty("primary", true);
+    export_->setToolTip(tr("Export (Ctrl+E)"));
+    export_->setEnabled(false);
+    row->addWidget(preview_);
+    row->addWidget(export_);
+    return bar;
+}
+
+QWidget* MainWindow::buildRail() {
+    auto* rail = new QWidget(this);
+    rail->setObjectName(QStringLiteral("ToolRail"));
+    rail->setAttribute(Qt::WA_StyledBackground);
+    rail->setFixedWidth(40);
+    auto* column = new QVBoxLayout(rail);
+    column->setContentsMargins(4, 6, 4, 6);
+    column->setSpacing(2);
+    column->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+
+    toolGroup_ = new QButtonGroup(rail);
+    toolGroup_->setExclusive(true);
+    const QStringList groupEnds = {QStringLiteral("select"), QStringLiteral("crop-ellipse"), QStringLiteral("zoom")};
+    for (const ToolInfo& tool : tools()) {
+        auto* b = new QToolButton(rail);
+        b->setObjectName(QStringLiteral("tool.%1").arg(tool.id));
+        b->setIcon(IconFactory::icon(tool.icon));
+        b->setIconSize(QSize(20, 20));
+        b->setFixedSize(32, 32);
+        b->setCheckable(true);
+        b->setAutoRaise(true);
+        b->setToolTip(QStringLiteral("%1 (%2)").arg(tool.name, tool.key.toString(QKeySequence::NativeText)));
+        b->setProperty("toolId", tool.id);
+        toolGroup_->addButton(b);
+        // The key switches at once (a button's own shortcut would animate a click for 100 ms first).
+        auto* key = new QAction(b);
+        key->setShortcut(tool.key);
+        connect(key, &QAction::triggered, this, [this, id = tool.id] { selectTool(id); });
+        addAction(key);
+        column->addWidget(b, 0, Qt::AlignHCenter);
+        if (groupEnds.contains(tool.id))
+            column->addWidget(separator(QStringLiteral("RailSeparator"), Qt::Horizontal, rail), 0, Qt::AlignHCenter);
+    }
+    return rail;
+}
+
+QWidget* MainWindow::buildTimelineArea() {
+    auto* area = new QWidget(this);
+    area->setObjectName(QStringLiteral("TimelineArea"));
+    area->setAttribute(Qt::WA_StyledBackground);
+    area->setMinimumHeight(110);
+    area->setMaximumHeight(260);
+    auto* column = new QVBoxLayout(area);
+    column->setContentsMargins(0, 0, 0, 0);
+    column->setSpacing(0);
+    transport_ = new Transport(area);
+    column->addWidget(transport_);
+    auto* rows = new QWidget(area);
+    rows->setObjectName(QStringLiteral("TimelineRows"));
+    column->addWidget(rows, 1);
+    return area;
+}
+
+void MainWindow::buildStatusBar() {
+    auto* bar = statusBar();
+    bar->setSizeGripEnabled(false);
+    bar->setFixedHeight(22);
+    sourceLabel_ = new QLabel(tr("No video open"), bar);
+    sourceLabel_->setObjectName(QStringLiteral("status.source"));
+    gpuLabel_ = new QLabel(bar);
+    gpuLabel_->setObjectName(QStringLiteral("status.gpu"));
+    exportArea_ = new QWidget(bar);
+    exportArea_->setObjectName(QStringLiteral("status.export"));
+    exportArea_->hide();
+    memoryLabel_ = new QLabel(bar);
+    memoryLabel_->setObjectName(QStringLiteral("status.memory"));
+    bar->addWidget(sourceLabel_);
+    bar->addWidget(gpuLabel_);
+    bar->addPermanentWidget(exportArea_);
+    bar->addPermanentWidget(memoryLabel_);
+}
+
+void MainWindow::registerProbes() {
+    WalkProbes::add(QStringLiteral("window.maximized"), [this] { return isMaximized(); });
+    WalkProbes::add(QStringLiteral("window.title"), [this] { return windowTitle(); });
+    WalkProbes::add(QStringLiteral("window.size"),
+                    [this] { return QStringLiteral("%1x%2").arg(width()).arg(height()); });
+    WalkProbes::add(QStringLiteral("topbar.buttons"), [this] { return topBarButtons().join(QLatin1Char(',')); });
+    WalkProbes::add(QStringLiteral("tool.active"), [this] { return activeTool(); });
+    WalkProbes::add(QStringLiteral("rail.count"), [this] { return toolGroup_->buttons().size(); });
+    WalkProbes::add(QStringLiteral("theme"), [] { return Theme::idName(Theme::instance().id()); });
+    WalkProbes::add(QStringLiteral("icons.missing"), [] {
+        QStringList missing;
+        for (const QString& name : IconFactory::allNames())
+            if (!IconFactory::exists(name)) missing << name;
+        return missing.isEmpty() ? QStringLiteral("none") : missing.join(QLatin1Char(','));
+    });
+    WalkProbes::add(QStringLiteral("icons.count"), [] { return IconFactory::allNames().size(); });
+    WalkProbes::add(QStringLiteral("status.source"), [this] { return sourceLabel_->text(); });
+    WalkProbes::add(QStringLiteral("dropzone.visible"), [this] { return dropZone_->isVisible(); });
+}
+
+void MainWindow::selectTool(const QString& id) {
+    for (QAbstractButton* b : toolGroup_->buttons())
+        if (b->property("toolId").toString() == id) b->setChecked(true);
+}
+
+QString MainWindow::activeTool() const {
+    QAbstractButton* b = toolGroup_->checkedButton();
+    return b ? b->property("toolId").toString() : QString();
+}
+
+QStringList MainWindow::topBarButtons() const {
+    QStringList names;
+    for (QPushButton* b : {open_, preview_, export_})
+        if (b->isVisible()) names << b->text();
+    return names;
+}
+
+void MainWindow::showEvent(QShowEvent* event) {
+    QMainWindow::showEvent(event);
+    if (!shownOnce_) {
+        shownOnce_ = true;
+        QTimer::singleShot(0, this, &MainWindow::firstShown);
+    }
+}
+
+void MainWindow::closeEvent(QCloseEvent* event) {
+    saveLayout();
+    QMainWindow::closeEvent(event);
+}
+
+void MainWindow::restoreLayout() {
+    QSettings s;
+    restoreGeometry(s.value(QStringLiteral("ui/windowGeometry")).toByteArray());
+    if (!mainSplit_->restoreState(s.value(QStringLiteral("ui/splitMain")).toByteArray()))
+        mainSplit_->setSizes({1000, 260});
+    if (!centreSplit_->restoreState(s.value(QStringLiteral("ui/splitCentre")).toByteArray()))
+        centreSplit_->setSizes({600, 150});
+}
+
+void MainWindow::saveLayout() const {
+    QSettings s;
+    s.setValue(QStringLiteral("ui/windowGeometry"), saveGeometry());
+    s.setValue(QStringLiteral("ui/splitMain"), mainSplit_->saveState());
+    s.setValue(QStringLiteral("ui/splitCentre"), centreSplit_->saveState());
+}
+
+} // namespace avloop

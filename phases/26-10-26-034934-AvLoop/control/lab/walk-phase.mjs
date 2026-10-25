@@ -32,7 +32,7 @@ for (const walk of walks) {
     ? spawnSync(lab.bin('avloop'), ['--walk', script, '--walk-out', into], { encoding: 'utf8', cwd: lab.REPO, timeout: 295000 })
     : spawnSync(process.execPath, [script], { encoding: 'utf8', cwd: into, timeout: 295000 });
   const out = `${run.stdout ?? ''}${run.stderr ?? ''}`;
-  fs.writeFileSync(path.join(into, `${path.basename(walk).replace(/\.(json|mjs)$/, '')}.log`), out);
+  fs.writeFileSync(path.join(into, `${path.basename(walk)}.log`), out);
   const verdict = /WALK PASSED/.test(out) ? 'PASSED' : /WALK FAILED/.test(out) ? 'FAILED' : `ENDED ${run.status ?? run.signal}`;
   if (verdict !== 'PASSED') failed++;
   line(`${verdict} ${walk} (${Math.round((Date.now() - began) / 1000)} s)`);

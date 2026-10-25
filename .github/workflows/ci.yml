@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build, test and gates (Windows)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Qt 6.8.3
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          host: windows
+          target: desktop
+          arch: win64_msvc2022_64
+          cache: true
+
+      - name: Cache the FFmpeg download
+        uses: actions/cache@v4
+        with:
+          path: third_party/_downloads
+          key: ffmpeg-${{ hashFiles('scripts/fetch-deps.ps1') }}
+
+      - name: Fetch FFmpeg 7.1 (LGPL)
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: scripts/fetch-deps.ps1
+
+      - name: Build (Release, warnings as errors)
+        shell: pwsh
+        run: scripts/build.ps1 -Config Release
+
+      - name: Licence gate (no GPL FFmpeg)
+        shell: pwsh
+        run: build/bin/avloop-cli.exe version
+
+      - name: Unit tests (no GPU on the runner)
+        shell: pwsh
+        run: ctest --test-dir build --output-on-failure --timeout 300 -R avloop -LE gpu
+
+      - name: Gates
+        shell: pwsh
+        run: |
+          node phases/26-10-26-034934-AvLoop/control/phase-tools/check-loc.mjs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          node tools/check-secrets.mjs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          node tools/icons/check-icons.mjs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          node phases/26-10-26-034934-AvLoop/control/phase-tools/validate-phase-system.mjs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          scripts/format.ps1 -Check

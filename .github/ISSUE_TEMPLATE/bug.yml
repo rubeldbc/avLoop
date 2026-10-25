@@ -1,0 +1,45 @@
+name: Bug report
+description: Something in AvLoop does not work as it should.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected and what you saw instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open …
+        2. Draw an ellipse crop …
+        3. Export …
+    validations:
+      required: true
+  - type: textarea
+    id: video
+    attributes:
+      label: The video
+      description: Paste the output of `avloop-cli probe <your video>` (container, codec, size, frame rate).
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: AvLoop version
+      placeholder: 1.0.0 (Menu → About)
+    validations:
+      required: true
+  - type: input
+    id: system
+    attributes:
+      label: Windows and GPU
+      placeholder: Windows 11 23H2, NVIDIA GeForce RTX 3060
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: The newest file in %LOCALAPPDATA%\AvLoop\logs (remove anything private).
+      render: text

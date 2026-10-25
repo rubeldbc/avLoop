@@ -1,0 +1,23 @@
+name: Feature request
+description: Suggest an improvement to AvLoop.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to make for OBS, and what gets in the way?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: How should AvLoop help? Tools, options, shortcuts — whatever you picture.
+    validations:
+      required: true
+  - type: textarea
+    id: else
+    attributes:
+      label: Anything else
+      description: Other apps that do it well, sketches, sample files.

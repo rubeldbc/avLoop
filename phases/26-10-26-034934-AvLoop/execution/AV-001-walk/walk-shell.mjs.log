@@ -1,0 +1,15 @@
+PASS avloop-cli version (no --enable-gpl): LGPL version 3 or later
+PASS second start: window shown: 184 ms (first 189 ms; process 1114 ms with the 800 ms settle)
+PASS shot s1-navy-100.png: 1920×1009 px, 36 KB
+     canvas background at 45%,25%: rgb(14, 23, 38)
+PASS shot s1-navy-150.png: 1920×1010 px, 55 KB
+     canvas background at 45%,25%: rgb(14, 23, 38)
+PASS shot s1-navy-200.png: 1920×1010 px, 67 KB
+     canvas background at 45%,25%: rgb(14, 23, 38)
+PASS shot s1-black-100.png: 1920×1009 px, 35 KB
+     canvas background at 45%,25%: rgb(11, 11, 12)
+PASS shot s1-black-150.png: 1920×1010 px, 54 KB
+     canvas background at 45%,25%: rgb(11, 11, 12)
+PASS shot s1-black-200.png: 1920×1010 px, 65 KB
+     canvas background at 45%,25%: rgb(11, 11, 12)
+WALK PASSED
