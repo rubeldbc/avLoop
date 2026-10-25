@@ -1,0 +1,5 @@
+PASS the open cycle ran: 42 steps, exit 0
+PASS Private Bytes: the later rounds against the first: round peaks 254 / 270 / 260 MB → growth 16.0 MB, 26 samples
+PASS VRAM: the later rounds against the first: round peaks 305 / 305 / 305 MB → growth 0.0 MB
+     cache at the end: 1 MB
+WALK PASSED

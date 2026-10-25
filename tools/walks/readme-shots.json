@@ -5,6 +5,9 @@
   "steps": [
     { "label": "README: the main window (docs/screenshots, each PNG under 300 KB)" },
     { "do": "expect", "probe": "window.maximized", "eq": true },
+    { "do": "open", "file": "samples/readme-demo.mp4" },
+    { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 15000 },
+    { "do": "wait", "ms": 500 },
     { "do": "shot", "file": "main-window.png", "maxWidth": 1600 }
   ]
 }

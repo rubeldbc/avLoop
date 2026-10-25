@@ -1,6 +1,8 @@
 // avloop-cli.exe (spec §2.6, §3.2): the same core without a GUI, for the lab and for scripts.
 //   avloop-cli version     AvLoop's version and FFmpeg's libraries, configuration and licence; refuses a GPL build
-// Later phases add: probe, frame, export.
+//   avloop-cli probe …     a video's reading (CliMedia.cpp)
+//   avloop-cli frame …     a normalized frame as a PNG (CliMedia.cpp)
+// Later phases add: export.
 #include "core/AppInfo.h"
 
 #include <QCoreApplication>
@@ -13,6 +15,11 @@ extern "C" {
 }
 
 #include <cstdio>
+
+namespace avloop::cli {
+int probe(const QStringList& args);
+int frame(const QStringList& args);
+} // namespace avloop::cli
 
 namespace {
 
@@ -43,7 +50,7 @@ int version() {
 }
 
 int usage() {
-    out(QStringLiteral("usage: avloop-cli version"));
+    out(QStringLiteral("usage: avloop-cli version | probe <video> | frame <video> --at N -o x.png"));
     return 1;
 }
 
@@ -55,5 +62,7 @@ int main(int argc, char** argv) {
     const QStringList args = QCoreApplication::arguments().mid(1);
     if (args.isEmpty()) return usage();
     if (args.first() == QLatin1String("version")) return version();
+    if (args.first() == QLatin1String("probe")) return avloop::cli::probe(args.mid(1));
+    if (args.first() == QLatin1String("frame")) return avloop::cli::frame(args.mid(1));
     return usage();
 }

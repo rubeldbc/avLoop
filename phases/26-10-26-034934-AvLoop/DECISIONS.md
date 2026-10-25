@@ -41,3 +41,5 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-12 | `gh` gets `GH_TOKEN` from git's credential manager per command | §2.9's "existing git credentials"; nothing stored | `README.md` §3 |
 | R-13 | The `.avloop` format is written by AV-003; AV-010 builds its UX | every walk and `avloop-cli` need projects early | `README.md` §3 |
 | R-14 | Encoder and muxer built by AV-008, reused by AV-009 | Encoded preview precedes Export in the order | `README.md` §3 |
+| R-15 | An animated WebP is refused with a plain message | no FFmpeg (7.1, 8.1) decodes it; no decoder of our own was asked for | `README.md` §3; AV-002 |
+| R-16 | The working size before a crop: the display size, long side ≤ 1920 | spec §3.7.3, no full 4K frames kept | `README.md` §3; AV-002 |

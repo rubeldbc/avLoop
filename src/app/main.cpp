@@ -2,8 +2,12 @@
 //   --shot <file.png> [--theme navy|black] [--tool <id>]   open maximized, grab the window, exit
 //   --walk <script.json> --walk-out <folder>               replay a walk on the real widgets, exit with its verdict
 //   --scale <factor>                                       the display scale (S1 at 100/150/200%)
+//   --mem-log <file>                                       Private Bytes, VRAM and the cache every second (spec §3.7.8)
 // In lab mode the settings live in a temporary folder, never the owner's.
 #include "core/AppInfo.h"
+#include "media/DiskCache.h"
+#include "media/FrameCache.h"
+#include "media/SystemMemory.h"
 #include "ui/MainWindow.h"
 #include "ui/WalkRunner.h"
 #include "ui/theme/IconFactory.h"
@@ -13,6 +17,7 @@
 #include <QCommandLineParser>
 #include <QDir>
 #include <QElapsedTimer>
+#include <QFile>
 #include <QSettings>
 #include <QTemporaryDir>
 #include <QTimer>
@@ -61,7 +66,9 @@ int main(int argc, char** argv) {
     const QCommandLineOption tool(QStringLiteral("tool"), QStringLiteral("The active tool."), QStringLiteral("id"));
     const QCommandLineOption scale(QStringLiteral("scale"), QStringLiteral("Display scale factor."),
                                    QStringLiteral("factor"));
-    cli.addOptions({shot, walk, walkOut, theme, tool, scale});
+    const QCommandLineOption memLog(QStringLiteral("mem-log"), QStringLiteral("Log memory every second."),
+                                    QStringLiteral("file"));
+    cli.addOptions({shot, walk, walkOut, theme, tool, scale, memLog});
     cli.addPositionalArgument(QStringLiteral("file"), QStringLiteral("A video or project to open."));
     cli.process(app);
 
@@ -77,12 +84,35 @@ int main(int argc, char** argv) {
     avloop::Theme::instance().apply(avloop::Theme::idFromName(themeName));
     QApplication::setWindowIcon(avloop::IconFactory::appIcon());
 
+    avloop::media::DiskCache::removeStaleSessions();
     avloop::MainWindow window;
     if (cli.isSet(tool)) window.selectTool(cli.value(tool));
     QObject::connect(&window, &avloop::MainWindow::firstShown, &window, [&] {
         if (lab) say(QStringLiteral("startup: %1 ms").arg(clock.elapsed()));
     });
     window.showMaximized();
+    if (!cli.positionalArguments().isEmpty()) window.openFiles(cli.positionalArguments());
+
+    // --mem-log: one line a second — ms since start, Private Bytes, VRAM, cache (MB).
+    QFile memFile;
+    QTimer memTimer;
+    if (cli.isSet(memLog)) {
+        memFile.setFileName(cli.value(memLog));
+        if (memFile.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+            memFile.write("ms,private_mb,vram_mb,cache_mb\n");
+            QObject::connect(&memTimer, &QTimer::timeout, &window, [&] {
+                const avloop::media::MemorySnapshot m = avloop::media::SystemMemory::read();
+                memFile.write(QStringLiteral("%1,%2,%3,%4\n")
+                                  .arg(clock.elapsed())
+                                  .arg(double(m.privateBytes) / (1 << 20), 0, 'f', 1)
+                                  .arg(double(m.vramUsed) / (1 << 20), 0, 'f', 1)
+                                  .arg(double(window.frameCache()->used()) / (1 << 20), 0, 'f', 1)
+                                  .toLatin1());
+                memFile.flush();
+            });
+            memTimer.start(1000);
+        }
+    }
 
     std::unique_ptr<avloop::WalkRunner> runner;
     if (cli.isSet(shot)) {

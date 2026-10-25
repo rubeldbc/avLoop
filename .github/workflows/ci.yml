@@ -15,11 +15,11 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install Qt 6.8.3
         uses: jurplel/install-qt-action@v4
@@ -31,7 +31,7 @@ jobs:
           cache: true
 
       - name: Cache the FFmpeg download
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: third_party/_downloads
           key: ffmpeg-${{ hashFiles('scripts/fetch-deps.ps1') }}
@@ -45,6 +45,10 @@ jobs:
       - name: Build (Release, warnings as errors)
         shell: pwsh
         run: scripts/build.ps1 -Config Release
+
+      - name: Make the sample videos (the media tests read them)
+        shell: pwsh
+        run: node tools/media/make-samples.mjs
 
       - name: Licence gate (no GPL FFmpeg)
         shell: pwsh

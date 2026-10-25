@@ -1,6 +1,9 @@
 #include "ui/MainWindow.h"
 
 #include "core/AppInfo.h"
+#include "media/DecodeWorker.h"
+#include "media/DiskCache.h"
+#include "media/FrameCache.h"
 #include "ui/WalkRunner.h"
 #include "ui/canvas/DropZone.h"
 #include "ui/panels/SidePanel.h"
@@ -58,6 +61,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setObjectName(QStringLiteral("MainWindow"));
     setWindowTitle(AppInfo::name());
     setMinimumSize(1280, 720);
+    setAcceptDrops(true);
+    disk_ = std::make_unique<media::DiskCache>();
+    const qint64 ramMb = QSettings().value(QStringLiteral("performance/ramCacheMB"), 1536).toLongLong();
+    cache_ = std::make_unique<media::FrameCache>(ramMb << 20);
+    cache_->setDiskCache(disk_.get());
 
     auto* central = new QWidget(this);
     auto* column = new QVBoxLayout(central);
@@ -74,8 +82,13 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     canvasStack_->setObjectName(QStringLiteral("CanvasArea"));
     canvasStack_->setAttribute(Qt::WA_StyledBackground);
     dropZone_ = new DropZone(canvasStack_);
-    dropZone_->openButton()->setEnabled(false);
     canvasStack_->addWidget(dropZone_);
+    framePreview_ = new QLabel(canvasStack_);
+    framePreview_->setObjectName(QStringLiteral("FramePreview"));
+    framePreview_->setAlignment(Qt::AlignCenter);
+    canvasStack_->addWidget(framePreview_);
+    connect(dropZone_, &DropZone::openRequested, this, &MainWindow::chooseFile);
+    connect(dropZone_, &DropZone::filesDropped, this, &MainWindow::openFiles);
     canvasLayout->addWidget(canvasStack_, 1);
 
     centreSplit_ = new QSplitter(Qt::Vertical, central);
@@ -101,8 +114,15 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     buildStatusBar();
     buildMenu();
     registerProbes();
+    registerMediaProbes();
     restoreLayout();
     selectTool(QStringLiteral("select"));
+
+    auto* status = new QTimer(this);
+    status->setInterval(1000);
+    connect(status, &QTimer::timeout, this, &MainWindow::updateStatus);
+    status->start();
+    updateStatus();
 }
 
 MainWindow::~MainWindow() = default;
@@ -136,7 +156,11 @@ QWidget* MainWindow::buildTopBar() {
     open_ = new QPushButton(IconFactory::icon(QStringLiteral("open")), tr("Open"), bar);
     open_->setObjectName(QStringLiteral("topbar.open"));
     open_->setToolTip(tr("Open a video or project (Ctrl+O)"));
-    open_->setEnabled(false);
+    connect(open_, &QPushButton::clicked, this, &MainWindow::chooseFile);
+    auto* openKey = new QAction(open_);
+    openKey->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O));
+    connect(openKey, &QAction::triggered, this, &MainWindow::chooseFile);
+    addAction(openKey);
     row->addWidget(open_);
     row->addWidget(separator(QStringLiteral("TopBarSeparator"), Qt::Vertical, bar));
 

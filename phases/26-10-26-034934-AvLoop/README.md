@@ -90,6 +90,11 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
 13. **R-13** The `.avloop` file's format is written first by AV-003 (the model's serialization, needed by every walk and
     by `avloop-cli`); AV-010 builds the file's user-facing side (Save, Open, migration, autosave, Recent).
 14. **R-14** The encoder and muxer are built by AV-008 for the Encoded preview and reused by Export at AV-009.
+15. **R-15** An animated WebP is refused with a plain message ("FFmpeg reads still WebP images only. Convert it to GIF,
+    APNG or a video first."): no FFmpeg decodes animated WebP — 7.1 and 8.1 were both tried (AV-002) — and a decoder
+    of AvLoop's own was not asked for. Every other family of §3.9 opens.
+16. **R-16** Until a crop exists the working size is the display size with its long side capped at 1920 (spec §3.7.3:
+    a 4K source is scaled down right after decoding); the renderer sets it from the crop and scale from AV-007.
 
 ## 4. What is not built
 

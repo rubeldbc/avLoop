@@ -3,7 +3,7 @@
 
 Canonical current execution state: `../AUTONOMOUS_STATE.md`
 
-Phases: **16** · done: **1** · state: **ACTIVE** · generated: 2026-10-25T22:31:21.575Z
+Phases: **16** · done: **2** · state: **ACTIVE** · generated: 2026-10-25T23:07:43.651Z
 
 Tracks: A The loop maker — the ground, the media, the canvas and the Selection, the crop tools, the timeline, the loop engine, the renderer, the preview window, the export, the project and the settings · B The extras — the keyframes, the loop finder, the batch and the other formats, the installer
 
@@ -12,8 +12,8 @@ Tracks: A The loop maker — the ground, the media, the canvas and the Selection
 | Phase | Item | Track | CP | Status | Risk | Class | Title | Depends on |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | AV-001 | 1 | A | CP-A1 | DONE | Medium | verify-env | The ground | — |
-| AV-002 | 2 | A | CP-A1 | IN_PROGRESS | High | verify-env | The media | AV-001 |
-| AV-003 | 3 | A | CP-A1 | NOT_STARTED | High | verify-env | The canvas and the Selection | AV-002 |
+| AV-002 | 2 | A | CP-A1 | DONE | High | verify-env | The media | AV-001 |
+| AV-003 | 3 | A | CP-A1 | IN_PROGRESS | High | verify-env | The canvas and the Selection | AV-002 |
 | AV-004 | 4 | A | CP-A1 | NOT_STARTED | Medium | verify-env | The crop tools | AV-003 |
 | AV-005 | 5 | A | CP-A1 | NOT_STARTED | High | verify-env | The timeline | AV-004 |
 | AV-006 | 6 | A | CP-A1 | NOT_STARTED | High | verify-env | The loop engine | AV-005 |

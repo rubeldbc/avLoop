@@ -1,7 +1,7 @@
 ---
 phase: AV-002
 title: "The media"
-status: IN_PROGRESS
+status: DONE
 owner_item: 2
 track: A
 checkpoint_id: CP-A1

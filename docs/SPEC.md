@@ -6,6 +6,32 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-002 — The media (AV-002, 2026-10-26)
+
+- A file opens by its content (probesize 50 MB, analyzeduration 10 s), never by its extension: the Open button and
+  Ctrl+O (filter "All media (*.*)" and the known extensions), a drop on the window or the drop zone, and
+  `avloop.exe <file>`. Probing runs on a worker; a file that cannot open says why in a toast — "This file has no video
+  AvLoop can decode (container: …)", "Cannot open <name>: <reason>", and for an animated WebP "FFmpeg reads still
+  WebP images only. Convert it to GIF, APNG or a video first." (reading R-15); the open video stays.
+- The default video stream is decoded; every other stream is discarded at the demuxer (audio never decoded).
+- The decoder (its own thread) gives the frame on screen at a time: a seek goes BACKWARD to the keyframe and decodes
+  to the target PTS (a container that lands after the target is sought again 1, 2, 4, 8 s earlier, then from the
+  start; MPEG-TS/PS rewind by byte; after a seek decoding waits for a keyframe packet); moves forward within 2 s
+  decode on. Corrupt frames are skipped and counted. 200 random seeks give the exact frame (software and D3D11VA).
+- D3D11VA for H.264, HEVC, VP9, AV1, MPEG-2, VC-1 (not for sources with alpha); a failure reopens the codec in
+  software and finds the position again, said once a file. VP8/VP9 with alpha decode through libvpx.
+- Frames are normalized: rotation and flips upright (display matrix as ffmpeg's autorotate reads it), square pixels
+  (SAR applied, even sizes), bwdif for interlaced frames, zscale + tonemap=hable to SDR BT.709 for PQ/HLG, RGBA
+  premultiplied, at the working size — the display size with the long side capped at 1920 until a crop sets it
+  (reading R-16).
+- The frame cache: an LRU of 1536 MB (256–8192) with a disk spill in `%LOCALAPPDATA%\AvLoop\cache\<pid>-<ms>\` (20 GB,
+  oldest first; deleted on exit; stale sessions deleted at start; a full disk stops the spill); below 1 GB of free RAM
+  the cache is halved with a toast.
+- The status bar: `<file> · 1920×1080 · 29.97 fps · H.264 · VFR → CFR` (`HDR → SDR`, `interlaced`, `alpha` when so),
+  `GPU: <adapter> · HW decode on|off`, `RAM … MB · VRAM … MB · Cache …/… GB` each second; `--mem-log <file>` writes the
+  same each second.
+- `avloop-cli probe <video>` (JSON) and `avloop-cli frame <video> --at N -o x.png [--hw on|off] [--size WxH]`.
+
 ### D-001 — The ground (AV-001, 2026-10-26)
 
 - The repository builds with `scripts\fetch-deps.ps1` (FFmpeg n7.1.5 LGPL shared, pinned by SHA-256, newest-7.1

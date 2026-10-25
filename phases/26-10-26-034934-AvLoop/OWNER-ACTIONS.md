@@ -25,3 +25,5 @@ read and open for a veto later; an answer that differs changes the reading in it
 | 16 | **R-6** Default output. | `README.md` §3 6. | Decided by the agent (spec §13.2); open for a veto |
 | 17 | **R-7** Premultiplied sRGB blending. | `README.md` §3 7. | Decided by the agent (spec §13.2); open for a veto |
 | 18 | **R-8** One crop; none = the whole video. | `README.md` §3 8. | Decided by the agent (spec §13.2); open for a veto |
+| 19 | **R-15** Animated WebP refused (no FFmpeg decodes it). | `README.md` §3 15; AV-002. | Decided by the agent (AV-002); open for a veto — a WebP decoder of AvLoop's own would be a new item |
+| 20 | **R-16** The working size before a crop. | `README.md` §3 16; AV-002. | Decided by the agent (AV-002); open for a veto |

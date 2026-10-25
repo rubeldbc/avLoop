@@ -1,7 +1,12 @@
 #pragma once
 
+#include "media/MediaInfo.h"
+
 #include <QMainWindow>
 #include <QStringList>
+
+#include <memory>
+#include <optional>
 
 class QAction;
 class QActionGroup;
@@ -14,6 +19,12 @@ class QStackedWidget;
 class QToolButton;
 
 namespace avloop {
+
+namespace media {
+class DecodeWorker;
+class DiskCache;
+class FrameCache;
+} // namespace media
 
 class DropZone;
 class SidePanel;
@@ -39,12 +50,22 @@ public:
     QString activeTool() const;
     QStringList topBarButtons() const;
 
+    // MainWindowActions.cpp — the video (spec §3.9): opened by its content, released with everything of it when
+    // another is opened.
+    void openFiles(const QStringList& paths);
+    void openVideo(const QString& path);
+    void closeVideo();
+    media::FrameCache* frameCache() const { return cache_.get(); }
+    QString videoState() const { return videoState_; }
+
 signals:
     void firstShown();
 
 protected:
     void showEvent(QShowEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
+    void dragEnterEvent(QDragEnterEvent* event) override;
+    void dropEvent(QDropEvent* event) override;
 
 private:
     QWidget* buildTopBar();
@@ -56,6 +77,12 @@ private:
     void restoreLayout();
     void saveLayout() const;
     void setThemeFromMenu(const QString& name);
+    // MainWindowActions.cpp
+    void chooseFile();
+    void probed(const QString& path, const std::optional<media::MediaInfo>& info, const QString& error);
+    void showFrame(const media::Frame& frame);
+    void updateStatus();
+    void registerMediaProbes();
 
     QToolButton* menuButton_ = nullptr;
     QMenu* menu_ = nullptr;
@@ -75,7 +102,17 @@ private:
     QLabel* gpuLabel_ = nullptr;
     QLabel* memoryLabel_ = nullptr;
     QWidget* exportArea_ = nullptr;
+    QLabel* framePreview_ = nullptr; // the frame until the canvas (AV-003)
     bool shownOnce_ = false;
+
+    std::unique_ptr<media::DiskCache> disk_;
+    std::unique_ptr<media::FrameCache> cache_;
+    std::unique_ptr<media::DecodeWorker> worker_;
+    std::optional<media::MediaInfo> video_;
+    QString videoState_ = QStringLiteral("none"); // none, opening, ready, error
+    QString lastError_;
+    QSize shownFrame_;
+    bool pressureToastShown_ = false;
 };
 
 } // namespace avloop

@@ -1,6 +1,6 @@
 # AVADR-0002 — Memory budgets and caches
 
-Status: **Drafted 2026-10-26** by the plan; accepted by AV-002 before the cache's code.
+Status: **Accepted 2026-10-26** by AV-002 (drafted by the plan), before the cache's code.
 
 ## Context
 

@@ -1,7 +1,7 @@
 ---
 phase: AV-003
 title: "The canvas and the Selection"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 3
 track: A
 checkpoint_id: CP-A1
