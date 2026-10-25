@@ -1,0 +1,23 @@
+# Risks
+
+The risks of the readings taken (`README.md` §3) and the programme's own. The lore's *Things that bite*
+(`docs/lore/avloop.md`) takes each trap found as a standing rule.
+
+| # | Risk | What is done about it | Phase |
+| --- | --- | --- | --- |
+| 1 | **Files at the gate**: the 600-line rule breaks as `MainWindow.cpp`, `Canvas.cpp`, `Timeline.cpp`, `Decoder.cpp`, `ExportJob.cpp` grow. | Spec §4's splits are planned from the start (`MainWindowActions.cpp`, `CanvasView/Overlay/Gl.cpp`, `TimelinePaint/Input.cpp`, `DecoderSeek/Hw.cpp`); each file's size read before the work; split at its seam first; `check-loc` before every commit. | all |
+| 2 | **Frame accuracy**: a seek lands one frame off (B-frames, open GOPs, VFR, a stream whose first PTS is not 0). | Seek BACKWARD to the keyframe then decode to the target PTS; timestamps by `best_effort_timestamp`; the start time subtracted; `test-decoder-seek` reads testsrc2's burned counter over 200 random seeks. | AV-002 |
+| 3 | **WebM alpha**: the native vp9 decoder drops alpha; an encoder with the wrong pixel format writes none. | The libvpx decoder for VP8/VP9 sources and for verification; `yuva420p` and `alpha_mode=1` checked by ffprobe and `alphaOf`; VP8 with `auto-alt-ref 0`. | AV-002, AV-008, AV-009 |
+| 4 | **GPU/CPU parity**: GL's sampling and rounding differ from a CPU twin. | One mask (CPU-built, uploaded); frames pre-scaled to the working size so the GL path samples bilinearly near 1:1; the CPU path implements the same texel-centre bilinear and premultiplied blend; `test-renderer` holds ≤ 2/255 on unit cases and mean ≤ 1.0 / max ≤ 4 on projects (AVADR-0001). | AV-007 |
+| 5 | **No OpenGL 3.3** (CI, Remote Desktop): the GPU path cannot be tested there. | CPU renderer from the start with one toast; CI runs the non-GPU tests; `test-renderer` skips the GPU half without a context and says so. | AV-007 |
+| 6 | **Memory**: a long Ping-pong segment or a 4K source fills RAM. | AVADR-0002: working resolution; the RAM LRU with a byte budget; the reversed half by GOP into the disk cache; halving below 1 GB free; bounded queues; the memory walk. | AV-002, AV-007, AV-009 |
+| 7 | **D3D11VA differences**: hardware frames differ slightly from software ones, or a driver fails mid-file. | The fallback to software on any error, logged once a file; S2 compares HW on/off frames (mean ≤ 1.0); the Settings switch. | AV-002 |
+| 8 | **FFmpeg 7.1's pin is pruned** by BtbN (they keep a limited history). | `fetch-deps.ps1` pins URL + SHA-256 and falls back to the newest `n7.1` LGPL shared asset by the API, writing what it took (R-9); CI caches the zip. | AV-001 |
+| 9 | **`h264_mf` missing or failing** in the LGPL build (Media Foundation encoder needs a hardware MFT or the software one). | Probed at AV-013 (`avcodec_find_encoder_by_name`); MP4 disabled with the reason where absent; recorded. | AV-013 |
+| 10 | **GUI walks on the owner's desktop** steal focus for seconds; a crash leaves a window. | `--walk` runs maximized, takes its pictures by `QWidget::grab` (not the screen), exits; `walk-phase.mjs` checks no process is left; a five-minute ceiling. | all |
+| 11 | **CI on `windows-latest`** lacks a GPU and a display. | `QT_QPA_PLATFORM=offscreen` for GUI-touching tests; the CPU renderer; the GPU tests skip; the gates that need the desktop run locally and are recorded. | AV-001 |
+| 12 | **A secret or a personal path committed** to the public repository. | `check-secrets.mjs` before every commit (tokens, keys, emails, `C:\Users\<name>` paths); explicit paths staged; the token passed to `gh` per command, never written. | all |
+| 13 | **Seam artefacts**: a crossfade off by one frame shows a jump; a Ping-pong turn shows a doubled frame. | `LoopMap` proved by unit tests on §8.2's checks; `seamDiff` ≤ 1.5 × median and the duplicate count in S7. | AV-006, AV-009 |
+| 14 | **OBS's playback** differs from FFmpeg's (hardware decoding drops alpha). | The OBS tip (hardware decoding off); S11's `-stream_loop 1` through libvpx; OBS itself only if installed (spec S11). | AV-009 |
+| 15 | **HiDPI**: icons or the canvas blur at 150/200%. | `PassThrough` rounding; icons rendered per DPI; the canvas's GL viewport by the device pixel ratio; S1 screenshots at three scales (`QT_SCALE_FACTOR`). | AV-001, AV-003 |
+| 16 | **Long phases lose the thread** across context windows. | `AUTONOMOUS_STATE.md`, `CONTINUE.md`, the execution records and the commits carry the state; `check-continuity.mjs`. | all |

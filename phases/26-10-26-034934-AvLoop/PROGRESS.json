@@ -1,0 +1,435 @@
+{
+  "programId": "AVLOOP",
+  "programmeVersion": "1.0.0",
+  "generatedBy": "control/phase-tools/sync-progress.mjs",
+  "generatedAt": "2026-10-25T22:06:16.488Z",
+  "state": "ACTIVE",
+  "activePhase": "AV-001",
+  "nextEligiblePhase": null,
+  "lastCompletedPhase": null,
+  "completed": 0,
+  "total": 16,
+  "blocked": [],
+  "deferred": [],
+  "branch": "main",
+  "publicationPolicy": "COMMIT_AND_PUSH_TO_ORIGIN_MAIN_AT_EVERY_PHASE_CLOSE",
+  "adrPrefix": "AVADR",
+  "reservedAdrs": [],
+  "readBudget": {},
+  "phases": [
+    {
+      "id": "AV-001",
+      "title": "The ground",
+      "status": "IN_PROGRESS",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [],
+      "unlocks": [
+        "AV-002",
+        "AV-015"
+      ],
+      "requirements": [
+        "REQ-AV-001",
+        "REQ-AV-015",
+        "REQ-AV-019",
+        "REQ-AV-021"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 600,
+      "ownerItem": 1,
+      "file": "phases/AV-001-the-ground.md",
+      "record": "execution/AV-001-EXECUTION.md"
+    },
+    {
+      "id": "AV-002",
+      "title": "The media",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AV-001"
+      ],
+      "unlocks": [
+        "AV-003",
+        "AV-015"
+      ],
+      "requirements": [
+        "REQ-AV-002",
+        "REQ-AV-016",
+        "REQ-AV-017",
+        "REQ-AV-018",
+        "REQ-AV-020"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 600,
+      "ownerItem": 2,
+      "file": "phases/AV-002-the-media.md",
+      "record": "execution/AV-002-EXECUTION.md"
+    },
+    {
+      "id": "AV-003",
+      "title": "The canvas and the Selection",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AV-002"
+      ],
+      "unlocks": [
+        "AV-004",
+        "AV-015"
+      ],
+      "requirements": [
+        "REQ-AV-003",
+        "REQ-AV-017"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 550,
+      "ownerItem": 3,
+      "file": "phases/AV-003-the-canvas-and-the-selection.md",
+      "record": "execution/AV-003-EXECUTION.md"
+    },
+    {
+      "id": "AV-004",
+      "title": "The crop tools",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-003"
+      ],
+      "unlocks": [
+        "AV-005",
+        "AV-015"
+      ],
+      "requirements": [
+        "REQ-AV-004",
+        "REQ-AV-016"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 550,
+      "ownerItem": 4,
+      "file": "phases/AV-004-the-crop-tools.md",
+      "record": "execution/AV-004-EXECUTION.md"
+    },
+    {
+      "id": "AV-005",
+      "title": "The timeline",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AV-004"
+      ],
+      "unlocks": [
+        "AV-006",
+        "AV-015"
+      ],
+      "requirements": [
+        "REQ-AV-005",
+        "REQ-AV-016"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 600,
+      "ownerItem": 5,
+      "file": "phases/AV-005-the-timeline.md",
+      "record": "execution/AV-005-EXECUTION.md"
+    },
+    {
+      "id": "AV-006",
+      "title": "The loop engine",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AV-005"
+      ],
+      "unlocks": [
+        "AV-007",
+        "AV-015"
+      ],
+      "requirements": [
+        "REQ-AV-006"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 500,
+      "ownerItem": 6,
+      "file": "phases/AV-006-the-loop-engine.md",
+      "record": "execution/AV-006-EXECUTION.md"
+    },
+    {
+      "id": "AV-007",
+      "title": "The renderer",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AV-006"
+      ],
+      "unlocks": [
+        "AV-008",
+        "AV-015"
+      ],
+      "requirements": [
+        "REQ-AV-007",
+        "REQ-AV-016",
+        "REQ-AV-017"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 550,
+      "ownerItem": 7,
+      "file": "phases/AV-007-the-renderer.md",
+      "record": "execution/AV-007-EXECUTION.md"
+    },
+    {
+      "id": "AV-008",
+      "title": "The preview window",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-007"
+      ],
+      "unlocks": [
+        "AV-009",
+        "AV-015"
+      ],
+      "requirements": [
+        "REQ-AV-008",
+        "REQ-AV-016"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 500,
+      "ownerItem": 8,
+      "file": "phases/AV-008-the-preview-window.md",
+      "record": "execution/AV-008-EXECUTION.md"
+    },
+    {
+      "id": "AV-009",
+      "title": "The export",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AV-008"
+      ],
+      "unlocks": [
+        "AV-010",
+        "AV-015"
+      ],
+      "requirements": [
+        "REQ-AV-009",
+        "REQ-AV-016",
+        "REQ-AV-020"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 600,
+      "ownerItem": 9,
+      "file": "phases/AV-009-the-export.md",
+      "record": "execution/AV-009-EXECUTION.md"
+    },
+    {
+      "id": "AV-010",
+      "title": "The project and the settings",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-009"
+      ],
+      "unlocks": [
+        "AV-015"
+      ],
+      "requirements": [
+        "REQ-AV-010",
+        "REQ-AV-015",
+        "REQ-AV-020"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 550,
+      "ownerItem": 10,
+      "file": "phases/AV-010-the-project-and-the-settings.md",
+      "record": "execution/AV-010-EXECUTION.md"
+    },
+    {
+      "id": "AV-011",
+      "title": "The keyframes",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-015"
+      ],
+      "unlocks": [
+        "AV-012",
+        "AV-016"
+      ],
+      "requirements": [
+        "REQ-AV-011"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 450,
+      "ownerItem": 11,
+      "file": "phases/AV-011-the-keyframes.md",
+      "record": "execution/AV-011-EXECUTION.md"
+    },
+    {
+      "id": "AV-012",
+      "title": "The loop finder",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-011"
+      ],
+      "unlocks": [
+        "AV-013",
+        "AV-016"
+      ],
+      "requirements": [
+        "REQ-AV-012"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 400,
+      "ownerItem": 12,
+      "file": "phases/AV-012-the-loop-finder.md",
+      "record": "execution/AV-012-EXECUTION.md"
+    },
+    {
+      "id": "AV-013",
+      "title": "The batch and the other formats",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-012"
+      ],
+      "unlocks": [
+        "AV-014",
+        "AV-016"
+      ],
+      "requirements": [
+        "REQ-AV-013"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 550,
+      "ownerItem": 13,
+      "file": "phases/AV-013-the-batch-and-the-other-formats.md",
+      "record": "execution/AV-013-EXECUTION.md"
+    },
+    {
+      "id": "AV-014",
+      "title": "The installer",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-013"
+      ],
+      "unlocks": [
+        "AV-016"
+      ],
+      "requirements": [
+        "REQ-AV-014"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 300,
+      "ownerItem": 14,
+      "file": "phases/AV-014-the-installer.md",
+      "record": "execution/AV-014-EXECUTION.md"
+    },
+    {
+      "id": "AV-015",
+      "title": "CP-A1 the loop maker walked",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": true,
+      "risk": "High",
+      "dependsOn": [
+        "AV-001",
+        "AV-002",
+        "AV-003",
+        "AV-004",
+        "AV-005",
+        "AV-006",
+        "AV-007",
+        "AV-008",
+        "AV-009",
+        "AV-010"
+      ],
+      "unlocks": [
+        "AV-011",
+        "AV-016"
+      ],
+      "requirements": [
+        "REQ-AV-016",
+        "REQ-AV-017",
+        "REQ-AV-018",
+        "REQ-AV-019",
+        "REQ-AV-020",
+        "REQ-AV-021"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 200,
+      "ownerItem": 0,
+      "file": "phases/AV-015-cp-a1-the-loop-maker-walked.md",
+      "record": "execution/AV-015-EXECUTION.md"
+    },
+    {
+      "id": "AV-016",
+      "title": "CP-B1 the whole walked",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": true,
+      "risk": "High",
+      "dependsOn": [
+        "AV-011",
+        "AV-012",
+        "AV-013",
+        "AV-014",
+        "AV-015"
+      ],
+      "unlocks": [],
+      "requirements": [
+        "REQ-AV-014",
+        "REQ-AV-019",
+        "REQ-AV-021"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 200,
+      "ownerItem": 0,
+      "file": "phases/AV-016-cp-b1-the-whole-walked.md",
+      "record": "execution/AV-016-EXECUTION.md"
+    }
+  ]
+}

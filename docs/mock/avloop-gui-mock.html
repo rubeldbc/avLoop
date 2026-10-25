@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="en" data-theme="navy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AvLoop — GUI mock</title>
+<style>
+:root, [data-theme="navy"] {
+  --bg:#0E1726; --panel:#16223A; --panel2:#1D2B47; --border:#2A3A5C;
+  --text:#E6EAF2; --text2:#9AA6BD; --accent:#FF7A1A; --accentHover:#FF9447; --accentPress:#E5650A;
+  --accentSoft:rgba(255,122,26,.18); --warning:#FFC53D; --danger:#FF4D4F; --success:#3DD68C;
+}
+[data-theme="black"] {
+  --bg:#0B0B0C; --panel:#151517; --panel2:#1E1E21; --border:#2C2C30; --text:#ECECEC; --text2:#9A9AA0;
+}
+* { box-sizing:border-box; }
+html,body { margin:0; height:100%; background:var(--bg); color:var(--text);
+  font:12px/1.35 "Segoe UI", system-ui, sans-serif; overflow:hidden; user-select:none; }
+.mono { font-family:Consolas, "Cascadia Mono", monospace; }
+button { font:inherit; color:var(--text); background:var(--panel2); border:1px solid var(--border);
+  border-radius:2px; height:24px; padding:0 10px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; }
+button:hover { border-color:var(--text2); }
+button.primary { background:var(--accent); border-color:var(--accent); color:#111; font-weight:600; }
+button.primary:hover { background:var(--accentHover); }
+button.icon { width:24px; padding:0; justify-content:center; background:transparent; border-color:transparent; }
+button.icon:hover { background:var(--panel2); border-color:var(--border); }
+button.icon.on { color:var(--accent); }
+input, select { font:inherit; color:var(--text); background:var(--panel2); border:1px solid var(--border);
+  border-radius:2px; height:22px; padding:0 4px; outline:none; }
+input:focus, select:focus { border-color:var(--accent); }
+input[type=number] { width:58px; font-family:Consolas, monospace; }
+input[type=range] { accent-color:var(--accent); height:16px; padding:0; border:0; background:transparent; }
+input[type=checkbox] { accent-color:var(--accent); height:auto; }
+svg.i { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:1.75; stroke-linecap:round; stroke-linejoin:round; }
+
+#app { display:grid; height:100vh; grid-template-rows:36px 1fr 150px 22px; grid-template-columns:40px 1fr 260px; }
+#top { grid-column:1/4; display:flex; align-items:center; gap:8px; padding:0 8px; background:var(--panel); border-bottom:1px solid var(--border); }
+.logo { display:flex; align-items:center; gap:6px; font-weight:700; letter-spacing:.3px; margin-right:6px; }
+.sep { width:1px; height:20px; background:var(--border); }
+#options { flex:1; display:flex; align-items:center; gap:8px; overflow:hidden; white-space:nowrap; color:var(--text2); }
+#options label { display:inline-flex; align-items:center; gap:4px; }
+#options .tname { color:var(--text); font-weight:600; margin-right:4px; }
+#rail { grid-row:2/3; background:var(--panel); border-right:1px solid var(--border); display:flex; flex-direction:column; align-items:center; padding-top:6px; gap:2px; }
+#rail button { width:32px; height:32px; padding:0; justify-content:center; background:transparent; border-color:transparent; color:var(--text2); }
+#rail button:hover { color:var(--text); background:var(--panel2); }
+#rail button.on { color:var(--accent); background:var(--accentSoft); border-color:rgba(255,122,26,.35); }
+#rail .gap { height:1px; width:24px; background:var(--border); margin:4px 0; }
+#stage { position:relative; overflow:hidden; background:var(--bg); }
+#stage canvas { position:absolute; inset:0; width:100%; height:100%; }
+#side { grid-row:2/4; grid-column:3; background:var(--panel); border-left:1px solid var(--border); overflow-y:auto; overflow-x:hidden; }
+.sec .body > * { min-width:0; }
+.sec .body select, .sec .body .seg { width:100%; }
+.seg button { min-width:0; font-size:11px; padding:0 2px; overflow:hidden; text-overflow:ellipsis; }
+.sec .row2 input[type=number] { width:56px; }
+.preset { display:flex; gap:4px; padding:8px; border-bottom:1px solid var(--border); }
+.preset select { flex:1; }
+.sec h3 { margin:0; font-size:12px; font-weight:600; padding:7px 8px; background:var(--panel2); border-bottom:1px solid var(--border);
+  cursor:pointer; display:flex; align-items:center; gap:6px; }
+.sec h3 .chev { transition:transform .15s; color:var(--text2); }
+.sec.closed h3 .chev { transform:rotate(-90deg); }
+.sec.closed .body { display:none; }
+.sec .body { padding:6px 8px 10px; display:grid; grid-template-columns:86px 1fr; gap:6px 8px; align-items:center; }
+.sec .body > span { color:var(--text2); }
+.sec .row2 { display:flex; gap:4px; align-items:center; }
+.sec .note { grid-column:1/3; color:var(--text2); font-family:Consolas, monospace; font-size:11px; background:var(--bg); padding:5px 6px; border-radius:2px; }
+.seg { display:flex; } .seg button { border-radius:0; flex:1; padding:0 4px; }
+.seg button.on { background:var(--accent); color:#111; border-color:var(--accent); font-weight:600; }
+#timeline { grid-column:1/3; background:var(--panel); border-top:1px solid var(--border); display:flex; flex-direction:column; }
+#transport { height:30px; display:flex; align-items:center; gap:2px; padding:0 6px; border-bottom:1px solid var(--border); }
+#transport .time { margin:0 10px; font-family:Consolas, monospace; font-size:13px; }
+#transport .time b { color:var(--accent); font-weight:400; }
+#transport .meta { margin-left:auto; color:var(--text2); }
+#tlwrap { flex:1; position:relative; }
+#tl { position:absolute; inset:0; width:100%; height:100%; cursor:pointer; }
+#status { grid-column:1/4; display:flex; align-items:center; gap:14px; padding:0 8px; background:var(--panel); border-top:1px solid var(--border); color:var(--text2); font-size:11px; }
+#status .grow { flex:1; }
+#exp { display:none; align-items:center; gap:6px; color:var(--text); }
+#exp .bar { width:140px; height:6px; background:var(--panel2); border-radius:3px; overflow:hidden; }
+#exp .bar i { display:block; height:100%; width:0; background:var(--accent); }
+#exp button { height:16px; font-size:10px; padding:0 6px; }
+
+#menu { position:absolute; top:34px; left:8px; background:var(--panel); border:1px solid var(--border); min-width:220px; padding:4px 0; display:none; z-index:50; box-shadow:0 8px 24px rgba(0,0,0,.4); }
+#menu div { padding:5px 12px; display:flex; justify-content:space-between; cursor:pointer; }
+#menu div:hover { background:var(--panel2); }
+#menu div span { color:var(--text2); font-family:Consolas, monospace; font-size:11px; }
+#menu hr { border:0; border-top:1px solid var(--border); margin:4px 0; }
+
+#preview { position:absolute; top:70px; left:calc(50% - 300px); width:600px; background:var(--panel); border:1px solid var(--border);
+  box-shadow:0 16px 48px rgba(0,0,0,.55); display:none; flex-direction:column; z-index:40; }
+#preview .title { height:28px; display:flex; align-items:center; gap:8px; padding:0 4px 0 10px; background:var(--panel2); cursor:move; border-bottom:1px solid var(--border); }
+#preview .title b { flex:1; font-weight:600; }
+#preview .bar1 { display:flex; align-items:center; gap:8px; padding:6px 8px; border-bottom:1px solid var(--border); color:var(--text2); }
+#pvArea { height:340px; display:flex; align-items:center; justify-content:center; background:var(--bg); position:relative; }
+#pvArea.checker, .checker { background-color:#3a3a3a;
+  background-image:linear-gradient(45deg,#2b2b2b 25%,transparent 25%),linear-gradient(-45deg,#2b2b2b 25%,transparent 25%),
+  linear-gradient(45deg,transparent 75%,#2b2b2b 75%),linear-gradient(-45deg,transparent 75%,#2b2b2b 75%);
+  background-size:16px 16px; background-position:0 0,0 8px,8px -8px,-8px 0; }
+#pvCanvas { max-width:100%; max-height:100%; }
+#pvBusy { position:absolute; inset:auto 20% 46% 20%; text-align:center; display:none; }
+#pvBusy .bar { height:6px; background:var(--panel2); border-radius:3px; overflow:hidden; margin-top:6px; }
+#pvBusy .bar i { display:block; height:100%; width:0; background:var(--accent); }
+#preview .bar2 { display:flex; align-items:center; gap:6px; padding:6px 8px; border-top:1px solid var(--border); }
+#pvSliderWrap { flex:1; position:relative; height:22px; }
+#pvSliderWrap input { width:100%; position:absolute; top:3px; }
+#pvSeam { position:absolute; inset:0; pointer-events:none; }
+#preview .info { padding:4px 10px 6px; color:var(--text2); font-family:Consolas, monospace; font-size:11px; border-top:1px solid var(--border); }
+
+#toast { position:absolute; right:276px; bottom:180px; background:var(--panel2); border:1px solid var(--border); border-left:3px solid var(--accent);
+  padding:8px 12px; max-width:340px; box-shadow:0 8px 24px rgba(0,0,0,.4); display:none; z-index:60; }
+#toast.ok { border-left-color:var(--success); }
+#help { position:absolute; inset:0; background:rgba(0,0,0,.55); display:none; align-items:center; justify-content:center; z-index:70; }
+#help .card { background:var(--panel); border:1px solid var(--border); padding:16px 20px; width:560px; columns:2; column-gap:28px; }
+#help .card div { display:flex; justify-content:space-between; padding:2px 0; break-inside:avoid; }
+#help .card span { color:var(--accent); font-family:Consolas, monospace; }
+#help h2 { margin:0 0 10px; font-size:14px; column-span:all; }
+.tag { position:absolute; left:50%; transform:translateX(-50%); top:8px; background:rgba(0,0,0,.45); color:#fff; padding:2px 8px; border-radius:2px; font-size:11px; pointer-events:none; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top">
+    <button class="icon" id="btnMenu" title="Menu"><svg class="i"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <div class="logo"><svg width="20" height="20" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#16223A" stroke="#2A3A5C"/><path d="M17.5 8.5a6 6 0 1 0 .9 5.4" stroke="#FF7A1A" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M18.6 5.2v3.6H15" stroke="#FF7A1A" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M10.4 9.3v5.4l4.3-2.7z" fill="#fff"/></svg>AvLoop</div>
+    <button id="btnOpen"><svg class="i"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>Open</button>
+    <div class="sep"></div>
+    <div id="options"></div>
+    <div class="sep"></div>
+    <button id="btnPreview" title="Preview (F5)"><svg class="i"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Preview</button>
+    <button class="primary" id="btnExport" title="Export (Ctrl+E)"><svg class="i"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>Export</button>
+  </div>
+
+  <div id="rail"></div>
+  <div id="stage"><canvas id="cv"></canvas><div class="tag" id="stageTag"></div></div>
+
+  <div id="side">
+    <div class="preset"><select id="presetSel"><option>— Preset —</option><option>OBS Overlay 1:1 512</option><option>OBS Lower Third 16:9 1280</option><option>OBS Vertical 9:16 1080</option></select>
+      <button class="icon" title="Save preset"><svg class="i"><path d="M5 3h11l3 3v15H5z"/><path d="M8 3v5h7V3M8 21v-7h8v7"/></svg></button></div>
+
+    <div class="sec" id="secCrop"><h3><svg class="i chev"><path d="M6 9l6 6 6-6"/></svg>Crop</h3><div class="body">
+      <span>Shape</span><select id="cShape"><option value="rect">Rectangle</option><option value="round">Rounded</option><option value="ellipse">Ellipse</option></select>
+      <span>Ratio</span><select id="cRatio"></select>
+      <span>X / Y</span><div class="row2"><input type="number" id="cX"><input type="number" id="cY"></div>
+      <span>W / H</span><div class="row2"><input type="number" id="cW"><input type="number" id="cH"></div>
+      <span>Radius</span><input type="number" id="cR" min="0" value="32">
+      <span>Feather</span><div class="row2"><input type="range" id="cF" min="0" max="80" value="4" style="flex:1"><span class="mono" id="cFv">4</span></div>
+    </div></div>
+
+    <div class="sec" id="secLoop"><h3><svg class="i chev"><path d="M6 9l6 6 6-6"/></svg>Loop</h3><div class="body">
+      <span>Mode</span><select id="lMode"><option value="simple">Simple</option><option value="crossfade" selected>Crossfade</option><option value="pingpong">Ping-pong</option><option value="smooth">Ping-pong + Smooth turn</option></select>
+      <span>Crossfade</span><div class="row2"><input type="number" id="lFade" step="0.05" min="0.05" value="0.50"><span>s</span><span class="mono" id="lFadeF" style="color:var(--text2)">15 f</span></div>
+      <span>Curve</span><div class="seg" id="lCurve"><button class="on" data-v="smooth">Smooth</button><button data-v="linear">Linear</button></div>
+      <span>Turn</span><div class="row2"><input type="number" id="lTurn" step="0.05" min="0.05" value="0.30"><span>s</span></div>
+      <span>Speed</span><div class="row2"><input type="number" id="lSpeed" step="0.05" min="0.1" max="4" value="1.00"><span>×</span></div>
+      <span>FPS method</span><select id="lMethod"><option>Nearest</option><option>Frame Blend</option><option>Motion Interpolation</option></select>
+      <div class="note" id="loopNote"></div>
+    </div></div>
+
+    <div class="sec" id="secOut"><h3><svg class="i chev"><path d="M6 9l6 6 6-6"/></svg>Output</h3><div class="body">
+      <span>Format</span><select id="oFmt"><option>WebM VP9</option><option>WebM VP8</option><option>GIF</option><option>APNG</option><option>MP4 H.264</option><option>MOV ProRes 4444</option></select>
+      <span>Size</span><select id="oSize"><option value="crop">Crop size</option><option value="1920">Long side 1920</option><option value="1280">Long side 1280</option><option value="720">Long side 720</option><option value="512">Long side 512</option></select>
+      <span>Alpha</span><div class="seg" id="oAlpha"><button class="on">Auto</button><button>On</button><button>Off</button></div>
+      <span>FPS</span><select id="oFps"><option>Source (29.97)</option><option>15</option><option>24</option><option>25</option><option selected>30</option><option>50</option><option>60</option><option>Custom…</option></select>
+      <div class="note" id="outNote"></div>
+    </div></div>
+
+    <div class="sec" id="secQ"><h3><svg class="i chev"><path d="M6 9l6 6 6-6"/></svg>Quality</h3><div class="body">
+      <span>Preset</span><div class="seg" id="qPreset"><button data-c="40">Low</button><button class="on" data-c="31">Med</button><button data-c="24">High</button><button data-c="">Custom</button></div>
+      <span>CRF</span><div class="row2"><input type="range" id="qCrf" min="4" max="63" value="31" style="flex:1"><span class="mono" id="qCrfV">31</span></div>
+      <span>Speed</span><div class="row2"><input type="range" min="0" max="8" value="2" style="flex:1"><span class="mono">2</span></div>
+      <span>Two-pass</span><input type="checkbox">
+      <span>Target size</span><div class="row2"><input type="number" value="0" min="0"><span>MB (0 = off)</span></div>
+      <div class="note" id="qNote"></div>
+    </div></div>
+  </div>
+
+  <div id="timeline">
+    <div id="transport">
+      <button class="icon" id="tIn" title="Go to In (Home)"><svg class="i"><path d="M5 5v14M19 6l-9 6 9 6z"/></svg></button>
+      <button class="icon" id="tPrev" title="Previous frame (←)"><svg class="i"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <button class="icon" id="tPlay" title="Play/Pause (Space)"><svg class="i" id="playIco"><path d="M7 5l12 7-12 7z"/></svg></button>
+      <button class="icon" id="tNext" title="Next frame (→)"><svg class="i"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="icon" id="tOut" title="Go to Out (End)"><svg class="i"><path d="M19 5v14M5 6l9 6-9 6z"/></svg></button>
+      <button class="icon on" id="tLoop" title="Loop playback (L)"><svg class="i"><path d="M17 2l3 3-3 3"/><path d="M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3"/><path d="M20 13v2a4 4 0 0 1-4 4H4"/></svg></button>
+      <div class="time"><b id="tNow">00:00:12.12</b> / <span id="tDur">00:04:10.00</span></div>
+      <span style="color:var(--text2)">In <span class="mono" id="tInV"></span> · Out <span class="mono" id="tOutV"></span> · <span class="mono" id="tLen"></span></span>
+      <span class="meta">Ctrl+wheel zoom · wheel scroll · \ fit</span>
+    </div>
+    <div id="tlwrap"><canvas id="tl"></canvas></div>
+  </div>
+
+  <div id="status">
+    <span>fire_on_beach.mp4 · 1920×1080 · 29.97 fps · H.264 · VFR → CFR</span>
+    <span>GPU: NVIDIA GeForce RTX 3060 · HW decode on</span>
+    <span class="grow"></span>
+    <span id="exp"><span id="expTxt">Exporting</span><span class="bar"><i id="expBar"></i></span><button id="expCancel">Cancel</button></span>
+    <span>RAM 812 MB · VRAM 210 MB · Cache 1.1/1.5 GB</span>
+  </div>
+</div>
+
+<div id="menu">
+  <div data-a="open">Open video / project… <span>Ctrl+O</span></div>
+  <div>Save project <span>Ctrl+S</span></div>
+  <div>Save project as… <span>Ctrl+Shift+S</span></div>
+  <div>Recent ▸ <span></span></div>
+  <hr>
+  <div data-a="undo">Undo <span>Ctrl+Z</span></div>
+  <div>Redo <span>Ctrl+Y</span></div>
+  <hr>
+  <div data-a="queue">Batch queue… <span>Ctrl+Shift+E</span></div>
+  <div data-a="finder">Loop finder… <span>Ctrl+L</span></div>
+  <div data-a="theme">Theme: Navy / Black <span>toggle</span></div>
+  <div>Settings… <span>Ctrl+,</span></div>
+  <div data-a="help">Keyboard shortcuts <span>F1</span></div>
+  <hr>
+  <div>About AvLoop <span></span></div>
+  <div>Exit <span>Alt+F4</span></div>
+</div>
+
+<div id="preview">
+  <div class="title"><svg class="i" style="color:var(--accent)"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><b>Preview — exactly what will be exported</b>
+    <button class="icon" id="pvClose" title="Close"><svg class="i"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="bar1">
+    <div class="seg" id="pvMode" style="width:150px"><button class="on" data-m="live">Live</button><button data-m="enc">Encoded</button></div>
+    <span style="margin-left:8px">Background</span>
+    <select id="pvBg"><option value="checker">Checker</option><option value="#000">Black</option><option value="#fff">White</option><option value="#00ff00">Green</option><option value="#0E1726">Navy</option></select>
+    <span>Zoom</span><select id="pvZoom"><option value="fit">Fit</option><option value="0.5">50%</option><option value="1">100%</option></select>
+    <span id="pvState" style="margin-left:auto" class="mono"></span>
+  </div>
+  <div id="pvArea" class="checker"><canvas id="pvCanvas"></canvas>
+    <div id="pvBusy">Encoding preview… <div class="bar"><i id="pvBusyBar"></i></div></div></div>
+  <div class="bar2">
+    <button class="icon" id="pvPlay"><svg class="i" id="pvPlayIco"><rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/></svg></button>
+    <div id="pvSliderWrap"><canvas id="pvSeam"></canvas><input type="range" id="pvSlider" min="0" value="0"></div>
+    <span class="mono" id="pvTime" style="width:96px;text-align:right"></span>
+    <label style="display:flex;gap:4px;align-items:center;color:var(--text2)"><input type="checkbox" id="pvAround">Around seam</label>
+  </div>
+  <div class="info" id="pvInfo"></div>
+</div>
+
+<div id="toast"></div>
+<div id="help"><div class="card"><h2>Keyboard shortcuts</h2>
+  <div>Selection (move/scale video)<span>V</span></div><div>Crop: Rectangle<span>M</span></div>
+  <div>Crop: Rounded<span>U</span></div><div>Crop: Ellipse<span>E</span></div>
+  <div>Hand<span>H</span></div><div>Zoom<span>Z</span></div>
+  <div>Set In / Out<span>I / O</span></div><div>Keyframe<span>K</span></div>
+  <div>Play / Pause<span>Space</span></div><div>Frame step<span>← →</span></div>
+  <div>10 frames<span>Shift+← →</span></div><div>Go to In / Out<span>Home / End</span></div>
+  <div>Loop playback<span>L</span></div><div>Preview<span>F5</span></div>
+  <div>Export<span>Ctrl+E</span></div><div>Fit / 100%<span>Ctrl+0 / Ctrl+1</span></div>
+  <div>Lock ratio / circle<span>Shift+drag</span></div><div>From centre<span>Alt+drag</span></div>
+  <div>Nudge crop<span>Arrows</span></div><div>Close this<span>Esc</span></div>
+</div></div>
+
+<script>
+"use strict";
+// ---------- state ----------
+const SRC = { w:1920, h:1080, dur:250, fps:29.97 };
+const S = {
+  tool:'ellipse', t:12.4, playing:false, loopPlay:true,
+  inT:12.4, outT:17.4, fps:30,
+  video:{ cx:960, cy:540, s:1, flipH:false, flipV:false },
+  crop:{ kind:'ellipse', x:700, y:260, w:560, h:560, r:32, feather:4, ratio:'1:1' },
+  view:{ zoom:1, px:0, py:0, fit:true },
+  loop:{ mode:'crossfade', fade:0.5, curve:'smooth', turn:0.3, speed:1 },
+  out:{ size:'crop', fmt:'WebM VP9' }, crf:31,
+  keys:[12.4, 15.0],
+  tl:{ a:0, b:40 },
+};
+const RATIOS = { 'Free':0, 'Original':16/9, '1:1':1, '4:3':4/3, '3:4':3/4, '16:9':16/9, '9:16':9/16, '21:9':21/9, '3:2':1.5, '2:3':2/3, '4:5':0.8 };
+const $ = (id) => document.getElementById(id);
+
+// ---------- fake source video ----------
+function drawSource(ctx, t, w, h) {
+  const k = w / 960;
+  const g = ctx.createLinearGradient(0, 0, 0, h);
+  const hue = 20 + 15 * Math.sin(t * 0.15);
+  g.addColorStop(0, `hsl(${hue + 200},55%,${22 + 6 * Math.sin(t * .1)}%)`);
+  g.addColorStop(0.55, `hsl(${hue},80%,55%)`); g.addColorStop(1, `hsl(${hue - 10},70%,30%)`);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+  const sx = ((t * 22) % 1160) - 100;
+  ctx.fillStyle = 'rgba(255,230,160,.95)'; ctx.beginPath(); ctx.arc(sx * k, (170 + 40 * Math.sin(t * .4)) * k, 46 * k, 0, 7); ctx.fill();
+  for (let L = 0; L < 3; L++) {
+    ctx.fillStyle = ['#3b2a4f', '#2a2140', '#1a1630'][L];
+    ctx.beginPath(); ctx.moveTo(0, h);
+    for (let x = 0; x <= 960; x += 12) {
+      const y = 330 + L * 60 + 26 * Math.sin(x * 0.012 + t * (0.6 + L * 0.5) + L) + 10 * Math.sin(x * 0.04 - t * 1.3);
+      ctx.lineTo(x * k, y * k);
+    }
+    ctx.lineTo(w, h); ctx.fill();
+  }
+  // fire / flame shape in centre
+  const fx = 480 * k, fy = 300 * k;
+  for (let i = 0; i < 6; i++) {
+    const r = (60 - i * 8) * k, wob = 8 * Math.sin(t * 6 + i);
+    ctx.fillStyle = `hsla(${30 + i * 8},100%,${50 + i * 6}%,${0.55 - i * 0.05})`;
+    ctx.beginPath(); ctx.ellipse(fx + wob * k, fy - i * 9 * k, r * 0.7, r * (1.1 + 0.15 * Math.sin(t * 5 + i)), 0, 0, 7); ctx.fill();
+  }
+  ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(12 * k, 12 * k, 150 * k, 24 * k);
+  ctx.fillStyle = '#fff'; ctx.font = `${13 * k}px Consolas, monospace`; ctx.fillText('SRC ' + tc(t), 20 * k, 29 * k);
+}
+const srcA = document.createElement('canvas'); srcA.width = 960; srcA.height = 540;
+const srcB = document.createElement('canvas'); srcB.width = 960; srcB.height = 540;
+function tc(t) {
+  const f = Math.floor((t % 1) * 30), s = Math.floor(t) % 60, m = Math.floor(t / 60) % 60, h = Math.floor(t / 3600);
+  return [h, m, s].map(v => String(v).padStart(2, '0')).join(':') + '.' + String(f).padStart(2, '0');
+}
+
+// ---------- icons & tools ----------
+const ICON = {
+  select:'<path d="M5 3l14 8-6 2-2 6z"/>',
+  rect:'<rect x="4" y="5" width="16" height="14" stroke-dasharray="3 2"/>',
+  round:'<rect x="4" y="5" width="16" height="14" rx="5" stroke-dasharray="3 2"/>',
+  ellipse:'<ellipse cx="12" cy="12" rx="8.5" ry="7" stroke-dasharray="3 2"/>',
+  hand:'<path d="M8 13V5.5a1.5 1.5 0 0 1 3 0V12m0-1V4.5a1.5 1.5 0 0 1 3 0V12m0-6.5a1.5 1.5 0 0 1 3 0V14a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-2.7L3.5 14a1.5 1.5 0 0 1 2.4-1.8L8 14"/>',
+  zoom:'<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21M8 10.5h5M10.5 8v5"/>',
+  in:'<path d="M7 4v16M7 12h11M14 8l4 4-4 4"/>',
+  out:'<path d="M17 4v16M17 12H6M10 8l-4 4 4 4"/>',
+  key:'<path d="M12 3l9 9-9 9-9-9z"/>',
+};
+const TOOLS = [
+  ['select', 'Selection — move & scale the video', 'V'], null,
+  ['rect', 'Crop: Rectangle', 'M'], ['round', 'Crop: Rounded', 'U'], ['ellipse', 'Crop: Ellipse', 'E'], null,
+  ['hand', 'Hand', 'H'], ['zoom', 'Zoom', 'Z'], null,
+  ['in', 'Set In at playhead', 'I'], ['out', 'Set Out at playhead', 'O'], ['key', 'Keyframe', 'K'],
+];
+const rail = $('rail');
+for (const t of TOOLS) {
+  if (!t) { const g = document.createElement('div'); g.className = 'gap'; rail.appendChild(g); continue; }
+  const b = document.createElement('button'); b.dataset.tool = t[0]; b.title = `${t[1]} (${t[2]})`;
+  b.innerHTML = `<svg class="i" viewBox="0 0 24 24">${ICON[t[0] === 'key' ? 'key' : t[0]]}</svg>`;
+  b.onclick = () => setTool(t[0]); rail.appendChild(b);
+}
+const isCrop = (t) => t === 'rect' || t === 'round' || t === 'ellipse';
+function setTool(t) {
+  if (t === 'in') { setIn(S.t); return; }
+  if (t === 'out') { setOut(S.t); return; }
+  if (t === 'key') { addKey(); }
+  S.tool = t;
+  if (isCrop(t)) { S.crop.kind = t; $('cShape').value = t; }
+  document.querySelectorAll('#rail button').forEach(b => b.classList.toggle('on', b.dataset.tool === t));
+  buildOptions(); syncPanel(); dirty();
+}
+
+// ---------- options bar ----------
+function num(id, v, w) { return `<input type="number" id="${id}" value="${Math.round(v)}" style="width:${w || 58}px">`; }
+function ratioSel(id) { return `<select id="${id}">` + Object.keys(RATIOS).map(k => `<option ${k === S.crop.ratio ? 'selected' : ''}>${k}</option>`).join('') + `</select>`; }
+const ib = (id, path, title) => `<button class="icon" id="${id}" title="${title}"><svg class="i" viewBox="0 0 24 24">${path}</svg></button>`;
+function buildOptions() {
+  const o = $('options'), v = S.video, c = S.crop;
+  let h = '';
+  if (S.tool === 'select') {
+    h = `<span class="tname">Selection</span><label>X ${num('oX', v.cx)}</label><label>Y ${num('oY', v.cy)}</label>
+      <label>Scale ${num('oS', v.s * 100)}%</label>${v.s * outScale() > 1.001 ? '<span title="Upscaled: output may look soft" style="color:var(--warning)">⚠</span>' : ''}
+      <label>W ${num('oW', SRC.w * v.s)}</label><label>H ${num('oH', SRC.h * v.s)}</label>
+      ${ib('oLock', '<rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>', 'Lock ratio')}
+      <div class="sep"></div>${ib('oFit', '<path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>', 'Fit inside crop')}
+      ${ib('oFill', '<rect x="4" y="4" width="16" height="16"/><path d="M4 4l16 16M20 4L4 20"/>', 'Fill crop')}
+      ${ib('oCenter', '<circle cx="12" cy="12" r="2"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/>', 'Center on crop')}
+      ${ib('oFH', '<path d="M12 3v18M8 7l-5 5 5 5M16 7l5 5-5 5"/>', 'Flip horizontal')}
+      ${ib('oFV', '<path d="M3 12h18M7 8l5-5 5 5M7 16l5 5 5-5"/>', 'Flip vertical')}
+      ${ib('oReset', '<path d="M4 4v6h6"/><path d="M20 12a8 8 0 1 1-2.3-5.7L4 10"/>', 'Reset')}`;
+  } else if (isCrop(S.tool)) {
+    h = `<span class="tname">Crop: ${{ rect:'Rectangle', round:'Rounded', ellipse:'Ellipse' }[S.tool]}</span>
+      <label>Ratio ${ratioSel('oRatio')}</label><label>X ${num('oCX', c.x)}</label><label>Y ${num('oCY', c.y)}</label>
+      <label>W ${num('oCW', c.w)}</label><label>H ${num('oCH', c.h)}</label>
+      ${ib('oSwap', '<path d="M7 4L3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>', 'Swap W/H')}
+      ${S.tool === 'round' ? `<label>Radius ${num('oCR', c.r, 48)}</label>` : ''}
+      ${S.tool !== 'rect' ? `<label>Feather ${num('oCF', c.feather, 48)}</label>` : ''}
+      <span style="margin-left:6px">Shift = lock · Alt = from centre</span>`;
+  } else if (S.tool === 'hand') {
+    h = `<span class="tname">Hand</span><span>Drag to pan · middle mouse pans in any tool</span>`;
+  } else if (S.tool === 'zoom') {
+    h = `<span class="tname">Zoom</span><button id="zFit">Fit</button><button id="z100">100%</button><button id="z200">200%</button>
+      <span class="mono" style="color:var(--text)">${Math.round(S.view.zoom * 100)}%</span><span>Click = in · Alt+click = out</span>`;
+  } else if (S.tool === 'key') {
+    h = `<span class="tname">Keyframe</span>${ib('kPrev', '<path d="M15 6l-6 6 6 6"/>', 'Previous [')}<button id="kAdd">Add at playhead</button>
+      ${ib('kNext', '<path d="M9 6l6 6-6 6"/>', 'Next ]')}<button id="kDel">Delete</button>
+      <label>Interpolation <select><option>Ease</option><option>Linear</option></select></label><span>${S.keys.length} keyframes</span>`;
+  }
+  o.innerHTML = h;
+  const bind = (id, fn) => { const e = $(id); if (e) e.onchange = () => { fn(+e.value || 0, e); dirty(); syncPanel(); }; };
+  bind('oX', (n) => v.cx = n); bind('oY', (n) => v.cy = n); bind('oS', (n) => { v.s = Math.max(.05, n / 100); buildOptions(); });
+  bind('oW', (n) => { v.s = n / SRC.w; buildOptions(); }); bind('oH', (n) => { v.s = n / SRC.h; buildOptions(); });
+  bind('oCX', (n) => c.x = n); bind('oCY', (n) => c.y = n); bind('oCW', (n) => { c.w = n; applyRatio('w'); });
+  bind('oCH', (n) => { c.h = n; applyRatio('h'); }); bind('oCR', (n) => c.r = n); bind('oCF', (n) => c.feather = n);
+  const r = $('oRatio'); if (r) r.onchange = () => { c.ratio = r.value; applyRatio('area'); buildOptions(); syncPanel(); dirty(); };
+  const on = (id, fn) => { const e = $(id); if (e) e.onclick = () => { fn(); buildOptions(); syncPanel(); dirty(); }; };
+  on('oFit', () => { v.s = Math.min(c.w / SRC.w, c.h / SRC.h); v.cx = c.x + c.w / 2; v.cy = c.y + c.h / 2; });
+  on('oFill', () => { v.s = Math.max(c.w / SRC.w, c.h / SRC.h); v.cx = c.x + c.w / 2; v.cy = c.y + c.h / 2; });
+  on('oCenter', () => { v.cx = c.x + c.w / 2; v.cy = c.y + c.h / 2; });
+  on('oFH', () => v.flipH = !v.flipH); on('oFV', () => v.flipV = !v.flipV);
+  on('oReset', () => Object.assign(v, { cx:960, cy:540, s:1, flipH:false, flipV:false }));
+  on('oSwap', () => { [c.w, c.h] = [c.h, c.w]; });
+  on('zFit', () => { S.view.fit = true; }); on('z100', () => zoomTo(1)); on('z200', () => zoomTo(2));
+  on('kAdd', addKey); on('kDel', () => { S.keys = S.keys.filter(k => Math.abs(k - S.t) > 0.05); });
+  on('kPrev', () => { const p = S.keys.filter(k => k < S.t - .01).pop(); if (p !== undefined) S.t = p; });
+  on('kNext', () => { const n = S.keys.find(k => k > S.t + .01); if (n !== undefined) S.t = n; });
+}
+function applyRatio(by) {
+  const c = S.crop, r = RATIOS[c.ratio] || (c.ratio === 'Original' ? 16 / 9 : 0); if (!r) return;
+  const cx = c.x + c.w / 2, cy = c.y + c.h / 2;
+  if (by === 'w') c.h = c.w / r; else if (by === 'h') c.w = c.h * r;
+  else { const a = c.w * c.h; c.w = Math.sqrt(a * r); c.h = c.w / r; c.x = cx - c.w / 2; c.y = cy - c.h / 2; }
+}
+function addKey() { if (!S.keys.some(k => Math.abs(k - S.t) < .05)) { S.keys.push(S.t); S.keys.sort((a, b) => a - b); } toast('Keyframe added at ' + tc(S.t)); }
+
+// ---------- canvas view ----------
+const cv = $('cv'), cx = cv.getContext('2d');
+let W = 0, H = 0, DPR = 1;
+function resize() {
+  const r = $('stage').getBoundingClientRect(); DPR = window.devicePixelRatio || 1;
+  W = r.width; H = r.height; cv.width = W * DPR; cv.height = H * DPR;
+  const tr = $('tlwrap').getBoundingClientRect(); tl.width = tr.width * DPR; tl.height = tr.height * DPR;
+  dirty();
+}
+function viewXf() {
+  if (S.view.fit) { S.view.zoom = Math.min((W - 80) / SRC.w, (H - 80) / SRC.h); S.view.px = 0; S.view.py = 0; S.view.fit = false; }
+  const z = S.view.zoom; return { z, ox:(W - SRC.w * z) / 2 + S.view.px, oy:(H - SRC.h * z) / 2 + S.view.py };
+}
+const toScr = (x, y, v) => [x * v.z + v.ox, y * v.z + v.oy];
+const toScene = (x, y, v) => [(x - v.ox) / v.z, (y - v.oy) / v.z];
+function zoomTo(z, ax, ay) {
+  const v = viewXf(); ax = ax ?? W / 2; ay = ay ?? H / 2;
+  const [sx, sy] = toScene(ax, ay, v); S.view.zoom = Math.min(8, Math.max(.05, z));
+  const v2 = viewXf(); S.view.px += ax - (sx * v2.z + v2.ox); S.view.py += ay - (sy * v2.z + v2.oy);
+}
+function shapePath(ctx, kind, x, y, w, h, r, keep) {
+  if (!keep) ctx.beginPath();
+  if (kind === 'ellipse') ctx.ellipse(x + w / 2, y + h / 2, Math.abs(w / 2), Math.abs(h / 2), 0, 0, Math.PI * 2);
+  else if (kind === 'round') { const rr = Math.min(r, Math.abs(w) / 2, Math.abs(h) / 2); ctx.roundRect(x, y, w, h, rr); }
+  else ctx.rect(x, y, w, h);
+}
+function videoRect() { const v = S.video; const w = SRC.w * v.s, h = SRC.h * v.s; return { x:v.cx - w / 2, y:v.cy - h / 2, w, h }; }
+function drawVideoInto(ctx, img) {
+  const r = videoRect(), v = S.video;
+  ctx.save(); ctx.translate(r.x + r.w / 2, r.y + r.h / 2); ctx.scale(v.flipH ? -1 : 1, v.flipV ? -1 : 1);
+  ctx.drawImage(img, -r.w / 2, -r.h / 2, r.w, r.h); ctx.restore();
+}
+let needs = true; const dirty = () => { needs = true; };
+function drawStage() {
+  const v = viewXf();
+  cx.setTransform(DPR, 0, 0, DPR, 0, 0); cx.clearRect(0, 0, W, H);
+  // checker where the crop has no video (scene area)
+  cx.save(); cx.translate(v.ox, v.oy); cx.scale(v.z, v.z);
+  const c = S.crop;
+  cx.save(); shapePath(cx, 'rect', c.x, c.y, c.w, c.h); cx.clip();
+  const p = cx.createPattern(checkerTile(), 'repeat'); cx.fillStyle = p; cx.fillRect(c.x, c.y, c.w, c.h); cx.restore();
+  drawSource(srcA.getContext('2d'), S.t, 960, 540); drawVideoInto(cx, srcA);
+  // dim outside the crop
+  cx.save(); cx.beginPath(); cx.rect(-6000, -6000, 14000, 12000);
+  shapePath(cx, c.kind, c.x, c.y, c.w, c.h, c.r, true);
+  cx.fillStyle = 'rgba(0,0,0,.6)'; cx.fill('evenodd'); cx.restore();
+  cx.restore();
+  // video border (selection)
+  const vr = videoRect(), [vx, vy] = toScr(vr.x, vr.y, v);
+  if (S.tool === 'select') {
+    cx.setLineDash([5, 4]); cx.strokeStyle = '#7FB2FF'; cx.lineWidth = 1; cx.strokeRect(vx + .5, vy + .5, vr.w * v.z, vr.h * v.z); cx.setLineDash([]);
+    for (const [hx, hy] of [[vx, vy], [vx + vr.w * v.z, vy], [vx, vy + vr.h * v.z], [vx + vr.w * v.z, vy + vr.h * v.z]]) handle(hx, hy, '#7FB2FF');
+  }
+  // crop outline
+  const [x0, y0] = toScr(c.x, c.y, v), cw = c.w * v.z, ch = c.h * v.z;
+  cx.strokeStyle = '#FF7A1A'; cx.lineWidth = 1.5; shapePath(cx, c.kind, x0, y0, cw, ch, c.r * v.z); cx.stroke();
+  if (c.kind !== 'rect') { cx.setLineDash([4, 4]); cx.strokeStyle = 'rgba(255,122,26,.6)'; cx.lineWidth = 1; cx.strokeRect(x0, y0, cw, ch); cx.setLineDash([]); }
+  if (drag && isCrop(S.tool)) { cx.strokeStyle = 'rgba(255,255,255,.25)'; cx.lineWidth = 1; cx.beginPath();
+    for (let i = 1; i < 3; i++) { cx.moveTo(x0 + cw * i / 3, y0); cx.lineTo(x0 + cw * i / 3, y0 + ch); cx.moveTo(x0, y0 + ch * i / 3); cx.lineTo(x0 + cw, y0 + ch * i / 3); } cx.stroke(); }
+  if (isCrop(S.tool)) for (const [hx, hy] of cropHandles(x0, y0, cw, ch)) handle(hx, hy, '#FF7A1A');
+  // size label
+  const o = outSize(); const lab = `${Math.round(c.w)} × ${Math.round(c.h)}  →  ${o.w} × ${o.h}`;
+  cx.font = '11px Consolas, monospace'; const tw = cx.measureText(lab).width + 12;
+  cx.fillStyle = 'rgba(14,23,38,.9)'; cx.fillRect(x0, y0 + ch + 6, tw, 18); cx.fillStyle = '#FF9447'; cx.fillText(lab, x0 + 6, y0 + ch + 19);
+  $('stageTag').textContent = `${Math.round(v.z * 100)}% · ${S.tool === 'select' ? 'Selection: drag the video, corners scale' : isCrop(S.tool) ? 'Crop: drag inside to move, handles resize, outside draws new' : S.tool}`;
+}
+function handle(x, y, col) { cx.fillStyle = '#fff'; cx.strokeStyle = col; cx.lineWidth = 1.5; cx.fillRect(x - 4, y - 4, 8, 8); cx.strokeRect(x - 4, y - 4, 8, 8); }
+function cropHandles(x, y, w, h) { return [[x, y], [x + w / 2, y], [x + w, y], [x + w, y + h / 2], [x + w, y + h], [x + w / 2, y + h], [x, y + h], [x, y + h / 2]]; }
+let _tile; function checkerTile() {
+  if (_tile) return _tile; _tile = document.createElement('canvas'); _tile.width = _tile.height = 32; const g = _tile.getContext('2d');
+  g.fillStyle = '#3a3a3a'; g.fillRect(0, 0, 32, 32); g.fillStyle = '#2b2b2b'; g.fillRect(0, 0, 16, 16); g.fillRect(16, 16, 16, 16); return _tile;
+}
+
+// ---------- canvas input ----------
+let drag = null;
+cv.addEventListener('mousedown', (e) => {
+  const v = viewXf(), r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, [sx, sy] = toScene(mx, my, v);
+  if (e.button === 1 || S.tool === 'hand') { drag = { k:'pan', mx, my, px:S.view.px, py:S.view.py }; e.preventDefault(); return; }
+  if (S.tool === 'zoom') { zoomTo(S.view.zoom * (e.altKey ? 1 / 1.5 : 1.5), mx, my); buildOptions(); dirty(); return; }
+  const c = S.crop;
+  if (S.tool === 'select') {
+    const vr = videoRect(); const corners = [[vr.x, vr.y], [vr.x + vr.w, vr.y], [vr.x, vr.y + vr.h], [vr.x + vr.w, vr.y + vr.h]];
+    const hi = corners.findIndex(([hx, hy]) => Math.hypot((hx - sx) * v.z, (hy - sy) * v.z) < 8);
+    if (hi >= 0) { const [ax, ay] = corners[3 - hi]; drag = { k:'vscale', ax, ay, s0:S.video.s, d0:Math.hypot(sx - ax, sy - ay) }; return; }
+    if (sx > vr.x && sx < vr.x + vr.w && sy > vr.y && sy < vr.y + vr.h) drag = { k:'vmove', sx, sy, cx:S.video.cx, cy:S.video.cy };
+    return;
+  }
+  if (isCrop(S.tool)) {
+    const [x0, y0] = toScr(c.x, c.y, v); const hs = cropHandles(x0, y0, c.w * v.z, c.h * v.z);
+    const hi = hs.findIndex(([hx, hy]) => Math.hypot(hx - mx, hy - my) < 8);
+    if (hi >= 0) { drag = { k:'cres', hi, c0:{ ...c } }; return; }
+    if (sx > c.x && sx < c.x + c.w && sy > c.y && sy < c.y + c.h) { drag = { k:'cmove', sx, sy, x:c.x, y:c.y }; return; }
+    drag = { k:'cnew', ax:sx, ay:sy }; c.w = 0; c.h = 0;
+  }
+});
+window.addEventListener('mousemove', (e) => {
+  if (!drag) { hover(e); return; }
+  const v = viewXf(), r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, [sx, sy] = toScene(mx, my, v);
+  const c = S.crop, rat = RATIOS[c.ratio] || (e.shiftKey ? 1 : 0);
+  if (drag.k === 'pan') { S.view.px = drag.px + mx - drag.mx; S.view.py = drag.py + my - drag.my; }
+  else if (drag.k === 'vmove') { S.video.cx = drag.cx + sx - drag.sx; S.video.cy = drag.cy + sy - drag.sy; }
+  else if (drag.k === 'vscale') { const d = Math.hypot(sx - drag.ax, sy - drag.ay); const s = Math.max(.05, drag.s0 * d / drag.d0);
+    const vr0 = videoRect(); const dx = Math.sign(vr0.x + vr0.w / 2 - drag.ax), dy = Math.sign(vr0.y + vr0.h / 2 - drag.ay);
+    S.video.s = s; S.video.cx = drag.ax + dx * SRC.w * s / 2; S.video.cy = drag.ay + dy * SRC.h * s / 2; }
+  else if (drag.k === 'cmove') { c.x = snap(drag.x + sx - drag.sx, c.w, 'x', v); c.y = snap(drag.y + sy - drag.sy, c.h, 'y', v); }
+  else if (drag.k === 'cnew') {
+    let w = sx - drag.ax, h = sy - drag.ay;
+    if (rat) { h = Math.sign(h || 1) * Math.abs(w) / rat; }
+    if (e.altKey) { c.x = drag.ax - Math.abs(w); c.y = drag.ay - Math.abs(h); c.w = Math.abs(w) * 2; c.h = Math.abs(h) * 2; }
+    else { c.x = Math.min(drag.ax, drag.ax + w); c.y = Math.min(drag.ay, drag.ay + h); c.w = Math.abs(w); c.h = Math.abs(h); }
+  } else if (drag.k === 'cres') {
+    const o = drag.c0, hi = drag.hi; let x1 = o.x, y1 = o.y, x2 = o.x + o.w, y2 = o.y + o.h;
+    if ([0, 6, 7].includes(hi)) x1 = sx; if ([2, 3, 4].includes(hi)) x2 = sx; if ([0, 1, 2].includes(hi)) y1 = sy; if ([4, 5, 6].includes(hi)) y2 = sy;
+    let w = Math.max(16, x2 - x1), h = Math.max(16, y2 - y1);
+    if (rat) { if (hi === 1 || hi === 5) w = h * rat; else h = w / rat; if ([0, 1, 2].includes(hi)) y1 = y2 - h; if ([0, 6, 7].includes(hi)) x1 = x2 - w; }
+    c.x = x1; c.y = y1; c.w = w; c.h = h;
+  }
+  if (drag.k !== 'pan') { buildOptionsLite(); syncPanel(); }
+  dirty();
+});
+window.addEventListener('mouseup', () => { if (drag && drag.k === 'cnew' && (S.crop.w < 16 || S.crop.h < 16)) Object.assign(S.crop, { x:700, y:260, w:560, h:560 }); drag = null; buildOptions(); dirty(); });
+function snap(val, size, ax, v) {
+  const lim = 8 / v.z, vr = videoRect(); const edges = ax === 'x' ? [vr.x, vr.x + vr.w, vr.x + vr.w / 2] : [vr.y, vr.y + vr.h, vr.y + vr.h / 2];
+  for (const e of edges) { if (Math.abs(val - e) < lim) return e; if (Math.abs(val + size - e) < lim) return e - size; if (Math.abs(val + size / 2 - e) < lim) return e - size / 2; }
+  return val;
+}
+function hover(e) {
+  const t = S.tool; cv.style.cursor = t === 'hand' ? 'grab' : t === 'zoom' ? 'zoom-in' : t === 'select' ? 'move' : 'crosshair';
+}
+cv.addEventListener('wheel', (e) => { e.preventDefault(); const r = cv.getBoundingClientRect();
+  if (e.ctrlKey) zoomTo(S.view.zoom * (e.deltaY < 0 ? 1.15 : 1 / 1.15), e.clientX - r.left, e.clientY - r.top);
+  else if (e.shiftKey) S.view.px -= e.deltaY; else S.view.py -= e.deltaY; dirty(); }, { passive:false });
+let _optT = 0; function buildOptionsLite() { const n = performance.now(); if (n - _optT > 80) { _optT = n; buildOptions(); } }
+
+// ---------- loop maths (§8) ----------
+function loopInfo() {
+  const L0 = S.loop, D = Math.max(2, Math.round((S.outT - S.inT) * S.fps / L0.speed));
+  let F = Math.max(1, Math.min(Math.floor(D / 2), Math.round(L0.fade * S.fps)));
+  let T = Math.max(1, Math.min(Math.floor((D - 1) / 2), Math.round(L0.turn * S.fps)));
+  const L = L0.mode === 'simple' ? D : L0.mode === 'crossfade' ? D - F : 2 * D - 2;
+  return { D, F, T, L };
+}
+const tau = (i) => S.inT + i * S.loop.speed / S.fps;
+function frameMap(k) {
+  const { D, F, T } = loopInfo(), m = S.loop.mode;
+  if (m === 'simple') return [{ t:tau(k), w:1 }];
+  if (m === 'crossfade') {
+    if (k < D - 2 * F) return [{ t:tau(F + k), w:1 }];
+    let x = (k - (D - 2 * F) + 1) / (F + 1); if (S.loop.curve === 'smooth') x = x * x * (3 - 2 * x);
+    return [{ t:tau(F + k), w:1 }, { t:tau(k - (D - 2 * F)), w:x }];
+  }
+  if (m === 'pingpong') return [{ t:tau(k < D ? k : 2 * D - 2 - k), w:1 }];
+  const a = T / (D - 1), x = k < D ? k / (D - 1) : (2 * D - 2 - k) / (D - 1);
+  const e = x < a ? x * x / (2 * a) : x <= 1 - a ? x - a / 2 : 1 - a - (1 - x) * (1 - x) / (2 * a);
+  return [{ t:tau((D - 1) * e / (1 - a)), w:1 }];
+}
+function outScale() { const o = outSize(); return o.w / S.crop.w; }
+function outSize() {
+  let w = S.crop.w, h = S.crop.h; const lim = S.out.size === 'crop' ? 1920 : +S.out.size;
+  const long = Math.max(w, h); if (long > lim || S.out.size !== 'crop') { const k = lim / long; w *= k; h *= k; }
+  const ev = (n) => Math.max(16, Math.round(n / 2) * 2); return { w:ev(w), h:ev(h) };
+}
+function renderOutput(ctx, k, ow, oh) {
+  const c = S.crop, layers = frameMap(k); const sc = ow / c.w;
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, ow, oh);
+  layers.forEach((ly, i) => {
+    const src = i ? srcB : srcA; drawSource(src.getContext('2d'), ly.t, 960, 540);
+    ctx.save(); ctx.globalAlpha = ly.w; ctx.scale(sc, sc); ctx.translate(-c.x, -c.y); drawVideoInto(ctx, src); ctx.restore();
+  });
+  // mask with feather
+  const m = maskCanvas(ow, oh); ctx.globalCompositeOperation = 'destination-in'; ctx.drawImage(m, 0, 0); ctx.globalCompositeOperation = 'source-over';
+}
+let _mk = '', _mc; function maskCanvas(w, h) {
+  const c = S.crop, key = [w, h, c.kind, c.r, c.feather].join();
+  if (key === _mk) return _mc; _mk = key; _mc = document.createElement('canvas'); _mc.width = w; _mc.height = h;
+  const g = _mc.getContext('2d'), f = c.kind === 'rect' ? 0 : c.feather * (w / c.w);
+  g.filter = f > 0 ? `blur(${f / 2}px)` : 'none'; g.fillStyle = '#fff';
+  shapePath(g, c.kind, f / 2, f / 2, w - f, h - f, c.r * (w / c.w)); g.fill(); return _mc;
+}
+
+// ---------- side panel ----------
+const rsel = $('cRatio'); Object.keys(RATIOS).concat(['Custom…']).forEach(k => rsel.add(new Option(k, k)));
+function syncPanel() {
+  const c = S.crop; $('cShape').value = c.kind; rsel.value = c.ratio;
+  for (const [id, v] of [['cX', c.x], ['cY', c.y], ['cW', c.w], ['cH', c.h]]) if (document.activeElement !== $(id)) $(id).value = Math.round(v);
+  $('cR').value = c.r; $('cF').value = c.feather; $('cFv').textContent = c.feather;
+  const li = loopInfo(), o = outSize();
+  $('lFadeF').textContent = li.F + ' f';
+  $('lFade').disabled = S.loop.mode !== 'crossfade'; $('lTurn').disabled = S.loop.mode !== 'smooth';
+  $('loopNote').textContent = `Loop ${(li.L / S.fps).toFixed(2)} s · ${li.L} frames @ ${S.fps} fps`;
+  const alpha = c.kind !== 'rect' || c.feather > 0 || c.x < videoRect().x;
+  $('outNote').textContent = `${o.w}×${o.h} · ${S.out.fmt} · ${alpha ? 'alpha' : 'no alpha'}`;
+  const mb = (o.w * o.h * li.L / 1e6 * (64 - S.crf) / 360 * 0.6 + 0.05).toFixed(1);
+  $('qNote').textContent = `Estimated size ~${mb} MB`; S._mb = mb;
+  $('tInV').textContent = tc(S.inT); $('tOutV').textContent = tc(S.outT); $('tLen').textContent = (S.outT - S.inT).toFixed(2) + ' s';
+}
+$('cShape').onchange = (e) => setTool(e.target.value);
+rsel.onchange = (e) => { S.crop.ratio = e.target.value; applyRatio('area'); buildOptions(); syncPanel(); dirty(); };
+for (const id of ['cX', 'cY', 'cW', 'cH']) $(id).onchange = (e) => { S.crop[id[1].toLowerCase()] = +e.target.value; if (id === 'cW') applyRatio('w'); if (id === 'cH') applyRatio('h'); buildOptions(); syncPanel(); dirty(); };
+$('cR').onchange = (e) => { S.crop.r = +e.target.value; dirty(); };
+$('cF').oninput = (e) => { S.crop.feather = +e.target.value; syncPanel(); dirty(); };
+$('lMode').onchange = (e) => { S.loop.mode = e.target.value; syncPanel(); dirty(); pvReset(); };
+$('lFade').onchange = (e) => { S.loop.fade = Math.max(.05, +e.target.value); syncPanel(); dirty(); pvReset(); };
+$('lTurn').onchange = (e) => { S.loop.turn = +e.target.value; syncPanel(); pvReset(); };
+$('lSpeed').onchange = (e) => { S.loop.speed = Math.min(4, Math.max(.1, +e.target.value)); syncPanel(); dirty(); pvReset(); };
+$('oSize').onchange = (e) => { S.out.size = e.target.value; syncPanel(); dirty(); pvReset(); };
+$('oFmt').onchange = (e) => { S.out.fmt = e.target.value; syncPanel(); };
+$('oFps').onchange = (e) => { const n = parseFloat(e.target.value); S.fps = isNaN(n) ? (e.target.value.startsWith('Source') ? 29.97 : 30) : n; syncPanel(); dirty(); pvReset(); };
+$('qCrf').oninput = (e) => { S.crf = +e.target.value; $('qCrfV').textContent = S.crf; segOn('qPreset', 3); syncPanel(); };
+document.querySelectorAll('.seg').forEach(sg => sg.querySelectorAll('button').forEach((b, i) => b.addEventListener('click', () => segOn(sg.id, i))));
+function segOn(id, i) { const bs = $(id).querySelectorAll('button'); bs.forEach((b, j) => b.classList.toggle('on', i === j));
+  if (id === 'qPreset' && bs[i].dataset.c) { S.crf = +bs[i].dataset.c; $('qCrf').value = S.crf; $('qCrfV').textContent = S.crf; syncPanel(); }
+  if (id === 'lCurve') { S.loop.curve = bs[i].dataset.v; pvReset(); }
+  if (id === 'pvMode') pvMode(bs[i].dataset.m); }
+document.querySelectorAll('.sec h3').forEach(h => h.onclick = () => h.parentElement.classList.toggle('closed'));
+
+// ---------- timeline ----------
+const tl = $('tl'), tx = tl.getContext('2d');
+const thumbs = []; (function makeThumbs() {
+  for (let i = 0; i <= 250; i++) { const c = document.createElement('canvas'); c.width = 96; c.height = 54; drawSource(c.getContext('2d'), i, 96, 54); thumbs.push(c); }
+})();
+function tlX(t) { const w = tl.width / DPR; return (t - S.tl.a) / (S.tl.b - S.tl.a) * w; }
+function tlT(x) { const w = tl.width / DPR; return S.tl.a + x / w * (S.tl.b - S.tl.a); }
+function drawTimeline() {
+  const w = tl.width / DPR, h = tl.height / DPR; tx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  const css = getComputedStyle(document.documentElement), col = (n) => css.getPropertyValue(n).trim();
+  tx.fillStyle = col('--panel'); tx.fillRect(0, 0, w, h);
+  // ruler
+  const span = S.tl.b - S.tl.a, steps = [1 / 30, 0.1, 0.5, 1, 2, 5, 10, 30, 60, 120]; const step = steps.find(s => s / span * w > 70) || 300;
+  tx.fillStyle = col('--text2'); tx.font = '10px Consolas, monospace'; tx.strokeStyle = col('--border');
+  for (let t = Math.ceil(S.tl.a / step) * step; t < S.tl.b; t += step) { const x = tlX(t); tx.beginPath(); tx.moveTo(x + .5, 12); tx.lineTo(x + .5, 18); tx.stroke(); tx.fillText(tc(t).slice(3), x + 3, 10); }
+  // thumbs
+  const ty = 22, th = 54, tw = 96; tx.fillStyle = col('--panel2'); tx.fillRect(0, ty, w, th);
+  for (let x = 0; x < w; x += tw) { const t = Math.min(249, Math.max(0, Math.round(tlT(x + tw / 2)))); tx.drawImage(thumbs[t], x, ty, tw - 1, th); }
+  // outside in/out dim
+  const xi = tlX(S.inT), xo = tlX(S.outT);
+  tx.fillStyle = 'rgba(0,0,0,.5)'; tx.fillRect(0, ty, Math.max(0, xi), th); tx.fillRect(xo, ty, w - xo, th);
+  tx.fillStyle = col('--accentSoft'); tx.fillRect(xi, ty, xo - xi, th);
+  tx.fillStyle = col('--accent'); tx.fillRect(xi, ty - 3, xo - xi, 3);
+  // crossfade band / turn
+  const li = loopInfo(), fpx = li.F * S.loop.speed / S.fps;
+  if (S.loop.mode === 'crossfade') {
+    const xa = tlX(S.outT - fpx), g = tx.createLinearGradient(xa, 0, xo, 0); g.addColorStop(0, 'rgba(255,122,26,0)'); g.addColorStop(1, 'rgba(255,122,26,.75)');
+    tx.fillStyle = g; tx.fillRect(xa, ty, xo - xa, th); tx.setLineDash([4, 3]); tx.strokeStyle = col('--accent'); tx.strokeRect(xi + .5, ty + .5, tlX(S.inT + fpx) - xi, th - 1); tx.setLineDash([]);
+    tx.fillStyle = '#fff'; tx.fillRect(xa - 1, ty, 2, th);
+  } else if (S.loop.mode === 'smooth') {
+    const tp = li.T * S.loop.speed / S.fps; tx.fillStyle = 'rgba(255,122,26,.3)'; tx.fillRect(xi, ty, tlX(S.inT + tp) - xi, th); tx.fillRect(tlX(S.outT - tp), ty, xo - tlX(S.outT - tp), th);
+  }
+  // in/out brackets
+  for (const [x, d] of [[xi, 1], [xo, -1]]) { tx.fillStyle = col('--accent'); tx.fillRect(x - (d < 0 ? 3 : 0), ty - 3, 3, th + 3); tx.fillRect(x - (d < 0 ? 10 : 0), ty + th - 3, 10, 3); tx.fillRect(x - (d < 0 ? 10 : 0), ty - 3, 10, 3); }
+  // keyframes
+  const ky = ty + th + 12;
+  tx.fillStyle = col('--panel2'); tx.fillRect(0, ky - 8, w, 16);
+  for (const k of S.keys) { const x = tlX(k), on = Math.abs(k - S.t) < .05; tx.save(); tx.translate(x, ky); tx.rotate(Math.PI / 4);
+    tx.fillStyle = on ? col('--accent') : col('--panel'); tx.strokeStyle = col('--accent'); tx.lineWidth = 1.5; tx.fillRect(-4, -4, 8, 8); tx.strokeRect(-4, -4, 8, 8); tx.restore(); }
+  tx.fillStyle = col('--text2'); tx.font = '10px Segoe UI'; tx.fillText('Keyframes', 4, ky + 3);
+  // playhead
+  const xp = tlX(S.t); tx.fillStyle = col('--accent'); tx.fillRect(xp - .75, 0, 1.5, h);
+  tx.beginPath(); tx.moveTo(xp - 6, 0); tx.lineTo(xp + 6, 0); tx.lineTo(xp, 8); tx.fill();
+}
+let tdrag = null;
+tl.addEventListener('mousedown', (e) => {
+  const x = e.offsetX, y = e.offsetY, xi = tlX(S.inT), xo = tlX(S.outT), li = loopInfo();
+  if (S.loop.mode === 'crossfade' && Math.abs(x - tlX(S.outT - li.F * S.loop.speed / S.fps)) < 5 && y > 20 && y < 76) tdrag = 'fade';
+  else if (Math.abs(x - xi) < 6 && y > 16) tdrag = 'in'; else if (Math.abs(x - xo) < 6 && y > 16) tdrag = 'out';
+  else if (y > 16 && y < 22 && x > xi && x < xo) tdrag = { k:'range', x, a:S.inT, b:S.outT };
+  else { tdrag = 'scrub'; S.t = clampT(tlT(x)); }
+  dirty(); pvReset();
+});
+window.addEventListener('mousemove', (e) => {
+  if (!tdrag) return; const r = tl.getBoundingClientRect(), x = e.clientX - r.left, t = snapF(tlT(x));
+  if (tdrag === 'in') S.inT = Math.min(t, S.outT - 2 / S.fps); else if (tdrag === 'out') S.outT = Math.max(t, S.inT + 2 / S.fps);
+  else if (tdrag === 'fade') { S.loop.fade = Math.max(1 / S.fps, (S.outT - t) / S.loop.speed); $('lFade').value = S.loop.fade.toFixed(2); }
+  else if (tdrag.k === 'range') { const d = tlT(x) - tlT(tdrag.x); S.inT = tdrag.a + d; S.outT = tdrag.b + d; }
+  else S.t = clampT(t);
+  syncPanel(); dirty();
+});
+window.addEventListener('mouseup', () => { if (tdrag) pvReset(); tdrag = null; });
+tl.addEventListener('wheel', (e) => { e.preventDefault(); const span = S.tl.b - S.tl.a;
+  if (e.ctrlKey) { const t0 = tlT(e.offsetX), k = e.deltaY < 0 ? .8 : 1.25, ns = Math.min(SRC.dur, Math.max(1, span * k)); const f = (t0 - S.tl.a) / span; S.tl.a = t0 - f * ns; S.tl.b = S.tl.a + ns; }
+  else { const d = e.deltaY / 400 * span; S.tl.a += d; S.tl.b += d; }
+  if (S.tl.a < 0) { S.tl.b -= S.tl.a; S.tl.a = 0; } if (S.tl.b > SRC.dur) { S.tl.a -= S.tl.b - SRC.dur; S.tl.b = SRC.dur; } dirty(); }, { passive:false });
+const snapF = (t) => Math.round(t * S.fps) / S.fps; const clampT = (t) => Math.min(SRC.dur, Math.max(0, snapF(t)));
+function setIn(t) { S.inT = Math.min(snapF(t), S.outT - 2 / S.fps); syncPanel(); dirty(); toast('In set at ' + tc(S.inT)); pvReset(); }
+function setOut(t) { S.outT = Math.max(snapF(t), S.inT + 2 / S.fps); syncPanel(); dirty(); toast('Out set at ' + tc(S.outT)); pvReset(); }
+
+// ---------- transport ----------
+function setPlay(p) { S.playing = p; $('playIco').innerHTML = p ? '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>' : '<path d="M7 5l12 7-12 7z"/>'; }
+$('tPlay').onclick = () => setPlay(!S.playing);
+$('tPrev').onclick = () => { S.t = clampT(S.t - 1 / S.fps); dirty(); }; $('tNext').onclick = () => { S.t = clampT(S.t + 1 / S.fps); dirty(); };
+$('tIn').onclick = () => { S.t = S.inT; dirty(); }; $('tOut').onclick = () => { S.t = S.outT; dirty(); };
+$('tLoop').onclick = () => { S.loopPlay = !S.loopPlay; $('tLoop').classList.toggle('on', S.loopPlay); };
+
+// ---------- preview window ----------
+const pv = $('preview'), pc = $('pvCanvas'), pctx = pc.getContext('2d');
+const P = { k:0, playing:true, mode:'live', enc:false, last:0 };
+function openPreview() { pv.style.display = 'flex'; pvReset(); }
+function pvReset() {
+  if (pv.style.display !== 'flex') return; const o = outSize(), li = loopInfo();
+  pc.width = o.w; pc.height = o.h; P.k = Math.min(P.k, li.L - 1); $('pvSlider').max = li.L - 1;
+  if (P.mode === 'enc' && P.enc) { P.enc = false; $('pvState').textContent = 'Encoded: out of date'; $('pvState').style.color = 'var(--warning)'; }
+  pvZoom(); drawSeam(); pvDraw();
+}
+function pvZoom() { const z = $('pvZoom').value; pc.style.width = z === 'fit' ? '' : (pc.width * +z) + 'px'; pc.style.maxWidth = z === 'fit' ? '100%' : 'none'; }
+function drawSeam() {
+  const c = $('pvSeam'), r = c.getBoundingClientRect(); c.width = r.width; c.height = r.height; const g = c.getContext('2d'), li = loopInfo();
+  g.clearRect(0, 0, c.width, c.height); g.fillStyle = '#FF7A1A';
+  const X = (k) => 7 + (c.width - 14) * k / Math.max(1, li.L - 1);
+  if (S.loop.mode === 'crossfade') { g.globalAlpha = .45; g.fillRect(X(li.D - 2 * li.F), 16, X(li.L - 1) - X(li.D - 2 * li.F), 4); g.globalAlpha = 1; }
+  if (S.loop.mode === 'pingpong' || S.loop.mode === 'smooth') g.fillRect(X(li.D - 1) - 1, 14, 2, 8);
+  g.fillRect(X(li.L - 1) - 1, 14, 2, 8); g.fillRect(X(0) - 1, 14, 2, 8);
+}
+function pvDraw() {
+  const li = loopInfo(); renderOutput(pctx, P.k, pc.width, pc.height); $('pvSlider').value = P.k;
+  $('pvTime').textContent = `${(P.k / S.fps).toFixed(2)} / ${(li.L / S.fps).toFixed(2)} s`;
+  const alpha = S.crop.kind !== 'rect' || S.crop.feather > 0;
+  $('pvInfo').textContent = `${pc.width}×${pc.height} · ${S.fps} fps · ${li.L} frames · ${(li.L / S.fps).toFixed(2)} s · ${S.out.fmt}${alpha ? ' alpha' : ''} · ${P.mode === 'enc' && P.enc ? 'actual 1.84 MB' : '~' + S._mb + ' MB'} · ${S.loop.mode}`;
+}
+function pvMode(m) {
+  P.mode = m; $('pvState').style.color = '';
+  if (m === 'live') { $('pvState').textContent = 'Live (GPU)'; return; }
+  $('pvBusy').style.display = 'block'; let p = 0; P.playing = false;
+  const iv = setInterval(() => { p += 4; $('pvBusyBar').style.width = p + '%'; if (p >= 100) { clearInterval(iv); $('pvBusy').style.display = 'none'; P.enc = true; P.playing = true; $('pvState').textContent = 'Encoded · libvpx decode · 1.84 MB'; $('pvState').style.color = 'var(--success)'; pvDraw(); } }, 40);
+}
+$('pvClose').onclick = () => { pv.style.display = 'none'; };
+$('pvPlay').onclick = () => { P.playing = !P.playing; $('pvPlayIco').innerHTML = P.playing ? '<rect x="6" y="5" width="4" height="14"/><rect x="14" y="5" width="4" height="14"/>' : '<path d="M7 5l12 7-12 7z"/>'; };
+$('pvSlider').oninput = (e) => { P.k = +e.target.value; pvDraw(); };
+$('pvBg').onchange = (e) => { const a = $('pvArea'); a.classList.toggle('checker', e.target.value === 'checker'); a.style.background = e.target.value === 'checker' ? '' : e.target.value; };
+$('pvZoom').onchange = pvZoom;
+(function dragWin() { let d = null; pv.querySelector('.title').addEventListener('mousedown', (e) => { if (e.target.closest('button')) return; d = { x:e.clientX - pv.offsetLeft, y:e.clientY - pv.offsetTop }; });
+  window.addEventListener('mousemove', (e) => { if (d) { pv.style.left = (e.clientX - d.x) + 'px'; pv.style.top = Math.max(0, e.clientY - d.y) + 'px'; } });
+  window.addEventListener('mouseup', () => d = null); })();
+
+// ---------- top bar, menu, export, toast ----------
+$('btnPreview').onclick = openPreview;
+$('btnOpen').onclick = () => toast('Mock: the Open dialog accepts any video (probed by content, not extension) or a .avloop project.');
+$('btnMenu').onclick = (e) => { e.stopPropagation(); $('menu').style.display = $('menu').style.display === 'block' ? 'none' : 'block'; };
+document.addEventListener('click', () => $('menu').style.display = 'none');
+$('menu').onclick = (e) => { const a = e.target.closest('div')?.dataset.a;
+  if (a === 'theme') { const r = document.documentElement; r.dataset.theme = r.dataset.theme === 'navy' ? 'black' : 'navy'; dirty(); }
+  else if (a === 'help') $('help').style.display = 'flex'; else if (a) toast('Mock: ' + e.target.closest('div').firstChild.textContent.trim()); };
+$('help').onclick = () => $('help').style.display = 'none';
+let expIv = null;
+$('btnExport').onclick = startExport;
+function startExport() {
+  if (expIv) return; const li = loopInfo(); let k = 0; $('exp').style.display = 'flex';
+  expIv = setInterval(() => { k += 3; const p = Math.min(100, k / li.L * 100); $('expBar').style.width = p + '%';
+    $('expTxt').textContent = `Exporting ${Math.min(k, li.L)}/${li.L} · ${Math.round(p)}% · 41 fps`;
+    if (k >= li.L) { clearInterval(expIv); expIv = null; $('exp').style.display = 'none'; const o = outSize();
+      toast(`Exported ${o.w}×${o.h} · ${(li.L / S.fps).toFixed(2)} s · ${S._mb} MB — <u>Show in folder</u><br><span style="color:var(--text2)">OBS tip: Media Source → Loop on · Use hardware decoding off (keeps transparency)</span>`, true, 6000); } }, 50);
+}
+$('expCancel').onclick = () => { clearInterval(expIv); expIv = null; $('exp').style.display = 'none'; toast('Export cancelled — partial file removed.'); };
+let toastT; function toast(html, ok, ms) { const t = $('toast'); t.innerHTML = html; t.className = ok ? 'ok' : ''; t.style.display = 'block'; clearTimeout(toastT); toastT = setTimeout(() => t.style.display = 'none', ms || 2200); }
+
+// ---------- keyboard ----------
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  const k = e.key;
+  if (e.ctrlKey && (k === 'e' || k === 'E')) { e.preventDefault(); startExport(); return; }
+  if (e.ctrlKey && k === '0') { e.preventDefault(); S.view.fit = true; dirty(); return; }
+  if (e.ctrlKey && k === '1') { e.preventDefault(); zoomTo(1); dirty(); return; }
+  if (k === 'F5') { e.preventDefault(); openPreview(); return; }
+  if (k === 'F1') { e.preventDefault(); $('help').style.display = 'flex'; return; }
+  if (k === 'Escape') { $('help').style.display = 'none'; $('menu').style.display = 'none'; return; }
+  const map = { v:'select', m:'rect', u:'round', e:'ellipse', h:'hand', z:'zoom', k:'key' };
+  if (!e.ctrlKey && map[k.toLowerCase()]) { setTool(map[k.toLowerCase()]); return; }
+  if (k === 'i' || k === 'I') return setIn(S.t); if (k === 'o' || k === 'O') return setOut(S.t);
+  if (k === ' ') { e.preventDefault(); if (pv.style.display === 'flex' && pv.matches(':hover')) $('pvPlay').click(); else setPlay(!S.playing); return; }
+  if (k === 'l' || k === 'L') return $('tLoop').click();
+  if (k === 'Home') { S.t = S.inT; dirty(); } if (k === 'End') { S.t = S.outT; dirty(); }
+  if (k === '\\') { if (e.shiftKey) { const p = (S.outT - S.inT) * .2; S.tl.a = Math.max(0, S.inT - p); S.tl.b = S.outT + p; } else { S.tl.a = 0; S.tl.b = SRC.dur; } dirty(); }
+  if (k === 'ArrowLeft' || k === 'ArrowRight') { const d = (k === 'ArrowLeft' ? -1 : 1) * (e.shiftKey ? 10 : 1);
+    if (isCrop(S.tool) && e.altKey === false && !e.ctrlKey && document.activeElement === document.body && e.getModifierState && false) {}
+    S.t = clampT(S.t + d / S.fps); dirty(); }
+  if (isCrop(S.tool) && (k === 'ArrowUp' || k === 'ArrowDown')) { S.crop.y += (k === 'ArrowUp' ? -1 : 1) * (e.shiftKey ? 10 : 1); buildOptions(); syncPanel(); dirty(); }
+  if (k === '[' || k === ']') { const n = k === '[' ? S.keys.filter(x => x < S.t - .01).pop() : S.keys.find(x => x > S.t + .01); if (n !== undefined) { S.t = n; dirty(); } }
+});
+
+// ---------- main loop ----------
+let last = performance.now();
+function tick(now) {
+  const dt = (now - last) / 1000; last = now;
+  if (S.playing) { S.t += dt * S.loop.speed; if (S.loopPlay && S.t > S.outT) S.t = S.inT; if (S.t > SRC.dur) { S.t = SRC.dur; setPlay(false); } dirty(); }
+  if (needs) { needs = false; drawStage(); drawTimeline(); $('tNow').textContent = tc(S.t); }
+  if (pv.style.display === 'flex' && P.playing && now - P.last > 1000 / S.fps) {
+    P.last = now; const li = loopInfo(); let k = P.k + 1;
+    if ($('pvAround').checked) { const span = Math.round(2 * S.fps); if (li.L > span * 2 && k > span && k < li.L - span) k = li.L - span; }
+    P.k = k % li.L; pvDraw();
+  }
+  requestAnimationFrame(tick);
+}
+window.addEventListener('resize', () => { S.view.fit = true; resize(); });
+$('tDur').textContent = tc(SRC.dur);
+setTool('ellipse'); syncPanel(); resize(); requestAnimationFrame(tick);
+</script>
+</body>
+</html>
