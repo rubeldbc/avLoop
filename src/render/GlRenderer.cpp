@@ -31,9 +31,10 @@ struct Texture {
 } // namespace
 
 struct GlRenderer::State {
-    QOpenGLContext context;
+    // Made in init(), on the thread that renders: a context belongs to the thread that made it.
+    std::unique_ptr<QOpenGLContext> context;
     QOpenGLFunctions_3_3_Core* gl = nullptr;
-    QOpenGLShaderProgram program;
+    std::unique_ptr<QOpenGLShaderProgram> program;
     GLuint vao = 0;
     GLuint fbo = 0;
     GLuint target = 0; // the FBO's colour texture
@@ -133,9 +134,10 @@ GlRenderer::GlRenderer() : surface_(std::make_unique<QOffscreenSurface>()), s_(s
 }
 
 GlRenderer::~GlRenderer() {
-    if (s_->gl && s_->context.makeCurrent(surface_.get())) {
+    if (s_->gl && s_->context && s_->context->makeCurrent(surface_.get())) {
         s_->release();
-        s_->context.doneCurrent();
+        s_->program.reset();
+        s_->context->doneCurrent();
     }
 }
 
@@ -144,17 +146,20 @@ bool GlRenderer::init(QString* error) {
         if (error) *error = why;
         return false;
     };
-    s_->context.setFormat(surface_->requestedFormat());
-    if (!surface_->isValid() || !s_->context.create() || !s_->context.makeCurrent(surface_.get()))
+    s_->context = std::make_unique<QOpenGLContext>();
+    s_->context->setFormat(surface_->requestedFormat());
+    if (!surface_->isValid() || !s_->context->create() || !s_->context->makeCurrent(surface_.get()))
         return fail(QStringLiteral("no OpenGL context"));
-    const QSurfaceFormat got = s_->context.format();
+    const QSurfaceFormat got = s_->context->format();
     if (got.version() < qMakePair(3, 3))
         return fail(QStringLiteral("OpenGL %1.%2, not 3.3").arg(got.majorVersion()).arg(got.minorVersion()));
-    s_->gl = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_3_3_Core>(&s_->context);
+    s_->gl = QOpenGLVersionFunctionsFactory::get<QOpenGLFunctions_3_3_Core>(s_->context.get());
     if (!s_->gl || !s_->gl->initializeOpenGLFunctions()) return fail(QStringLiteral("no OpenGL 3.3 core functions"));
-    if (!s_->program.addShaderFromSourceCode(QOpenGLShader::Vertex, shaders::outputVertex()) ||
-        !s_->program.addShaderFromSourceCode(QOpenGLShader::Fragment, shaders::outputFragment()) || !s_->program.link())
-        return fail(QStringLiteral("shaders: %1").arg(s_->program.log()));
+    s_->program = std::make_unique<QOpenGLShaderProgram>();
+    if (!s_->program->addShaderFromSourceCode(QOpenGLShader::Vertex, shaders::outputVertex()) ||
+        !s_->program->addShaderFromSourceCode(QOpenGLShader::Fragment, shaders::outputFragment()) ||
+        !s_->program->link())
+        return fail(QStringLiteral("shaders: %1").arg(s_->program->log()));
     s_->gl->glGenVertexArrays(1, &s_->vao);
     const std::int64_t vram = media::SystemMemory::adapterMemory();
     s_->budget = vram > 0 ? std::min(kPoolCap, vram / 4) : kPoolCap;
@@ -162,7 +167,7 @@ bool GlRenderer::init(QString* error) {
 }
 
 bool GlRenderer::ready() const {
-    return s_->gl && s_->context.isValid();
+    return s_->gl && s_->context && s_->context->isValid();
 }
 
 QString GlRenderer::name() const {
@@ -172,7 +177,7 @@ QString GlRenderer::name() const {
 
 bool GlRenderer::submit(const Composite& c) {
     State& s = *s_;
-    if (!ready() || !s.context.makeCurrent(surface_.get()) || c.layers.size() > 4) return false;
+    if (!ready() || !s.context->makeCurrent(surface_.get()) || c.layers.size() > 4) return false;
     if (!s.resize(c.size)) return false;
     QOpenGLFunctions_3_3_Core* gl = s.gl;
     gl->glBindFramebuffer(GL_FRAMEBUFFER, s.fbo);
@@ -180,19 +185,19 @@ bool GlRenderer::submit(const Composite& c) {
     gl->glDisable(GL_BLEND);
     gl->glClearColor(0, 0, 0, 0);
     gl->glClear(GL_COLOR_BUFFER_BIT);
-    s.program.bind();
+    s.program->bind();
     for (int i = 0; i < int(c.layers.size()); ++i) {
         const Layer& l = c.layers[i];
         gl->glActiveTexture(GL_TEXTURE0 + i);
         gl->glBindTexture(GL_TEXTURE_2D, s.texture(l.frame));
-        s.program.setUniformValue(QStringLiteral("uTex%1").arg(i).toLatin1().constData(), i);
-        s.program.setUniformValue(
+        s.program->setUniformValue(QStringLiteral("uTex%1").arg(i).toLatin1().constData(), i);
+        s.program->setUniformValue(
             QStringLiteral("uPlace[%1]").arg(i).toLatin1().constData(),
             QVector4D(float(l.place.ax), float(l.place.bx), float(l.place.ay), float(l.place.by)));
-        s.program.setUniformValue(QStringLiteral("uWeight[%1]").arg(i).toLatin1().constData(), float(l.weight));
+        s.program->setUniformValue(QStringLiteral("uWeight[%1]").arg(i).toLatin1().constData(), float(l.weight));
     }
-    s.program.setUniformValue("uCount", int(c.layers.size()));
-    s.program.setUniformValue("uHasMask", c.mask != nullptr);
+    s.program->setUniformValue("uCount", int(c.layers.size()));
+    s.program->setUniformValue("uHasMask", c.mask != nullptr);
     if (c.mask) {
         gl->glActiveTexture(GL_TEXTURE4);
         if (!s.mask) gl->glGenTextures(1, &s.mask);
@@ -208,11 +213,11 @@ bool GlRenderer::submit(const Composite& c) {
             gl->glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             s.maskKey = c.mask->cacheKey();
         }
-        s.program.setUniformValue("uMask", 4);
+        s.program->setUniformValue("uMask", 4);
     }
-    s.program.setUniformValue("uOpaque", !c.alpha);
-    s.program.setUniformValue("uBackground", QVector3D(float(c.background.redF()), float(c.background.greenF()),
-                                                       float(c.background.blueF())));
+    s.program->setUniformValue("uOpaque", !c.alpha);
+    s.program->setUniformValue("uBackground", QVector3D(float(c.background.redF()), float(c.background.greenF()),
+                                                        float(c.background.blueF())));
     gl->glBindVertexArray(s.vao);
     gl->glDrawArrays(GL_TRIANGLES, 0, 3);
     // Read back into a PBO: the copy runs while the next frame is drawn.
@@ -227,7 +232,7 @@ bool GlRenderer::submit(const Composite& c) {
 
 bool GlRenderer::take(std::uint8_t* out, int stride) {
     State& s = *s_;
-    if (!ready() || s.inFlight == 0 || !s.context.makeCurrent(surface_.get())) return false;
+    if (!ready() || s.inFlight == 0 || !s.context->makeCurrent(surface_.get())) return false;
     // The oldest in flight: two back when two are, else the one just read.
     const int which = s.inFlight == 2 ? s.next : (s.next ^ 1);
     QOpenGLFunctions_3_3_Core* gl = s.gl;
@@ -255,7 +260,7 @@ bool GlRenderer::render(const Composite& c, std::uint8_t* out, int stride) {
 }
 
 bool GlRenderer::recover() {
-    if (s_->context.isValid()) return true;
+    if (s_->context && s_->context->isValid()) return true;
     s_->gl = nullptr;
     s_->pool.clear();
     s_->poolBytes = 0;
@@ -263,7 +268,7 @@ bool GlRenderer::recover() {
     s_->size = {};
     s_->mask = s_->target = s_->fbo = s_->vao = 0;
     s_->pbo[0] = s_->pbo[1] = 0;
-    s_->program.removeAllShaders();
+    s_->program.reset();
     return init();
 }
 

@@ -14,9 +14,15 @@ namespace {
 constexpr double kSameFrame = 1e-6; // seconds: two times this close name the same frame
 }
 
-FrameRenderer::FrameRenderer(const RenderJob& job, media::DiskCache* diskCache, bool preferGpu)
+FrameRenderer::FrameRenderer(const RenderJob& job, media::DiskCache* diskCache, bool preferGpu, GlRenderer* sharedGl)
     : job_(job), disk_(diskCache), preferGpu_(preferGpu) {
-    if (preferGpu_) gl_ = std::make_unique<GlRenderer>();
+    if (!preferGpu_) return;
+    if (sharedGl) {
+        gl_ = sharedGl;
+    } else {
+        ownGl_ = std::make_unique<GlRenderer>();
+        gl_ = ownGl_.get();
+    }
 }
 
 FrameRenderer::~FrameRenderer() = default;
@@ -49,10 +55,10 @@ bool FrameRenderer::open(QString* error) {
     if (!job_.crop.isEmpty()) mask_ = masks_.mask(job_.crop, job_.outputSize);
     backend_ = Backend::Cpu;
     if (gl_) {
-        if (gl_->init(&gpuNote_))
+        if (gl_->ready() || gl_->init(&gpuNote_))
             backend_ = Backend::Gpu;
         else
-            gl_.reset();
+            gl_ = nullptr;
     }
     return true;
 }

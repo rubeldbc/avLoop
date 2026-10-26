@@ -54,8 +54,18 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
         {QStringLiteral("fpsMethod"), LoopSettings::methodId(d.loop.method)},
     };
     root.insert(QStringLiteral("loop"), merged(d.original, QStringLiteral("loop"), loop));
-    const QJsonObject output{{QStringLiteral("fps"), d.output.fpsId()}};
+    const QJsonObject output{{QStringLiteral("format"), formatId(d.output.format)},
+                             {QStringLiteral("fps"), d.output.fpsId()}};
     root.insert(QStringLiteral("output"), merged(d.original, QStringLiteral("output"), output));
+    const QJsonObject quality{
+        {QStringLiteral("preset"), QualitySettings::presetId(d.quality.preset)},
+        {QStringLiteral("crf"), d.quality.crf},
+        {QStringLiteral("speed"), d.quality.speed},
+        {QStringLiteral("maxBitrate"), d.quality.maxBitrate},
+        {QStringLiteral("twoPass"), d.quality.twoPass},
+        {QStringLiteral("targetMB"), d.quality.targetMB},
+    };
+    root.insert(QStringLiteral("quality"), merged(d.original, QStringLiteral("quality"), quality));
 
     QJsonObject transform{
         {QStringLiteral("x"), d.transform.x},         {QStringLiteral("y"), d.transform.y},
@@ -132,8 +142,19 @@ bool fromJson(const QJsonObject& json, ProjectData& d, QString* error, const QSt
     d.loop.speed = l.value(QStringLiteral("speed")).toDouble(defaults.speed);
     d.loop.method = LoopSettings::methodFromId(l.value(QStringLiteral("fpsMethod")).toString());
     d.loop = d.loop.clamped();
-    d.output = OutputSettings::fromFpsId(
-        json.value(QStringLiteral("output")).toObject().value(QStringLiteral("fps")).toString());
+    const QJsonObject o = json.value(QStringLiteral("output")).toObject();
+    d.output = OutputSettings::fromFpsId(o.value(QStringLiteral("fps")).toString());
+    d.output.format = formatFromId(o.value(QStringLiteral("format")).toString());
+    const QJsonObject q = json.value(QStringLiteral("quality")).toObject();
+    const QualitySettings qd;
+    d.quality.preset = q.contains(QStringLiteral("preset"))
+                           ? QualitySettings::presetFromId(q.value(QStringLiteral("preset")).toString())
+                           : qd.preset;
+    d.quality.crf = q.value(QStringLiteral("crf")).toInt(qd.crf);
+    d.quality.speed = q.value(QStringLiteral("speed")).toInt(qd.speed);
+    d.quality.maxBitrate = q.value(QStringLiteral("maxBitrate")).toInt(0);
+    d.quality.twoPass = q.value(QStringLiteral("twoPass")).toBool(false);
+    d.quality.targetMB = q.value(QStringLiteral("targetMB")).toDouble(0);
 
     const QJsonObject t = json.value(QStringLiteral("transform")).toObject();
     d.transform.x = t.value(QStringLiteral("x")).toDouble();

@@ -82,6 +82,7 @@ int main(int argc, char** argv) {
     cli.process(app);
 
     const bool lab = cli.isSet(shot) || cli.isSet(walk);
+    app.setProperty("avloop.lab", lab); // windows opened later (the Preview) stay quiet too
     std::unique_ptr<QTemporaryDir> labSettings;
     if (lab) {
         labSettings = std::make_unique<QTemporaryDir>(QDir::temp().filePath(QStringLiteral("avloop-lab-XXXXXX")));

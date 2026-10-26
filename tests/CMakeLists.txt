@@ -29,11 +29,13 @@ foreach(_t geometry commands project-json loopmap timemap)
 endforeach()
 
 # The media tests read the lab's samples (tools/media/make-samples.mjs); a missing sample skips its case.
-foreach(_t probe decoder-seek memory interpolator)
+foreach(_t probe decoder-seek memory interpolator export)
     avloop_add_test(${_t} SOURCES test-${_t}.cpp Samples.h LIBS avloop_media)
     target_compile_definitions(test-${_t} PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
     target_include_directories(test-${_t} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 endforeach()
+# test-export reads the written file's packets itself.
+target_link_libraries(test-export PRIVATE FFmpeg::avformat FFmpeg::avcodec FFmpeg::avutil)
 
 # GPU/CPU parity needs an OpenGL 3.3 context: a real display, never CI (labelled gpu).
 avloop_add_test(renderer GPU SOURCES test-renderer.cpp RenderCases.h Samples.h LIBS avloop_render)

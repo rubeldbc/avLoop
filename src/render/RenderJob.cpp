@@ -16,6 +16,7 @@ RenderJob RenderJob::of(const ProjectData& p, const media::MediaInfo& source) {
     job.crop = p.crop;
     job.loop = p.loop.clamped();
     job.output = p.output;
+    job.quality = p.quality;
     const QSizeF video(source.width, source.height);
     job.fps = p.output.effectiveFps(source.avgFps.isValid() ? source.avgFps : source.realFps, source.vfr);
     job.frame = geometry::exportFrame(p.crop.rect, p.transform, video);

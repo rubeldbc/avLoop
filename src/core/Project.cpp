@@ -28,6 +28,7 @@ ProjectData Project::snapshot() const {
     d.range = range_;
     d.loop = loop_;
     d.output = output_;
+    d.quality = quality_;
     d.transform = transform_;
     d.crop = crop_;
     d.view = view_;
@@ -39,6 +40,7 @@ void Project::restore(const ProjectData& data) {
     source_ = data.source;
     loop_ = data.loop.clamped();
     output_ = data.output;
+    quality_ = data.quality;
     range_ = timerange::valid(data.range, source_.duration, outputFps());
     transform_ = data.transform;
     crop_ = data.crop.clamped();
@@ -51,6 +53,7 @@ void Project::restore(const ProjectData& data) {
     emit changed(Aspect::Crop);
     emit changed(Aspect::Loop);
     emit changed(Aspect::Output);
+    emit changed(Aspect::Quality);
     emit changed(Aspect::View);
 }
 
@@ -102,6 +105,18 @@ void Project::changeOutput(const OutputSettings& after, const QString& mergeKey)
         changeRange(timerange::valid(range_, source_.duration, next));
         undo_.endMacro();
     }
+}
+
+void Project::changeQuality(const QualitySettings& after, const QString& mergeKey) {
+    if (after == quality_) return;
+    undo_.push(new SetQualityCommand(
+        SetQualityId, tr("Change the quality"), quality_, after, [this](const QualitySettings& q) { applyQuality(q); },
+        mergeKey));
+}
+
+void Project::applyQuality(const QualitySettings& q) {
+    quality_ = q;
+    emit changed(Aspect::Quality);
 }
 
 void Project::applyLoop(const LoopSettings& l) {

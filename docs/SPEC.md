@@ -6,6 +6,35 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-008 — The Preview window (AV-008, 2026-10-26)
+
+- The Preview button or F5 opens one non-modal window (again: to the front) that shows only the exported part as it
+  will be exported — the FrameRenderer's frames, the same as `avloop-cli frame` byte for byte. Its size and place are
+  remembered; it starts at the output's size with its controls, at most 80% of the screen.
+- Top: Live | Encoded, Background (Checker, Black, White, Green #00FF00, Navy, Image…), Zoom (Fit, 50%, 100% —
+  pixel-exact —, 200%), and what it is doing ("Caching…", "Encoding n/L", "Out of date", "Encoded · 0.28 MB").
+  Bottom: Play/Pause (Space), the slider over frames 0 … L − 1 (←/→ a frame) with the seam at its ends, Crossfade's
+  blended frames as an orange strip, the Ping-pongs' turn points and a thin bar of the frames already made; the time
+  "1.43 / 2.50 s"; Around seam (the last 2 s and the first 2 s, again and again). The info row: "640×360 · 30 fps ·
+  75 frames · 2.50 s · VP9 alpha", with the encoded size once there is one.
+- Live: frames made on the render service's thread into the Preview's own cache (a third of the frame cache's budget,
+  at most 512 MB — reading R-31); playback always loops and waits for a frame not yet made ("Caching…") instead of
+  dropping it. Any change in the main window reaches it 250 ms later.
+- Encoded: the loop encoded with the current Output and Quality into a temporary WebM in the session's folder (progress
+  shown), then that file played back through libvpx — alpha and compression as OBS shows them; a change marks it "Out
+  of date" (it is not encoded again by itself); the file goes when the window closes.
+- The encoder (`media/Encoder`, `EncoderOptions`, `Muxer`; shared with the export, reading R-14): premultiplied
+  frames made straight, `yuva420p` (`yuv420p` without alpha), libvpx-vp9 (crf, `b:v 0`, deadline good, cpu-used,
+  row-mt, tile columns log2(W/256), auto-alt-ref, lag-in-frames 25) or libvpx for VP8 (crf within the preset's bitrate,
+  auto-alt-ref 0); BT.709 for VP9, BT.601 for VP8 (reading R-32), limited range, tagged; pts = k in 1/fps, the first
+  frame a keyframe, the loop one GOP, no audio; the WebM marked `alpha_mode`. The Quality presets Low / Medium / High
+  / Custom (§10.3) and the format (VP9 / VP8) are in the project (`quality`, `output.format`); their panels are
+  AV-009's.
+- The render service (one thread and one GPU context for the app's life — reading R-33) makes the Preview's frames;
+  closing the Preview releases its player, its caches and its file; six opens and closes in a row hold Private Bytes
+  within 3 MB.
+- The editor's playback keeps the loop's first six frames, so each lap starts without waiting for a seek to In.
+
 ### D-007 — The renderer (AV-007, 2026-10-26)
 
 - One `render::FrameRenderer` makes output frame k from a `RenderJob` snapshot (source, range, transform, crop,

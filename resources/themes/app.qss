@@ -5,7 +5,7 @@ QWidget {
     color: @text;
     background: transparent;
 }
-QMainWindow, QDialog, #CanvasArea {
+QMainWindow, QDialog, #CanvasArea, #PreviewWindow {
     background: @bg;
 }
 #TopBar {
@@ -248,6 +248,11 @@ QLabel[quiet="true"] {
 }
 *[mono="true"] {
     font-family: Consolas;
+}
+/* The Preview's Live | Encoded: the mode on show */
+#PreviewWindow QPushButton:checked {
+    color: @accent;
+    border: 1px solid @accent;
 }
 /* A value the loop clamped (spec §8.5) */
 *[flash="true"] {

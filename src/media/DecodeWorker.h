@@ -18,7 +18,8 @@ class FrameCache;
 
 // A decoder on its own thread (spec §3.5: decoding never happens on the UI thread). Requests are coalesced — only the
 // newest waiting request is decoded — and answered by a signal; decoded frames go into the frame cache. Playback
-// decodes ahead in display order into a ring of six frames the UI's clock takes from (spec §7.3).
+// decodes ahead in display order into a ring of six frames the UI's clock takes from (spec §7.3); with loop on, the
+// lap's first six are kept too, so each new lap starts without waiting for a seek.
 class DecodeWorker : public QObject {
     Q_OBJECT
 public:

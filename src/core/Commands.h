@@ -68,5 +68,6 @@ using SetCropCommand = ValueCommand<CropShape>;
 using SetRangeCommand = ValueCommand<TimeRange>;
 using SetLoopCommand = ValueCommand<LoopSettings>;
 using SetOutputCommand = ValueCommand<OutputSettings>;
+using SetQualityCommand = ValueCommand<QualitySettings>;
 
 } // namespace avloop

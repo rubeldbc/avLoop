@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/QualitySettings.h"
 #include "core/Rational.h"
 
 #include <QList>
@@ -36,6 +37,7 @@ struct LoopSettings {
 
 // What the export is (spec §10.2, §11.1 "output"); AV-006 holds the frame rate, AV-009 the rest.
 struct OutputSettings {
+    OutputFormat format = OutputFormat::WebmVp9;
     bool sourceFps = true; // "Source" (reading R-6): the stream's rate, at most 60
     Rational fps{30, 1};   // a chosen rate (15 … 60 or Custom 1–60, three decimals)
 

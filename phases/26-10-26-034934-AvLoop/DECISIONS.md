@@ -57,3 +57,6 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-28 | The default loop is Crossfade (F 0.5 s, Smooth) | the app's purpose; §11.1's example | `README.md` §3; AV-006 |
 | R-29 | A new rate moves In/Out to its grid in the same Undo step | §8.3 | `README.md` §3; AV-006 |
 | R-30 | The Motion pre-pass runs for the Preview and the export | §8.3, §9, §10 | `README.md` §3; AV-006 |
+| R-31 | The Preview's cache: a third of the frame cache, ≤ 512 MB | §3.7.1 | `README.md` §3; AV-008 |
+| R-32 | VP9 in BT.709, VP8 in BT.601; straight colour, separate alpha | what decoders read | `README.md` §3; AV-008 |
+| R-33 | One render thread and GPU context for the app's life | GPU-driver memory (AV-007) | `README.md` §3; AV-008 |

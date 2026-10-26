@@ -5,6 +5,7 @@
 
 #include <QElapsedTimer>
 #include <QMainWindow>
+#include <QPointer>
 #include <QStringList>
 
 #include <memory>
@@ -18,6 +19,7 @@ class QMenu;
 class QPushButton;
 class QSplitter;
 class QStackedWidget;
+class QTimer;
 class QToolButton;
 
 namespace avloop {
@@ -31,6 +33,10 @@ class FrameCache;
 
 class Canvas;
 class DropZone;
+class PreviewWindow;
+namespace render {
+class RenderService;
+}
 class PlaybackClock;
 class Timeline;
 class Project;
@@ -106,6 +112,9 @@ private:
     void toggleLoop();
     void refreshTransport();
     double fileEnd() const;
+    // MainWindowPreview.cpp — the one Preview window.
+    void buildPreview();
+    void openPreview();
 
     QToolButton* menuButton_ = nullptr;
     QMenu* menu_ = nullptr;
@@ -125,6 +134,8 @@ private:
     bool loopOn_ = true;
     double shownSeconds_ = 0;
     QElapsedTimer rasterClock_; // playback's timeline repaints, at most 30 a second
+    QPointer<PreviewWindow> previewWindow_;
+    QTimer* previewDue_ = nullptr;
     QString rangeText_;
     QSplitter* mainSplit_ = nullptr;
     QSplitter* centreSplit_ = nullptr;
@@ -140,7 +151,8 @@ private:
 
     std::unique_ptr<media::DiskCache> disk_;
     std::unique_ptr<media::FrameCache> cache_;
-    std::unique_ptr<media::WorkerThread> decodeThread_; // outlives every worker: declared first, gone last
+    std::unique_ptr<render::RenderService> renderService_; // outlives every Preview
+    std::unique_ptr<media::WorkerThread> decodeThread_;    // outlives every worker: declared first, gone last
     std::unique_ptr<media::DecodeWorker> worker_;
     std::optional<media::MediaInfo> video_;
     QString videoState_ = QStringLiteral("none"); // none, opening, ready, error

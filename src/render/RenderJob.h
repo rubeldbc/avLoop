@@ -19,6 +19,7 @@ struct RenderJob {
     CropShape crop;
     LoopSettings loop;
     OutputSettings output;
+    QualitySettings quality;
     bool alpha = true; // Alpha Auto until AV-009: needed → kept, else composited over `background`
     QColor background = Qt::black;
 

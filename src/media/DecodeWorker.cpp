@@ -4,6 +4,9 @@
 
 #include <QMetaObject>
 
+#include <cmath>
+#include <vector>
+
 namespace avloop::media {
 
 DecodeWorker::DecodeWorker(const MediaInfo& info, const Decoder::Options& options, FrameCache* cache, QThread* thread,
@@ -105,6 +108,10 @@ bool DecodeWorker::push(Slot slot) {
 void DecodeWorker::produce(double from, double until, double loopFrom, bool loop) {
     if (!decoder_ || stopPlay_) return;
     int lap = 0;
+    // The lap's first frames, kept: a new lap starts with them at once while the decoder seeks back behind them — an
+    // In between keyframes would otherwise cost a GOP's decoding at every wrap.
+    std::vector<Frame> head;
+    bool capturing = loop && std::abs(from - loopFrom) < 1e-6;
     Frame f = decoder_->frameAt(from);
     while (!stopPlay_) {
         if (f.isNull() || f.seconds >= until - 1e-9) {
@@ -113,11 +120,24 @@ void DecodeWorker::produce(double from, double until, double loopFrom, bool loop
                 return;
             }
             ++lap; // the clock wraps to loopFrom at `until`
+            if (head.size() == std::size_t(kRing)) {
+                for (const Frame& h : head)
+                    if (!push(Slot{h, lap, false, h.seconds})) return;
+                decoder_->frameAt(head.back().seconds + 1e-6);
+                f = decoder_->next(); // the frame after the head
+                continue;
+            }
+            head.clear();
+            capturing = true;
             f = decoder_->frameAt(loopFrom);
             if (f.isNull()) {
                 push(Slot{{}, lap, true, until});
                 return;
             }
+        }
+        if (capturing) {
+            head.push_back(f);
+            capturing = head.size() < std::size_t(kRing);
         }
         if (!push(Slot{f, lap, false, f.seconds})) return;
         f = decoder_->next();

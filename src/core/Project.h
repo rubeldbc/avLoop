@@ -60,6 +60,7 @@ public:
     const CropShape& crop() const { return crop_; }
     const LoopSettings& loop() const { return loop_; }
     const OutputSettings& output() const { return output_; }
+    const QualitySettings& quality() const { return quality_; }
     // The output frame grid In, Out and the playhead snap to (spec §6.4, §8.3): the Output section's FPS.
     Rational outputFps() const;
     const ViewState& view() const { return view_; }
@@ -82,6 +83,7 @@ public:
     void changeLoop(const LoopSettings& after, const QString& mergeKey = {});
     // A new frame rate keeps In and Out in seconds, on the new grid (one Undo step with the range — reading R-29).
     void changeOutput(const OutputSettings& after, const QString& mergeKey = {});
+    void changeQuality(const QualitySettings& after, const QString& mergeKey = {});
 
     // Only commands call these.
     void applyTransform(const VideoTransform& t);
@@ -89,6 +91,7 @@ public:
     void applyRange(const TimeRange& r);
     void applyLoop(const LoopSettings& l);
     void applyOutput(const OutputSettings& o);
+    void applyQuality(const QualitySettings& q);
 
 signals:
     void changed(avloop::Project::Aspect aspect);
@@ -100,6 +103,7 @@ private:
     CropShape crop_;
     LoopSettings loop_;
     OutputSettings output_;
+    QualitySettings quality_;
     ViewState view_;
     QJsonObject extra_;
     QUndoStack undo_;

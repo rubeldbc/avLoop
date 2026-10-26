@@ -6,6 +6,7 @@ add_library(avloop_core STATIC
     core/CropShape.h core/CropShape.cpp core/AspectRatio.h core/AspectRatio.cpp
     core/Timecode.h core/Timecode.cpp core/TimeRange.h core/TimeRange.cpp
     core/LoopSettings.h core/LoopSettings.cpp core/LoopMap.h core/LoopMap.cpp core/TimeMap.h core/TimeMap.cpp
+    core/QualitySettings.h core/QualitySettings.cpp
     core/Project.h core/Project.cpp core/Commands.h core/ProjectJson.h core/ProjectJson.cpp)
 target_include_directories(avloop_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/generated)
 # Qt Gui only for QUndoStack/QUndoCommand, which Qt 6 moved there from Widgets (spec §11.2).
@@ -18,6 +19,7 @@ add_library(avloop_media STATIC
     media/FrameCache.h media/FrameCache.cpp media/DiskCache.h media/DiskCache.cpp
     media/DecodeWorker.h media/DecodeWorker.cpp media/ThumbnailWorker.h media/ThumbnailWorker.cpp
     media/Interpolator.h media/Interpolator.cpp media/FrameIndex.h media/FrameIndex.cpp media/WorkerThread.h
+    media/Encoder.h media/Encoder.cpp media/EncoderOptions.h media/EncoderOptions.cpp media/Muxer.h media/Muxer.cpp
     media/SystemMemory.h media/SystemMemory.cpp)
 target_link_libraries(avloop_media
     PUBLIC avloop_core Qt6::Core
@@ -26,13 +28,16 @@ target_link_libraries(avloop_media
 add_library(avloop_render STATIC
     render/Shaders.h render/Shaders.cpp render/MaskBuilder.h render/MaskBuilder.cpp
     render/RenderJob.h render/RenderJob.cpp render/CpuRenderer.h render/CpuRenderer.cpp
-    render/GlRenderer.h render/GlRenderer.cpp render/FrameRenderer.h render/FrameRenderer.cpp)
+    render/GlRenderer.h render/GlRenderer.cpp render/FrameRenderer.h render/FrameRenderer.cpp
+    render/RenderService.h render/RenderService.cpp)
 target_link_libraries(avloop_render PUBLIC avloop_core avloop_media Qt6::Gui Qt6::OpenGL
     PRIVATE Qt6::Concurrent avloop_warnings)
 
 add_library(avloop_ui STATIC
     ui/MainWindow.h ui/MainWindow.cpp ui/MainMenu.cpp ui/MainWindowActions.cpp ui/MainWindowCanvas.cpp
-    ui/MainWindowTimeline.cpp
+    ui/MainWindowTimeline.cpp ui/MainWindowPreview.cpp
+    ui/preview/PreviewWindow.h ui/preview/PreviewWindow.cpp ui/preview/PreviewWidgets.h ui/preview/PreviewWidgets.cpp
+    ui/preview/PreviewPlayer.h ui/preview/PreviewPlayer.cpp ui/preview/PreviewEncode.cpp
     ui/WalkRunner.h ui/WalkRunner.cpp ui/WalkSteps.cpp
     ui/theme/Theme.h ui/theme/Theme.cpp
     ui/theme/IconFactory.h ui/theme/IconFactory.cpp

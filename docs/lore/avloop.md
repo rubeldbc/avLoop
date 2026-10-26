@@ -160,3 +160,20 @@ end of its section.
   decode and thumbnail workers on threads that live with the window, the thumbnail decoder single-threaded. (AV-007)
 - **A memory check compares the floor, not the last sample**: Private Bytes after a burst swings with the heap's
   timing. Rule: the late rounds' minimum against the early rounds' maximum (test-memory `decodersComeAndGo`). (AV-007)
+
+## The Preview and the encoder
+
+- **A QOpenGLContext belongs to the thread that made it**: made with the GlRenderer on the GUI thread, it could not be
+  made current on the render thread ("Cannot make QOpenGLContext current in a different thread", a fail-fast). Rule:
+  `GlRenderer::init()` makes its context and program on the thread that renders; only the offscreen surface is made
+  on the GUI thread. (AV-008)
+- **VP8 cannot say BT.709**: frames written in BT.709 came back 14–16 levels off, as decoders read VP8 as BT.601. Rule:
+  VP9 in BT.709, VP8 in BT.601, both tagged. (AV-008)
+- **WebM keeps alpha only when the stream is marked**: the Matroska muxer writes AlphaMode (and the alpha in
+  BlockAdditions) when the stream's metadata has `alpha_mode=1`; the colour planes are straight, so premultiplied
+  frames are made straight first. (AV-008)
+- **Keys typed into a second window need it as Qt's active window**: the walk's key step made the main window active,
+  so the Preview's window shortcuts never fired. Rule: the key step activates (in Qt only) the window of its target.
+  (AV-008)
+- **A loop's wrap to an In between keyframes costs a GOP of decoding**: the editor's playback keeps the lap's first six
+  frames and starts each lap with them while the decoder seeks behind them. (AV-008)

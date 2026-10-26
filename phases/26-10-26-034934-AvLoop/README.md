@@ -123,6 +123,12 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     the same Undo step; F and T stay in seconds and their frames are worked out again.
 30. **R-30** Motion Interpolation's pre-pass runs when the Preview or the export needs its frames (AV-008, AV-009),
     with their progress and cancel; AV-006 builds and tests it.
+31. **R-31** The Preview's own cache holds a third of the frame cache's budget, at most 512 MB; a loop larger than that
+    keeps playing through "Caching…" (§3.7.1 names no Preview limit).
+32. **R-32** VP9 is written in BT.709, VP8 in BT.601 (VP8 cannot carry BT.709 and every decoder reads it as BT.601);
+    the colour planes are straight, the alpha separate (WebM's alpha is unassociated).
+33. **R-33** The app's output frames are made on one render thread with one GPU context that live with the window
+    (the Preview now, the export at AV-009): a thread or a context made per use leaves GPU-driver memory behind (AV-007).
 
 ## 4. What is not built
 

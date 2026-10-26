@@ -80,7 +80,7 @@ private:
     int stepMenu(const QJsonObject& step);
     void menuNext();
     QPoint point(QWidget* widget, const QJsonObject& step, const QString& key) const;
-    void ensureActive();
+    void ensureActive(QWidget* window = nullptr); // Qt's active window: the main one, or the one given
 
     QPointer<QWidget> window_;
     QString script_;

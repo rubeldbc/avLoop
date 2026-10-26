@@ -1,0 +1,8 @@
+PASS Live frame 10 = avloop-cli frame 10: frame 10 of 75 · 640x360 · crossfade · GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 · 47 ms → cli-10.png | mean 0.0000, max 0
+PASS Encoded frame 10 against Live (compression only): mean 1.065, max 76
+PASS the Encoded file keeps its alpha (libvpx): {"w":640,"h":360,"min":0,"max":255,"mean":190.73616319444446,"corner":0,"centre":255}
+     encoded: vp9 640×360 30/1, ? frames, 298618 bytes
+PASS the Preview opened and closed six times: exit 0
+PASS Private Bytes: opens 3–6 against open 2: peaks 607 / 614 / 618 / 617 / 618 / 620 MB → growth 5.4 MB
+PASS VRAM: opens 3–6 against open 2: peaks 105 / 107 / 107 / 107 / 107 / 107 MB → growth 0.0 MB
+WALK PASSED

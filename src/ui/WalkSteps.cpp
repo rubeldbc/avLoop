@@ -172,13 +172,14 @@ int WalkRunner::stepWheel(const QJsonObject& step) {
     return delay_;
 }
 
-void WalkRunner::ensureActive() {
+void WalkRunner::ensureActive(QWidget* window) {
     // Shortcuts and menus need Qt's active window. A walk runs on the owner's desktop while the owner works: it never
     // takes the system's focus (the owner's typing must not land here), it sets Qt's own notion of the active window.
-    if (!window_ || QApplication::activeWindow() == window_) return;
+    if (!window) window = window_;
+    if (!window || QApplication::activeWindow() == window) return;
     QT_WARNING_PUSH
     QT_WARNING_DISABLE_DEPRECATED
-    QApplication::setActiveWindow(window_);
+    QApplication::setActiveWindow(window);
     QT_WARNING_POP
 }
 
@@ -191,6 +192,7 @@ int WalkRunner::stepKey(const QJsonObject& step) {
     }
     QWidget* w = step.contains(QStringLiteral("on")) ? target(step) : QApplication::focusWidget();
     if (!w) w = window_;
+    ensureActive(w->window()); // keys typed in another window (the Preview) go by its shortcuts
     // Keys aimed at a widget go to it as typed there: it has the focus, so its shortcut overrides count.
     if (w != window_ && w->focusPolicy() != Qt::NoFocus) w->setFocus(Qt::OtherFocusReason);
     const QKeyCombination combo = seq[0];

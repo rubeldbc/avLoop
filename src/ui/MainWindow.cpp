@@ -6,10 +6,12 @@
 #include "media/DiskCache.h"
 #include "media/FrameCache.h"
 #include "media/WorkerThread.h"
+#include "render/RenderService.h"
 #include "ui/WalkRunner.h"
 #include "ui/canvas/Canvas.h"
 #include "ui/canvas/DropZone.h"
 #include "ui/panels/SidePanel.h"
+#include "ui/preview/PreviewWindow.h"
 #include "ui/theme/IconFactory.h"
 #include "ui/theme/Theme.h"
 #include "ui/timeline/Timeline.h"
@@ -120,6 +122,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     buildMenu();
     buildCanvasTools();
     buildTimeline();
+    buildPreview();
     registerProbes();
     registerMediaProbes();
     restoreLayout();

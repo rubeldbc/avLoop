@@ -29,8 +29,10 @@ class FrameRenderer {
 public:
     enum class Backend { Gpu, Cpu };
 
-    // Construct on the GUI thread (the GPU back end's surface is made there); render on one thread.
-    FrameRenderer(const RenderJob& job, media::DiskCache* diskCache = nullptr, bool preferGpu = true);
+    // Construct on the GUI thread (the GPU back end's surface is made there); render on one thread. With `sharedGl`
+    // (the RenderService's) that context is used — made on first use — instead of one of its own.
+    FrameRenderer(const RenderJob& job, media::DiskCache* diskCache = nullptr, bool preferGpu = true,
+                  GlRenderer* sharedGl = nullptr);
     ~FrameRenderer();
 
     // "GPU rendering: Auto / Off" (spec §3.6; Settings → Performance, key performance/gpuRendering).
@@ -59,7 +61,8 @@ private:
     bool preferGpu_;
     Backend backend_ = Backend::Cpu;
     QString gpuNote_;
-    std::unique_ptr<GlRenderer> gl_;
+    std::unique_ptr<GlRenderer> ownGl_;
+    GlRenderer* gl_ = nullptr; // ownGl_, or a shared one
     CpuRenderer cpu_;
     MaskBuilder masks_;
     QImage mask_;

@@ -1,0 +1,60 @@
+startup: 492 ms
+walk walk-preview.json: 87 steps
+-- S9: a 3 s Crossfade loop of the counter, an Ellipse with Feather — the Preview shows only that
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect crop.kind: ellipse
+PASS expect preview.open: false
+-- F5 opens the Preview; Live makes every frame once, then plays from its cache
+PASS expect preview.open: true
+PASS expect preview.length: 75
+PASS waitFor preview.cached: 75 after 0 ms
+PASS expect preview.info: 640×360 · 30 fps · 75 frames · 2.50 s · VP9 alpha
+PASS expect preview.frame: 640x360
+PASS expect preview.mode: live
+PASS shot preview-checker.png: 680x500 px
+PASS expect preview.open: true
+-- backgrounds and zoom
+PASS shot preview-green.png: 664x398 px
+PASS shot preview-navy.png: 664x398 px
+PASS shot preview-100.png: 664x398 px
+-- the keys and the transport: → and ←, Play, Around seam
+PASS expect preview.position: 1
+PASS expect preview.position: 74
+PASS expect preview.playing: true
+PASS expect preview.playing: false
+PASS expect preview.position: 42
+PASS expect preview.position: 42
+PASS expect preview.aroundSeam: true
+-- Live frame 10 written for the comparison with avloop-cli
+PASS waitFor preview.playing: false after 0 ms
+PASS projectSave I:/AvLoop/phases/26-10-26-034934-AvLoop/execution/AV-008-walk/preview.avloop 
+-- Encoded: encodes a temporary WebM, plays it back through libvpx, shows its size
+PASS expect preview.mode: encoded
+PASS waitFor preview.encode: done after 1400 ms
+PASS expect preview.encodedBytes: 298618
+PASS expect preview.status: Encoded · 0.28 MB
+PASS expect preview.info: 640×360 · 30 fps · 75 frames · 2.50 s · VP9 alpha · 0.28 MB
+PASS waitFor preview.cached: 75 after 0 ms
+PASS shot preview-encoded.png: 680x500 px
+PASS expect preview.mode: live
+-- the frame at 10 in Live and in Encoded, and the encoded file kept for the check
+     previewSeek 10
+PASS waitFor preview.position: 10 after 0 ms
+PASS previewWrite I:/AvLoop/phases/26-10-26-034934-AvLoop/execution/AV-008-walk/live-10.rgba: 640x360
+PASS previewWrite I:/AvLoop/phases/26-10-26-034934-AvLoop/execution/AV-008-walk/encoded-10.rgba: 640x360
+-- a change in the main window: Live follows in 250 ms, Encoded goes out of date
+PASS expect preview.encode: outofdate
+PASS expect preview.status: Out of date
+PASS waitFor preview.cached: 75 after 250 ms
+-- closing releases it; opening again starts fresh
+     previewClose
+PASS expect preview.open: false
+PASS expect preview.open: true
+PASS expect preview.encode: none
+     previewClose
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 0000025dab8bf540] v1.16.0
+[libvpx-vp9 @ 0000025dab8bdf40] v1.16.0
+[libvpx-vp9 @ 0000025dab8bdf40] v1.16.0

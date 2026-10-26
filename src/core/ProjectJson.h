@@ -14,6 +14,7 @@ struct ProjectData {
     TimeRange range;
     LoopSettings loop;
     OutputSettings output;
+    QualitySettings quality;
     VideoTransform transform;
     CropShape crop;
     ViewState view;
