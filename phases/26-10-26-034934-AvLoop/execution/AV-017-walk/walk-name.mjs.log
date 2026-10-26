@@ -1,0 +1,14 @@
+PASS scripts\deploy.ps1: Deployed AvLoop 1.0.1 in D:\Code5\avLoop\deploy: 37 files, 141.2 MB
+PASS avloop.exe's details: AvLoop by Rubel | Md. Kamrul Islam Rubel | AvLoop by Rubel - seamless looping videos for OBS | Copyright (C) 2026 Md. Kamrul Islam Rubel. MIT License | 1.0.1
+PASS ISCC installer\AvLoop.iss: AvLoop-1.0.1-setup.exe, 44.8 MB
+PASS the installer's details: AvLoop by Rubel | Md. Kamrul Islam Rubel | AvLoop by Rubel Setup | Copyright c 2026 Md. Kamrul Islam Rubel | 1.0.1
+PASS installed (per user, silent): exit 0
+PASS the Start menu entry: AvLoop by Rubel.lnk
+PASS 1.0.0's "AvLoop.lnk" removed: gone
+PASS Apps & features: AvLoop by Rubel | Md. Kamrul Islam Rubel | 1.0.1
+PASS the association keeps its name: .avloop → AvLoop.Project
+PASS the installed app is titled by the name: PASS expect window.title: AvLoop by Rubel · PASS shot installed.png: 1200x626 px · PASS the owner's focus untouched: another program holds the focus
+PASS the program folder gone: after 0 ms
+PASS no shortcut left: neither name
+PASS the uninstall entry gone: Apps & features
+WALK PASSED

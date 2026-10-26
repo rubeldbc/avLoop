@@ -72,7 +72,7 @@ QList<MainWindow::ToolInfo> MainWindow::tools() {
 
 MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setObjectName(QStringLiteral("MainWindow"));
-    setWindowTitle(AppInfo::name());
+    setWindowTitle(AppInfo::displayName());
     setMinimumSize(1280, 720);
     setAcceptDrops(true);
     // Settings → Performance: the disk cache's folder and size, the RAM cache's (spec §3.7.1, §11.3).
@@ -181,7 +181,7 @@ QWidget* MainWindow::buildTopBar() {
 
     auto* logo = new QLabel(bar);
     logo->setPixmap(IconFactory::appIcon().pixmap(QSize(20, 20)));
-    auto* title = new QLabel(AppInfo::name(), bar);
+    auto* title = new QLabel(AppInfo::displayName(), bar);
     title->setObjectName(QStringLiteral("AppTitle"));
     row->addWidget(logo);
     row->addWidget(title);

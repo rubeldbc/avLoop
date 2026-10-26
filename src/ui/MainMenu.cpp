@@ -2,6 +2,7 @@
 // yet stands disabled. Shortcuts live on the window so they work with the menu closed (spec §11.4).
 #include "ui/MainWindow.h"
 
+#include "core/AppInfo.h"
 #include "ui/theme/IconFactory.h"
 #include "ui/theme/Theme.h"
 
@@ -70,7 +71,7 @@ void MainWindow::buildMenu() {
           QStringLiteral("settings"));
     entry(menu_, QStringLiteral("action.shortcuts"), tr("Keyboard shortcuts"), QKeySequence(Qt::Key_F1));
     menu_->addSeparator();
-    entry(menu_, QStringLiteral("action.about"), tr("About AvLoop"));
+    entry(menu_, QStringLiteral("action.about"), tr("About %1").arg(AppInfo::displayName()));
     QAction* exit = entry(menu_, QStringLiteral("action.exit"), tr("Exit"));
     connect(exit, &QAction::triggered, this, &QWidget::close);
 

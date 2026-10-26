@@ -12,6 +12,10 @@ QString AppInfo::organization() {
     return QStringLiteral("AvLoop");
 }
 
+QString AppInfo::displayName() {
+    return QStringLiteral("AvLoop by Rubel");
+}
+
 QString AppInfo::version() {
     return QStringLiteral(AVLOOP_VERSION);
 }

@@ -3,6 +3,7 @@
 // its bar in the status bar, the toast says how it ended (Show in folder; the OBS tip once a session, Don't show
 // again), quitting asks first. Export and Preview stand disabled with the reason when they cannot run. The size
 // estimate follows the project's changes while the Quality section is open.
+#include "core/AppInfo.h"
 #include "core/AppSettings.h"
 #include "core/Geometry.h"
 #include "core/Project.h"
@@ -199,7 +200,7 @@ void MainWindow::requestEstimate() {
 bool MainWindow::confirm(const QString& text) {
     lastQuestion_ = text;
     if (qApp->property("avloop.lab").toBool()) return labAnswer_;
-    return QMessageBox::question(this, tr("AvLoop"), text) == QMessageBox::Yes;
+    return QMessageBox::question(this, AppInfo::displayName(), text) == QMessageBox::Yes;
 }
 
 bool MainWindow::mayCloseDuringExport() {

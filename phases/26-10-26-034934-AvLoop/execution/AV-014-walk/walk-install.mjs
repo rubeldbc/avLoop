@@ -13,12 +13,15 @@ const { lab, writeProject } = await import(pathToFileURL(path.resolve(HERE, '..'
 const w = lab.walkLog();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'avloop-install-'));
 const hide = (t) => t.split(TMP).join('…').split(os.homedir()).join('~');
-const ISCC = 'C:/Program Files (x86)/Inno Setup 6/ISCC.exe';
+// Inno Setup 6 for every user, or for this user alone (winget's per-user install, AV-017's PC).
+const ISCC = [path.join(process.env['ProgramFiles(x86)'] ?? 'C:/Program Files (x86)', 'Inno Setup 6', 'ISCC.exe'),
+  path.join(process.env.LOCALAPPDATA ?? '', 'Programs', 'Inno Setup 6', 'ISCC.exe')].find((p) => fs.existsSync(p)) ?? 'ISCC.exe';
 const LOCAL = process.env.LOCALAPPDATA;
 const ROAMING = process.env.APPDATA;
 const owned = [path.join(LOCAL, 'AvLoop'), path.join(LOCAL, 'cache', 'AvLoop')]; // what uninstalling removes
 const settings = path.join(ROAMING, 'AvLoop'); // what it keeps
-const startMenu = path.join(ROAMING, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'AvLoop.lnk');
+// The Start menu entry: AV-017's name.
+const startMenu = path.join(ROAMING, 'Microsoft', 'Windows', 'Start Menu', 'Programs', 'AvLoop by Rubel.lnk');
 const reg = (key, value) => {
   const r = lab.run('reg', ['query', key, ...(value === undefined ? ['/ve'] : ['/v', value])]);
   const m = /REG_\w+\s+(.*)$/m.exec(r.out);
@@ -71,7 +74,7 @@ try {
     '.avloop → AvLoop.Project → "avloop.exe" "%1"', hide(command ?? 'no key'));
   w.check(/avloop\.exe",0$/.test(reg('HKCU\\Software\\Classes\\AvLoop.Project\\DefaultIcon') ?? ''), 'its icon: the app\'s',
     hide(reg('HKCU\\Software\\Classes\\AvLoop.Project\\DefaultIcon') ?? 'none'));
-  w.check(fs.existsSync(startMenu), 'the Start menu entry', fs.existsSync(startMenu) ? 'AvLoop.lnk' : 'none');
+  w.check(fs.existsSync(startMenu), 'the Start menu entry', fs.existsSync(startMenu) ? path.basename(startMenu) : 'none');
   w.check(reg(uninstallKey, 'DisplayVersion') === version, 'Apps & features lists it with its version',
     `${reg(uninstallKey, 'DisplayName')} ${reg(uninstallKey, 'DisplayVersion')}`);
 

@@ -21,6 +21,8 @@ const RULES = [
 ];
 // Addresses that are no one's: placeholders and the hosting service's no-reply domains.
 const ALLOWED_EMAIL = /@(?:example\.(?:com|org)|users\.noreply\.github\.com|noreply\.github\.com)$/i;
+// The owner's public contact address, shown in the About box at the owner's request (2026-10-26). Only this one.
+const OWNER_CONTACT = /^rubel\.tv@gmail\.com$/i;
 
 const listed = execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], { cwd: ROOT })
   .toString('utf8').split('\0').filter(Boolean);
@@ -35,6 +37,7 @@ for (const f of files) {
       const m = line.match(re);
       if (!m) continue;
       if (kind === 'email address' && ALLOWED_EMAIL.test(m[0])) continue;
+      if (kind === 'email address' && OWNER_CONTACT.test(m[0]) && f === 'src/ui/dialogs/AboutDialog.cpp') continue;
       if (kind === 'email address' && /^[^@]+@\d+x\./.test(m[0])) continue; // image@2x.png
       findings.push(`${f}:${i + 1}: ${kind} (${m[0].slice(0, 12)}…)`);
     }

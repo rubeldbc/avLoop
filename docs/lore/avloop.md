@@ -294,3 +294,19 @@ end of its section.
   peak lasts (`--mem-log-ms 200`); the limits stay. (AV-016)
 - **The installed app is the one walked**: `AVLOOP_BIN_DIR` points every walk at an installed AvLoop instead of
   `build/bin`; a lab run of it keeps its data in its temp folder as the build's does. (AV-016)
+
+## The name and the About box (late)
+
+- **The name shown is not the name that files hang on**: QSettings, `%APPDATA%\AvLoop`, `%LOCALAPPDATA%\AvLoop`, the
+  disk cache, the AppId and the association all derive from "AvLoop"; renaming them loses every setting and breaks an
+  update. Rule: what the user reads is `AppInfo::displayName()`; `name()` and `organization()` never change. (AV-017)
+- **A contact allowed in one file spreads by copy**: the address went into the plan, the shapes, a walk's expectations
+  and the app's walk log (the probe prints the whole About box), and the secrets gate failed 28 lines. Rule: the gate's
+  exception is one address in `AboutDialog.cpp`; documents name it by its row; a walk that checks it reads it from the
+  source and keeps the app's own log in its temp folder. (AV-017)
+- **Inno Setup pads its own VERSIONINFO**: setup.exe's ProductName and the rest read with trailing spaces. Rule: trim
+  before comparing. (AV-017)
+- **A fixed wait for a menu is a race on a busy desktop**: the walk's `menu` step pressed ☰ and looked for the popup
+  250 ms later; under load it was not open yet ("Theme" not found), and the shell walk once read the window before it
+  was maximized. Rule: the step looks again for two seconds; a state the window reaches by itself is waited for
+  (`waitFor`), not sampled once. (AV-017)

@@ -10,7 +10,7 @@ risk: High
 permission_class: VERIFY_ENVIRONMENT_FIRST
 code_budget: 200
 depends_on: [AV-011, AV-012, AV-013, AV-014, AV-015]
-unlocks: []
+unlocks: [AV-017]
 requirements: [REQ-AV-014, REQ-AV-019, REQ-AV-021]
 read_scope:
   - phases/26-10-26-034934-AvLoop/control/02_MAJOR_CHECKPOINTS.md

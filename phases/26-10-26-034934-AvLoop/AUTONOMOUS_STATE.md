@@ -2,7 +2,9 @@
 
 Program: AVLOOP
 Programme version: 1.0.0
-State: **COMPLETE 2026-10-26** — every phase DONE, `v1.0.0` released (AV-016).
+State: **COMPLETE 2026-10-26** — every phase DONE, `v1.0.1` released (AV-017, the owner's late item 15).
+Was: **ACTIVE 2026-10-26** — the owner's late wish (item 15): AV-017, the name and the About box.
+Was: **COMPLETE 2026-10-26** — every phase DONE, `v1.0.0` released (AV-016).
 Was: **STARTED 2026-10-26** on the owner's specification (*AvLoop — Software Specification*, Oct 26, 2026; its §2.8
 "The go-ahead is given") and the owner's word "start". Was: **PLANNED 2026-10-26, 03:49 (Asia/Dhaka).** The owner's
 words: *"I want to build a piece of software called AvLoop. Its main job is to take any video, cut it at a specific
@@ -11,7 +13,7 @@ feels like a loop."* — with the ten decisions and the five later words of `REA
 a checkpoint after each.
 Active phase: none
 Next eligible: none — every phase is closed
-Completed: 16 of 16
+Completed: 17 of 17
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -37,7 +39,9 @@ is walked `control/04`.
 - Install the environment on this PC (CMake, Ninja, Qt, FFmpeg, Inno Setup, Node, `gh`): **given** — spec §2.8 item 5.
 - Use the machine's existing git credentials for `git push` and `gh` (`GH_TOKEN` per command, never stored): **given**
   — spec §2.9 ("the machine's existing git credentials or `gh auth`"); R-12.
-- Create the GitHub Release `v1.0.0` at CP-B1: **decided by the agent** (R-5).
+- Create the GitHub Release `v1.0.0` at CP-B1: **decided by the agent** (R-5); `v1.0.1` at AV-017 likewise (R-62).
+- Item 15 (2026-10-26, after the close): the owner's words; the owner's contact made public in the About box — the
+  owner told so before the push, the next word "continue" (`OWNER-ACTIONS.md` 33).
 - **Not given, and never taken**: code signing; a force-push; a secret, personal path, email or token in the
   repository; anything outside the repository's working copy, the session's temp and `%LOCALAPPDATA%\AvLoop` /
   `%APPDATA%\AvLoop` but the tools' installs.
@@ -70,12 +74,17 @@ estimate; GIF, APNG, MP4 H.264 (Media Foundation) and MOV ProRes 4444; the batch
 projects, autosave and recovery, presets, Settings, logs and minidumps; `avloop-cli`; the Inno Setup installer with
 the `.avloop` association; the GitHub Release `v1.0.0` with the installer and its SHA-256.
 
-Readings taken: R-1 … R-58 (`README.md` §3; `DECISIONS.md`; `OWNER-ACTIONS.md`) — every one open for the owner's
+**Item 15, late (AV-017, 2026-10-26).** The owner's wish after the close: the app is shown as "AvLoop by Rubel" — the
+window, the About box, avloop.exe's details, the installer and its shortcuts — while its folders and association keep
+"AvLoop"; the About box gives the developer and the ways to reach them. Version 1.0.1, the Release `v1.0.1`.
+
+Readings taken: R-1 … R-62 (`README.md` §3; `DECISIONS.md`; `OWNER-ACTIONS.md`) — every one open for the owner's
 veto. Dropped: nothing the specification names. Not done, and why: OBS itself was never driven (S11's second half needs
 obs-websocket, not on this PC; the libvpx half passes); no code signing (§1.3, the owner's word). `BLOCKED_EXTERNAL`:
 none. Waiting legs: none.
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-017** DONE 2026-10-26 — The name and the About box (late, item 15): AvLoop by Rubel in the app, its exe and its installer; About with the developer's contact; 1.0.1; walks about and name PASSED, the old name's walks again Record: `execution/AV-017-EXECUTION.md`.
 - **AV-016** DONE 2026-10-26 — CP-B1: everything walked on the installed 1.0.0 — unit, ASan, Debug leaks, every walk, the memory walk, GPU off, S15; the Release v1.0.0 Record: `execution/AV-016-EXECUTION.md`.
 - **AV-014** DONE 2026-10-26 — A Windows installer: Inno Setup 6, per user or every user, the .avloop association, a clean uninstall Record: `execution/AV-014-EXECUTION.md`.
 - **AV-013** DONE 2026-10-26 — GIF, APNG, MP4 H.264 and MOV ProRes 4444 besides WebM; a batch queue that survives a restart Record: `execution/AV-013-EXECUTION.md`.

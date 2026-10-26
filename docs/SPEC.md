@@ -6,6 +6,25 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-015 — The name and the About box, v1.0.1 (AV-017, late, 2026-10-26)
+
+- The name shown is "AvLoop by Rubel" (`AppInfo::displayName()`): the window's title ("AvLoop by Rubel — <file>"),
+  the top bar, the ☰ menu's "About AvLoop by Rubel", the About box, the questions' window titles; avloop.exe's
+  VERSIONINFO (ProductName, FileDescription; CompanyName and LegalCopyright Md. Kamrul Islam Rubel); the installer's
+  AppName, publisher, copyright, Start menu and desktop shortcuts and Apps & features entry. An install over 1.0.0
+  deletes 1.0.0's `AvLoop.lnk` shortcuts.
+- What keeps "AvLoop": `AppInfo::name()` and `organization()` (QSettings, `%APPDATA%\AvLoop`, `%LOCALAPPDATA%\AvLoop`,
+  the disk cache), the install folder, the AppId, `.avloop` → `AvLoop.Project`, the executables' names (R-59).
+- The About box: the logo, the name, "Version 1.0.1", the purpose, the MIT licence and the repository (a link);
+  *Developer & contact* — the developer, Bangladesh, the email (`mailto:`), the developer profile and WhatsApp
+  (`wa.me`) as links in the theme's accent, opening in the browser or mail program; *Built with*, as before; the footer
+  "© <year> Md. Kamrul Islam Rubel · Designed and built in Bangladesh" (R-60). The walks read it by the `about.text`
+  probe.
+- `tools/check-secrets.mjs` allows the owner's address in `src/ui/dialogs/AboutDialog.cpp` alone (R-61).
+- Version 1.0.1; the GitHub Release `v1.0.1` carries `AvLoop-1.0.1-setup.exe` and its SHA-256 (R-62).
+- The walk's `menu` step looks again for its menu or submenu for two seconds before failing (a busy desktop opens it
+  late); the shell walk waits up to 3 s for the window to be maximized.
+
 ### CP-B1 — The whole walked, v1.0.0 (AV-016, 2026-10-26)
 
 - Version 1.0.0 (the root CMakeLists.txt; the About box, avloop.exe's VERSIONINFO, the installer).

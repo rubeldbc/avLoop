@@ -139,6 +139,8 @@ void Theme::apply(ThemeId id) {
         p.setColor(QPalette::ButtonText, tokens_.text);
         p.setColor(QPalette::Highlight, tokens_.accent);
         p.setColor(QPalette::HighlightedText, tokens_.onAccent);
+        p.setColor(QPalette::Link, tokens_.accent); // the About box's links
+        p.setColor(QPalette::LinkVisited, tokens_.accent);
         p.setColor(QPalette::ToolTipBase, tokens_.panel2);
         p.setColor(QPalette::ToolTipText, tokens_.text);
         p.setColor(QPalette::Disabled, QPalette::Text, tokens_.text2);

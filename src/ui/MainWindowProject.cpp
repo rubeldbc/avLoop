@@ -25,6 +25,7 @@
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QJsonDocument>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
@@ -96,6 +97,15 @@ void MainWindow::buildProject() {
     WalkProbes::add(QStringLiteral("settings.open"), [this] { return !settings_.isNull(); });
     WalkProbes::add(QStringLiteral("shortcuts.open"),
                     [this] { return ShortcutOverlay::find(centralWidget()) != nullptr; });
+    // The About box's labels as written (rich text, the links' targets with them), joined by "|"; empty when closed.
+    WalkProbes::add(QStringLiteral("about.text"), [] {
+        QStringList texts;
+        for (QWidget* top : QApplication::topLevelWidgets())
+            if (top->objectName() == QLatin1String("AboutDialog") && top->isVisible())
+                for (const QLabel* label : top->findChildren<QLabel*>())
+                    texts << label->text();
+        return texts.join(QLatin1Char('|'));
+    });
     WalkProbes::add(QStringLiteral("theme"), [] { return Theme::idName(Theme::instance().id()); });
     // {"do": "saveAs", "file": "x.avloop"}: Save As with its dialog answered (in the walk's folder).
     WalkRunner::addStep(QStringLiteral("saveAs"), [this](WalkRunner& walk, const QJsonObject& step) {
@@ -140,14 +150,15 @@ void MainWindow::refreshTitle() {
         name = QFileInfo(projectPath_).fileName();
     else if (video_)
         name = QFileInfo(video_->path).fileName();
-    setWindowTitle(name.isEmpty() ? AppInfo::name() : QStringLiteral("%1 — %2[*]").arg(AppInfo::name(), name));
+    setWindowTitle(name.isEmpty() ? AppInfo::displayName()
+                                  : QStringLiteral("%1 — %2[*]").arg(AppInfo::displayName(), name));
     setWindowModified(projectDirty());
 }
 
 int MainWindow::ask(const QString& text, const QStringList& choices) {
     lastQuestion_ = text;
     if (lab()) return std::max(0, int(choices.indexOf(labChoice_)));
-    QMessageBox box(QMessageBox::Question, AppInfo::name(), text, QMessageBox::NoButton, this);
+    QMessageBox box(QMessageBox::Question, AppInfo::displayName(), text, QMessageBox::NoButton, this);
     QList<QPushButton*> buttons;
     for (const QString& c : choices)
         buttons << box.addButton(c, buttons.isEmpty() ? QMessageBox::AcceptRole : QMessageBox::RejectRole);

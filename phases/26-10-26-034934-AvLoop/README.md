@@ -42,9 +42,14 @@ and testing, e2e and walks by itself. If there is a problem it solves it on its 
 makes the decision itself and gets the work done. It will not ask me anything. Once started, it finishes the whole job
 by itself."* The go: **"start"**, 2026-10-26.
 
+Added by the owner after the programme closed (2026-10-26), item 15, verbatim: *"The applicaiton name will be AvLoop
+by Rubel. There will be a about section where my information will be available. You can get the information from
+glayer.app which is in my repo"*; then *"Email: [the owner's address — written in
+`src/ui/dialogs/AboutDialog.cpp` alone, R-61], website not required."*
+
 ## 2. The items
 
-Fourteen, in two tracks; a checkpoint closes each track.
+Fifteen, in two tracks; a checkpoint closes each track. The fifteenth came after both had closed: a late phase.
 
 | # | Item | What it gives |
 | --- | --- | --- |
@@ -62,6 +67,7 @@ Fourteen, in two tracks; a checkpoint closes each track.
 | 12 | **The loop finder** (AV-012) | the best In/Out pairs found automatically |
 | 13 | **The batch and the other formats** (AV-013) | the export queue; GIF, APNG, MP4 H.264, ProRes 4444 |
 | 14 | **The installer** (AV-014) | an Inno Setup installer with the `.avloop` association |
+| 15 | **The name and the About box** (AV-017, late) | "AvLoop by Rubel" in the app, its executable and its installer; the About box with the developer and the ways to reach them |
 
 Checkpoints: CP-A1 (AV-015) walks track A on one fresh build; CP-B1 (AV-016) walks the whole, installed, and makes
 the GitHub Release `v1.0.0`.
@@ -188,6 +194,18 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     shader cache beside it (`qtshadercache-*`) is shared by every Qt program and stays.
 58. **R-58** The deployment carries no network module (Qt's TUIO touch plugin, TLS and network information left out),
     the VC++ runtime beside the exe, and the version as avloop.exe's VERSIONINFO, which the installer reads.
+59. **R-59** "AvLoop by Rubel" is the name shown — the window, the top bar, the menu, the About box, the questions'
+    titles, avloop.exe's details, the installer, its shortcuts and Apps & features. The identity stays "AvLoop": the
+    settings and data folders, the install folder, the AppId, the `.avloop` association, the executables' names, the
+    project file's keys — renaming them would lose the owner's settings and break an update over 1.0.0.
+60. **R-60** The About box's details are those of the owner's gLayer About box (name, Bangladesh, the Facebook
+    profile, WhatsApp), the email the owner's correction, no website; the publisher and copyright the owner's name.
+61. **R-61** The secrets gate allows the owner's address in `src/ui/dialogs/AboutDialog.cpp` alone — the owner's public
+    contact at the owner's request; every other address, or this one elsewhere, still fails. The programme's documents
+    and walks name it, and the WhatsApp number, by their row, never by their value.
+62. **R-62** The renamed build is version 1.0.1 (it differs from the Release 1.0.0) and is released as `v1.0.1` with
+    its installer and SHA-256, as R-5 did for 1.0.0, so the README's Download link gives the app as it stands; an
+    install over 1.0.0 removes 1.0.0's "AvLoop" shortcuts.
 
 ## 4. What is not built
 

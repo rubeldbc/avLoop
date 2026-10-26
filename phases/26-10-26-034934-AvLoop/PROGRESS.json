@@ -2,13 +2,13 @@
   "programId": "AVLOOP",
   "programmeVersion": "1.0.0",
   "generatedBy": "control/phase-tools/sync-progress.mjs",
-  "generatedAt": "2026-10-26T10:20:29.133Z",
+  "generatedAt": "2026-10-26T16:46:18.552Z",
   "state": "COMPLETE",
   "activePhase": null,
   "nextEligiblePhase": null,
-  "lastCompletedPhase": "AV-016",
-  "completed": 16,
-  "total": 16,
+  "lastCompletedPhase": "AV-017",
+  "completed": 17,
+  "total": 17,
   "blocked": [],
   "deferred": [],
   "branch": "main",
@@ -419,7 +419,9 @@
         "AV-014",
         "AV-015"
       ],
-      "unlocks": [],
+      "unlocks": [
+        "AV-017"
+      ],
       "requirements": [
         "REQ-AV-014",
         "REQ-AV-019",
@@ -430,6 +432,27 @@
       "ownerItem": 0,
       "file": "phases/AV-016-cp-b1-the-whole-walked.md",
       "record": "execution/AV-016-EXECUTION.md"
+    },
+    {
+      "id": "AV-017",
+      "title": "The name and the About box",
+      "status": "DONE",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Low",
+      "dependsOn": [
+        "AV-016"
+      ],
+      "unlocks": [],
+      "requirements": [
+        "REQ-AV-022"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 200,
+      "ownerItem": 15,
+      "file": "phases/AV-017-the-name-and-the-about-box.md",
+      "record": "execution/AV-017-EXECUTION.md"
     }
   ]
 }

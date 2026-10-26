@@ -2,7 +2,7 @@
   <img src="resources/app/avloop.svg" width="96" alt="AvLoop logo">
 </p>
 
-<h1 align="center">AvLoop</h1>
+<h1 align="center">AvLoop by Rubel</h1>
 
 <p align="center"><b>Cut any video into a seamless, transparent loop for OBS Studio.</b></p>
 
@@ -19,9 +19,10 @@ crop — a rectangle, a rounded rectangle or an ellipse) of any video, and AvLoo
 WebM with transparency**, sized for OBS's Media Source — up to 1080p, with crossfade or ping-pong loops, adjustable
 frame rate and quality, and a preview that shows exactly what will be exported. GIF, APNG, MP4 and ProRes 4444 too.
 
-> **v1.0.0** — every item of the specification is built and walked
-> ([the plan](phases/26-10-26-034934-AvLoop/README.md) and its execution records).
-> **[Download the installer](https://github.com/rubeldbc/avLoop/releases/tag/v1.0.0)** for Windows 10/11 x64.
+> **v1.0.1** — every item of the specification is built and walked
+> ([the plan](phases/26-10-26-034934-AvLoop/README.md) and its execution records); the app is shown as *AvLoop by
+> Rubel*, with an About box that names its developer.
+> **[Download the installer](https://github.com/rubeldbc/avLoop/releases/tag/v1.0.1)** for Windows 10/11 x64.
 
 ## Features
 
@@ -87,6 +88,8 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
 - **Settings** (Ctrl+,): theme, open the last project at start, autosave interval; hardware decoding, GPU rendering,
   RAM and disk cache, Clear cache; the export folder, the file name template, the OBS tips. **F1** lists the shortcuts.
   A daily log and, on a crash, a minidump in `%LOCALAPPDATA%\AvLoop\logs`.
+- **About** (☰ → About AvLoop by Rubel): the version; the developer, Md. Kamrul Islam Rubel of Bangladesh, with an
+  email address, a profile and WhatsApp as links; the licence and the libraries AvLoop is built with.
 
   ![Settings, the Performance tab](docs/screenshots/settings.png)
 
@@ -133,7 +136,7 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   `avloop-cli find <video|project>` for scripts; `avloop-cli version` shows the FFmpeg build in use and refuses a
   GPL build.
 
-## What is not in v1.0.0
+## What is not in this version
 
 Audio, output above 1080p, a rotation tool, colour correction, text or stickers, several layers or crop areas, keyframes
 of the crop, macOS or Linux, an auto-updater, licence keys, telemetry and code signing are outside this version's specification
@@ -149,8 +152,9 @@ WebM is the format for OBS. MOV ProRes 4444 keeps the alpha too, at many times t
 
 ## Download and install
 
-Download `AvLoop-1.0.0-setup.exe` (about 45 MB) from the
-[v1.0.0 release](https://github.com/rubeldbc/avLoop/releases/tag/v1.0.0) — its SHA-256 is beside it — and run it.
+Download `AvLoop-1.0.1-setup.exe` (about 45 MB) from the
+[v1.0.1 release](https://github.com/rubeldbc/avLoop/releases/tag/v1.0.1) — its SHA-256 is beside it — and run it.
+It installs as *AvLoop by Rubel*; installed over 1.0.0, it keeps your settings and replaces the old shortcuts.
 
 - It installs for you alone (no administrator needed) or, if you choose, for everyone on the PC; it adds a Start menu
   entry, optionally a desktop icon, and opens `.avloop` projects with a double-click.

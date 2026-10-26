@@ -1,0 +1,22 @@
+PASS the contact details, in AboutDialog.cpp: developer, email, profile, whatsApp, whatsAppLink, repository
+PASS WhatsApp's link: wa.me/ and the number shown, its digits only
+PASS About: the name: as written
+PASS About: the version: as written
+PASS About: the repository, a link: as written
+PASS About: the developer: as written
+PASS About: the country: as written
+PASS About: the email, a mailto: link: as written
+PASS About: the developer profile, a link: as written
+PASS About: WhatsApp, a wa.me link: as written
+PASS About: the footer: as written
+PASS About: no glayer address: as written
+PASS About: no Website row: as written
+PASS About: nothing once closed: as written
+PASS expect window.title: AvLoop by Rubel
+PASS shot topbar.png: 1400x26 px
+PASS shot about-navy.png: 560x560 px
+PASS expect theme: black
+PASS shot about-black.png: 560x560 px
+PASS the owner's focus untouched: another program holds the focus
+PASS the app's walk: exit 0
+WALK PASSED

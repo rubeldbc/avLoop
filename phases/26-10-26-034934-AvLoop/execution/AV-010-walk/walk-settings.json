@@ -5,7 +5,7 @@
     { "label": "a video open, so the Export tab's name template has a name to make" },
     { "do": "open", "file": "samples/counter-640p30.mp4" },
     { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 10000 },
-    { "do": "expect", "probe": "window.title", "eq": "AvLoop — counter-640p30.mp4" },
+    { "do": "expect", "probe": "window.title", "eq": "AvLoop by Rubel — counter-640p30.mp4" },
 
     { "label": "Settings (Ctrl+,): General — the theme switched without a restart, the autosave minutes" },
     { "do": "key", "keys": "Ctrl+,", "on": "MainWindow" },
@@ -42,7 +42,7 @@
     { "do": "expect", "probe": "shortcuts.open", "eq": false },
 
     { "label": "About" },
-    { "do": "menu", "path": ["About AvLoop"] },
+    { "do": "menu", "path": ["About AvLoop by Rubel"] },
     { "do": "shot", "on": "AboutDialog", "file": "about.png" },
     { "do": "click", "on": "about.close" },
 

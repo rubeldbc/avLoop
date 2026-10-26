@@ -1,0 +1,7 @@
+PASSED walk-shell.json (7 s)
+PHASE WALKS PASSED
+PASSED walk-settings.json (9 s)
+PASSED walk-project.mjs (15 s)
+PHASE WALKS PASSED
+PASSED walk-install.mjs (37 s)
+PHASE WALKS PASSED

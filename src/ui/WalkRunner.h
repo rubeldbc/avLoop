@@ -91,6 +91,7 @@ private:
     bool focusTaken_ = false; // the foreground window became AvLoop's (logged at the step after)
     int delay_ = 60;
     QStringList menuPath_;
+    int menuTries_ = 0; // looks for the open menu's entry, every 250 ms
     int waitTicks_ = 0;
     bool keepLog_ = true; // the script's "log": a copy of the lines in <out>/<script>.walk.txt
 };

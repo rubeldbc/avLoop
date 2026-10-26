@@ -328,6 +328,7 @@ int WalkRunner::stepWaitFor(const QJsonObject& step) {
 int WalkRunner::stepMenu(const QJsonObject& step) {
     ensureActive();
     menuPath_.clear();
+    menuTries_ = 0;
     for (const QJsonValue& v : step.value(QStringLiteral("path")).toArray())
         menuPath_ << v.toString();
     auto* button = window_ ? window_->findChild<QToolButton*>(QStringLiteral("menu.button")) : nullptr;
@@ -344,11 +345,18 @@ int WalkRunner::stepMenu(const QJsonObject& step) {
 
 void WalkRunner::menuNext() {
     auto* menu = qobject_cast<QMenu*>(QApplication::activePopupWidget());
-    const QString wanted = menuPath_.isEmpty() ? QString() : menuPath_.takeFirst();
+    const QString wanted = menuPath_.isEmpty() ? QString() : menuPath_.first();
     QAction* found = nullptr;
     if (menu)
         for (QAction* a : menu->actions())
             if (a->text().remove(QLatin1Char('&')) == wanted) found = a;
+    // A busy desktop opens a menu or its submenu late (AV-017 saw it): look again, for two seconds, before failing.
+    if ((!menu || !found) && ++menuTries_ < 8) {
+        QTimer::singleShot(250, this, &WalkRunner::menuNext);
+        return;
+    }
+    menuTries_ = 0;
+    if (!menuPath_.isEmpty()) menuPath_.removeFirst();
     if (!menu || !found || !found->isEnabled()) {
         check(false, QStringLiteral("menu"), QStringLiteral("\"%1\" not found or disabled").arg(wanted));
         while (QWidget* popup = QApplication::activePopupWidget())
