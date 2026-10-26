@@ -45,7 +45,8 @@ SourceInfo sourceInfoOf(const media::MediaInfo& m) {
     s.path = m.path;
     s.width = m.width;
     s.height = m.height;
-    s.fps = m.avgFps;
+    s.fps = m.avgFps.isValid() ? m.avgFps : m.realFps;
+    s.vfr = m.vfr;
     s.duration = m.duration;
     s.frameCount = m.frameCount;
     s.hasAlpha = m.hasAlpha;

@@ -1,7 +1,7 @@
 ---
 phase: AV-007
 title: "The renderer"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 7
 track: A
 checkpoint_id: CP-A1

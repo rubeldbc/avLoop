@@ -57,10 +57,12 @@ void MainWindow::buildTimeline() {
         updateStatus();
     });
     connect(project_, &Project::changed, this, [this](Project::Aspect a) {
-        if (a != Project::Aspect::Range && a != Project::Aspect::Source) return;
+        if (a != Project::Aspect::Range && a != Project::Aspect::Source && a != Project::Aspect::Loop &&
+            a != Project::Aspect::Output)
+            return;
         refreshTransport();
-        // Playing with loop on: the new range takes effect at once.
-        if (a == Project::Aspect::Range && clock_->running()) startPlayback(clock_->lastShown());
+        // Playing: a new range, Speed or rate takes effect at once.
+        if (a != Project::Aspect::Source && clock_->running()) startPlayback(clock_->lastShown());
     });
 
     connect(transport_->play(), &QToolButton::clicked, this, &MainWindow::togglePlay);
@@ -122,6 +124,7 @@ void MainWindow::buildTimeline() {
     });
     WalkProbes::add(QStringLiteral("timeline.overlaps"), [this] { return timeline_->labelOverlaps(); });
     WalkProbes::add(QStringLiteral("timeline.thumbs"), [this] { return timeline_->thumbnailsMade(); });
+    WalkProbes::add(QStringLiteral("timeline.fadeEdge"), [this] { return timeline_->fadeEdge(); });
     // Walks give timeline points as [seconds, y px]: {"space": "timeline", "at": [2.5, 40]}.
     WalkProbes::addMapper(QStringLiteral("timeline"),
                           [this](const QPointF& p) { return QPointF(timeline_->xOf(p.x()), p.y()); });
@@ -161,7 +164,7 @@ void MainWindow::togglePlay() {
 
 void MainWindow::startPlayback(double from) {
     const TimeRange r = project_->range();
-    clock_->start(from, r.in, r.out, fileEnd(), frameLength(project_), loopOn_);
+    clock_->start(from, r.in, r.out, fileEnd(), frameLength(project_), loopOn_, project_->loop().speed);
     transport_->setPlaying(clock_->running());
 }
 

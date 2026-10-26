@@ -56,6 +56,10 @@ frame rate and quality, and a preview that shows exactly what will be exported.
   to the output frame grid.
 - **Playback** that never waits for the decoder: Space plays and pauses, loop on cycles In → Out, and a dropped frame
   is counted in the status bar — 1080p H.264 plays at 30 and 60 fps with none dropped.
+- **Four loop modes** worked out exactly: Simple, Crossfade inside the range (Linear or Smooth), Ping-pong and Ping-pong
+  with a smooth turn; Speed 0.10–4.00×; the output frame rate (Source, 15 … 60 or custom) with Nearest, Frame Blend
+  or Motion Interpolation. The Loop panel shows the result ("Loop 4.50 s · 135 frames @ 30 fps"), and the crossfade
+  shows on the timeline as a band whose edge you drag.
 - **Undo and Redo** for every change (200 steps; one drag is one step).
 - **Memory under control**: a bounded frame cache (1.5 GB by default) with a disk spill; the status bar shows the
   source, the GPU and RAM / VRAM / cache use.
@@ -66,14 +70,12 @@ frame rate and quality, and a preview that shows exactly what will be exported.
 
 Built in this order (each line is a phase of [the plan](phases/26-10-26-034934-AvLoop/control/01_PHASE_DEPENDENCY_GRAPH.md)):
 
-1. **Loop engine**: Simple, Crossfade (inside the range), Ping-pong, Ping-pong with a smooth turn; Speed; frame rate with
-   Nearest, Frame Blend or Motion Interpolation.
-2. **One renderer** for preview and export, on the GPU with a CPU fallback of the same result — the crop's mask and
-   feather applied.
-3. **Preview window**: Live and Encoded, the seam marked, Around seam, backgrounds.
-4. **Export**: VP9/VP8 alpha WebM, quality presets, target file size, verification.
-5. **Projects** (`.avloop`), presets, autosave, settings.
-6. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
+1. **One renderer** for preview and export, on the GPU with a CPU fallback of the same result — the crop's mask and
+   feather, the loop's blends and Motion Interpolation applied.
+2. **Preview window**: Live and Encoded, the seam marked, Around seam, backgrounds.
+3. **Export**: VP9/VP8 alpha WebM, quality presets, target file size, verification.
+4. **Projects** (`.avloop`), presets, autosave, settings.
+5. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
 
 ## Using a loop in OBS
 

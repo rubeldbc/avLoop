@@ -117,6 +117,12 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     frame (a raster repaint beside the GL canvas costs a whole-window composition).
 27. **R-27** The scrub's two speeds (§7.2): while the pointer moves, the keyframe at or before it (the frame on screen
     when already near); after 150 ms at rest or on release, the exact frame.
+28. **R-28** The default loop is Crossfade (F 0.5 s, Smooth; T 0.3 s; Speed 1; Nearest): the point of AvLoop is a
+    seamless loop, and the spec's project example uses it (§8 names defaults for F, T and the method, not the mode).
+29. **R-29** A new frame rate moves In and Out to the nearest frame of its grid ("seconds stay, on the grid", §8.3), in
+    the same Undo step; F and T stay in seconds and their frames are worked out again.
+30. **R-30** Motion Interpolation's pre-pass runs when the Preview or the export needs its frames (AV-008, AV-009),
+    with their progress and cancel; AV-006 builds and tests it.
 
 ## 4. What is not built
 

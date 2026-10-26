@@ -1,5 +1,6 @@
 #include "ui/timeline/Timeline.h"
 
+#include "core/LoopMap.h"
 #include "core/Project.h"
 #include "media/ThumbnailWorker.h"
 #include "ui/timeline/TimelineScale.h"
@@ -31,7 +32,9 @@ Timeline::Timeline(Project* project, QWidget* parent) : QWidget(parent), project
             playhead_ = 0;
             fitFile();
         }
-        if (a == Project::Aspect::Range || a == Project::Aspect::Source) update();
+        if (a == Project::Aspect::Range || a == Project::Aspect::Source || a == Project::Aspect::Loop ||
+            a == Project::Aspect::Output)
+            update();
     });
 }
 
@@ -58,6 +61,17 @@ double Timeline::duration() const {
 
 Rational Timeline::fps() const {
     return project_->outputFps();
+}
+
+double Timeline::segmentFrameSeconds() const {
+    return loopmap::secondsOf(1, fps()) * project_->loop().speed;
+}
+
+double Timeline::fadeEdge() const {
+    const TimeRange r = project_->range();
+    if (project_->loop().mode != LoopSettings::Mode::Crossfade) return r.out;
+    const LoopPlan plan = LoopPlan::of(project_->loop(), r.in, r.out, fps());
+    return r.out - plan.fade * segmentFrameSeconds();
 }
 
 Timeline::Rows Timeline::rows() const {

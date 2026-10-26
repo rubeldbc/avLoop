@@ -19,6 +19,8 @@ std::int64_t frameOf(double seconds, Rational fps);
 // The nearest grid frame and its time.
 std::int64_t nearestFrame(double seconds, Rational fps);
 double snap(double seconds, Rational fps);
+// A rate as people write it: "30", "29.97", "23.976".
+QString rateText(Rational fps);
 // "HH:MM:SS.FF": the whole seconds of the frame's time and FF its frame within that second.
 QString format(double seconds, Rational fps);
 // What a time field accepts: "12.4" (seconds), "00:00:12.12", "1:02.05" or "12.05" after a colon (FF frames), "372f"

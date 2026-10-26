@@ -3,6 +3,7 @@
 // a handle drags In or Out, the bar moves the range keeping its length (one Undo step each); the playhead snaps to In
 // and Out within 8 px; Ctrl+wheel zooms about the pointer, the wheel and Shift+wheel scroll; a double-click on the
 // ruler switches timecode and frame numbers.
+#include "core/LoopMap.h"
 #include "core/Project.h"
 #include "core/Timecode.h"
 #include "ui/timeline/Timeline.h"
@@ -19,6 +20,10 @@ Timeline::Drag Timeline::hit(const QPointF& at) const {
     const Rows r = rows();
     const TimeRange range = project_->range();
     if (!project_->source().isValid()) return Drag::None;
+    // The crossfade band's left edge sets F.
+    if (r.band.contains(at.toPoint()) && project_->loop().mode == LoopSettings::Mode::Crossfade &&
+        std::abs(at.x() - xOf(fadeEdge())) <= kHandlePx)
+        return Drag::Fade;
     if (at.y() > r.ruler.bottom() && at.y() <= r.overlayBottom()) {
         const double din = std::abs(at.x() - xOf(range.in));
         const double dout = std::abs(at.x() - xOf(range.out));
@@ -75,9 +80,9 @@ void Timeline::mouseMoveEvent(QMouseEvent* event) {
     switch (drag_) {
     case Drag::None: {
         const Drag h = hit(event->position());
-        setCursor(h == Drag::In || h == Drag::Out ? Qt::SizeHorCursor
-                  : h == Drag::Bar                ? Qt::OpenHandCursor
-                                                  : Qt::ArrowCursor);
+        setCursor(h == Drag::In || h == Drag::Out || h == Drag::Fade ? Qt::SizeHorCursor
+                  : h == Drag::Bar                                   ? Qt::OpenHandCursor
+                                                                     : Qt::ArrowCursor);
         return;
     }
     case Drag::Scrub:
@@ -99,6 +104,16 @@ void Timeline::mouseMoveEvent(QMouseEvent* event) {
     case Drag::Bar:
         project_->changeRange(timerange::moved(dragRange_, timeAt(x) - dragFrom_, d, fps()), dragKey_);
         return;
+    case Drag::Fade: {
+        // F = the frames from the pointer to Out, within 1 … ⌊D/2⌋.
+        const TimeRange r = project_->range();
+        LoopSettings l = project_->loop();
+        const LoopPlan plan = LoopPlan::of(l, r.in, r.out, fps());
+        const int f = loopmap::clampFade(int(std::lround((r.out - timeAt(x)) / segmentFrameSeconds())), plan.segment);
+        l.fade = loopmap::secondsOf(f, fps());
+        project_->changeLoop(l, dragKey_);
+        return;
+    }
     }
 }
 

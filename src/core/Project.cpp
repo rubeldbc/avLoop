@@ -26,6 +26,8 @@ ProjectData Project::snapshot() const {
     ProjectData d;
     d.source = source_;
     d.range = range_;
+    d.loop = loop_;
+    d.output = output_;
     d.transform = transform_;
     d.crop = crop_;
     d.view = view_;
@@ -35,6 +37,8 @@ ProjectData Project::snapshot() const {
 
 void Project::restore(const ProjectData& data) {
     source_ = data.source;
+    loop_ = data.loop.clamped();
+    output_ = data.output;
     range_ = timerange::valid(data.range, source_.duration, outputFps());
     transform_ = data.transform;
     crop_ = data.crop.clamped();
@@ -45,6 +49,8 @@ void Project::restore(const ProjectData& data) {
     emit changed(Aspect::Range);
     emit changed(Aspect::Transform);
     emit changed(Aspect::Crop);
+    emit changed(Aspect::Loop);
+    emit changed(Aspect::Output);
     emit changed(Aspect::View);
 }
 
@@ -73,7 +79,39 @@ void Project::changeCrop(const CropShape& after, const QString& mergeKey) {
 }
 
 Rational Project::outputFps() const {
-    return timecode::defaultFps(source_.fps);
+    return output_.effectiveFps(source_.fps, source_.vfr);
+}
+
+void Project::changeLoop(const LoopSettings& after, const QString& mergeKey) {
+    const LoopSettings target = after.clamped();
+    if (target == loop_) return;
+    undo_.push(new SetLoopCommand(
+        SetLoopId, tr("Change the loop"), loop_, target, [this](const LoopSettings& l) { applyLoop(l); }, mergeKey));
+}
+
+void Project::changeOutput(const OutputSettings& after, const QString& mergeKey) {
+    if (after == output_) return;
+    const Rational before = outputFps();
+    const Rational next = after.effectiveFps(source_.fps, source_.vfr);
+    const bool regrid = source_.isValid() && !(before == next);
+    if (regrid) undo_.beginMacro(tr("Change the frame rate"));
+    undo_.push(new SetOutputCommand(
+        SetOutputId, tr("Change the output"), output_, after, [this](const OutputSettings& o) { applyOutput(o); },
+        regrid ? QString() : mergeKey));
+    if (regrid) {
+        changeRange(timerange::valid(range_, source_.duration, next));
+        undo_.endMacro();
+    }
+}
+
+void Project::applyLoop(const LoopSettings& l) {
+    loop_ = l;
+    emit changed(Aspect::Loop);
+}
+
+void Project::applyOutput(const OutputSettings& o) {
+    output_ = o;
+    emit changed(Aspect::Output);
 }
 
 void Project::changeRange(const TimeRange& after, const QString& mergeKey) {

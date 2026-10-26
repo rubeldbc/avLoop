@@ -45,6 +45,17 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
 
     const QJsonObject range{{QStringLiteral("in"), d.range.in}, {QStringLiteral("out"), d.range.out}};
     root.insert(QStringLiteral("range"), merged(d.original, QStringLiteral("range"), range));
+    const QJsonObject loop{
+        {QStringLiteral("mode"), LoopSettings::modeId(d.loop.mode)},
+        {QStringLiteral("fade"), d.loop.fade},
+        {QStringLiteral("curve"), LoopSettings::curveId(d.loop.curve)},
+        {QStringLiteral("turn"), d.loop.turn},
+        {QStringLiteral("speed"), d.loop.speed},
+        {QStringLiteral("fpsMethod"), LoopSettings::methodId(d.loop.method)},
+    };
+    root.insert(QStringLiteral("loop"), merged(d.original, QStringLiteral("loop"), loop));
+    const QJsonObject output{{QStringLiteral("fps"), d.output.fpsId()}};
+    root.insert(QStringLiteral("output"), merged(d.original, QStringLiteral("output"), output));
 
     QJsonObject transform{
         {QStringLiteral("x"), d.transform.x},         {QStringLiteral("y"), d.transform.y},
@@ -107,6 +118,22 @@ bool fromJson(const QJsonObject& json, ProjectData& d, QString* error, const QSt
     const QJsonObject r = json.value(QStringLiteral("range")).toObject();
     d.range.in = r.value(QStringLiteral("in")).toDouble();
     d.range.out = r.value(QStringLiteral("out")).toDouble();
+
+    const QJsonObject l = json.value(QStringLiteral("loop")).toObject();
+    const LoopSettings defaults;
+    d.loop.mode = l.contains(QStringLiteral("mode"))
+                      ? LoopSettings::modeFromId(l.value(QStringLiteral("mode")).toString())
+                      : defaults.mode;
+    d.loop.fade = l.value(QStringLiteral("fade")).toDouble(defaults.fade);
+    d.loop.curve = l.contains(QStringLiteral("curve"))
+                       ? LoopSettings::curveFromId(l.value(QStringLiteral("curve")).toString())
+                       : defaults.curve;
+    d.loop.turn = l.value(QStringLiteral("turn")).toDouble(defaults.turn);
+    d.loop.speed = l.value(QStringLiteral("speed")).toDouble(defaults.speed);
+    d.loop.method = LoopSettings::methodFromId(l.value(QStringLiteral("fpsMethod")).toString());
+    d.loop = d.loop.clamped();
+    d.output = OutputSettings::fromFpsId(
+        json.value(QStringLiteral("output")).toObject().value(QStringLiteral("fps")).toString());
 
     const QJsonObject t = json.value(QStringLiteral("transform")).toObject();
     d.transform.x = t.value(QStringLiteral("x")).toDouble();

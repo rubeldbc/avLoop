@@ -6,6 +6,30 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-006 — The loop engine (AV-006, 2026-10-26)
+
+- The loop's maths are pure functions in `core`: `LoopMap` gives D = round((Out − In) × fps / Speed) (at least 2, 3
+  for the Ping-pongs), L for each mode (Simple D, Crossfade D − F, Ping-pong and Ping-pong + Smooth turn 2D − 2) and
+  for output frame k the one or two segment frames with their weight — §8.2's formulas, F clamped to 1 … ⌊D/2⌋, T to
+  1 … ⌊(D − 1)/2⌋, the Smooth curve x²(3 − 2x), the turn's trapezoid velocity. `TimeMap` gives τ(i) and the source
+  frames of segment frame i: Nearest (a tie to the earlier), Frame Blend (by time), Motion (the pre-pass's frame); a
+  variable rate always by its frame times.
+- `.avloop` keeps `loop` (mode, fade, curve, turn, speed, fpsMethod) and `output.fps` ("source" or "30000/1001").
+  The default loop is Crossfade, F 0.5 s, Smooth, T 0.3 s, Speed 1, Nearest (reading R-28).
+- The Loop section: Mode, Crossfade in seconds and frames (linked), Curve, Turn, Speed (0.10–4.00×, steps of 0.05),
+  FPS method; "Motion Interpolation gives smoother slow motion" under Speed < 1 with Nearest; the summary "Loop 4.50 s
+  · 135 frames @ 30 fps"; a value the loop clamps flashes yellow for 600 ms. Rows a mode does not use are hidden.
+- The Output section's FPS: Source (shown with its value; a variable rate takes the nearest common one; at most 60),
+  15, 23.976, 24, 25, 29.97, 30, 50, 59.94, 60, Custom (1–60, three decimals). A new rate keeps In and Out in seconds,
+  moved to the nearest frame of its grid, in the same Undo step (reading R-29); F and T are kept in seconds.
+- The timeline's crossfade band: a gradient over the F frames before Out and a dashed outline over the F after In;
+  dragging the gradient's left edge sets F (one Undo step). Ping-pong + Smooth turn fills both ends' T frames quietly.
+- The editor's playback runs at Speed.
+- `media/Interpolator`: the Motion Interpolation pre-pass — the segment's normalized frames through `minterpolate`
+  (mi_mode=mci, mc_mode=aobmc, vsbmc=1) at the output rate, Speed by stretched timestamps, alpha on a branch of its
+  own; frames into the disk cache under a key of every input; progress and cancel. It runs when the Preview or the
+  export needs its frames (AV-008, AV-009 — reading R-30).
+
 ### D-005 — The timeline (AV-005, 2026-10-26)
 
 - Time is kept on the output frame grid (frame n at n / fps from the source's start); until AV-006's setting the

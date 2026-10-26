@@ -29,6 +29,8 @@ void MainWindow::buildCanvasTools() {
     tools_->add(createInOutTool(false, canvas_, project_));
     tools_->add(createInOutTool(true, canvas_, project_));
     side_->bindCrop(project_);
+    side_->bindLoop(project_);
+    side_->bindOutput(project_);
 
     // "Transparent area in output" / "Output is fully transparent" (spec §6.2, §12.2).
     auto* notice = new QLabel(statusBar());

@@ -1,6 +1,7 @@
 // The timeline's painting (spec §7.1): the ruler with labels that never overlap, the thumbnails (a `panel2` block
 // until each is made), the In/Out overlay — `accentSoft` inside, 50% black outside, the 3 px orange bar and the two
 // bracket handles —, the empty crossfade band and keyframe row, and the playhead over all.
+#include "core/LoopMap.h"
 #include "core/Project.h"
 #include "media/ThumbnailWorker.h"
 #include "ui/theme/Theme.h"
@@ -28,6 +29,7 @@ void Timeline::paintEvent(QPaintEvent*) {
     paintRuler(p, r);
     paintStrip(p, r);
     paintRange(p, r);
+    paintBand(p, r);
     paintPlayhead(p, r);
 }
 
@@ -112,6 +114,38 @@ void Timeline::paintRange(QPainter& p, const Rows& r) {
     };
     bracket(xin, 1);
     bracket(xout, -1);
+}
+
+void Timeline::paintBand(QPainter& p, const Rows& r) {
+    // Crossfade: a gradient over the F frames before Out (they blend into the start) and a dashed outline over the F
+    // after In (the part blended in). Ping-pong + Smooth turn: both ends' T frames filled quiet orange.
+    const ThemeTokens& t = Theme::instance().tokens();
+    const LoopSettings& l = project_->loop();
+    const TimeRange range = project_->range();
+    const LoopPlan plan = LoopPlan::of(l, range.in, range.out, fps());
+    const double unit = segmentFrameSeconds();
+    const QRectF band(0, r.band.top() + 1, 0, r.band.height() - 2);
+    auto span = [&](double from, double to) {
+        return QRectF(xOf(from), band.top(), (to - from) * pxPerSecond_, band.height());
+    };
+    if (l.mode == LoopSettings::Mode::Crossfade) {
+        const QRectF end = span(range.out - plan.fade * unit, range.out);
+        QLinearGradient g(end.topLeft(), end.topRight());
+        QColor clear = t.accent;
+        clear.setAlpha(0);
+        g.setColorAt(0, clear);
+        g.setColorAt(1, t.accent);
+        p.fillRect(end, g);
+        p.fillRect(QRectF(end.left() - 1, end.top() - 1, 2, end.height() + 2), t.accent); // the edge to drag
+        p.setPen(QPen(t.accent, 1, Qt::DashLine));
+        p.setBrush(Qt::NoBrush);
+        p.drawRect(span(range.in, range.in + plan.fade * unit).adjusted(0.5, 0.5, -0.5, -0.5));
+    } else if (l.mode == LoopSettings::Mode::PingPongSmooth) {
+        QColor quiet = t.accent;
+        quiet.setAlpha(90);
+        p.fillRect(span(range.in, range.in + plan.turn * unit), quiet);
+        p.fillRect(span(range.out - plan.turn * unit, range.out), quiet);
+    }
 }
 
 void Timeline::paintPlayhead(QPainter& p, const Rows& r) {

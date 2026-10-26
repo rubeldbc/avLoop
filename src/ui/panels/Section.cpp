@@ -3,6 +3,7 @@
 #include "ui/theme/IconFactory.h"
 #include "ui/theme/Theme.h"
 
+#include <QComboBox>
 #include <QGridLayout>
 #include <QLabel>
 #include <QSettings>
@@ -71,6 +72,11 @@ void Section::addRow(const QString& label, QWidget* value) {
     name->setProperty("quiet", true);
     grid_->addWidget(name, row, 0);
     grid_->addWidget(value, row, 1);
+    // A value never widens the panel: a combo box asks for a few characters and elides a longer item.
+    if (auto* box = qobject_cast<QComboBox*>(value)) {
+        box->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
+        box->setMinimumContentsLength(6);
+    }
 }
 
 void Section::addWide(QWidget* widget) {

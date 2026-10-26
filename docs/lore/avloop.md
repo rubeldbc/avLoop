@@ -121,3 +121,15 @@ end of its section.
   screen landed on it and made it the foreground window. Rule: lab windows are placed behind the owner's windows
   (`HWND_BOTTOM`) with `WS_EX_NOACTIVATE`, so no click can activate them; pictures come from the widgets' own
   rendering, not the screen. (AV-005)
+
+## The loop engine
+
+- **`minterpolate` makes an output frame only once it holds the input after it**: the pre-pass stopped one frame
+  short. Rule: feed a few source frames past the segment's end, then flush. (AV-006)
+- **`minterpolate` works in YUV**: RGBA in would be converted and lose its alpha. Rule: colour through
+  `format=yuv444p`, alpha through `alphaextract` and a second `minterpolate`, joined by `alphamerge`. (AV-006)
+- **A combo box's size hint is its longest item**: "Ping-pong + Smooth turn" widened the side panel past its width
+  and clipped every row. Rule: `Section::addRow` gives combo boxes `AdjustToMinimumContentsLengthWithIcon`; paired
+  fields take 44 px at least. (AV-006)
+- **Crossfade's last frame is mostly S[F − 1]** — exactly half when F is 1, and O[0] is itself blended when D = 2F:
+  tests of §8.2 allow both. (AV-006)

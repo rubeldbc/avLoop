@@ -44,6 +44,14 @@ double snap(double seconds, Rational fps) {
     return secondsOf(nearestFrame(seconds, fps), fps);
 }
 
+QString rateText(Rational fps) {
+    QString s = QString::number(rate(fps), 'f', 3);
+    while (s.endsWith(QLatin1Char('0')))
+        s.chop(1);
+    if (s.endsWith(QLatin1Char('.'))) s.chop(1);
+    return s;
+}
+
 QString format(double seconds, Rational fps) {
     const std::int64_t n = std::max<std::int64_t>(0, frameOf(seconds, fps));
     const auto whole = std::int64_t(std::floor(secondsOf(n, fps) + 1e-9));

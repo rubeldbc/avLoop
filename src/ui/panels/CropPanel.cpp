@@ -24,6 +24,8 @@ QWidget* pair(QWidget* parent, StepSpinBox* a, StepSpinBox* b) {
     row->setSpacing(4);
     a->setParent(w);
     b->setParent(w);
+    a->setMinimumWidth(44);
+    b->setMinimumWidth(44);
     row->addWidget(a);
     row->addWidget(b);
     return w;

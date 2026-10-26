@@ -12,6 +12,8 @@ struct ProjectData {
     SourceInfo source;
     QString relativePath; // the source relative to the project file, as read
     TimeRange range;
+    LoopSettings loop;
+    OutputSettings output;
     VideoTransform transform;
     CropShape crop;
     ViewState view;

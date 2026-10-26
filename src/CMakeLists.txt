@@ -5,6 +5,7 @@ add_library(avloop_core STATIC
     core/Geometry.h core/Geometry.cpp core/VideoTransform.h core/VideoTransform.cpp
     core/CropShape.h core/CropShape.cpp core/AspectRatio.h core/AspectRatio.cpp
     core/Timecode.h core/Timecode.cpp core/TimeRange.h core/TimeRange.cpp
+    core/LoopSettings.h core/LoopSettings.cpp core/LoopMap.h core/LoopMap.cpp core/TimeMap.h core/TimeMap.cpp
     core/Project.h core/Project.cpp core/Commands.h core/ProjectJson.h core/ProjectJson.cpp)
 target_include_directories(avloop_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/generated)
 # Qt Gui only for QUndoStack/QUndoCommand, which Qt 6 moved there from Widgets (spec §11.2).
@@ -16,6 +17,7 @@ add_library(avloop_media STATIC
     media/SourceNormalizer.h media/SourceNormalizer.cpp
     media/FrameCache.h media/FrameCache.cpp media/DiskCache.h media/DiskCache.cpp
     media/DecodeWorker.h media/DecodeWorker.cpp media/ThumbnailWorker.h media/ThumbnailWorker.cpp
+    media/Interpolator.h media/Interpolator.cpp
     media/SystemMemory.h media/SystemMemory.cpp)
 target_link_libraries(avloop_media
     PUBLIC avloop_core Qt6::Core
@@ -33,7 +35,8 @@ add_library(avloop_ui STATIC
     ui/theme/IconFactory.h ui/theme/IconFactory.cpp
     ui/widgets/Toast.h ui/widgets/Toast.cpp
     ui/panels/Section.h ui/panels/Section.cpp
-    ui/panels/SidePanel.h ui/panels/SidePanel.cpp ui/panels/CropPanel.cpp
+    ui/panels/SidePanel.h ui/panels/SidePanel.cpp ui/panels/CropPanel.cpp ui/panels/LoopPanel.cpp
+    ui/panels/OutputPanel.cpp
     ui/canvas/DropZone.h ui/canvas/DropZone.cpp
     ui/canvas/Canvas.h ui/canvas/Canvas.cpp ui/canvas/CanvasView.cpp ui/canvas/CanvasGl.cpp ui/canvas/CanvasGlState.h ui/canvas/CanvasOverlay.cpp
     ui/tools/Tool.h ui/tools/ToolManager.h ui/tools/ToolManager.cpp

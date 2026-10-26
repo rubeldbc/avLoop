@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/CropShape.h"
+#include "core/LoopSettings.h"
 #include "core/Rational.h"
 #include "core/TimeRange.h"
 #include "core/VideoTransform.h"
@@ -22,6 +23,7 @@ struct SourceInfo {
     int width = 0; // display size (rotation and SAR applied)
     int height = 0;
     Rational fps;
+    bool vfr = false;
     double duration = 0;
     qint64 frameCount = 0;
     bool hasAlpha = false;
@@ -56,7 +58,9 @@ public:
     const TimeRange& range() const { return range_; }
     const VideoTransform& transform() const { return transform_; }
     const CropShape& crop() const { return crop_; }
-    // The output frame grid In, Out and the playhead snap to (spec §6.4); AV-006 adds the setting.
+    const LoopSettings& loop() const { return loop_; }
+    const OutputSettings& output() const { return output_; }
+    // The output frame grid In, Out and the playhead snap to (spec §6.4, §8.3): the Output section's FPS.
     Rational outputFps() const;
     const ViewState& view() const { return view_; }
     const QJsonObject& extra() const { return extra_; }
@@ -75,11 +79,16 @@ public:
     void changeTransform(const VideoTransform& after, const QString& mergeKey = {});
     void changeCrop(const CropShape& after, const QString& mergeKey = {});
     void changeRange(const TimeRange& after, const QString& mergeKey = {});
+    void changeLoop(const LoopSettings& after, const QString& mergeKey = {});
+    // A new frame rate keeps In and Out in seconds, on the new grid (one Undo step with the range — reading R-29).
+    void changeOutput(const OutputSettings& after, const QString& mergeKey = {});
 
     // Only commands call these.
     void applyTransform(const VideoTransform& t);
     void applyCrop(const CropShape& c);
     void applyRange(const TimeRange& r);
+    void applyLoop(const LoopSettings& l);
+    void applyOutput(const OutputSettings& o);
 
 signals:
     void changed(avloop::Project::Aspect aspect);
@@ -89,6 +98,8 @@ private:
     TimeRange range_;
     VideoTransform transform_;
     CropShape crop_;
+    LoopSettings loop_;
+    OutputSettings output_;
     ViewState view_;
     QJsonObject extra_;
     QUndoStack undo_;

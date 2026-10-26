@@ -54,3 +54,6 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-25 | Dropped = never shown; frames shown in order, dropped only beyond two frames late | §7.3 | `README.md` §3; AV-005 |
 | R-26 | Timeline repaints at most 30 a second while playing | GL composition cost | `README.md` §3; AV-005 |
 | R-27 | Scrub: keyframe while moving, exact at rest (150 ms) or release | §7.2 | `README.md` §3; AV-005 |
+| R-28 | The default loop is Crossfade (F 0.5 s, Smooth) | the app's purpose; §11.1's example | `README.md` §3; AV-006 |
+| R-29 | A new rate moves In/Out to its grid in the same Undo step | §8.3 | `README.md` §3; AV-006 |
+| R-30 | The Motion pre-pass runs for the Preview and the export | §8.3, §9, §10 | `README.md` §3; AV-006 |

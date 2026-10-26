@@ -57,6 +57,8 @@ public:
     void setFrameLabels(bool on);
     int labelOverlaps() const { return overlaps_; } // in the last paint; never more than 0
     int thumbnailsMade() const;
+    // Where the crossfade band's left edge is (the F frames before Out start), in seconds; Out when no crossfade.
+    double fadeEdge() const;
 
 signals:
     // The user moved the playhead: `fast` while a drag is moving (the keyframe preview), exact when it rests or ends.
@@ -72,7 +74,7 @@ protected:
     void resizeEvent(QResizeEvent* event) override;
 
 private:
-    enum class Drag { None, Scrub, In, Out, Bar };
+    enum class Drag { None, Scrub, In, Out, Bar, Fade };
     struct Rows {
         QRect ruler, bar, strip, band, keys;
         int overlayTop() const { return strip.top(); }
@@ -81,6 +83,7 @@ private:
     Rows rows() const;
     double duration() const;
     Rational fps() const;
+    double segmentFrameSeconds() const; // one segment frame in source time: Speed / fps
     double visibleSeconds() const;
     void viewChanged();
     void requestThumbnails();
@@ -88,6 +91,7 @@ private:
     void paintRuler(QPainter& p, const Rows& r);
     void paintStrip(QPainter& p, const Rows& r);
     void paintRange(QPainter& p, const Rows& r);
+    void paintBand(QPainter& p, const Rows& r);
     void paintPlayhead(QPainter& p, const Rows& r);
     // TimelineInput.cpp
     Drag hit(const QPointF& at) const;

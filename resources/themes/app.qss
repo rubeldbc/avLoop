@@ -249,6 +249,10 @@ QLabel[quiet="true"] {
 *[mono="true"] {
     font-family: Consolas;
 }
+/* A value the loop clamped (spec §8.5) */
+*[flash="true"] {
+    border: 1px solid @warning;
+}
 QLineEdit[timeNow="true"] {
     color: @accent;
     padding: 1px 4px;
