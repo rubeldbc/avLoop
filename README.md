@@ -137,7 +137,7 @@ frame rate and quality, and a preview that shows exactly what will be exported.
 
 Built in this order (each line is a phase of [the plan](phases/26-10-26-034934-AvLoop/control/01_PHASE_DEPENDENCY_GRAPH.md)):
 
-1. A Windows installer (v1.0.0).
+1. Everything walked once more on a fresh build, installed by the installer, and the v1.0.0 release.
 
 ## Using a loop in OBS
 
@@ -149,8 +149,15 @@ WebM is the format for OBS. MOV ProRes 4444 keeps the alpha too, at many times t
 
 ## Download and install
 
-The installer arrives with v1.0.0 on the [Releases](https://github.com/rubeldbc/avLoop/releases) page. Until then,
-build from source.
+The installer (`AvLoop-<version>-setup.exe`, about 45 MB) arrives with v1.0.0 on the
+[Releases](https://github.com/rubeldbc/avLoop/releases) page; until then, build it from source (below).
+
+- It installs for you alone (no administrator needed) or, if you choose, for everyone on the PC; it adds a Start menu
+  entry, optionally a desktop icon, and opens `.avloop` projects with a double-click.
+- Everything AvLoop needs comes with it (Qt, FFmpeg's LGPL DLLs, the Visual C++ runtime); it never uses the network.
+- Uninstalling (Settings → Apps) removes the program, the `.avloop` association, the autosave, the logs and the disk
+  cache, and keeps your settings, presets and batch queue (`%APPDATA%\AvLoop`).
+- It is not code-signed: Windows SmartScreen may ask you to confirm (More info → Run anyway).
 
 ## Build from source
 
@@ -162,6 +169,8 @@ scripts\fetch-deps.ps1                   # FFmpeg 7.1, LGPL shared build
 scripts\build.ps1 -Config Release
 scripts\test.ps1
 build\bin\avloop.exe
+scripts\deploy.ps1 -NoBuild                # deploy\: what the installer installs
+& 'C:\Program Files (x86)\Inno Setup 6\ISCC.exe' installer\AvLoop.iss   # installer\Output\AvLoop-<version>-setup.exe
 ```
 
 Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -195,13 +204,14 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 src/core      the project model and the loop's maths (Qt Core only)
 src/media     FFmpeg: probe, decode, normalize, cache, encode
 src/render    the FrameRenderer (GPU and CPU) and the crop's mask
-src/export    the export job, its check, the size estimate (the Loop Finder later)
+src/export    the export job, its check, the formats, the batch queue, the size estimate, the Loop Finder
 src/ui        the main window, tools, canvas, timeline, panels, preview
 src/app       avloop.exe            src/cli   avloop-cli.exe
 resources     icons (SVG), themes (QSS with colour tokens), the app icon
 tests         Qt Test unit tests (ctest -R avloop)
 tools         gate tools (check-secrets, check-icons), walks, sample media
-scripts       fetch-deps, build, test, format
+scripts       fetch-deps, build, test, format, deploy
+installer     the Inno Setup script          licenses   the LGPL and GPL texts the installer carries
 phases        the development plan, its phase contracts and execution records
 docs          the specification, the lore, screenshots
 ```
@@ -214,4 +224,5 @@ Security reports: [SECURITY.md](SECURITY.md).
 ## License
 
 AvLoop is MIT-licensed ([LICENSE](LICENSE)). It links Qt 6 (LGPLv3) and FFmpeg 7.1 (LGPL, with libvpx, dav1d and
-zimg) dynamically; see [LICENSE-THIRD-PARTY.md](LICENSE-THIRD-PARTY.md).
+zimg) dynamically; see [LICENSE-THIRD-PARTY.md](LICENSE-THIRD-PARTY.md). The installer carries these notices and the
+licence texts (`licenses/`).

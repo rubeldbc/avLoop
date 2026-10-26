@@ -1,7 +1,7 @@
 ---
 phase: AV-016
 title: "CP-B1 the whole walked"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 0
 track: B
 checkpoint_id: CP-B1

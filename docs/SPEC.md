@@ -6,6 +6,22 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-014 — The installer (AV-014, 2026-10-26)
+
+- `scripts\deploy.ps1` (or `cmake --build build --target deploy`): a Release build → `deploy\` with avloop.exe,
+  avloop-cli.exe, windeployqt's Qt (no translations, no software OpenGL, no network: the TUIO touch, TLS and
+  network-information plugins left out), the FFmpeg DLLs, the VC++ runtime app-local, and `licenses\` (LICENSE,
+  LICENSE-THIRD-PARTY.md, LGPL-3.0, GPL-3.0); 37 files, 141 MB.
+- `installer\AvLoop.iss` (Inno Setup 6, not signed): `ISCC installer\AvLoop.iss` → `installer\Output\AvLoop-<version>-
+  setup.exe` (45 MB, 31 s). Per user by default, every user by choice; the licence and the notices shown; Start menu
+  entry, optional desktop icon; `.avloop` → `AvLoop.Project` (`"avloop.exe" "%1"`, the app's icon); uninstalling
+  removes the program, the association, `%LOCALAPPDATA%\AvLoop` and `%LOCALAPPDATA%\cache\AvLoop`, keeps
+  `%APPDATA%\AvLoop`. Readings R-56, R-57, R-58.
+- The version: the root CMakeLists.txt → AvLoopVersion.h → the About box and avloop.exe's VERSIONINFO, which the
+  installer reads (`/DAppVersion=` overrides).
+- Walked: a silent per-user install into a temporary folder; the installed app draws with only Windows on PATH; the
+  association's command from the registry opens a project; the silent uninstall leaves only the settings.
+
 ### D-013 — The batch and the other formats (AV-013, 2026-10-26)
 
 - Output → Format offers WebM VP9, WebM VP8, GIF, APNG, MP4 H.264 and MOV ProRes 4444; one this FFmpeg cannot write is

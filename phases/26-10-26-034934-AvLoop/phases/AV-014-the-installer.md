@@ -1,7 +1,7 @@
 ---
 phase: AV-014
 title: "The installer"
-status: IN_PROGRESS
+status: DONE
 owner_item: 14
 track: B
 checkpoint_id: CP-B1

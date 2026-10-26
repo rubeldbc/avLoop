@@ -181,6 +181,13 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     without alpha). GIF and APNG have no quality settings, ProRes its profile (the Quality section says so).
 55. **R-55** queue.json lives beside the settings (`%APPDATA%\AvLoop`; AVLOOP_DATA_DIR when set) and is locked while an
     AvLoop holds it: a second AvLoop's queue works but is not saved (its window says so).
+56. **R-56** The installer installs for the user alone by default (no administrator; `%LOCALAPPDATA%\Programs\AvLoop`)
+    and for every user by the user's choice (Inno's dialog); the association goes where the install goes (HKA).
+57. **R-57** Uninstalling removes the program, the association, `%LOCALAPPDATA%\AvLoop` (autosave, logs) and
+    `%LOCALAPPDATA%\cache\AvLoop` (the disk cache), and keeps `%APPDATA%\AvLoop` (settings, presets, queue). Qt's
+    shader cache beside it (`qtshadercache-*`) is shared by every Qt program and stays.
+58. **R-58** The deployment carries no network module (Qt's TUIO touch plugin, TLS and network information left out),
+    the VC++ runtime beside the exe, and the version as avloop.exe's VERSIONINFO, which the installer reads.
 
 ## 4. What is not built
 

@@ -1,2 +1,36 @@
-// The executable's icon (spec §5.3): avloop.ico, made from avloop.svg by tools/icons/iconbake.cpp.
+// The executable's icon (spec §5.3): avloop.ico, made from avloop.svg by tools/icons/iconbake.cpp. Its version
+// (Explorer's Properties, the installer's own version) from the root CMakeLists.txt through AvLoopVersion.h.
+#include <winver.h>
+
+#include "AvLoopVersion.h"
+
 IDI_ICON1 ICON "avloop.ico"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION AVLOOP_VERSION_MAJOR, AVLOOP_VERSION_MINOR, AVLOOP_VERSION_PATCH, 0
+PRODUCTVERSION AVLOOP_VERSION_MAJOR, AVLOOP_VERSION_MINOR, AVLOOP_VERSION_PATCH, 0
+FILEFLAGSMASK 0x3fL
+FILEFLAGS 0x0L
+FILEOS VOS_NT_WINDOWS32
+FILETYPE VFT_APP
+FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904b0"
+        BEGIN
+            VALUE "CompanyName", "AvLoop"
+            VALUE "FileDescription", "AvLoop - seamless looping videos for OBS"
+            VALUE "FileVersion", AVLOOP_VERSION
+            VALUE "InternalName", "avloop"
+            VALUE "LegalCopyright", "MIT License"
+            VALUE "OriginalFilename", "avloop.exe"
+            VALUE "ProductName", "AvLoop"
+            VALUE "ProductVersion", AVLOOP_VERSION
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1200
+    END
+END

@@ -8,9 +8,9 @@ words: *"I want to build a piece of software called AvLoop. Its main job is to t
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: AV-014
-Next eligible: AV-014 (in progress)
-Completed: 14 of 16
+Active phase: AV-016
+Next eligible: AV-016 (in progress)
+Completed: 15 of 16
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -60,6 +60,7 @@ where `--shot` and `--walk` open their window for seconds and close it.
 ## Completion record
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-014** DONE 2026-10-26 — A Windows installer: Inno Setup 6, per user or every user, the .avloop association, a clean uninstall Record: `execution/AV-014-EXECUTION.md`.
 - **AV-013** DONE 2026-10-26 — GIF, APNG, MP4 H.264 and MOV ProRes 4444 besides WebM; a batch queue that survives a restart Record: `execution/AV-013-EXECUTION.md`.
 - **AV-012** DONE 2026-10-26 — The Loop Finder: fingerprints, every pair scored in parallel, the best five, the window and avloop-cli find Record: `execution/AV-012-EXECUTION.md`.
 - **AV-011** DONE 2026-10-26 — The keyframes: K, the Keyframe tool, the keyframe row, Linear/Ease, the renderer interpolating Record: `execution/AV-011-EXECUTION.md`.

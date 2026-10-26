@@ -82,3 +82,6 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-53 | GIF: 1-bit alpha at 128, the palette of every frame, at most 50 fps | §10.4 | `README.md` §3; AV-013 |
 | R-54 | MP4: the preset's bitrate, h264_mf else OpenH264; ProRes its profile; GIF/APNG none | §10.4 | `README.md` §3; AV-013 |
 | R-55 | queue.json beside the settings, locked; a second AvLoop's queue not saved | §10.5 | `README.md` §3; AV-013 |
+| R-56 | Install scope: per user by default, every user by choice | §1.2 item 14 | `README.md` §3; AV-014 |
+| R-57 | Uninstall keeps %APPDATA%\AvLoop only; Qt's shared shader cache stays | §1.2 item 14 | `README.md` §3; AV-014 |
+| R-58 | No network module; VC++ runtime app-local; the version from the exe | §3.1, §3.8 | `README.md` §3; AV-014 |

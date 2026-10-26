@@ -20,3 +20,10 @@ function(avloop_test_environment test)
     endif()
     set_property(TEST ${test} PROPERTY ENVIRONMENT ${_env})
 endfunction()
+
+# `cmake --build build --target deploy`: deploy/ for the installer from this build (scripts/deploy.ps1 -NoBuild), then
+# `ISCC installer/AvLoop.iss`.
+add_custom_target(deploy
+    COMMAND powershell -NoProfile -ExecutionPolicy Bypass -File "${CMAKE_SOURCE_DIR}/scripts/deploy.ps1" -NoBuild
+            -BuildDir "${CMAKE_BINARY_DIR}"
+    WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" USES_TERMINAL VERBATIM)

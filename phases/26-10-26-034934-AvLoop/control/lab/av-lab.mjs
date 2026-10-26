@@ -122,9 +122,10 @@ export function avloopProcesses() {
   return r.out.split(/\r?\n/).filter((l) => /^"avloop(-cli)?\.exe"/i.test(l)).map((l) => l.split('","')[0].replace(/"/g, ''));
 }
 
-/** Session cache folders still on disk (spec §3.5: deleted on exit). */
+/** Session cache folders still on disk (spec §3.5: deleted on exit), under the disk cache's default root: Qt's
+ * GenericCacheLocation (%LOCALAPPDATA%\cache) + AvLoop/cache (DiskCache::defaultRoot). */
 export function cacheSessions() {
-  const dir = path.join(process.env.LOCALAPPDATA ?? os.tmpdir(), 'AvLoop', 'cache');
+  const dir = path.join(process.env.LOCALAPPDATA ?? os.tmpdir(), 'cache', 'AvLoop', 'cache');
   return fs.existsSync(dir) ? fs.readdirSync(dir) : [];
 }
 

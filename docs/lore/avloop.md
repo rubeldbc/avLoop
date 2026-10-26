@@ -270,3 +270,18 @@ end of its section.
   context before the render service, and an estimate's last render task posted to the deleted context (a crash after
   WALK PASSED). Rule: `~MainWindow` drops the batch, the export and the estimate, then drains render → export →
   render before any thread goes. (AV-013)
+
+## The installer
+
+- **The disk cache is not where the walks looked for it**: Qt's GenericCacheLocation is `%LOCALAPPDATA%\cache`, so the
+  cache lives in `%LOCALAPPDATA%\cache\AvLoop\cache`; av-lab looked in `%LOCALAPPDATA%\AvLoop\cache` and its "no
+  session left" check never saw a session. Rule: the lab reads the path DiskCache::defaultRoot() makes; the
+  uninstaller removes that folder. (AV-014)
+- **windeployqt deploys what Qt might load, not what the app links**: the TUIO touch plugin brought Qt6Network and its
+  TLS plugins into an app that never uses the network. Rule: deploy with `--no-network` and skip those plugin types;
+  the install walk fails a deployment with Qt6Network. (AV-014)
+- **PowerShell reads `"$name:"` as a scoped variable**: `"... in $bin: run ..."` is a parse error. Rule: `${bin}:`.
+  (AV-014)
+- **An install walk changes the owner's machine**: it installs per user into a temporary folder, reads and runs what the
+  registry holds, and uninstalls; the owner's AvLoop folders (which uninstalling removes) are copied aside first and
+  put back, and a marker proves the settings folder stays. (AV-014)
