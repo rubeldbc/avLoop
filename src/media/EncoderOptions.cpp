@@ -30,7 +30,11 @@ void configure(AVCodecContext* c, const EncodeSettings& s) {
     c->colorspace = vp8 ? AVCOL_SPC_SMPTE170M : AVCOL_SPC_BT709;
     c->color_range = AVCOL_RANGE_MPEG;
     c->thread_count = s.threads > 0 ? s.threads : QThread::idealThreadCount();
-    if (vp8) {
+    if (s.pass == 1) c->flags |= AV_CODEC_FLAG_PASS1;
+    if (s.pass == 2) c->flags |= AV_CODEC_FLAG_PASS2;
+    if (s.bitrateKbps > 0) {
+        c->bit_rate = std::int64_t(s.bitrateKbps) * 1000; // Target size: an average bitrate (VBR)
+    } else if (vp8) {
         c->bit_rate = std::int64_t(q.vp8Bitrate()) * 1000; // VP8: crf within a bitrate
     } else {
         c->bit_rate = 0; // VP9: constant quality
@@ -42,7 +46,7 @@ AVDictionary* encoderOptions(const EncodeSettings& s) {
     const bool vp8 = s.format == OutputFormat::WebmVp8;
     const QualitySettings q = s.quality.resolved(vp8);
     AVDictionary* o = nullptr;
-    av_dict_set_int(&o, "crf", q.crf, 0);
+    if (s.bitrateKbps <= 0) av_dict_set_int(&o, "crf", q.crf, 0);
     av_dict_set(&o, "deadline", "good", 0);
     av_dict_set_int(&o, "cpu-used", q.speed, 0);
     if (vp8) {
@@ -51,7 +55,7 @@ AVDictionary* encoderOptions(const EncodeSettings& s) {
         av_dict_set(&o, "row-mt", "1", 0);
         av_dict_set_int(&o, "tile-columns", tileColumns(s.size.width()), 0);
         av_dict_set(&o, "auto-alt-ref", "1", 0);
-        av_dict_set(&o, "lag-in-frames", "25", 0);
+        av_dict_set_int(&o, "lag-in-frames", std::clamp(s.lagInFrames, 0, 25), 0);
     }
     return o;
 }

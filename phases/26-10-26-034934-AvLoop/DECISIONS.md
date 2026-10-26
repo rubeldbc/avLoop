@@ -60,3 +60,8 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-31 | The Preview's cache: a third of the frame cache, ≤ 512 MB | §3.7.1 | `README.md` §3; AV-008 |
 | R-32 | VP9 in BT.709, VP8 in BT.601; straight colour, separate alpha | what decoders read | `README.md` §3; AV-008 |
 | R-33 | One render thread and GPU context for the app's life | GPU-driver memory (AV-007) | `README.md` §3; AV-008 |
+| R-34 | Export opens the Save dialog each time, filled with the last export | §10.1 | `README.md` §3; AV-009 |
+| R-35 | The size estimate follows changes, not a video's opening | §10.3, §3.7.5 | `README.md` §3; AV-009 |
+| R-36 | A locked destination: `name (1).webm` at once, with a toast | §12.3 | `README.md` §3; AV-009 |
+| R-37 | Target size in MiB; one correction pass when > 5 % off either way | §10.3 | `README.md` §3; AV-009 |
+| R-38 | The `.avloop` output keys: size, w, h, lock, alpha, background; export.lastPath | §11.1 | `README.md` §3; AV-009 |

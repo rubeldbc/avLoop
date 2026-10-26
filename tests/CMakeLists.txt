@@ -34,6 +34,10 @@ foreach(_t probe decoder-seek memory interpolator export)
     target_compile_definitions(test-${_t} PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
     target_include_directories(test-${_t} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 endforeach()
+# The export job on a sample, on the CPU (QGuiApplication on the offscreen platform).
+avloop_add_test(export-job SOURCES test-export-job.cpp Samples.h LIBS avloop_export)
+target_compile_definitions(test-export-job PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
+target_include_directories(test-export-job PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # test-export reads the written file's packets itself.
 target_link_libraries(test-export PRIVATE FFmpeg::avformat FFmpeg::avcodec FFmpeg::avutil)
 

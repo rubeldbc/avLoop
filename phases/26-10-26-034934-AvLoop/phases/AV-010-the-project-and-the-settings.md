@@ -1,7 +1,7 @@
 ---
 phase: AV-010
 title: "The project and the settings"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 10
 track: A
 checkpoint_id: CP-A1

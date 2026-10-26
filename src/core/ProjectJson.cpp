@@ -1,5 +1,6 @@
 #include "core/ProjectJson.h"
 
+#include <QColor>
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -7,6 +8,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QSaveFile>
+
+#include <algorithm>
 
 namespace avloop::projectjson {
 
@@ -54,9 +57,20 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
         {QStringLiteral("fpsMethod"), LoopSettings::methodId(d.loop.method)},
     };
     root.insert(QStringLiteral("loop"), merged(d.original, QStringLiteral("loop"), loop));
-    const QJsonObject output{{QStringLiteral("format"), formatId(d.output.format)},
-                             {QStringLiteral("fps"), d.output.fpsId()}};
+    const QJsonObject output{
+        {QStringLiteral("format"), formatId(d.output.format)},
+        {QStringLiteral("size"), d.output.sizeId()},
+        {QStringLiteral("w"), d.output.custom.width()},
+        {QStringLiteral("h"), d.output.custom.height()},
+        {QStringLiteral("lock"), d.output.lockRatio},
+        {QStringLiteral("alpha"), OutputSettings::alphaId(d.output.alpha)},
+        {QStringLiteral("background"), d.output.background},
+        {QStringLiteral("fps"), d.output.fpsId()},
+    };
     root.insert(QStringLiteral("output"), merged(d.original, QStringLiteral("output"), output));
+    if (!d.exportPath.isEmpty())
+        root.insert(QStringLiteral("export"), merged(d.original, QStringLiteral("export"),
+                                                     QJsonObject{{QStringLiteral("lastPath"), d.exportPath}}));
     const QJsonObject quality{
         {QStringLiteral("preset"), QualitySettings::presetId(d.quality.preset)},
         {QStringLiteral("crf"), d.quality.crf},
@@ -145,6 +159,14 @@ bool fromJson(const QJsonObject& json, ProjectData& d, QString* error, const QSt
     const QJsonObject o = json.value(QStringLiteral("output")).toObject();
     d.output = OutputSettings::fromFpsId(o.value(QStringLiteral("fps")).toString());
     d.output.format = formatFromId(o.value(QStringLiteral("format")).toString());
+    d.output.setSizeId(o.value(QStringLiteral("size")).toString());
+    d.output.custom = QSize(std::clamp(o.value(QStringLiteral("w")).toInt(640), 16, 9999),
+                            std::clamp(o.value(QStringLiteral("h")).toInt(640), 16, 9999));
+    d.output.lockRatio = o.value(QStringLiteral("lock")).toBool(true);
+    d.output.alpha = OutputSettings::alphaFromId(o.value(QStringLiteral("alpha")).toString());
+    const QString background = o.value(QStringLiteral("background")).toString();
+    d.output.background = QColor::isValidColorName(background) ? QColor(background).name() : QStringLiteral("#000000");
+    d.exportPath = json.value(QStringLiteral("export")).toObject().value(QStringLiteral("lastPath")).toString();
     const QJsonObject q = json.value(QStringLiteral("quality")).toObject();
     const QualitySettings qd;
     d.quality.preset = q.contains(QStringLiteral("preset"))

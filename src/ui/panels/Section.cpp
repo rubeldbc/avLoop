@@ -83,6 +83,14 @@ void Section::addWide(QWidget* widget) {
     grid_->addWidget(widget, grid_->rowCount(), 0, 1, 2);
 }
 
+QList<QWidget*> Section::row(QWidget* value) const {
+    QList<QWidget*> both{value};
+    for (int r = 0; r < grid_->rowCount(); ++r)
+        if (auto* item = grid_->itemAtPosition(r, 1); item && item->widget() == value)
+            if (auto* label = grid_->itemAtPosition(r, 0)) both << label->widget();
+    return both;
+}
+
 bool Section::isOpen() const {
     return header_->isChecked();
 }

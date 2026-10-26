@@ -3,6 +3,7 @@
 #include <QWidget>
 
 class QComboBox;
+class QLabel;
 class QToolButton;
 
 namespace avloop {
@@ -27,6 +28,9 @@ public:
     // LoopPanel.cpp: the Loop section; OutputPanel.cpp: the Output section (its frame rate until AV-009).
     void bindLoop(Project* project);
     void bindOutput(Project* project);
+    // QualityPanel.cpp: the Quality section, with the size estimate's row.
+    void bindQuality(Project* project);
+    void setEstimate(const QString& text);
 
 private:
     QComboBox* presets_ = nullptr;
@@ -36,6 +40,7 @@ private:
     Section* loop_ = nullptr;
     Section* output_ = nullptr;
     Section* quality_ = nullptr;
+    QLabel* estimate_ = nullptr;
 };
 
 } // namespace avloop

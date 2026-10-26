@@ -4,6 +4,8 @@
 #include "core/Rational.h"
 
 #include <QList>
+#include <QSize>
+#include <QSizeF>
 #include <QString>
 
 namespace avloop {
@@ -35,11 +37,29 @@ struct LoopSettings {
     static Method methodFromId(const QString& id);
 };
 
-// What the export is (spec §10.2, §11.1 "output"); AV-006 holds the frame rate, AV-009 the rest.
+// What the export is (spec §10.2, §11.1 "output"): the format, the size, alpha and the colour behind it, the rate.
 struct OutputSettings {
+    enum class Size { Crop, LongSide, Custom };
+    enum class Alpha { Auto, On, Off };
+
     OutputFormat format = OutputFormat::WebmVp9;
-    bool sourceFps = true; // "Source" (reading R-6): the stream's rate, at most 60
-    Rational fps{30, 1};   // a chosen rate (15 … 60 or Custom 1–60, three decimals)
+    Size size = Size::Crop;                         // reading R-6: Crop size
+    int longSide = 1080;                            // Long side: 1920, 1280, 1080, 720, 512 or 256
+    QSize custom{640, 640};                         // Custom W×H
+    bool lockRatio = true;                          // Custom keeps the crop's ratio while typing
+    Alpha alpha = Alpha::Auto;                      // Auto: only when there are transparent parts
+    QString background = QStringLiteral("#000000"); // behind transparency when Alpha is Off
+    bool sourceFps = true;                          // "Source" (reading R-6): the stream's rate, at most 60
+    Rational fps{30, 1};                            // a chosen rate (15 … 60 or Custom 1–60, three decimals)
+
+    // The output's size for a frame of `frame` scene px (spec §10.2): its own size, its long side made N, or W×H; even,
+    // ≥ 16, the long side ≤ 1920 (`scaled` set when that limit took it down).
+    QSize sizeFor(const QSizeF& frame, bool* scaled = nullptr) const;
+    static const QList<int>& longSides();
+    QString sizeId() const; // "crop", "long-1080", "custom"
+    void setSizeId(const QString& id);
+    static QString alphaId(Alpha a); // "auto", "on", "off"
+    static Alpha alphaFromId(const QString& id);
 
     friend bool operator==(const OutputSettings&, const OutputSettings&) = default;
     // The rate the output has: the chosen one, or the source's (avg_frame_rate; a VFR source's nearest common rate),

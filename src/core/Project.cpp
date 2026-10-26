@@ -1,6 +1,7 @@
 #include "core/Project.h"
 
 #include "core/Commands.h"
+#include "core/Geometry.h"
 #include "core/ProjectJson.h"
 #include "core/Timecode.h"
 
@@ -32,6 +33,7 @@ ProjectData Project::snapshot() const {
     d.transform = transform_;
     d.crop = crop_;
     d.view = view_;
+    d.exportPath = exportPath_;
     d.original = extra_;
     return d;
 }
@@ -45,6 +47,7 @@ void Project::restore(const ProjectData& data) {
     transform_ = data.transform;
     crop_ = data.crop.clamped();
     view_ = data.view;
+    exportPath_ = data.exportPath;
     extra_ = data.original;
     undo_.clear();
     emit changed(Aspect::Source);
@@ -55,6 +58,20 @@ void Project::restore(const ProjectData& data) {
     emit changed(Aspect::Output);
     emit changed(Aspect::Quality);
     emit changed(Aspect::View);
+}
+
+QRectF Project::exportFrame() const {
+    return geometry::exportFrame(crop_.rect, transform_, source_.size());
+}
+
+QSize Project::outputSize(bool* limited) const {
+    return output_.sizeFor(exportFrame().size(), limited);
+}
+
+bool Project::outputAlpha() const {
+    using A = OutputSettings::Alpha;
+    return output_.alpha == A::On ||
+           (output_.alpha == A::Auto && geometry::needsAlpha(crop_, transform_, source_.size(), source_.hasAlpha));
 }
 
 void Project::setView(const ViewState& view) {

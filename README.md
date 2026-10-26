@@ -73,17 +73,28 @@ frame rate and quality, and a preview that shows exactly what will be exported.
 - **One renderer** for what you will see and what you will export: output frame N of a loop is made on the GPU
   (OpenGL 3.3) or, without one, on the CPU with the same result (within 2/255) — the crop's mask and feather, the
   loop's blends and Motion Interpolation applied.
-- `avloop-cli probe <video>`, `avloop-cli frame <video> --at N -o x.png` and, of a project,
-  `avloop-cli frame <project.avloop> --at N -o x.png [--cpu]` for scripts; `avloop-cli version` shows the FFmpeg build
-  in use and refuses a GPL build.
+- **Export** (Ctrl+E) writes a **VP9 (or VP8) WebM with transparency** that OBS's Media Source loops seamlessly: in
+  the background from a snapshot of the project (keep editing), with its progress and Cancel in the status bar
+  (`Exporting 86/149 · 58% · 41 fps · ETA 0:02`), written to `name.part` and renamed only when complete, then
+  re-opened and checked (frame count, rate, size, codec, alpha, the first frame a keyframe). A file OBS holds open is
+  never half-overwritten: AvLoop waits for it, then saves beside it as `name (1).webm`. The **Output** section sets
+  the format, the size (the crop's own, a long side of 1920 … 256, or a custom W×H with its ratio lock — always even,
+  at most 1920), alpha (Auto: only when the loop has transparent parts; On; Off with a background colour) and the
+  frame rate; the **Quality** section offers Low / Medium / High or Custom (CRF, Speed, max bitrate, two passes, or a
+  **target file size** met within 5 %), with the estimated size beside it.
+
+  ![An export just written, with the OBS tip](docs/screenshots/export.png)
+
+- `avloop-cli probe <video>`, `avloop-cli frame <video> --at N -o x.png`, of a project
+  `avloop-cli frame <project.avloop> --at N -o x.png [--cpu]` and `avloop-cli export <project.avloop> -o x.webm`
+  for scripts; `avloop-cli version` shows the FFmpeg build in use and refuses a GPL build.
 
 ## Roadmap
 
 Built in this order (each line is a phase of [the plan](phases/26-10-26-034934-AvLoop/control/01_PHASE_DEPENDENCY_GRAPH.md)):
 
-1. **Export**: VP9/VP8 alpha WebM, quality presets, target file size, verification.
-2. **Projects** (`.avloop`), presets, autosave, settings.
-3. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
+1. **Projects** (`.avloop`), presets, autosave, settings.
+2. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
 
 ## Using a loop in OBS
 
@@ -123,6 +134,7 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 | Zoom: Fit · 100% · in · out | Ctrl+0 · Ctrl+1 · Ctrl+= · Ctrl+- |
 | Zoom about the cursor · pan | Ctrl+wheel · wheel (Shift: across), middle-drag |
 | Preview window · in it: play/pause, a frame back / on | F5 · Space, ← / → |
+| Export | Ctrl+E |
 | Play / Pause · loop on/off | Space · L |
 | Previous / next frame · ten frames | ← / → · Shift+← / Shift+→ |
 | Go to In / Out · start / end of the file | Home / End · Ctrl+Home / Ctrl+End |
@@ -136,7 +148,7 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 src/core      the project model and the loop's maths (Qt Core only)
 src/media     FFmpeg: probe, decode, normalize, cache, encode
 src/render    the FrameRenderer (GPU and CPU) and the crop's mask
-src/export    the export job, verification, the Loop Finder
+src/export    the export job, its check, the size estimate (the Loop Finder later)
 src/ui        the main window, tools, canvas, timeline, panels, preview
 src/app       avloop.exe            src/cli   avloop-cli.exe
 resources     icons (SVG), themes (QSS with colour tokens), the app icon

@@ -46,7 +46,6 @@ void MainWindow::buildPreview() {
         if (previewWindow_ && video_) previewWindow_->setJob(render::RenderJob::of(project_->snapshot(), *video_));
     });
     connect(project_, &Project::changed, this, [this](Project::Aspect a) {
-        if (a == Project::Aspect::Source) preview_->setEnabled(project_->source().isValid());
         if (a != Project::Aspect::View && previewWindow_) previewDue_->start();
     });
     connect(preview_, &QPushButton::clicked, this, &MainWindow::openPreview);
@@ -124,6 +123,11 @@ void MainWindow::buildPreview() {
     });
 }
 
+render::RenderService* MainWindow::renderService() {
+    if (!renderService_) renderService_ = std::make_unique<render::RenderService>();
+    return renderService_.get();
+}
+
 void MainWindow::openPreview() {
     if (!video_) return;
     if (previewWindow_) {
@@ -134,10 +138,9 @@ void MainWindow::openPreview() {
         }
         return;
     }
-    if (!renderService_) renderService_ = std::make_unique<render::RenderService>();
     // The preview's cache: a third of the frame cache's budget, at most 512 MB (spec §3.7).
     const std::int64_t budget = std::min<std::int64_t>(512LL << 20, cache_->budget() / 3);
-    previewWindow_ = new PreviewWindow(renderService_.get(), disk_.get(), budget, this);
+    previewWindow_ = new PreviewWindow(renderService(), disk_.get(), budget, this);
     previewWindow_->setJob(render::RenderJob::of(project_->snapshot(), *video_));
     if (qApp->property("avloop.lab").toBool()) {
         previewWindow_->setAttribute(Qt::WA_ShowWithoutActivating);

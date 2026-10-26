@@ -20,8 +20,11 @@ RenderJob RenderJob::of(const ProjectData& p, const media::MediaInfo& source) {
     const QSizeF video(source.width, source.height);
     job.fps = p.output.effectiveFps(source.avgFps.isValid() ? source.avgFps : source.realFps, source.vfr);
     job.frame = geometry::exportFrame(p.crop.rect, p.transform, video);
-    job.outputSize = geometry::outputSize(job.frame.size());
-    job.alpha = geometry::needsAlpha(p.crop, p.transform, video, source.hasAlpha);
+    job.outputSize = p.output.sizeFor(job.frame.size(), &job.sizeLimited);
+    using A = OutputSettings::Alpha;
+    job.alpha = p.output.alpha == A::On ||
+                (p.output.alpha == A::Auto && geometry::needsAlpha(p.crop, p.transform, video, source.hasAlpha));
+    job.background = QColor(p.output.background);
     job.plan = LoopPlan::of(job.loop, job.range.in, job.range.out, job.fps);
     // Decode no larger than the output needs: the display size × min(1, effective scale), long side ≤ 1920 (R-16).
     const double scale = std::min(1.0, geometry::effectiveScale(p.transform, job.frame));

@@ -5,6 +5,7 @@
 
 #include <functional>
 
+class QHBoxLayout;
 class QLabel;
 class QPushButton;
 
@@ -21,6 +22,9 @@ public:
                        const QString& actionText = {}, std::function<void()> action = {});
     static Toast* current(QWidget* host);
 
+    // Another button after the first ("Don't show again"); each closes the toast once its action ran.
+    void addButton(const QString& text, std::function<void()> action);
+
     QString text() const;
     Kind kind() const { return kind_; }
     void dismiss();
@@ -30,10 +34,12 @@ protected:
 
 private:
     Toast(QWidget* host, const QString& text, Kind kind);
+    void fit();
     void place();
 
     QLabel* label_ = nullptr;
-    QPushButton* button_ = nullptr;
+    QHBoxLayout* buttonRow_ = nullptr;
+    int buttons_ = 0;
     Kind kind_;
 };
 

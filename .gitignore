@@ -26,3 +26,6 @@ Desktop.ini
 # Crash and log leftovers
 *.dmp
 *.part
+
+# A walk's exported loops: checked by the walk, never committed
+/phases/*/execution/*-walk/*.webm

@@ -9,6 +9,8 @@
 #include <QDateTime>
 #include <QJsonObject>
 #include <QObject>
+#include <QRectF>
+#include <QSize>
 #include <QSizeF>
 #include <QString>
 #include <QUndoStack>
@@ -63,6 +65,10 @@ public:
     const QualitySettings& quality() const { return quality_; }
     // The output frame grid In, Out and the playhead snap to (spec §6.4, §8.3): the Output section's FPS.
     Rational outputFps() const;
+    // The export's frame as the Output section makes it (spec §10.2): the scene rectangle, its size, its alpha.
+    QRectF exportFrame() const;
+    QSize outputSize(bool* limited = nullptr) const;
+    bool outputAlpha() const;
     const ViewState& view() const { return view_; }
     const QJsonObject& extra() const { return extra_; }
     QUndoStack* undoStack() { return &undo_; }
@@ -75,6 +81,8 @@ public:
     // The view and the unknown keys are kept outside Undo.
     void setView(const ViewState& view);
     void setExtra(const QJsonObject& extra);
+    const QString& exportPath() const { return exportPath_; }
+    void setExportPath(const QString& path) { exportPath_ = path; }
 
     // Pushes the change as one Undo step; changes under the same merge key within 500 ms (or one drag) merge.
     void changeTransform(const VideoTransform& after, const QString& mergeKey = {});
@@ -106,6 +114,7 @@ private:
     QualitySettings quality_;
     ViewState view_;
     QJsonObject extra_;
+    QString exportPath_;
     QUndoStack undo_;
 };
 

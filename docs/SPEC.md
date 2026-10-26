@@ -6,6 +6,39 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-009 — The export (AV-009, 2026-10-26)
+
+- Export and Ctrl+E open the Save dialog (each time — reading R-34), filled with the project's last export, else
+  `<source>_loop_<W>x<H>.webm` in the last folder. The export runs in the background from a snapshot of the project:
+  its frames made on the render service's thread (the shared GPU context, two a turn so the Preview's work goes
+  between them, at most six ahead), encoded on an export thread made at the first export or estimate, written to
+  `<name>.part`, then `MoveFileEx` with REPLACE_EXISTING over `<name>`; a file still locked (OBS playing it) gets five
+  more tries a second apart, then the loop is saved as `name (1).webm` with a warning toast (R-36).
+- Cancel, an error or a full disk delete the `.part`; a full disk says how much the export needs and how much is free;
+  an allocation failure stops the export with a message; a GPU that fails leaves the CPU to make the rest.
+- The status bar: `Exporting 86/149 · 58% · 41 fps · ETA 0:02` (with "pass 1/2" for two passes), a thin bar and Cancel.
+  Export stands disabled with the reason ("Open a video to export it"; a loop under 2 frames), as Preview does.
+  Closing the window during an export asks "Export in progress — cancel and quit?"; a crop wholly outside the video
+  asks before exporting.
+- The written file is reopened and checked (`export/OutputVerify`): frame count = L, rate, W×H, codec, alpha (the
+  stream's `alpha_mode` and the first frame through libvpx), the first frame a keyframe, no audio; a mismatch is an
+  error toast and a log line. Success: `Exported 640×360 · 2.50 s · 0.28 MB` with Show in folder; the first export of a
+  session adds the OBS tip (Media Source → Loop on · hardware decoding off) with Don't show again.
+- The Output section: Format (WebM VP9, WebM VP8; the others at AV-013), Size (Crop size, Long side 1920 / 1280 /
+  1080 / 720 / 512 / 256, Custom W×H with a ratio lock — even, ≥ 16, the long side ≤ 1920 with a note when that limit
+  took it down), Alpha (Auto — only with transparent parts —, On, Off), Background (#rrggbb, behind the transparent
+  parts when there is no alpha), FPS. The Crop section's Output row shows the result. `.avloop`: `output.size`, `w`,
+  `h`, `lock`, `alpha`, `background`; `export.lastPath` (R-38).
+- The Quality section: Low / Medium / High show their CRF and Speed; typing either makes it Custom from those values;
+  Custom adds Max bitrate (VP8's bitrate), Two-pass and Target size (MB, R-37): two passes at
+  target × 8 / duration × 0.9, one more at the corrected bitrate when the size lands more than 5 % off. The estimate
+  (`~0.29 MB`): three parts of ten frames spread over the loop, encoded alone and extrapolated, 1 s after a change
+  (R-35).
+- `avloop-cli export <project.avloop> -o out.webm [--cpu] [--repeat N]`: the same job from a project file.
+- Measured: every loop mode's frame count = L and its seam within 1.3 × the median neighbour difference; 12–60 fps by
+  all three methods CFR with the right `r_frame_rate`; each file read twice in a row gives 2L frames; Target size
+  within 2 %; three exports in a row hold the memory flat (Private Bytes peaks 712 / 722 / 723 MB).
+
 ### D-008 — The Preview window (AV-008, 2026-10-26)
 
 - The Preview button or F5 opens one non-modal window (again: to the front) that shows only the exported part as it

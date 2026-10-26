@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QList>
 #include <QString>
 #include <QWidget>
 
@@ -21,6 +22,8 @@ public:
     void addRow(const QString& label, QWidget* value);
     // Appends a widget across both columns.
     void addWide(QWidget* widget);
+    // A row's value and its label: what a setting that does not apply hides together.
+    QList<QWidget*> row(QWidget* value) const;
 
     bool isOpen() const;
     void setOpen(bool open);

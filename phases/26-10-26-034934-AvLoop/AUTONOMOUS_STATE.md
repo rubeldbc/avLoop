@@ -8,9 +8,9 @@ words: *"I want to build a piece of software called AvLoop. Its main job is to t
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: AV-009
-Next eligible: AV-009 (in progress)
-Completed: 8 of 16
+Active phase: AV-010
+Next eligible: AV-010 (in progress)
+Completed: 9 of 16
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -60,6 +60,7 @@ where `--shot` and `--walk` open their window for seconds and close it.
 ## Completion record
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-009** DONE 2026-10-26 — The export: VP9/VP8 alpha WebM in the background, .part and rename, checked; Output and Quality panels, Target size, the estimate, avloop-cli export Record: `execution/AV-009-EXECUTION.md`.
 - **AV-008** DONE 2026-10-26 — The Preview window (D-008): F5 opens one window showing only the export — Live from the FrameRenderer (= avloop-cli frame byte for byte) with a bounded cache that waits instead of dropping, Encoded through a temporary WebM played by libvpx with its size, seam marks, Around seam, backgrounds, zoom; the VP9/VP8 alpha encoder shared with the export (R-14, R-32); one render thread and GPU context (R-33); 17 test suites, walk-preview 87 steps and walk-preview-check PASSED (six opens +3.2 MB). Record: `execution/AV-008-EXECUTION.md`. Record: `execution/AV-008-EXECUTION.md`.
 - **AV-007** DONE 2026-10-26 — The renderer (D-007, AVADR-0001 accepted): one FrameRenderer for every output frame — a GPU back end (OpenGL 3.3, one output pass, texture pool, double-PBO readback) and a CPU twin within 2/255 (measured mean ≤ 0.075, max 1) — avloop-cli frame/frames for projects; video opens no longer leak (shared D3D11 device, one-thread filter graphs, persistent worker threads) and HW = SW frames again; 16 test suites, walk-render and walk-memory-render PASSED, every earlier walk re-run. Record: `execution/AV-007-EXECUTION.md`. Record: `execution/AV-007-EXECUTION.md`.
 - **AV-006** DONE 2026-10-26 — The loop engine (D-006): LoopMap and TimeMap as tested pure functions for the four modes and three FPS methods, Speed, the output frame rate (R-28, R-29), the Motion Interpolation pre-pass with progress and cancel (R-30), the Loop panel with its summary and the Output FPS row, the crossfade band dragged on the timeline; 14 test suites, walk-loop 74 steps PASSED. Record: `execution/AV-006-EXECUTION.md`. Record: `execution/AV-006-EXECUTION.md`.

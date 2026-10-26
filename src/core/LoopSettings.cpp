@@ -1,5 +1,7 @@
 #include "core/LoopSettings.h"
 
+#include "core/Geometry.h"
+
 #include <QList>
 
 #include <algorithm>
@@ -59,6 +61,45 @@ LoopSettings::Method LoopSettings::methodFromId(const QString& id) {
     for (Method m : {Method::Nearest, Method::FrameBlend, Method::Motion})
         if (methodId(m) == id) return m;
     return Method::Nearest;
+}
+
+QSize OutputSettings::sizeFor(const QSizeF& frame, bool* scaled) const {
+    QSizeF want = frame;
+    if (size == Size::LongSide && frame.width() > 0 && frame.height() > 0)
+        want = frame * (double(longSide) / std::max(frame.width(), frame.height()));
+    if (size == Size::Custom) want = QSizeF(custom);
+    if (scaled) *scaled = std::max(want.width(), want.height()) > geometry::kMaxLongSide + 0.5;
+    return geometry::outputSize(want);
+}
+
+const QList<int>& OutputSettings::longSides() {
+    static const QList<int> sides = {1920, 1280, 1080, 720, 512, 256};
+    return sides;
+}
+
+QString OutputSettings::sizeId() const {
+    if (size == Size::LongSide) return QStringLiteral("long-%1").arg(longSide);
+    return size == Size::Custom ? QStringLiteral("custom") : QStringLiteral("crop");
+}
+
+void OutputSettings::setSizeId(const QString& id) {
+    size = Size::Crop;
+    if (id == QLatin1String("custom")) size = Size::Custom;
+    if (id.startsWith(QLatin1String("long-"))) {
+        const int n = id.mid(5).toInt();
+        if (longSides().contains(n)) {
+            size = Size::LongSide;
+            longSide = n;
+        }
+    }
+}
+
+QString OutputSettings::alphaId(Alpha a) {
+    return a == Alpha::On ? QStringLiteral("on") : a == Alpha::Off ? QStringLiteral("off") : QStringLiteral("auto");
+}
+
+OutputSettings::Alpha OutputSettings::alphaFromId(const QString& id) {
+    return id == QLatin1String("on") ? Alpha::On : id == QLatin1String("off") ? Alpha::Off : Alpha::Auto;
 }
 
 const QList<Rational>& OutputSettings::commonRates() {

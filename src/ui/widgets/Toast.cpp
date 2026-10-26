@@ -6,6 +6,9 @@
 #include <QPushButton>
 #include <QStyle>
 #include <QTimer>
+#include <QVBoxLayout>
+
+#include <algorithm>
 
 namespace avloop {
 
@@ -31,13 +34,13 @@ Toast::Toast(QWidget* host, const QString& text, Kind kind) : QFrame(host), kind
     setObjectName(QStringLiteral("Toast"));
     setProperty("kind", QString::fromLatin1(kindName(kind)));
     setAttribute(Qt::WA_StyledBackground);
-    auto* row = new QHBoxLayout(this);
-    row->setContentsMargins(12, 8, 10, 8);
-    row->setSpacing(10);
+    // The text, then its buttons (if any) in a row at the right.
+    auto* column = new QVBoxLayout(this);
+    column->setContentsMargins(12, 8, 10, 8);
+    column->setSpacing(6);
     label_ = new QLabel(text, this);
     label_->setWordWrap(true);
-    label_->setMaximumWidth(340);
-    row->addWidget(label_);
+    column->addWidget(label_);
     host->installEventFilter(this);
 }
 
@@ -46,16 +49,8 @@ Toast* Toast::post(QWidget* host, const QString& text, Kind kind, int ms, const 
     if (!host) return nullptr;
     if (Toast* old = current(host)) old->dismiss();
     auto* toast = new Toast(host, text, kind);
-    if (!actionText.isEmpty() && action) {
-        toast->button_ = new QPushButton(actionText, toast);
-        toast->layout()->addWidget(toast->button_);
-        connect(toast->button_, &QPushButton::clicked, toast, [toast, action] {
-            action();
-            toast->dismiss();
-        });
-    }
-    toast->adjustSize();
-    toast->place();
+    if (!actionText.isEmpty() && action) toast->addButton(actionText, std::move(action));
+    toast->fit();
     toast->show();
     toast->raise();
     if (ms > 0) QTimer::singleShot(ms, toast, &Toast::dismiss);
@@ -68,6 +63,34 @@ Toast* Toast::current(QWidget* host) {
     for (Toast* t : toasts)
         if (!t->property("avloopClosing").toBool()) return t;
     return nullptr;
+}
+
+void Toast::addButton(const QString& text, std::function<void()> action) {
+    auto* button = new QPushButton(text, this);
+    button->setObjectName(buttons_++ == 0 ? QStringLiteral("toast.action") : QStringLiteral("toast.action2"));
+    button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    if (!buttonRow_) {
+        buttonRow_ = new QHBoxLayout;
+        buttonRow_->setSpacing(8);
+        buttonRow_->addStretch(1);
+        static_cast<QVBoxLayout*>(layout())->addLayout(buttonRow_);
+    }
+    buttonRow_->addWidget(button);
+    connect(button, &QPushButton::clicked, this, [this, action] {
+        action();
+        dismiss();
+    });
+    if (isVisible()) fit();
+}
+
+void Toast::fit() {
+    // A wrapped label asks for little width: give it its longest line, up to its maximum.
+    int widest = 0;
+    for (const QString& line : label_->text().split(QLatin1Char('\n')))
+        widest = std::max(widest, label_->fontMetrics().horizontalAdvance(line) + 4);
+    label_->setFixedWidth(std::min(widest, 340)); // its height then follows the wrapped lines
+    adjustSize();
+    place();
 }
 
 QString Toast::text() const {

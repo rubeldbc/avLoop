@@ -28,6 +28,7 @@ read and open for a veto later; an answer that differs changes the reading in it
 | 19 | **R-15** Animated WebP refused (no FFmpeg decodes it). | `README.md` §3 15; AV-002. | Decided by the agent (AV-002); open for a veto — a WebP decoder of AvLoop's own would be a new item |
 | 20 | **R-16** The working size before a crop. | `README.md` §3 16; AV-002. | Decided by the agent (AV-002); open for a veto |
 | 21 | **R-17 … R-20** QUndoStack in core; Reset at (0,0); Fit without a crop; the border with the Selection. | `README.md` §3 17 … 20; AV-003. | Decided by the agent (AV-003); open for a veto |
+| 26 | **R-34 … R-38** The Save dialog each time; the estimate after changes; `name (1).webm` without a question; Target size's MiB and correction; the output keys. | `README.md` §3 34 … 38; AV-009. | Decided by the agent (AV-009); open for a veto |
 | 25 | **R-31 … R-33** The Preview's cache; VP8 in BT.601; one render thread and GPU context. | `README.md` §3 31 … 33; AV-008. | Decided by the agent (AV-008); open for a veto |
 | 24 | **R-28 … R-30** Crossfade by default; a new rate moves In/Out to its grid; the Motion pre-pass runs for the Preview and the export. | `README.md` §3 28 … 30; AV-006. | Decided by the agent (AV-006); open for a veto |
 | 23 | **R-24 … R-27** The range In up to Out (O keeps the frame); Dropped = never shown; timeline at 30 Hz while playing; the scrub's two speeds. | `README.md` §3 24 … 27; AV-005. | Decided by the agent (AV-005); open for a veto |

@@ -129,6 +129,18 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     the colour planes are straight, the alpha separate (WebM's alpha is unassociated).
 33. **R-33** The app's output frames are made on one render thread with one GPU context that live with the window
     (the Preview now, the export at AV-009): a thread or a context made per use leaves GPU-driver memory behind (AV-007).
+34. **R-34** Export always opens the Save dialog (§10.1's "the first time" read as: the dialog comes first), filled with
+    the project's last export, else `<source>_loop_<W>x<H>.webm` in the last folder; a walk answers it with a path.
+35. **R-35** The size estimate is measured 1 s after a change of the range, crop, transform, loop, output or quality, or
+    when the Quality section is opened — not when a video is only opened, which must stay cheap (§3.7.5); a measure
+    makes one frame at a time and gives VP9 no more look-ahead than its ten frames.
+36. **R-36** A destination still locked after the five tries is written as `name (1).webm` at once, with a warning toast
+    that says so — no question in the middle of a finished export (§12.3's "offer").
+37. **R-37** Target size counts MB as 1,048,576 bytes; when the first two passes land more than 5 % off either way, one
+    more pass at the corrected bitrate (aiming 3 % under when over). A target above what the loop takes at the best
+    quality comes out smaller: libvpx cannot spend bits a loop does not need.
+38. **R-38** The `.avloop` `output` keeps `size` (`crop`, `long-<N>`, `custom`), `w`/`h` (the Custom size), `lock`,
+    `alpha` (`auto`, `on`, `off`), `background` (`#rrggbb`); `export.lastPath` the last file written.
 
 ## 4. What is not built
 

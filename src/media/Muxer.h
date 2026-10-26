@@ -18,13 +18,15 @@ public:
     bool open(const QString& path, const AVCodecContext* codec, bool alpha, QString* error = nullptr);
     bool write(AVPacket* packet, QString* error = nullptr);
     bool finish(QString* error = nullptr);
-    void close(); // without the trailer
+    void close();                                   // without the trailer
+    bool outOfSpace() const { return outOfSpace_; } // a write failed for want of disk space (spec §12.3)
 
 private:
     AVFormatContext* fmt_ = nullptr;
     AVStream* stream_ = nullptr;
     AVRational codecTimeBase_{1, 1};
     bool headerWritten_ = false;
+    bool outOfSpace_ = false;
 };
 
 } // namespace avloop::media

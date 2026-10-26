@@ -14,13 +14,6 @@ namespace avloop {
 
 namespace {
 
-QLabel* hint(const QString& text, QWidget* parent) {
-    auto* label = new QLabel(text, parent);
-    label->setProperty("quiet", true);
-    label->setWordWrap(true);
-    return label;
-}
-
 QToolButton* iconButton(const QString& name, const QString& icon, const QString& tip, QWidget* parent) {
     auto* b = new QToolButton(parent);
     b->setObjectName(name);
@@ -73,7 +66,6 @@ SidePanel::SidePanel(QWidget* parent) : QWidget(parent) {
     loop_ = new Section(QStringLiteral("loop"), tr("Loop"), body);
     output_ = new Section(QStringLiteral("output"), tr("Output"), body);
     quality_ = new Section(QStringLiteral("quality"), tr("Quality"), body);
-    quality_->addWide(hint(tr("Open a video to set its quality."), quality_->body()));
     for (Section* s : {crop_, loop_, output_, quality_})
         sections->addWidget(s);
     sections->addStretch(1);

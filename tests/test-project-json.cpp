@@ -47,6 +47,35 @@ private slots:
         QCOMPARE(json.value(QStringLiteral("source")).toObject().value(QStringLiteral("mtime")).toString(),
                  QStringLiteral("2026-10-26T10:12:00Z"));
     }
+    // "output" (spec §11.1): format, size, w, h, the lock, alpha, background; "export": lastPath.
+    void outputRoundTrip() {
+        ProjectData d = sample(QStringLiteral("D:/clips/fire.mp4"));
+        d.output.format = OutputFormat::WebmVp8;
+        d.output.setSizeId(QStringLiteral("long-720"));
+        d.output.custom = QSize(500, 300);
+        d.output.lockRatio = false;
+        d.output.alpha = OutputSettings::Alpha::Off;
+        d.output.background = QStringLiteral("#112233");
+        d.exportPath = QStringLiteral("D:/obs/loops/fire_loop_640x640.webm");
+        const QJsonObject json = projectjson::toJson(d);
+        const QJsonObject o = json.value(QStringLiteral("output")).toObject();
+        QCOMPARE(o.value(QStringLiteral("size")).toString(), QStringLiteral("long-720"));
+        QCOMPARE(o.value(QStringLiteral("alpha")).toString(), QStringLiteral("off"));
+        QCOMPARE(json.value(QStringLiteral("export")).toObject().value(QStringLiteral("lastPath")).toString(),
+                 d.exportPath);
+        ProjectData back;
+        QString error;
+        QVERIFY(projectjson::fromJson(json, back, &error));
+        QCOMPARE(back.output, d.output);
+        QCOMPARE(back.exportPath, d.exportPath);
+        // The defaults (reading R-6): Crop size, Alpha Auto, black, the lock on.
+        ProjectData plain;
+        QVERIFY(projectjson::fromJson(projectjson::toJson(sample(QStringLiteral("D:/a.mp4"))), plain, &error));
+        QCOMPARE(plain.output.size, OutputSettings::Size::Crop);
+        QCOMPARE(plain.output.alpha, OutputSettings::Alpha::Auto);
+        QCOMPARE(plain.output.background, QStringLiteral("#000000"));
+        QVERIFY(plain.output.lockRatio);
+    }
     void cropRoundTrip() {
         ProjectData d = sample(QStringLiteral("a.mp4"));
         d.crop.kind = CropShape::Kind::Rounded;

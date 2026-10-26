@@ -8,6 +8,7 @@ Muxer::~Muxer() {
 
 bool Muxer::open(const QString& path, const AVCodecContext* codec, bool alpha, QString* error) {
     auto fail = [&](const QString& what, int r) {
+        outOfSpace_ = r == AVERROR(ENOSPC);
         if (error) *error = QStringLiteral("%1: %2").arg(what, avError(r));
         close();
         return false;
@@ -35,6 +36,7 @@ bool Muxer::write(AVPacket* packet, QString* error) {
     packet->stream_index = stream_->index;
     av_packet_rescale_ts(packet, codecTimeBase_, stream_->time_base);
     const int r = av_interleaved_write_frame(fmt_, packet);
+    outOfSpace_ = outOfSpace_ || r == AVERROR(ENOSPC);
     if (r < 0 && error) *error = QStringLiteral("write: %1").arg(avError(r));
     return r >= 0;
 }
@@ -42,6 +44,7 @@ bool Muxer::write(AVPacket* packet, QString* error) {
 bool Muxer::finish(QString* error) {
     if (!fmt_ || !headerWritten_) return false;
     const int r = av_write_trailer(fmt_);
+    outOfSpace_ = outOfSpace_ || r == AVERROR(ENOSPC);
     if (r < 0 && error) *error = QStringLiteral("trailer: %1").arg(avError(r));
     close();
     return r >= 0;

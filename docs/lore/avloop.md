@@ -177,3 +177,17 @@ end of its section.
   (AV-008)
 - **A loop's wrap to an In between keyframes costs a GOP of decoding**: the editor's playback keeps the lap's first six
   frames and starts each lap with them while the decoder seeks behind them. (AV-008)
+
+## The export
+
+- **A GL call off the render thread crashes, not errors**: the export thread asked the FrameRenderer for its
+  `backendName()`, which reads `glGetString` — with no current context there, an access violation. Rule: what needs the
+  context is read on the render thread (the GPU's name at open) and passed over. (AV-009)
+- **libvpx's two-pass VBR undershoots a target the loop does not need**: an easy loop asked for 3× its CRF size came
+  out 20–40 % small, and VP8 saturates; `minrate` pushes it over at low rates instead. Rule: plain VBR, one corrected
+  pass when more than 5 % off, and a reachable target in the tests. (AV-009)
+- **An estimate is an export in small**: measured at every video opening it doubled the opening's memory (a 4K source:
+  ≈ 400 → 1,000 MB, its decoders, textures and a 1080p VP9 encoder). Rule: measure after a change, a frame at a time,
+  with no more look-ahead than the frames encoded. (AV-009)
+- **A wrapped QLabel beside buttons asks for too little width**: the toast clipped its second line under its buttons.
+  Rule: the text above, the buttons in a row beneath, the label fixed to its longest line (at most 340 px). (AV-009)

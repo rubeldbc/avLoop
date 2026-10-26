@@ -3,7 +3,7 @@
 //   avloop-cli probe …     a video's reading (CliMedia.cpp)
 //   avloop-cli frame …     a normalized frame as a PNG (CliMedia.cpp); of a project: output frame N (CliRender.cpp)
 //   avloop-cli frames …    output frames in a row, round the loop (CliRender.cpp)
-// Later phases add: export.
+//   avloop-cli export …    a project's loop written as the app exports it (CliExport.cpp)
 #include "core/AppInfo.h"
 
 #include <QGuiApplication>
@@ -24,6 +24,7 @@ int probe(const QStringList& args);
 int frame(const QStringList& args);
 int renderFrame(const QStringList& args);
 int renderFrames(const QStringList& args);
+int exportLoop(const QStringList& args);
 } // namespace avloop::cli
 
 namespace {
@@ -56,7 +57,7 @@ int version() {
 
 int usage() {
     out(QStringLiteral("usage: avloop-cli version | probe <video> | frame <video|project> --at N -o x.png | "
-                       "frames <project> [--count N]"));
+                       "frames <project> [--count N] | export <project> -o out.webm"));
     return 1;
 }
 
@@ -64,7 +65,7 @@ int usage() {
 
 int main(int argc, char** argv) {
     // Rendering a project needs OpenGL, so a GUI application (no window is shown); everything else does not.
-    const bool renders = argc > 2 && (std::strcmp(argv[1], "frames") == 0 ||
+    const bool renders = argc > 2 && (std::strcmp(argv[1], "frames") == 0 || std::strcmp(argv[1], "export") == 0 ||
                                       (std::strcmp(argv[1], "frame") == 0 && std::strstr(argv[2], ".avloop")));
     std::unique_ptr<QCoreApplication> app;
     if (renders)
@@ -77,6 +78,7 @@ int main(int argc, char** argv) {
     if (args.first() == QLatin1String("version")) return version();
     if (args.first() == QLatin1String("probe")) return avloop::cli::probe(args.mid(1));
     if (args.first() == QLatin1String("frames")) return avloop::cli::renderFrames(args.mid(1));
+    if (args.first() == QLatin1String("export")) return avloop::cli::exportLoop(args.mid(1));
     if (args.first() == QLatin1String("frame"))
         return renders ? avloop::cli::renderFrame(args.mid(1)) : avloop::cli::frame(args.mid(1));
     return usage();

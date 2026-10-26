@@ -1,7 +1,6 @@
 // The side panel's Crop section (spec §5.1, §6.1): Shape, Ratio, X / Y, W / H, Radius, Feather and the output's size
 // with whether it carries alpha. The same crop as the canvas and the options bar; every edit one Undo step.
 #include "core/AspectRatio.h"
-#include "core/Geometry.h"
 #include "core/Project.h"
 #include "ui/WalkRunner.h"
 #include "ui/options/OptionsBar.h"
@@ -67,8 +66,6 @@ void SidePanel::bindCrop(Project* project) {
 
     auto refresh = [=] {
         const CropShape& c = project->crop();
-        const VideoTransform& t = project->transform();
-        const QSizeF video = project->source().size();
         hint->setVisible(c.isEmpty());
         {
             const QSignalBlocker b1(shape);
@@ -88,8 +85,9 @@ void SidePanel::bindCrop(Project* project) {
                            static_cast<QWidget*>(h), static_cast<QWidget*>(radius)})
             f->setEnabled(!c.isEmpty());
         radius->setEnabled(!c.isEmpty() && c.kind == CropShape::Kind::Rounded);
-        const QSize out = geometry::outputSize(geometry::exportFrame(c.rect, t, video).size());
-        const bool alpha = geometry::needsAlpha(c, t, video, project->source().hasAlpha);
+        // What the export makes of it: the Output section's size and alpha (spec §10.2).
+        const QSize out = project->outputSize();
+        const bool alpha = project->outputAlpha();
         output->setText(
             QStringLiteral("%1 × %2%3").arg(out.width()).arg(out.height()).arg(alpha ? tr(" · alpha") : QString()));
         setEnabled(project->source().isValid());

@@ -31,8 +31,14 @@ class DiskCache;
 class FrameCache;
 } // namespace media
 
+namespace exporting {
+class ExportJob;
+class SizeEstimator;
+} // namespace exporting
+
 class Canvas;
 class DropZone;
+class ExportBar;
 class PreviewWindow;
 namespace render {
 class RenderService;
@@ -115,6 +121,21 @@ private:
     // MainWindowPreview.cpp — the one Preview window.
     void buildPreview();
     void openPreview();
+    render::RenderService* renderService();
+    // MainWindowExport.cpp — the export (spec §10.1), its Save dialog, its bar and toasts, the size estimate.
+    void buildExport();
+    void chooseExport();
+    void exportTo(const QString& path);
+    void exportFinished();
+    void refreshExportState();
+    void requestEstimate();
+    QString exportBlocker() const; // why Export (and Preview) cannot run now; empty when they can
+    bool exportRunning() const;
+    bool mayCloseDuringExport();
+    // A yes/no question; a lab run answers it from the walk ("answer" step) and never opens a dialog.
+    bool confirm(const QString& text);
+    QObject* exportContext(); // made at first use, as the estimator
+    exporting::SizeEstimator* estimator();
 
     QToolButton* menuButton_ = nullptr;
     QMenu* menu_ = nullptr;
@@ -142,7 +163,10 @@ private:
     QLabel* sourceLabel_ = nullptr;
     QLabel* gpuLabel_ = nullptr;
     QLabel* memoryLabel_ = nullptr;
-    QWidget* exportArea_ = nullptr;
+    ExportBar* exportBar_ = nullptr;
+    QString lastQuestion_;
+    bool labAnswer_ = true;
+    bool obsTipShown_ = false;
     Project* project_ = nullptr;
     Canvas* canvas_ = nullptr;
     ToolManager* tools_ = nullptr;
@@ -154,6 +178,10 @@ private:
     std::unique_ptr<render::RenderService> renderService_; // outlives every Preview
     std::unique_ptr<media::WorkerThread> decodeThread_;    // outlives every worker: declared first, gone last
     std::unique_ptr<media::DecodeWorker> worker_;
+    std::unique_ptr<QObject> exportContext_;            // on the export thread; deleted once that thread is gone
+    std::unique_ptr<media::WorkerThread> exportThread_; // the export's encoder and the estimate's (spec §10.1)
+    std::unique_ptr<exporting::SizeEstimator> estimator_;
+    std::unique_ptr<exporting::ExportJob> exportJob_; // the running or the last export: goes first
     std::optional<media::MediaInfo> video_;
     QString videoState_ = QStringLiteral("none"); // none, opening, ready, error
     QString lastError_;

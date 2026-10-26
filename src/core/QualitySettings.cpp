@@ -6,6 +6,12 @@ namespace avloop {
 
 QualitySettings QualitySettings::resolved(bool vp8) const {
     QualitySettings q = *this;
+    if (preset != Preset::Custom) {
+        // Max bitrate, Two-pass and Target size are Custom's alone.
+        q.maxBitrate = 0;
+        q.twoPass = false;
+        q.targetMB = 0;
+    }
     switch (preset) {
     case Preset::Low:
         q.crf = vp8 ? 30 : 40;

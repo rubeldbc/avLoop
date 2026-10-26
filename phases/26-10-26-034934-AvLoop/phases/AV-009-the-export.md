@@ -1,7 +1,7 @@
 ---
 phase: AV-009
 title: "The export"
-status: IN_PROGRESS
+status: DONE
 owner_item: 9
 track: A
 checkpoint_id: CP-A1

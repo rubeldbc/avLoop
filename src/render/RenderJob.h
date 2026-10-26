@@ -20,8 +20,9 @@ struct RenderJob {
     LoopSettings loop;
     OutputSettings output;
     QualitySettings quality;
-    bool alpha = true; // Alpha Auto until AV-009: needed → kept, else composited over `background`
+    bool alpha = true; // Alpha: Auto (needed → kept), On, Off (composited over `background`)
     QColor background = Qt::black;
+    bool sizeLimited = false; // the long-side limit of 1920 took the asked size down (spec §10.2's note)
 
     Rational fps;     // the output rate
     QRectF frame;     // the scene rectangle that becomes the output (the crop, else the video's rectangle)

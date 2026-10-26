@@ -249,7 +249,7 @@ int WalkRunner::stepShot(const QJsonObject& step) {
 
 namespace {
 
-// An expect's or a waitFor's test of a probe's value: eq, near [v, ±], min, max, contains — all that are given.
+// An expect's or a waitFor's test of a probe's value: eq, near [v, ±], min, max, contains, lacks — all that are given.
 bool matches(const QJsonObject& step, const QVariant& value, QString* wanted) {
     const QString observed = text(value);
     bool ok = true;
@@ -275,6 +275,8 @@ bool matches(const QJsonObject& step, const QVariant& value, QString* wanted) {
         ok = ok && value.toDouble() <= step.value(QStringLiteral("max")).toDouble();
     if (step.contains(QStringLiteral("contains")))
         ok = ok && observed.contains(step.value(QStringLiteral("contains")).toString());
+    if (step.contains(QStringLiteral("lacks")))
+        ok = ok && !observed.contains(step.value(QStringLiteral("lacks")).toString());
     if (wanted) *wanted = want;
     return ok;
 }

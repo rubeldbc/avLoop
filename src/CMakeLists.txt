@@ -33,9 +33,16 @@ add_library(avloop_render STATIC
 target_link_libraries(avloop_render PUBLIC avloop_core avloop_media Qt6::Gui Qt6::OpenGL
     PRIVATE Qt6::Concurrent avloop_warnings)
 
+add_library(avloop_export STATIC
+    export/FormatProfiles.h export/FormatProfiles.cpp export/OutputVerify.h export/OutputVerify.cpp
+    export/ExportJob.h export/ExportJob.cpp export/SizeEstimator.h export/SizeEstimator.cpp)
+target_link_libraries(avloop_export PUBLIC avloop_core avloop_media avloop_render
+    PRIVATE FFmpeg::avformat FFmpeg::avcodec FFmpeg::avutil FFmpeg::swscale avloop_warnings)
+
 add_library(avloop_ui STATIC
     ui/MainWindow.h ui/MainWindow.cpp ui/MainMenu.cpp ui/MainWindowActions.cpp ui/MainWindowCanvas.cpp
-    ui/MainWindowTimeline.cpp ui/MainWindowPreview.cpp
+    ui/MainWindowTimeline.cpp ui/MainWindowPreview.cpp ui/MainWindowExport.cpp
+    ui/export/ExportBar.h ui/export/ExportBar.cpp
     ui/preview/PreviewWindow.h ui/preview/PreviewWindow.cpp ui/preview/PreviewWidgets.h ui/preview/PreviewWidgets.cpp
     ui/preview/PreviewPlayer.h ui/preview/PreviewPlayer.cpp ui/preview/PreviewEncode.cpp
     ui/WalkRunner.h ui/WalkRunner.cpp ui/WalkSteps.cpp
@@ -44,7 +51,7 @@ add_library(avloop_ui STATIC
     ui/widgets/Toast.h ui/widgets/Toast.cpp
     ui/panels/Section.h ui/panels/Section.cpp
     ui/panels/SidePanel.h ui/panels/SidePanel.cpp ui/panels/CropPanel.cpp ui/panels/LoopPanel.cpp
-    ui/panels/OutputPanel.cpp
+    ui/panels/OutputPanel.cpp ui/panels/QualityPanel.cpp
     ui/canvas/DropZone.h ui/canvas/DropZone.cpp
     ui/canvas/Canvas.h ui/canvas/Canvas.cpp ui/canvas/CanvasView.cpp ui/canvas/CanvasGl.cpp ui/canvas/CanvasGlState.h ui/canvas/CanvasOverlay.cpp
     ui/tools/Tool.h ui/tools/ToolManager.h ui/tools/ToolManager.cpp
@@ -58,7 +65,7 @@ add_library(avloop_ui STATIC
     ui/timeline/TimelineScale.h ui/timeline/TimelineScale.cpp
     ui/timeline/PlaybackClock.h ui/timeline/PlaybackClock.cpp)
 target_link_libraries(avloop_ui
-    PUBLIC avloop_core avloop_media avloop_render Qt6::Widgets Qt6::Svg Qt6::OpenGLWidgets Qt6::Test Qt6::Concurrent
+    PUBLIC avloop_core avloop_media avloop_render avloop_export Qt6::Widgets Qt6::Svg Qt6::OpenGLWidgets Qt6::Test Qt6::Concurrent
     PRIVATE avloop_warnings)
 
 set(AVLOOP_RC "")
@@ -69,8 +76,8 @@ add_executable(avloop WIN32 app/main.cpp ${CMAKE_SOURCE_DIR}/resources/resources
 target_link_libraries(avloop PRIVATE avloop_ui avloop_warnings)
 avloop_copy_ffmpeg_dlls(avloop)
 
-add_executable(avloop-cli cli/main.cpp cli/CliMedia.cpp cli/CliRender.cpp)
-target_link_libraries(avloop-cli PRIVATE avloop_core avloop_media avloop_render Qt6::Gui
+add_executable(avloop-cli cli/main.cpp cli/CliMedia.cpp cli/CliRender.cpp cli/CliExport.cpp)
+target_link_libraries(avloop-cli PRIVATE avloop_core avloop_media avloop_render avloop_export Qt6::Gui
     FFmpeg::avcodec FFmpeg::avformat FFmpeg::avutil avloop_warnings)
 avloop_copy_ffmpeg_dlls(avloop-cli)
 

@@ -16,6 +16,8 @@ struct Encoder::State {
     FramePtr frame;
     PacketPtr packet;
     Muxer muxer;
+    bool file = false;
+    QByteArray statsIn;                 // pass 2's statistics, NUL-ended, for as long as the codec reads them
     std::vector<std::uint8_t> straight; // a frame made straight (not premultiplied) for the encoder
 };
 
@@ -32,18 +34,27 @@ bool Encoder::open(const QString& path, QString* error) {
         return false;
     };
     path_ = path;
+    s_->file = !path.isEmpty() && settings_.pass != 1;
     const AVCodec* codec = avcodec_find_encoder_by_name(encoderName(settings_));
     if (!codec)
         return fail(QStringLiteral("no %1 encoder in this FFmpeg").arg(QString::fromLatin1(encoderName(settings_))));
     s_->codec.reset(avcodec_alloc_context3(codec));
     if (!s_->codec) return fail(QStringLiteral("no memory for the encoder"));
     configure(s_->codec.get(), settings_);
+    if (settings_.pass == 2) {
+        s_->statsIn = settings_.passStats;
+        s_->statsIn.append('\0');
+        s_->codec->stats_in = s_->statsIn.data(); // ours: taken back before the codec is freed
+    }
     AVDictionary* options = encoderOptions(settings_);
     const int r = avcodec_open2(s_->codec.get(), codec, &options);
     av_dict_free(&options);
     if (r < 0) return fail(QStringLiteral("%1: %2").arg(QString::fromLatin1(encoderName(settings_)), avError(r)));
     QString why;
-    if (!s_->muxer.open(path, s_->codec.get(), settings_.alpha, &why)) return fail(why);
+    if (s_->file && !s_->muxer.open(path, s_->codec.get(), settings_.alpha, &why)) {
+        outOfSpace_ = s_->muxer.outOfSpace();
+        return fail(why);
+    }
 
     const int w = settings_.size.width();
     const int h = settings_.size.height();
@@ -62,7 +73,25 @@ bool Encoder::open(const QString& path, QString* error) {
     s_->packet = makePacket();
     s_->straight.resize(std::size_t(w) * h * 4);
     written_ = 0;
+    bytes_ = keyBytes_ = 0;
+    stats_.clear();
     return true;
+}
+
+bool Encoder::put(AVPacket* packet, QString* error) {
+    // The alpha plane travels as the packet's side data (Matroska BlockAdditional): it counts toward the size.
+    std::int64_t size = packet->size;
+    for (int i = 0; i < packet->side_data_elems; ++i)
+        size += std::int64_t(packet->side_data[i].size);
+    bytes_ += size;
+    if (packet->flags & AV_PKT_FLAG_KEY) keyBytes_ += size;
+    bool ok = true;
+    if (s_->file) {
+        ok = s_->muxer.write(packet, error);
+        outOfSpace_ = outOfSpace_ || s_->muxer.outOfSpace();
+    }
+    av_packet_unref(packet);
+    return ok;
 }
 
 bool Encoder::write(const std::uint8_t* rgba, int stride, QString* error) {
@@ -98,12 +127,15 @@ bool Encoder::write(const std::uint8_t* rgba, int stride, QString* error) {
     while (r >= 0) {
         r = avcodec_receive_packet(s_->codec.get(), s_->packet.get());
         if (r == AVERROR(EAGAIN) || r == AVERROR_EOF) break;
-        if (r < 0 || !s_->muxer.write(s_->packet.get(), error)) {
-            if (r < 0 && error) *error = QStringLiteral("encode: %1").arg(avError(r));
-            av_packet_unref(s_->packet.get());
+        if (r < 0) {
+            if (error) *error = QStringLiteral("encode: %1").arg(avError(r));
             return false;
         }
-        av_packet_unref(s_->packet.get());
+        if (!put(s_->packet.get(), error)) return false;
+    }
+    if (r < 0 && r != AVERROR(EAGAIN) && r != AVERROR_EOF) {
+        if (error) *error = QStringLiteral("encode: %1").arg(avError(r));
+        return false;
     }
     ++written_;
     return true;
@@ -119,25 +151,32 @@ bool Encoder::finish(QString* error) {
             if (error) *error = QStringLiteral("flush: %1").arg(avError(r));
             return false;
         }
-        const bool ok = s_->muxer.write(s_->packet.get(), error);
-        av_packet_unref(s_->packet.get());
-        if (!ok) return false;
+        if (!put(s_->packet.get(), error)) return false;
     }
-    const bool ok = s_->muxer.finish(error);
+    if (s_->codec->stats_out) stats_ = QByteArray(s_->codec->stats_out); // pass 1: set at the flush
+    bool ok = true;
+    if (s_->file) {
+        ok = s_->muxer.finish(error);
+        outOfSpace_ = outOfSpace_ || s_->muxer.outOfSpace();
+    }
+    close();
+    return ok;
+}
+
+void Encoder::close() {
+    if (s_->codec) s_->codec->stats_in = nullptr;
     s_->codec.reset();
     s_->sws.reset();
     s_->frame.reset();
+    s_->packet.reset();
+    s_->statsIn.clear();
     s_->straight = {};
-    return ok;
 }
 
 void Encoder::abort() {
     s_->muxer.close();
-    s_->codec.reset();
-    s_->sws.reset();
-    s_->frame.reset();
-    s_->straight = {};
-    if (!path_.isEmpty()) QFile::remove(path_);
+    close();
+    if (s_->file && !path_.isEmpty()) QFile::remove(path_);
 }
 
 } // namespace avloop::media

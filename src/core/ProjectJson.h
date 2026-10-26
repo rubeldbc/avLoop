@@ -18,6 +18,7 @@ struct ProjectData {
     VideoTransform transform;
     CropShape crop;
     ViewState view;
+    QString exportPath;   // "export": {"lastPath"} — the last file this project was exported to
     QJsonObject original; // the JSON as read: unknown keys are written back unchanged (spec §11.1)
 };
 

@@ -1,6 +1,7 @@
 // Scene geometry (spec §3.3, §6.2): the output size rule, the effective scale, the video rectangle, Fit, Fill,
 // Center, Reset and the scale's limits.
 #include "core/Geometry.h"
+#include "core/LoopSettings.h"
 #include "core/VideoTransform.h"
 
 #include <QTest>
@@ -25,6 +26,38 @@ private slots:
         QFETCH(QSizeF, frame);
         QFETCH(QSize, out);
         QCOMPARE(geometry::outputSize(frame), out);
+    }
+    // The Output section's Size (spec §10.2): Crop size, a long side, Custom W×H — all through the same rule.
+    void outputSettingsSize_data() {
+        QTest::addColumn<QString>("mode");
+        QTest::addColumn<QSize>("custom");
+        QTest::addColumn<QSizeF>("frame");
+        QTest::addColumn<QSize>("out");
+        QTest::addColumn<bool>("limited");
+        QTest::newRow("crop") << "crop" << QSize() << QSizeF(641, 361) << QSize(642, 362) << false;
+        QTest::newRow("crop over 1920") << "crop" << QSize() << QSizeF(2400, 1200) << QSize(1920, 960) << true;
+        QTest::newRow("long side 1080") << "long-1080" << QSize() << QSizeF(640, 360) << QSize(1080, 608) << false;
+        QTest::newRow("long side 256 portrait")
+            << "long-256" << QSize() << QSizeF(360, 640) << QSize(144, 256) << false;
+        QTest::newRow("custom") << "custom" << QSize(500, 300) << QSizeF(640, 360) << QSize(500, 300) << false;
+        QTest::newRow("custom odd") << "custom" << QSize(501, 301) << QSizeF(640, 360) << QSize(502, 302) << false;
+        QTest::newRow("custom over 1920")
+            << "custom" << QSize(4000, 1000) << QSizeF(640, 360) << QSize(1920, 480) << true;
+        QTest::newRow("unknown long side") << "long-999" << QSize() << QSizeF(640, 360) << QSize(640, 360) << false;
+    }
+    void outputSettingsSize() {
+        QFETCH(QString, mode);
+        QFETCH(QSize, custom);
+        QFETCH(QSizeF, frame);
+        QFETCH(QSize, out);
+        QFETCH(bool, limited);
+        OutputSettings o;
+        o.setSizeId(mode);
+        if (custom.isValid()) o.custom = custom;
+        bool wasLimited = false;
+        QCOMPARE(o.sizeFor(frame, &wasLimited), out);
+        QCOMPARE(wasLimited, limited);
+        if (mode != QLatin1String("long-999")) QCOMPARE(o.sizeId(), mode);
     }
     void effectiveScale() {
         VideoTransform t = VideoTransform::initial({640, 360});

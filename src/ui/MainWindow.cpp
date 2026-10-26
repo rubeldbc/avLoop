@@ -2,6 +2,8 @@
 
 #include "core/AppInfo.h"
 #include "core/Project.h"
+#include "export/ExportJob.h"
+#include "export/SizeEstimator.h"
 #include "media/DecodeWorker.h"
 #include "media/DiskCache.h"
 #include "media/FrameCache.h"
@@ -10,6 +12,7 @@
 #include "ui/WalkRunner.h"
 #include "ui/canvas/Canvas.h"
 #include "ui/canvas/DropZone.h"
+#include "ui/export/ExportBar.h"
 #include "ui/panels/SidePanel.h"
 #include "ui/preview/PreviewWindow.h"
 #include "ui/theme/IconFactory.h"
@@ -123,6 +126,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     buildCanvasTools();
     buildTimeline();
     buildPreview();
+    buildExport();
     registerProbes();
     registerMediaProbes();
     restoreLayout();
@@ -260,14 +264,12 @@ void MainWindow::buildStatusBar() {
     sourceLabel_->setObjectName(QStringLiteral("status.source"));
     gpuLabel_ = new QLabel(bar);
     gpuLabel_->setObjectName(QStringLiteral("status.gpu"));
-    exportArea_ = new QWidget(bar);
-    exportArea_->setObjectName(QStringLiteral("status.export"));
-    exportArea_->hide();
+    exportBar_ = new ExportBar(bar);
     memoryLabel_ = new QLabel(bar);
     memoryLabel_->setObjectName(QStringLiteral("status.memory"));
     bar->addWidget(sourceLabel_);
     bar->addWidget(gpuLabel_);
-    bar->addPermanentWidget(exportArea_);
+    bar->addPermanentWidget(exportBar_);
     bar->addPermanentWidget(memoryLabel_);
 }
 
@@ -335,6 +337,10 @@ void MainWindow::showEvent(QShowEvent* event) {
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
+    if (!mayCloseDuringExport()) {
+        event->ignore();
+        return;
+    }
     saveLayout();
     QMainWindow::closeEvent(event);
 }

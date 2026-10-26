@@ -94,15 +94,8 @@ void SidePanel::bindLoop(Project* project) {
     summary->setProperty("mono", true);
     s->addWide(summary);
     // The rows a mode does not use are hidden with their labels.
-    auto rowOf = [s](QWidget* w) {
-        QList<QWidget*> both{w};
-        for (int r = 0; r < s->grid()->rowCount(); ++r)
-            if (auto* item = s->grid()->itemAtPosition(r, 1); item && item->widget() == w)
-                if (auto* label = s->grid()->itemAtPosition(r, 0)) both << label->widget();
-        return both;
-    };
-    const QList<QWidget*> fadeWidgets = rowOf(fadeRow) + rowOf(curve);
-    const QList<QWidget*> turnWidgets = rowOf(turn);
+    const QList<QWidget*> fadeWidgets = s->row(fadeRow) + s->row(curve);
+    const QList<QWidget*> turnWidgets = s->row(turn);
 
     auto refresh = [=] {
         const LoopSettings& l = project->loop();
