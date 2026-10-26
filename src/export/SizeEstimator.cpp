@@ -56,7 +56,10 @@ void renderFrame(const std::shared_ptr<Measure>& m, int i, int n) {
     }
     QImage image;
     if (!m->renderer->render(m->starts[i] + n, image)) return stop(true);
-    if (i + 1 == m->starts.size() && n + 1 == m->partFrames(i)) stop(false); // the last frame made
+    if (i + 1 == m->starts.size() && n + 1 == m->partFrames(i)) { // the last frame made: the renderer and its
+        stop(false);                                              // textures let go
+        m->service->trim();
+    }
     QMetaObject::invokeMethod(m->encodeContext, [m, i, n, image] { encodeFrame(m, i, n, image); });
 }
 

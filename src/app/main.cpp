@@ -18,6 +18,7 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QDateTime>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
@@ -57,6 +58,7 @@ int main(int argc, char** argv) {
     gl.setProfile(QSurfaceFormat::CoreProfile);
     QSurfaceFormat::setDefaultFormat(gl);
     QApplication app(argc, argv);
+    app.setProperty("avloop.clockOrigin", QDateTime::currentMSecsSinceEpoch() - clock.elapsed()); // walk labels' clock
     QApplication::setOrganizationName(avloop::AppInfo::organization());
     QApplication::setApplicationName(avloop::AppInfo::name());
     QApplication::setApplicationVersion(avloop::AppInfo::version());

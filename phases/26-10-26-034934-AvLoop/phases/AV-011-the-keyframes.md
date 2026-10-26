@@ -1,7 +1,7 @@
 ---
 phase: AV-011
 title: "The keyframes"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 11
 track: B
 checkpoint_id: CP-B1

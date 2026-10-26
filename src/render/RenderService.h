@@ -29,6 +29,9 @@ public:
     void post(std::function<void()> work);
     // Runs `work` there and waits for it.
     void run(std::function<void()> work);
+    // Queued on the render thread: the GPU's buffers of the jobs before it freed (an export, an estimate, a Preview
+    // ended — spec §3.7.5); the next job makes what it needs again.
+    void trim();
 
 private:
     std::unique_ptr<media::WorkerThread> thread_;

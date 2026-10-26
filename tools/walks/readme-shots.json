@@ -24,6 +24,36 @@
     { "do": "type", "on": "transport.time", "text": "4.2" },
     { "do": "waitFor", "probe": "timeline.thumbs", "min": 300, "timeout": 15000 },
     { "do": "wait", "ms": 300 },
-    { "do": "shot", "file": "main-window.png", "maxWidth": 1360 }
+    { "do": "shot", "file": "main-window.png", "maxWidth": 1280 },
+
+    { "label": "the timeline: the In–Out range, its thumbnails, the crossfade band" },
+    { "do": "shot", "on": "timeline", "file": "timeline.png", "maxWidth": 1360 },
+
+    { "label": "the Preview window: only the exported part, over the checker" },
+    { "do": "key", "keys": "F5", "on": "MainWindow" },
+    { "do": "waitFor", "probe": "preview.cached", "min": 150, "timeout": 60000 },
+    { "do": "previewSeek", "at": 60 },
+    { "do": "wait", "ms": 500 },
+    { "do": "shot", "on": "PreviewWindow", "file": "preview.png", "maxWidth": 1000 },
+    { "do": "previewClose" },
+
+    { "label": "an ellipse crop with a soft edge" },
+    { "do": "key", "keys": "E", "on": "MainWindow" },
+    { "do": "drag", "on": "canvas", "space": "canvas", "from": [560, 240], "to": [1360, 840], "steps": 20 },
+    { "do": "type", "on": "options.ellipse.feather", "text": "32" },
+    { "do": "wait", "ms": 300 },
+    { "do": "shot", "on": "CanvasArea", "file": "crop-ellipse.png", "maxWidth": 1100 },
+
+    { "label": "an export just written, with the OBS tip (the file goes into build/, never the repository)" },
+    { "do": "exportTo", "file": "../../build/readme-export.webm" },
+    { "do": "waitFor", "probe": "export.state", "eq": "done", "timeout": 120000 },
+    { "do": "wait", "ms": 300 },
+    { "do": "shot", "file": "export.png", "maxWidth": 1200 },
+
+    { "label": "Settings, the Performance tab" },
+    { "do": "key", "keys": "Ctrl+,", "on": "MainWindow" },
+    { "do": "key", "keys": "Ctrl+Tab", "on": "settings.tabs" },
+    { "do": "shot", "on": "SettingsDialog", "file": "settings.png" },
+    { "do": "click", "on": "settings.close" }
   ]
 }

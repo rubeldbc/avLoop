@@ -35,6 +35,12 @@ public:
     bool render(const Composite& c, std::uint8_t* out, int stride);
     // A lost context (driver reset): made again once; false when it cannot be.
     bool recover();
+    // What a finished job leaves on the GPU — the texture pool, the mask, the output target and its PBOs — freed; the
+    // context and the program stay for the next job (spec §3.7.5). On the rendering thread, between jobs.
+    void trim();
+    // The GL objects, the program and the context gone — on the rendering thread, which owns the context; the
+    // surface stays for the destructor on the thread that made it (a QObject dies on its own thread).
+    void shutdown();
 
     std::int64_t textureBytes() const;
     std::int64_t textureBudget() const;

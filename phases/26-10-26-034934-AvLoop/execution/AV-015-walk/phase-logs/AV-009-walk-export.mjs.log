@@ -1,0 +1,51 @@
+PASS vp9-alpha: exported and checked by the app: PASS export …\vp9-alpha.webm: 400x280, 90 frames at 30/1, 192618 bytes, 1 pass(es), 1.81 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS vp9-alpha: codec and W×H: vp9 400×280
+PASS vp9-alpha: alpha_mode = 1: alpha_mode 1
+PASS vp9-alpha: no audio stream: video
+PASS vp9-alpha: the first packet a keyframe, one GOP: 90 packets, keyframes at 0
+PASS vp9-alpha: frame count = L: 90 packets, L = 90
+PASS vp9-alpha: the alpha plane by libvpx: corner 0, centre 255, min 0
+PASS vp9-off: exported and checked by the app: PASS export …\vp9-off.webm: 400x280, 90 frames at 30/1, 171659 bytes, 1 pass(es), 1.45 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS vp9-off: codec and W×H: vp9 400×280
+PASS vp9-off: alpha_mode absent: alpha_mode absent
+PASS vp9-off: no audio stream: video
+PASS vp9-off: the first packet a keyframe, one GOP: 90 packets, keyframes at 0
+PASS vp9-off: frame count = L: 90 packets, L = 90
+PASS vp9-off: the alpha plane by libvpx: corner 255, centre 255, min 255
+PASS vp9-on: exported and checked by the app: PASS export …\vp9-on.webm: 400x280, 90 frames at 30/1, 270011 bytes, 1 pass(es), 1.80 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS vp9-on: codec and W×H: vp9 400×280
+PASS vp9-on: alpha_mode = 1: alpha_mode 1
+PASS vp9-on: no audio stream: video
+PASS vp9-on: the first packet a keyframe, one GOP: 90 packets, keyframes at 0
+PASS vp9-on: frame count = L: 90 packets, L = 90
+PASS vp9-on: the alpha plane by libvpx: corner 255, centre 255, min 255
+PASS vp9-auto-opaque: exported and checked by the app: PASS export …\vp9-auto-opaque.webm: 400x280, 90 frames at 30/1, 266631 bytes, 1 pass(es), 1.61 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS vp9-auto-opaque: codec and W×H: vp9 400×280
+PASS vp9-auto-opaque: alpha_mode absent: alpha_mode absent
+PASS vp9-auto-opaque: no audio stream: video
+PASS vp9-auto-opaque: the first packet a keyframe, one GOP: 90 packets, keyframes at 0
+PASS vp9-auto-opaque: frame count = L: 90 packets, L = 90
+PASS vp9-auto-opaque: the alpha plane by libvpx: corner 255, centre 255, min 255
+PASS vp8-alpha: exported and checked by the app: PASS export …\vp8-alpha.webm: 400x280, 90 frames at 30/1, 331774 bytes, 1 pass(es), 0.80 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS vp8-alpha: codec and W×H: vp8 400×280
+PASS vp8-alpha: alpha_mode = 1: alpha_mode 1
+PASS vp8-alpha: no audio stream: video
+PASS vp8-alpha: the first packet a keyframe, one GOP: 90 packets, keyframes at 0
+PASS vp8-alpha: frame count = L: 90 packets, L = 90
+PASS vp8-alpha: the alpha plane by libvpx: corner 0, centre 255, min 0
+PASS vp9-long-256: exported and checked by the app: PASS export …\vp9-long-256.webm: 256x180, 90 frames at 30/1, 115033 bytes, 1 pass(es), 1.34 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS vp9-long-256: codec and W×H: vp9 256×180
+PASS vp9-long-256: alpha_mode = 1: alpha_mode 1
+PASS vp9-long-256: no audio stream: video
+PASS vp9-long-256: the first packet a keyframe, one GOP: 90 packets, keyframes at 0
+PASS vp9-long-256: frame count = L: 90 packets, L = 90
+PASS vp9-long-256: the alpha plane by libvpx: corner 0, centre 255, min 0
+PASS Target size 0.1 MB (webm-vp9): 103421 bytes, -1.4 % off, 3 passes
+PASS Target size 0.12 MB (webm-vp8): 125251 bytes, -0.5 % off, 2 passes
+PASS a held destination: written beside it: PASS export …\held (1).webm: 400x280, 90 frames at 30/1, 192618 bytes, 1 pass(es), 6.87 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 | moved aside: …\held.webm was in use; 7.2 s; held.webm 0 bytes
+PASS no .part left anywhere: 10 files
+PASS three exports in a row in the app: exit 0
+PASS Private Bytes: export 3 against export 2: peaks 712 / 722 / 725 MB
+PASS VRAM: export 3 against export 2: peaks 117 / 108 / 109 MB
+     vp9-alpha: 192618 bytes for 90 frames
+WALK PASSED

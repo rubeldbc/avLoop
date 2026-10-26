@@ -8,9 +8,9 @@ words: *"I want to build a piece of software called AvLoop. Its main job is to t
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: AV-015
-Next eligible: AV-015 (in progress)
-Completed: 10 of 16
+Active phase: AV-011
+Next eligible: AV-011 (in progress)
+Completed: 11 of 16
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -60,6 +60,7 @@ where `--shot` and `--walk` open their window for seconds and close it.
 ## Completion record
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-015** DONE 2026-10-26 — CP-A1: track A walked whole on one fresh build — unit, ASan, Debug leaks, every walk, the memory walk, GPU off, README pictures Record: `execution/AV-015-EXECUTION.md`.
 - **AV-010** DONE 2026-10-26 — The project and the settings: .avloop UX, autosave and recovery, Settings, presets, logs and minidumps, F1 Record: `execution/AV-010-EXECUTION.md`.
 - **AV-009** DONE 2026-10-26 — The export: VP9/VP8 alpha WebM in the background, .part and rename, checked; Output and Quality panels, Target size, the estimate, avloop-cli export Record: `execution/AV-009-EXECUTION.md`.
 - **AV-008** DONE 2026-10-26 — The Preview window (D-008): F5 opens one window showing only the export — Live from the FrameRenderer (= avloop-cli frame byte for byte) with a bounded cache that waits instead of dropping, Encoded through a temporary WebM played by libvpx with its size, seam marks, Around seam, backgrounds, zoom; the VP9/VP8 alpha encoder shared with the export (R-14, R-32); one render thread and GPU context (R-33); 17 test suites, walk-preview 87 steps and walk-preview-check PASSED (six opens +3.2 MB). Record: `execution/AV-008-EXECUTION.md`. Record: `execution/AV-008-EXECUTION.md`.

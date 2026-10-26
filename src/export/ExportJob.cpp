@@ -352,6 +352,7 @@ void ExportJob::run() {
     sh->ended = true;
     sh->queue.clear();
     sh->service->post([sh] { sh->renderer.reset(); }); // its decoders let go on the thread that used them
+    sh->service->trim();                               // and its textures on the GPU
     sh->cv.notify_all();
 }
 

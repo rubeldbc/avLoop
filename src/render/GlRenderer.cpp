@@ -134,11 +134,19 @@ GlRenderer::GlRenderer() : surface_(std::make_unique<QOffscreenSurface>()), s_(s
 }
 
 GlRenderer::~GlRenderer() {
-    if (s_->gl && s_->context && s_->context->makeCurrent(surface_.get())) {
+    shutdown(); // nothing left to do when the rendering thread did it (the RenderService's case)
+}
+
+void GlRenderer::shutdown() {
+    if (!s_->context) return;
+    if (s_->gl && s_->context->makeCurrent(surface_.get())) {
         s_->release();
         s_->program.reset();
         s_->context->doneCurrent();
     }
+    s_->program.reset();
+    s_->gl = nullptr;
+    s_->context.reset();
 }
 
 bool GlRenderer::init(QString* error) {
@@ -257,6 +265,25 @@ bool GlRenderer::render(const Composite& c, std::uint8_t* out, int stride) {
         take(drop.data(), s_->size.width() * 4);
     }
     return submit(c) && take(out, stride);
+}
+
+void GlRenderer::trim() {
+    State& s = *s_;
+    if (!ready() || !s.context->makeCurrent(surface_.get())) return;
+    for (const Texture& t : s.pool)
+        s.gl->glDeleteTextures(1, &t.id);
+    s.pool.clear();
+    s.poolBytes = 0;
+    if (s.mask) s.gl->glDeleteTextures(1, &s.mask);
+    if (s.target) s.gl->glDeleteTextures(1, &s.target);
+    if (s.fbo) s.gl->glDeleteFramebuffers(1, &s.fbo);
+    if (s.pbo[0]) s.gl->glDeleteBuffers(2, s.pbo);
+    s.mask = s.target = s.fbo = 0;
+    s.pbo[0] = s.pbo[1] = 0;
+    s.maskKey = -1;
+    s.size = {};
+    s.inFlight = 0;
+    s.gl->glFinish();
 }
 
 bool GlRenderer::recover() {

@@ -49,11 +49,17 @@ frame rate and quality, and a preview that shows exactly what will be exported.
   Free, Original, 1:1, 4:3, 3:4, 16:9, 9:16, 21:9, 3:2, 2:3, 4:5 or a custom W:H keep the crop's centre and area.
   Radius and Feather (0–200 px, softening inward) for the round shapes; the outside is dimmed; the side panel shows the
   output size and whether it needs transparency, and the status bar warns when the crop leaves the video.
+
+  ![An ellipse crop on the canvas](docs/screenshots/crop-ellipse.png)
+
 - **A frame-accurate timeline**: the ruler (timecode or frame numbers — double-click it), thumbnails made on their
   own decoder, the In–Out range with its handles and bar, and the playhead; scrub fast while dragging and land on the
   exact frame; zoom with Ctrl+wheel down to 12 px a frame. **I** and **O** set In and Out at the playhead (the frame
   under it is the first or the last of the range), by the In/Out tools with a click, or by dragging; everything snaps
   to the output frame grid.
+
+  ![The timeline: In–Out, thumbnails, the crossfade band](docs/screenshots/timeline.png)
+
 - **Playback** that never waits for the decoder: Space plays and pauses, loop on cycles In → Out, and a dropped frame
   is counted in the status bar — 1080p H.264 plays at 30 and 60 fps with none dropped.
 - **Four loop modes** worked out exactly: Simple, Crossfade inside the range (Linear or Smooth), Ping-pong and Ping-pong
@@ -80,7 +86,7 @@ frame rate and quality, and a preview that shows exactly what will be exported.
   (checker, black, white, green, navy, or your own image — an OBS scene) and zoom up to pixel-exact. **Encoded** mode
   encodes the loop with your settings and plays the file back through libvpx, as OBS will, with its real size.
 
-  ![The Preview window, Encoded mode](docs/screenshots/preview.png)
+  ![The Preview window: only the exported part, over the checker](docs/screenshots/preview.png)
 
 - **One renderer** for what you will see and what you will export: output frame N of a loop is made on the GPU
   (OpenGL 3.3) or, without one, on the CPU with the same result (within 2/255) — the crop's mask and feather, the

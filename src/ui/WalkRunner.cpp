@@ -3,6 +3,7 @@
 #include "ui/theme/Theme.h"
 
 #include <QApplication>
+#include <QDateTime>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -110,7 +111,11 @@ void WalkRunner::next() {
     }
     const QJsonObject step = steps_.at(at_++).toObject();
     const QString label = step.value(QStringLiteral("label")).toString();
-    if (!label.isEmpty()) log(QStringLiteral("-- %1").arg(label));
+    // A label carries the time since the app started (the --mem-log clock), so a memory log can be read by phase.
+    const qint64 origin = qApp->property("avloop.clockOrigin").toLongLong();
+    if (!label.isEmpty())
+        log(origin > 0 ? QStringLiteral("-- %1 @%2 ms").arg(label).arg(QDateTime::currentMSecsSinceEpoch() - origin)
+                       : QStringLiteral("-- %1").arg(label));
     const int wait = run(step);
     if (wait < 0) {
         log(QStringLiteral("WALK FAILED (%1) at step %2").arg(failures_).arg(at_));

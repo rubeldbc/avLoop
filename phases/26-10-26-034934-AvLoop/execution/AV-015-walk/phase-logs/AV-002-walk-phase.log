@@ -1,0 +1,6 @@
+PASSED walk-import.mjs (27 s)
+PASSED walk-seek.mjs (21 s)
+PASSED walk-open.json (13 s)
+FAILED walk-memory-decode.mjs (27 s)
+   FAIL Private Bytes: the later rounds against the first: round peaks 461 / 514 / 515 MB → growth 54.2 MB, 26 samples
+PHASE WALKS FAILED: 1

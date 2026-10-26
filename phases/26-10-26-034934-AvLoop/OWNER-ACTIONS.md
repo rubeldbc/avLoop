@@ -28,6 +28,7 @@ read and open for a veto later; an answer that differs changes the reading in it
 | 19 | **R-15** Animated WebP refused (no FFmpeg decodes it). | `README.md` §3 15; AV-002. | Decided by the agent (AV-002); open for a veto — a WebP decoder of AvLoop's own would be a new item |
 | 20 | **R-16** The working size before a crop. | `README.md` §3 16; AV-002. | Decided by the agent (AV-002); open for a veto |
 | 21 | **R-17 … R-20** QUndoStack in core; Reset at (0,0); Fit without a crop; the border with the Selection. | `README.md` §3 17 … 20; AV-003. | Decided by the agent (AV-003); open for a veto |
+| 28 | **R-45, R-46** The Debug leak gate by heap growth; ASan judges errors, Release the growth. | `README.md` §3 45, 46; AV-015. | Decided by the agent (AV-015); open for a veto |
 | 27 | **R-39 … R-44** The first format; the presets' long sides; the title of an unsaved video; the lab's answers; a changed source's toast; Settings saved at once. | `README.md` §3 39 … 44; AV-010. | Decided by the agent (AV-010); open for a veto |
 | 26 | **R-34 … R-38** The Save dialog each time; the estimate after changes; `name (1).webm` without a question; Target size's MiB and correction; the output keys. | `README.md` §3 34 … 38; AV-009. | Decided by the agent (AV-009); open for a veto |
 | 25 | **R-31 … R-33** The Preview's cache; VP8 in BT.601; one render thread and GPU context. | `README.md` §3 31 … 33; AV-008. | Decided by the agent (AV-008); open for a veto |

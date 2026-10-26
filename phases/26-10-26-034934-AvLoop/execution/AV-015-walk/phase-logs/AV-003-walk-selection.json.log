@@ -1,0 +1,59 @@
+startup: 457 ms
+walk walk-selection.json: 75 steps
+-- S4: a video on the GL canvas, the Selection active @1163 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect canvas.gl: true
+PASS expect tool.active: select
+PASS expect transform.x: 320
+PASS expect transform.scale: 1
+PASS shot selection-start.png: 1600x834 px
+-- a drag inside the video moves it (one Undo step) @2737 ms
+PASS expect transform.x: 419.7159091
+PASS expect transform.y: 230.1136364
+PASS expect undo.count: 1
+PASS expect options.x: 419.7
+-- the bottom-right handle scales about the top-left corner, the ratio kept @3517 ms
+PASS expect transform.scale: 1.500754616
+PASS expect transform.x: 579.9573864
+PASS expect transform.y: 320.2494673
+PASS expect options.scale: 150.1
+PASS expect options.upscaleWarning: true
+PASS expect undo.count: 2
+PASS shot selection-scaled.png: 1600x834 px
+-- Alt: the top-left handle scales about the centre @4720 ms
+PASS expect transform.scale: 0.7507546165
+PASS expect transform.x: 579.9573864
+PASS expect transform.y: 320.2494673
+PASS expect options.upscaleWarning: false
+-- Undo and Redo @5482 ms
+PASS expect transform.scale: 1.500754616
+PASS expect transform.scale: 0.7507546165
+-- the options bar: Scale typed, Fit, Fill, Center, Flip, Reset @5965 ms
+PASS expect transform.scale: 2
+PASS expect transform.scale: 1
+PASS expect transform.x: 320
+PASS expect transform.x: 100
+PASS expect transform.x: 320
+PASS expect transform.flipH: true
+PASS expect transform.flipV: true
+PASS shot selection-flipped.png: 1600x834 px
+PASS expect transform.flipH: false
+PASS expect transform.scale: 1
+PASS expect undo.count: 10
+-- Zoom and Hand change the view, never Undo @8234 ms
+PASS expect undo.index: 10
+PASS expect tool.active: zoom
+PASS expect canvas.zoom: 1
+PASS expect canvas.zoom: 1.5
+PASS expect canvas.zoom: 1
+PASS expect canvas.zoom: 1.5
+PASS expect canvas.panX: 386.8333333
+PASS expect canvas.panX: 320
+PASS expect undo.index: 10
+PASS shot selection-end.png: 1600x834 px
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 000002a91778aac0] v1.16.0
+[libvpx-vp9 @ 000002a917787e80] v1.16.0
+[libvpx-vp9 @ 000002a917788600] v1.16.0

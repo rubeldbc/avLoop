@@ -1,0 +1,63 @@
+PASS 15-nearest: exported: PASS export …\15-nearest.webm: 640x360, 30 frames at 15/1, 127127 bytes, 1 pass(es), 0.90 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 15-nearest: 30 frames: 30 made, 30 packets
+PASS 15-nearest: r_frame_rate: 15/1
+PASS 15-nearest: CFR: steps 66.67 ms ± 0.67 ms
+PASS 15-blend: exported: PASS export …\15-blend.webm: 640x360, 30 frames at 15/1, 127127 bytes, 1 pass(es), 0.88 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 15-blend: 30 frames: 30 made, 30 packets
+PASS 15-blend: r_frame_rate: 15/1
+PASS 15-blend: CFR: steps 66.67 ms ± 0.67 ms
+PASS 15-motion: exported: PASS export …\15-motion.webm: 640x360, 30 frames at 15/1, 126892 bytes, 1 pass(es), 2.46 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 15-motion: 30 frames: 30 made, 30 packets
+PASS 15-motion: r_frame_rate: 15/1
+PASS 15-motion: CFR: steps 66.67 ms ± 0.67 ms
+PASS 24-nearest: exported: PASS export …\24-nearest.webm: 640x360, 48 frames at 24/1, 186884 bytes, 1 pass(es), 1.23 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 24-nearest: 48 frames: 48 made, 48 packets
+PASS 24-nearest: r_frame_rate: 24/1
+PASS 24-nearest: CFR: steps 41.67 ms ± 0.67 ms
+PASS 24-blend: exported: PASS export …\24-blend.webm: 640x360, 48 frames at 24/1, 248418 bytes, 1 pass(es), 1.19 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 24-blend: 48 frames: 48 made, 48 packets
+PASS 24-blend: r_frame_rate: 24/1
+PASS 24-blend: CFR: steps 41.67 ms ± 0.67 ms
+PASS 24-motion: exported: PASS export …\24-motion.webm: 640x360, 48 frames at 24/1, 206172 bytes, 1 pass(es), 4.08 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 24-motion: 48 frames: 48 made, 48 packets
+PASS 24-motion: r_frame_rate: 24/1
+PASS 24-motion: CFR: steps 41.67 ms ± 0.67 ms
+PASS 30-nearest: exported: PASS export …\30-nearest.webm: 640x360, 60 frames at 30/1, 227936 bytes, 1 pass(es), 1.32 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 30-nearest: 60 frames: 60 made, 60 packets
+PASS 30-nearest: r_frame_rate: 30/1
+PASS 30-nearest: CFR: steps 33.33 ms ± 0.67 ms
+PASS 30-blend: exported: PASS export …\30-blend.webm: 640x360, 60 frames at 30/1, 227936 bytes, 1 pass(es), 1.29 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 30-blend: 60 frames: 60 made, 60 packets
+PASS 30-blend: r_frame_rate: 30/1
+PASS 30-blend: CFR: steps 33.33 ms ± 0.67 ms
+PASS 30-motion: exported: PASS export …\30-motion.webm: 640x360, 60 frames at 30/1, 225190 bytes, 1 pass(es), 3.24 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 30-motion: 60 frames: 60 made, 60 packets
+PASS 30-motion: r_frame_rate: 30/1
+PASS 30-motion: CFR: steps 33.33 ms ± 0.67 ms
+PASS 60-nearest: exported: PASS export …\60-nearest.webm: 640x360, 120 frames at 60/1, 259378 bytes, 1 pass(es), 1.72 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 60-nearest: 120 frames: 120 made, 120 packets
+PASS 60-nearest: r_frame_rate: 60/1
+PASS 60-nearest: CFR: steps 16.67 ms ± 0.67 ms
+PASS 60-blend: exported: PASS export …\60-blend.webm: 640x360, 120 frames at 60/1, 517148 bytes, 1 pass(es), 2.10 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 60-blend: 120 frames: 120 made, 120 packets
+PASS 60-blend: r_frame_rate: 60/1
+PASS 60-blend: CFR: steps 16.67 ms ± 0.67 ms
+PASS 60-motion: exported: PASS export …\60-motion.webm: 640x360, 120 frames at 60/1, 409048 bytes, 1 pass(es), 6.91 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 60-motion: 120 frames: 120 made, 120 packets
+PASS 60-motion: r_frame_rate: 60/1
+PASS 60-motion: CFR: steps 16.67 ms ± 0.67 ms
+PASS 12-nearest: exported: PASS export …\12-nearest.webm: 640x360, 24 frames at 12/1, 106652 bytes, 1 pass(es), 0.82 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 12-nearest: 24 frames: 24 made, 24 packets
+PASS 12-nearest: r_frame_rate: 12/1
+PASS 12-nearest: CFR: steps 83.33 ms ± 0.67 ms
+PASS 12-blend: exported: PASS export …\12-blend.webm: 640x360, 24 frames at 12/1, 134399 bytes, 1 pass(es), 0.81 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 12-blend: 24 frames: 24 made, 24 packets
+PASS 12-blend: r_frame_rate: 12/1
+PASS 12-blend: CFR: steps 83.33 ms ± 0.67 ms
+PASS 12-motion: exported: PASS export …\12-motion.webm: 640x360, 24 frames at 12/1, 112936 bytes, 1 pass(es), 2.70 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS 12-motion: 24 frames: 24 made, 24 packets
+PASS 12-motion: r_frame_rate: 12/1
+PASS 12-motion: CFR: steps 83.33 ms ± 0.67 ms
+PASS Speed 0.5×: 120 frames: PASS export …\speed-0.5.webm: 640x360, 120 frames at 30/1, 259379 bytes, 1 pass(es), 1.72 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS Speed 2×: 30 frames: PASS export …\speed-2.webm: 640x360, 30 frames at 30/1, 127127 bytes, 1 pass(es), 0.87 s, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+WALK PASSED

@@ -1,0 +1,10 @@
+PASS a crash ends the process: exit 3221225477
+PASS a minidump in the logs folder: avloop-YYYYMMDD-HHMMSS.dmp 599074 bytes
+PASS the log: time, module, text: HH:MM:SS.mmm [app] AvLoop 0.1.0 started / HH:MM:SS.mmm [lab] error: a crash on purpose
+PASS the autosave left behind: 1 file(s)
+PASS Discard: nothing restored, the autosave gone: 0 autosave(s) left
+PASS killed after its autosave: 1 file(s) after 2250 ms
+PASS Recover: the project back, unsaved: Feather 25, the title with *
+PASS a clean exit leaves no autosave: 0 file(s)
+PASS no AvLoop left running: none
+WALK PASSED

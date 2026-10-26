@@ -45,6 +45,9 @@ bool hardwareDecoding() {
 }
 
 bool gpuRendering() {
+    // AVLOOP_GPU_RENDERING=off: the lab's whole set again on the CPU (CP-A1's S13), whatever the settings say.
+    const QByteArray forced = qgetenv("AVLOOP_GPU_RENDERING");
+    if (!forced.isEmpty()) return forced != "off";
     return value(kGpuRendering, QStringLiteral("auto")).toString() != QLatin1String("off");
 }
 

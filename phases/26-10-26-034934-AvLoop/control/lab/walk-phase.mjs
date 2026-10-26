@@ -33,7 +33,9 @@ for (const walk of walks) {
     : spawnSync(process.execPath, [script], { encoding: 'utf8', cwd: into, timeout: 295000 });
   const out = `${run.stdout ?? ''}${run.stderr ?? ''}`;
   fs.writeFileSync(path.join(into, `${path.basename(walk)}.log`), out);
-  const verdict = /WALK PASSED/.test(out) ? 'PASSED' : /WALK FAILED/.test(out) ? 'FAILED' : `ENDED ${run.status ?? run.signal}`;
+  // The verdict is a line of its own (a check's text may quote another walk's), and the exit code must agree.
+  const verdict = /^WALK PASSED\s*$/m.test(out) && run.status === 0 ? 'PASSED'
+    : /^WALK FAILED/m.test(out) ? 'FAILED' : `ENDED ${run.status ?? run.signal}`;
   if (verdict !== 'PASSED') failed++;
   line(`${verdict} ${walk} (${Math.round((Date.now() - began) / 1000)} s)`);
   for (const bad of out.split(/\r?\n/).filter((l) => /^FAIL /.test(l))) line(`   ${bad}`);

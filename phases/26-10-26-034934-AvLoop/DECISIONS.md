@@ -71,3 +71,5 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-42 | A lab run answers questions from its walk; its own data folder | §2.8.6 | `README.md` §3; AV-010 |
 | R-43 | A changed source: a warning toast | §11.1 | `README.md` §3; AV-010 |
 | R-44 | Settings saved at once, each applied when it can be | §11.3 | `README.md` §3; AV-010 |
+| R-45 | The Debug leak gate: no heap block left by repeated cycles | §3.7.8 | `README.md` §3; AV-015 |
+| R-46 | ASan judges memory errors; growth thresholds judged in Release | §3.7.8 | `README.md` §3; AV-015 |

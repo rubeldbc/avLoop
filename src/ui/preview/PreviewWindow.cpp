@@ -147,7 +147,8 @@ PreviewWindow::PreviewWindow(render::RenderService* service, media::DiskCache* d
 PreviewWindow::~PreviewWindow() {
     delete player_; // its renderer, its caches and its decoder of the encoded file
     player_ = nullptr;
-    service_->run([] {}); // what the render thread still held of it is gone, the file closed
+    service_->trim();
+    service_->run([] {}); // what the render thread still held of it is gone, its textures too, the file closed
     if (!tempFile_.isEmpty()) QFile::remove(tempFile_);
 }
 

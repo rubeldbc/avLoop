@@ -6,6 +6,15 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### CP-A1 — Track A walked whole (AV-015, 2026-10-26)
+
+- Items 1–10 checked on one fresh Release build: every unit test, the same under AddressSanitizer and in Debug (no
+  debug-heap block left by repeated cycles — reading R-45), every phase's walk, the 10-minute memory walk (§3.7.8), the
+  rendering walks again with the GPU off (`AVLOOP_GPU_RENDERING=off`), the README's pictures retaken.
+- Corrections it delivered: a finished export, size estimate or Preview frees its GPU textures, mask, target and
+  buffers (`RenderService::trim()`; the shared context stays); the render service ends its GL objects and context on
+  the render thread and the offscreen surface on the GUI thread that made it.
+
 ### D-010 — The project and the settings (AV-010, 2026-10-26)
 
 - The ☰ menu's New, Open Project…, Save (Ctrl+S), Save As… (Ctrl+Shift+S) and Recent (the last 10 projects, then the

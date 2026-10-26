@@ -16,10 +16,20 @@ RenderService::RenderService(QObject* parent) : QObject(parent) {
 }
 
 RenderService::~RenderService() {
-    // The GPU objects go on the thread whose context made them, then the thread.
-    run([this] { gl_.reset(); });
+    // The GPU objects and the context go on the thread that made them, then the thread; the offscreen surface last,
+    // here on the GUI thread that made it.
+    run([this] {
+        if (gl_) gl_->shutdown();
+    });
     context_->deleteLater();
     thread_.reset();
+    gl_.reset();
+}
+
+void RenderService::trim() {
+    post([this] {
+        if (gl_) gl_->trim();
+    });
 }
 
 void RenderService::post(std::function<void()> work) {

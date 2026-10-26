@@ -204,3 +204,21 @@ end of its section.
 - **A walk answers what a user would be asked**: modal questions (Save / Don't save / Cancel, Recover / Discard, a
   name, Locate source…) take the walk's `answer` in a lab run instead of opening, so the focus stays the owner's.
   (AV-010)
+
+## The checkpoint (CP-A1)
+
+- **A QObject dies on the thread that owns it**: the render service destroyed its GlRenderer on the render thread, and
+  with it the QOffscreenSurface the GUI thread made — Qt asserts in Debug ("Cannot send events to objects owned by a
+  different thread"), Release stays silent. Rule: `GlRenderer::shutdown()` frees the GL objects and the context on the
+  render thread; the surface goes with the object on the GUI thread. (AV-015)
+- **A finished job's textures stay in the shared GPU context**: after the first export the app at rest kept ~70 MB
+  more VRAM. Rule: `RenderService::trim()` after an export, an estimate or a Preview. (AV-015)
+- **Under AddressSanitizer, Private Bytes only grows**: freed memory waits in ASan's quarantine, so the process-memory
+  thresholds fail for ASan's reasons. Rule: an ASan run judges memory errors; the growth gates are judged in Release.
+  (AV-015)
+- **An exit-time CRT leak report lists Qt's process-lifetime allocations**: the Debug gate counts the debug heap's live
+  blocks around repeated cycles instead (test-leaks: no block left by any cycle). (AV-015)
+- **A verdict is a line of its own**: walk-phase read "WALK PASSED" quoted inside a failed walk's check and passed it.
+  Rule: the verdict is matched at the start of a line, with the exit code. (AV-015)
+- **In Bash, a double-quoted `node -e` runs backticks**: a comment with `` `node walk-memory.mjs start` `` was executed
+  as a command substitution. Rule: scripts with backticks or backslashes are written with the Write tool. (AV-015)

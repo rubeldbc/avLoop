@@ -1,0 +1,42 @@
+startup: 509 ms
+walk walk-open.json: 37 steps
+-- S2 in the window: a video opens by the walk's open step (the code path of Open, drop and the command line) @1119 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect video.size: 640x360
+PASS expect frame.size: 640x360
+PASS expect status.source: counter-640p30.mp4 · 640×360 · 30.00 fps · H.264
+PASS expect status.gpu: GPU: NVIDIA GeForce RTX 2060 SUPER · HW decode on
+PASS expect status.memory: RAM 285 MB · VRAM 75 MB · Cache 0.0/1.5 GB
+PASS expect dropzone.visible: false
+PASS shot open-counter.png: 1600x834 px
+-- a broken file: a message, not a crash; the open video stays @2474 ms
+     open samples/broken.mp4
+PASS expect toast.text: Cannot open broken.mp4: Invalid data found when processing input. It is not a video file AvLoop can read.
+PASS expect video.size: 640x360
+PASS shot open-broken-toast.png: 1600x834 px
+-- an audio-only file is refused with its reason @4070 ms
+     open samples/audio-only.m4a
+PASS expect toast.text: This file has no video AvLoop can decode (container: QuickTime / MOV).
+-- rotation upright, a Bengali path, alpha, HDR @5372 ms
+     open samples/rotate90.mp4
+PASS waitFor frame.size: 360x640 after 0 ms
+PASS shot open-rotate90.png: 1600x834 px
+     open samples/বাংলা নমুনা/ভিডিও.mp4
+PASS waitFor frame.size: 640x360 after 0 ms
+PASS expect status.source: ভিডিও.mp4 · 640×360 · 30.00 fps · H.264
+     open samples/alpha-vp9.webm
+PASS waitFor video.codec: vp9 after 0 ms
+PASS expect video.hardware: false
+PASS expect status.source: alpha-vp9.webm · 640×360 · 30.00 fps · VP9 · alpha
+     open samples/hdr-pq.mkv
+PASS waitFor video.codec: hevc after 0 ms
+PASS expect status.source: hdr-pq.mkv · 640×360 · 25.00 fps · HEVC · HDR → SDR
+PASS shot open-hdr.png: 1600x834 px
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[mov,mp4,m4a,3gp,3g2,mj2 @ 000001e43cd79440] moov atom not found
+[libvpx-vp9 @ 000001e40b9b9900] v1.16.0
+[libvpx-vp9 @ 000001e40b9b9cc0] v1.16.0
+[libvpx-vp9 @ 000001e40b9b9cc0] v1.16.0
+[libvpx-vp9 @ 000001e40b9b9900] v1.16.0

@@ -152,6 +152,11 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     side already shows the source, so the toast is where §11.1's warning is seen.
 44. **R-44** Settings is a window whose changes are saved at once (no OK/Cancel): the theme and the RAM cache apply
     at once, decoding and GPU rendering from the next video, the disk cache from the next start (said in the tab).
+45. **R-45** §3.7.8's "zero CRT leak report in Debug" is checked as no live debug-heap block left by repeated cycles of
+    each subsystem (`test-leaks`): an exit-time report would list Qt's own process-lifetime allocations.
+46. **R-46** Under AddressSanitizer the process-memory growth thresholds are reported, not judged (ASan's quarantine
+    keeps freed memory); they are judged in the Release run. §3.7.8's memory walk: after warm-up — a minute of playback,
+    the first export, the first Preview — phase against phase.
 
 ## 4. What is not built
 

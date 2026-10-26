@@ -18,6 +18,17 @@
 #include <limits>
 
 using namespace avloop;
+
+// Under AddressSanitizer freed memory waits in its quarantine, so Private Bytes only grows: the process-memory gates
+// are judged in the Release run (spec §3.7.8; reading R-46). An ASan run still makes every cycle for ASan's own checks
+// and reports the numbers.
+#ifdef __SANITIZE_ADDRESS__
+#define AVLOOP_MEMORY_GATE(cond, message)                                                                              \
+    if (!(cond)) qInfo("not judged under ASan: %s", message)
+#else
+#define AVLOOP_MEMORY_GATE(cond, message) QVERIFY2(cond, message)
+#endif
+
 using avloop::test::samplePath;
 
 namespace {
@@ -133,7 +144,7 @@ private slots:
                                      .arg(cache.budget() / MB);
         }
         QVERIFY(cache.used() <= cache.budget());
-        QVERIFY2(growth < 50 * MB, qPrintable(QStringLiteral("grew %1 MB").arg(growth / MB)));
+        AVLOOP_MEMORY_GATE(growth < 50 * MB, qPrintable(QStringLiteral("grew %1 MB").arg(growth / MB)));
     }
     void decodersComeAndGo_data() {
         QTest::addColumn<QString>("sample");
@@ -213,7 +224,8 @@ private slots:
                                  .arg(QString::fromLatin1(QTest::currentDataTag()))
                                  .arg(early / MB)
                                  .arg(late / MB);
-        QVERIFY2(late - early < 20 * MB, qPrintable(QStringLiteral("the floor rose %1 MB").arg((late - early) / MB)));
+        AVLOOP_MEMORY_GATE(late - early < 20 * MB,
+                           qPrintable(QStringLiteral("the floor rose %1 MB").arg((late - early) / MB)));
     }
 };
 

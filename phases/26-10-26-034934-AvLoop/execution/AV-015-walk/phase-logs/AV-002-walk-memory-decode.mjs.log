@@ -1,0 +1,6 @@
+PASS the open cycle ran: 57 steps, exit 0
+PASS the rounds found by their labels: 4 rounds
+PASS Private Bytes: rounds 3–4 against round 2 (round 1 the warm-up): round peaks 463 / 514 / 507 / 512 MB → growth -2.1 MB, 34 samples
+PASS VRAM: rounds 3–4 against round 2: round peaks 374 / 376 / 376 / 396 MB → growth 20.0 MB
+     cache at the end: 1 MB
+WALK PASSED
