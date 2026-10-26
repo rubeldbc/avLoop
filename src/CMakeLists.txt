@@ -36,16 +36,18 @@ target_link_libraries(avloop_render PUBLIC avloop_core avloop_media Qt6::Gui Qt6
 
 add_library(avloop_export STATIC
     export/FormatProfiles.h export/FormatProfiles.cpp export/OutputVerify.h export/OutputVerify.cpp
-    export/ExportJob.h export/ExportJob.cpp export/SizeEstimator.h export/SizeEstimator.cpp)
+    export/ExportJob.h export/ExportJob.cpp export/SizeEstimator.h export/SizeEstimator.cpp
+    export/LoopFinder.h export/LoopFinder.cpp)
 target_link_libraries(avloop_export PUBLIC avloop_core avloop_media avloop_render
-    PRIVATE FFmpeg::avformat FFmpeg::avcodec FFmpeg::avutil FFmpeg::swscale avloop_warnings)
+    PRIVATE Qt6::Concurrent FFmpeg::avformat FFmpeg::avcodec FFmpeg::avutil FFmpeg::swscale avloop_warnings)
 
 add_library(avloop_ui STATIC
     ui/MainWindow.h ui/MainWindow.cpp ui/MainMenu.cpp ui/MainWindowActions.cpp ui/MainWindowCanvas.cpp
     ui/MainWindowTimeline.cpp ui/MainWindowPreview.cpp ui/MainWindowExport.cpp ui/MainWindowProject.cpp
     ui/dialogs/SettingsDialog.h ui/dialogs/SettingsDialog.cpp ui/dialogs/AboutDialog.h ui/dialogs/AboutDialog.cpp
     ui/dialogs/ShortcutOverlay.h ui/dialogs/ShortcutOverlay.cpp
-    ui/export/ExportBar.h ui/export/ExportBar.cpp
+    ui/export/ExportBar.h ui/export/ExportBar.cpp ui/export/LoopFinderWindow.h ui/export/LoopFinderWindow.cpp
+    ui/MainWindowFinder.cpp
     ui/preview/PreviewWindow.h ui/preview/PreviewWindow.cpp ui/preview/PreviewWidgets.h ui/preview/PreviewWidgets.cpp
     ui/preview/PreviewPlayer.h ui/preview/PreviewPlayer.cpp ui/preview/PreviewEncode.cpp
     ui/WalkRunner.h ui/WalkRunner.cpp ui/WalkSteps.cpp
@@ -80,7 +82,7 @@ add_executable(avloop WIN32 app/main.cpp app/Diagnostics.h app/Diagnostics.cpp $
 target_link_libraries(avloop PRIVATE avloop_ui dbghelp avloop_warnings)
 avloop_copy_ffmpeg_dlls(avloop)
 
-add_executable(avloop-cli cli/main.cpp cli/CliMedia.cpp cli/CliRender.cpp cli/CliExport.cpp)
+add_executable(avloop-cli cli/main.cpp cli/CliMedia.cpp cli/CliRender.cpp cli/CliExport.cpp cli/CliFind.cpp)
 target_link_libraries(avloop-cli PRIVATE avloop_core avloop_media avloop_render avloop_export Qt6::Gui
     FFmpeg::avcodec FFmpeg::avformat FFmpeg::avutil avloop_warnings)
 avloop_copy_ffmpeg_dlls(avloop-cli)

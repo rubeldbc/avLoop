@@ -1,7 +1,7 @@
 ---
 phase: AV-012
 title: "The loop finder"
-status: IN_PROGRESS
+status: DONE
 owner_item: 12
 track: B
 checkpoint_id: CP-B1

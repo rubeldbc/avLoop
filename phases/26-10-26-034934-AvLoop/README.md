@@ -163,6 +163,9 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     the playhead to it. Deleting the last keyframe leaves the video where it was shown.
 49. **R-49** Without a crop the export's frame is the video where it stands at In; Alpha Auto looks at every keyframe
     (between two, the video never goes beyond them).
+50. **R-50** The Loop Finder's score: 100 × (1 − raw / the 95th percentile of every pair's raw score), at least 0; at a
+    tie the shorter loop, then the earlier; a pair (a, b) is the loop In = frame a, Out = frame b (b the frame after the
+    last), a from the range's second frame (its motion needs the one before); thumbnails of frames a and b − 1.
 
 ## 4. What is not built
 

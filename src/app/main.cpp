@@ -164,5 +164,7 @@ int main(int argc, char** argv) {
         });
         QTimer::singleShot(0, runner.get(), &avloop::WalkRunner::start);
     }
-    return QApplication::exec();
+    const int code = QApplication::exec();
+    avloop::diagnostics::closeLog();
+    return code;
 }

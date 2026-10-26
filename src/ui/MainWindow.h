@@ -39,6 +39,7 @@ class SizeEstimator;
 class Canvas;
 class DropZone;
 class ExportBar;
+class LoopFinderWindow;
 class SettingsDialog;
 class PreviewWindow;
 namespace render {
@@ -156,6 +157,9 @@ private:
     void openAbout();
     void showQuietly(QWidget* window);
     void toggleShortcuts();
+    // MainWindowFinder.cpp — the Loop Finder's window.
+    void buildFinder();
+    void openFinder();
     QObject* exportContext(); // made at first use, as the estimator
     exporting::SizeEstimator* estimator();
 
@@ -196,6 +200,7 @@ private:
     QTimer* autosaveTimer_ = nullptr;
     QString autosaveFile_;
     QPointer<SettingsDialog> settings_;
+    QPointer<LoopFinderWindow> finder_;
     bool obsTipShown_ = false;
     Project* project_ = nullptr;
     Canvas* canvas_ = nullptr;

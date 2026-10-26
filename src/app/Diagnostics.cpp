@@ -106,6 +106,12 @@ void installLog(const QString& dir) {
     previous = qInstallMessageHandler(handler);
 }
 
+void closeLog() {
+    qInstallMessageHandler(previous);
+    const QMutexLocker lock(&logMutex);
+    logOut.close();
+}
+
 QString logFile() {
     const QMutexLocker lock(&logMutex);
     return logPath;

@@ -249,6 +249,17 @@ QLabel[quiet="true"] {
 *[mono="true"] {
     font-family: Consolas;
 }
+/* The Loop Finder's answers */
+#LoopFinderWindow QListWidget {
+    background: @bg;
+    border: 1px solid @border;
+    color: @text;
+    outline: none;
+}
+#LoopFinderWindow QListWidget::item:selected {
+    background: @accentSoft;
+    color: @text;
+}
 /* F1's list of shortcuts */
 #ShortcutOverlay {
     background: @panel;

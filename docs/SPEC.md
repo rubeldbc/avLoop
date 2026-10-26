@@ -6,6 +6,23 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-012 — The Loop Finder (AV-012, 2026-10-26)
+
+- Menu → Loop Finder and Ctrl+L (with a video open) open its window: Search In–Out ± 5 s or the whole file, Length
+  2–10 s (0.5–60), Find with a progress bar and Cancel, then the best five — "In 00:00:00.01 · Out 00:00:04.01 ·
+  4.00 s · score 100" with the loop's first and last frames side by side. A click sets In and Out (one Undo step); a
+  double-click also opens the Preview. A new video closes the window.
+- `export/LoopFinder`: every frame of the range on the output grid, decoded on a software decoder of its own (at most
+  640 px), reduced to a 64×64 greyscale fingerprint of the export's frame — the crop, the transform and keyframes at
+  that time (4 KB a frame); every pair (a, b) with b − a within the lengths scored by the mean absolute difference of
+  frames a and b plus that of their motions, rows in parallel (QtConcurrent) between progress reports; the best five
+  with none within a second of a better one at both ends; 0–100 by the 95th percentile, ties to the shorter loop
+  (reading R-50). The fingerprints live only in the search: closing the window (or a new search) lets them go.
+- `avloop-cli find <video|project> [--from] [--to] [--min] [--max]`; `tools/media/make-samples.mjs` makes `loop4s.mp4`
+  (20 s repeating exactly every 4 s, lossless H.264).
+- Measured: on `loop4s.mp4` the best loop is 4.000 s (raw 0, score 100) over the whole file and over a project's crop;
+  the search of 20 s at 640×360 takes 0.3 s; four searches in a row hold the memory (peaks 262–269 MB).
+
 ### D-011 — The keyframes (AV-011, 2026-10-26)
 
 - `core/Keyframes`: a keyframe is a source time, a centre, a scale and Linear or Ease; at most one an output frame.

@@ -235,3 +235,14 @@ end of its section.
   with the prefix doubles it. (AV-011)
 - **A walk mapper must exist in the binary that runs the walk**: an unknown `space` falls back to raw pixels — [4, 0]
   became a ruler click at time 0. Rebuild before walking new steps. (AV-011)
+
+## The Loop Finder
+
+- **A log file open in a folder keeps the folder**: every lab run since the log came in left its `avloop-lab-*` folder
+  in the temp folder (134 of them), and a message of the teardown could reach the file's statics after they were gone
+  (an exit crash once). Rule: the log is closed and Qt's handler put back before `main` returns; walk-phase fails a
+  walk that leaves a lab folder. (AV-012)
+- **A perfectly periodic clip ties its multiples**: a 4 s loop scores exactly as well as the 8 s one. Rule: at a tie the
+  shorter loop wins, then the earlier. (AV-012)
+- **A cancel test needs a search long enough to cancel**: a 20 s search ends in 0.3 s; the walk asks for loops up to
+  30 s before pressing Cancel. (AV-012)

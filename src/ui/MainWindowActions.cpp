@@ -13,6 +13,7 @@
 #include "ui/WalkRunner.h"
 #include "ui/canvas/Canvas.h"
 #include "ui/canvas/DropZone.h"
+#include "ui/export/LoopFinderWindow.h"
 #include "ui/timeline/PlaybackClock.h"
 #include "ui/timeline/Timeline.h"
 #include "ui/widgets/Toast.h"
@@ -175,6 +176,7 @@ void MainWindow::probed(const QString& path, const std::optional<media::MediaInf
 }
 
 void MainWindow::closeVideo() {
+    if (finder_) finder_->close(); // its fingerprints were of this video
     clock_->setWorker(nullptr);
     timeline_->setSource(nullptr);
     if (worker_ && cache_) cache_->removeSource(worker_->sourceId());

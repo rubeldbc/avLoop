@@ -1,0 +1,8 @@
+PASS the whole file: the best loop 4 s: searched 0.00 – 20.00 s, loops of 2 – 10 s at 30 fps in 0.28 s; best {"in":0.033,"out":4.033,"length":4,"score":100,"raw":0}
+PASS the five in order of their scores: 0.033–4.033 (100), 1.033–5.033 (100), 2.033–6.033 (100), 3.033–7.033 (100), 4.033–8.033 (100)
+PASS a project's crop: the best loop 4 s: searched 1.00 – 14.00 s, loops of 2 – 10 s at 30 fps in 0.20 s; best {"in":1.033,"out":5.033,"length":4,"score":100,"raw":0}
+PASS 2–3 s: the bounds kept, no perfect loop: best {"in":1.933,"out":3.933,"length":2,"score":48,"raw":6.571}
+PASS the Finder opened, found and closed four times: exit 0
+PASS Private Bytes: rounds 3–4 against round 2: peaks 260 / 262 / 269 / 264 MB
+PASS closed, the memory comes back: before the first 245 MB; after each close 258 / 260 / 262 / 263 MB
+WALK PASSED

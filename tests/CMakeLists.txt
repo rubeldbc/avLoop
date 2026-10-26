@@ -38,6 +38,10 @@ endforeach()
 avloop_add_test(export-job SOURCES test-export-job.cpp Samples.h LIBS avloop_export)
 target_compile_definitions(test-export-job PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
 target_include_directories(test-export-job PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+# The Loop Finder on synthetic fingerprints (and loop4s.mp4 when the samples are there).
+avloop_add_test(loopfinder SOURCES test-loopfinder.cpp Samples.h LIBS avloop_export)
+target_compile_definitions(test-loopfinder PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
+target_include_directories(test-loopfinder PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # The Debug leak gate: the CRT debug heap around repeated cycles (skips in Release).
 avloop_add_test(leaks SOURCES test-leaks.cpp Samples.h LIBS avloop_export)
 target_compile_definitions(test-leaks PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")

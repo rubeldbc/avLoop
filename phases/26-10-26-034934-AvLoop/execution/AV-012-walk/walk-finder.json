@@ -1,0 +1,44 @@
+{
+  "delay": 120,
+  "settle": 700,
+  "steps": [
+    { "label": "no video: the Loop Finder is not offered" },
+    { "do": "expect", "probe": "loopfinder.open", "eq": false },
+
+    { "label": "loop4s.mp4 (repeats every 4 s), Ctrl+L, Find over the whole file" },
+    { "do": "open", "file": "samples/loop4s.mp4" },
+    { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 10000 },
+    { "do": "key", "keys": "Ctrl+L", "on": "MainWindow" },
+    { "do": "expect", "probe": "loopfinder.open", "eq": true },
+    { "do": "choose", "on": "loopfinder.range", "data": "file" },
+    { "do": "click", "on": "loopfinder.find" },
+    { "do": "waitFor", "probe": "loopfinder.state", "eq": "done", "timeout": 60000 },
+    { "do": "expect", "probe": "loopfinder.count", "eq": 5 },
+    { "do": "expect", "probe": "loopfinder.bestLength", "near": [4.0, 0.067] },
+    { "do": "expect", "probe": "loopfinder.best", "contains": " 100" },
+    { "do": "shot", "on": "LoopFinderWindow", "file": "finder.png", "maxWidth": 900 },
+
+    { "label": "a click sets In and Out (one Undo step); Ctrl+Z puts them back" },
+    { "do": "expect", "probe": "range.in", "eq": 0 },
+    { "do": "finderChoose", "row": 0 },
+    { "do": "expect", "probe": "range.in", "near": [0.0333, 0.001] },
+    { "do": "expect", "probe": "range.out", "near": [4.0333, 0.001] },
+    { "do": "key", "keys": "Ctrl+Z", "on": "MainWindow" },
+    { "do": "expect", "probe": "range.in", "eq": 0 },
+
+    { "label": "a double-click sets them and opens the Preview" },
+    { "do": "finderChoose", "row": 1, "preview": true },
+    { "do": "expect", "probe": "range.in", "near": [1.0333, 0.001] },
+    { "do": "expect", "probe": "preview.open", "eq": true },
+    { "do": "waitFor", "probe": "preview.cached", "min": 60, "timeout": 30000 },
+    { "do": "previewClose" },
+
+    { "label": "Cancel stops a search (a longer one: loops up to 30 s); closing lets the fingerprints go" },
+    { "do": "type", "on": "loopfinder.max", "text": "30" },
+    { "do": "click", "on": "loopfinder.find" },
+    { "do": "click", "on": "loopfinder.cancel" },
+    { "do": "waitFor", "probe": "loopfinder.state", "eq": "idle", "timeout": 10000 },
+    { "do": "finderClose" },
+    { "do": "expect", "probe": "loopfinder.open", "eq": false }
+  ]
+}

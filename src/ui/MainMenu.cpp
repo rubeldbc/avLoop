@@ -45,8 +45,8 @@ void MainWindow::buildMenu() {
                           QStringLiteral("redo"));
     menu_->addSeparator();
     QAction* batch = entry(menu_, QStringLiteral("action.batch"), tr("Batch Queue…"), {}, QStringLiteral("batch"));
-    QAction* finder = entry(menu_, QStringLiteral("action.finder"), tr("Loop Finder…"),
-                            QKeySequence(Qt::CTRL | Qt::Key_L), QStringLiteral("finder"));
+    entry(menu_, QStringLiteral("action.finder"), tr("Loop Finder…"), QKeySequence(Qt::CTRL | Qt::Key_L),
+          QStringLiteral("finder")); // MainWindowFinder.cpp
 
     QMenu* theme = menu_->addMenu(tr("Theme"));
     theme->setObjectName(QStringLiteral("menu.theme"));
@@ -71,8 +71,8 @@ void MainWindow::buildMenu() {
     QAction* exit = entry(menu_, QStringLiteral("action.exit"), tr("Exit"));
     connect(exit, &QAction::triggered, this, &QWidget::close);
 
-    // Entries whose behaviour later phases build (the Batch Queue and the Loop Finder); Undo and Redo follow the stack.
-    for (QAction* a : {undo, redo, batch, finder})
+    // The Batch Queue is built later; Undo and Redo follow the stack.
+    for (QAction* a : {undo, redo, batch})
         a->setEnabled(false);
     for (QAction* a : menu_->actions())
         addAction(a);

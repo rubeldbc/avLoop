@@ -70,6 +70,13 @@ frame rate and quality, and a preview that shows exactly what will be exported.
   keyframes, moving or scaling the video writes into the keyframe at the playhead, as in After Effects. Diamonds on the
   timeline's keyframe row — drag one to move it in time, Delete removes it, **[** / **]** jump between them — and Linear
   or Ease per keyframe. The Preview and the export follow them frame by frame.
+- **The Loop Finder** (Ctrl+L) looks for the In and Out where the video joins itself best: every frame of the search
+  range (In–Out ± 5 s, or the whole file) reduced to a small fingerprint of what will be exported, every pair of the
+  allowed lengths (2–10 s by default) compared — the pictures and their motion —, the best five shown with a 0–100
+  score and both ends side by side. A click sets In and Out (one Undo step); a double-click opens the Preview too.
+
+  ![The Loop Finder on a clip that repeats every 4 s](docs/screenshots/finder.png)
+
 - **Undo and Redo** for every change (200 steps; one drag is one step).
 - **Projects** (`.avloop`, plain JSON): New, Open, Save (Ctrl+S), Save As, Recent (10 projects and 10 videos), drag and
   drop or `avloop.exe <project>`. The title shows the project and `*` while it has unsaved changes; closing asks Save /
@@ -108,14 +115,15 @@ frame rate and quality, and a preview that shows exactly what will be exported.
   ![An export just written, with the OBS tip](docs/screenshots/export.png)
 
 - `avloop-cli probe <video>`, `avloop-cli frame <video> --at N -o x.png`, of a project
-  `avloop-cli frame <project.avloop> --at N -o x.png [--cpu]` and `avloop-cli export <project.avloop> -o x.webm`
-  for scripts; `avloop-cli version` shows the FFmpeg build in use and refuses a GPL build.
+  `avloop-cli frame <project.avloop> --at N -o x.png [--cpu]`, `avloop-cli export <project.avloop> -o x.webm` and
+  `avloop-cli find <video|project>` for scripts; `avloop-cli version` shows the FFmpeg build in use and refuses a
+  GPL build.
 
 ## Roadmap
 
 Built in this order (each line is a phase of [the plan](phases/26-10-26-034934-AvLoop/control/01_PHASE_DEPENDENCY_GRAPH.md)):
 
-1. The **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
+1. A batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
 
 ## Using a loop in OBS
 
@@ -163,7 +171,7 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 | Timeline: fit the file · fit In–Out · zoom · switch timecode/frames | `\` · `Shift+\` · Ctrl+wheel · double-click the ruler |
 | Keyframe: add or update at the playhead · previous / next · delete the one at the playhead | K · [ / ] · Delete |
 | Save · Save As | Ctrl+S · Ctrl+Shift+S |
-| Settings · the list of shortcuts | Ctrl+, · F1 |
+| Settings · the list of shortcuts · the Loop Finder | Ctrl+, · F1 · Ctrl+L |
 
 ## Project structure
 

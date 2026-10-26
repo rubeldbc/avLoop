@@ -76,3 +76,4 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-47 | Flips hold: not keyframed | §6.4 | `README.md` §3; AV-011 |
 | R-48 | The keyframe acted on is the one at the playhead | §6.4 | `README.md` §3; AV-011 |
 | R-49 | No crop: the frame where the video stands at In; Alpha Auto over every keyframe | §1.3, §10.2 | `README.md` §3; AV-011 |
+| R-50 | The Finder's 0–100 score by the 95th percentile; ties to the shorter loop | §11.5 | `README.md` §3; AV-012 |

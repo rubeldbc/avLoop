@@ -9,6 +9,9 @@ namespace avloop::diagnostics {
 // older than 7 days are deleted at start. Qt's messages still reach stderr as well.
 void installLog(const QString& dir);
 QString logFile(); // the file being written
+// Qt's own handler back and the file closed: before main returns (a lab run's folder can then be removed, and no
+// message of the teardown reaches a file already gone).
+void closeLog();
 
 // An unhandled exception writes `<dir>\avloop-YYYYMMDD-HHMMSS.dmp` (MiniDumpWriteDump) before the process ends.
 void installCrashHandler(const QString& dir);

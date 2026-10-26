@@ -19,6 +19,9 @@ const env = { ...process.env, AVLOOP_DATA_DIR: data };
 const autosaves = () => (fs.existsSync(path.join(data, 'autosave'))
   ? fs.readdirSync(path.join(data, 'autosave')).filter((f) => f.endsWith('.avloop')) : []);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// A crashed or killed app cannot remove its lab folder (settings, logs): this walk removes the ones its runs left.
+const labFolders = () => fs.readdirSync(os.tmpdir()).filter((f) => f.startsWith('avloop-lab-'));
+const labBefore = new Set(labFolders());
 
 const change = (feather) => [
   { do: 'open', file: 'samples/counter-640p30.mp4' },
@@ -85,5 +88,6 @@ const recovered = app('recover', [
 w.check(recovered.passed, 'Recover: the project back, unsaved', recovered.fails || 'Feather 25, the title with *');
 w.check(autosaves().length === 0, 'a clean exit leaves no autosave', `${autosaves().length} file(s)`);
 w.check(lab.avloopProcesses().length === 0, 'no AvLoop left running', lab.avloopProcesses().join(', ') || 'none');
+for (const f of labFolders().filter((x) => !labBefore.has(x))) fs.rmSync(path.join(os.tmpdir(), f), { recursive: true, force: true });
 fs.rmSync(TMP, { recursive: true, force: true });
 w.verdict();

@@ -1,0 +1,39 @@
+startup: 481 ms
+walk walk-finder.json: 34 steps
+-- no video: the Loop Finder is not offered @1183 ms
+PASS expect loopfinder.open: false
+-- loop4s.mp4 (repeats every 4 s), Ctrl+L, Find over the whole file @1303 ms
+     open samples/loop4s.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect loopfinder.open: true
+PASS waitFor loopfinder.state: done after 150 ms
+PASS expect loopfinder.count: 5
+PASS expect loopfinder.bestLength: 4
+PASS expect loopfinder.best: 0.033-4.033 100
+PASS shot finder.png: 560x520 px
+-- a click sets In and Out (one Undo step); Ctrl+Z puts them back @3261 ms
+PASS expect range.in: 0
+     finderChoose 0
+PASS expect range.in: 0.03333333333
+PASS expect range.out: 4.033333333
+PASS expect range.in: 0
+-- a double-click sets them and opens the Preview @4276 ms
+     finderChoose 1 (and Preview)
+PASS expect range.in: 1.033333333
+PASS expect preview.open: true
+PASS waitFor preview.cached: 105 after 0 ms
+     previewClose
+-- Cancel stops a search (a longer one: loops up to 30 s); closing lets the fingerprints go @5433 ms
+PASS waitFor loopfinder.state: idle after 0 ms
+     finderClose
+PASS expect loopfinder.open: false
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[h264 @ 0000025aee4a5440] Failed setup for format d3d11: hwaccel initialisation returned error.
+[h264 @ 0000025aee4a7580] Failed setup for format d3d11: hwaccel initialisation returned error.
+[h264 @ 0000025aa6940580] Failed setup for format d3d11: hwaccel initialisation returned error.
+[h264 @ 0000025aa6940580] Failed setup for format d3d11: hwaccel initialisation returned error.
+[libvpx-vp9 @ 0000025aee4a4200] v1.16.0
+[libvpx-vp9 @ 0000025aee4a6a80] v1.16.0
+[h264 @ 0000025aee4a5800] Failed setup for format d3d11: hwaccel initialisation returned error.
+[libvpx-vp9 @ 0000025aee4a6a80] v1.16.0

@@ -79,6 +79,14 @@ const SAMPLES = [
   // The README's pictures: soft moving colours in AvLoop's palette.
   { name: 'readme-demo.mp4', need: [], args: ['-f', 'lavfi', '-i', 'gradients=s=1920x1080:r=30:d=10:n=3:c0=0x16223A:c1=0xFF7A1A:c2=0x3DD68C:speed=0.02', ...h264] },
   { name: 'family-prores.mov', need: ['prores_ks'], args: [...src(), '-c:v', 'prores_ks', '-profile:v', '2'] },
+  // The Loop Finder's known loop (S14): 20 s whose picture repeats exactly every 4 s (two boxes, both a 4 s period),
+  // losslessly coded so that repeat is exact.
+  { name: 'loop4s.mp4', need: ['libx264'], args: [
+    '-f', 'lavfi', '-i', 'color=c=0x16223A:s=640x360:r=30:d=20',
+    '-f', 'lavfi', '-i', 'color=c=0xFF7A1A:s=80x80:r=30:d=20',
+    '-f', 'lavfi', '-i', 'color=c=0x3DD68C:s=60x60:r=30:d=20',
+    '-filter_complex', "[0][1]overlay=x='mod(n*16/3\\,640)-40':y=140[a];[a][2]overlay=x=290:y='mod(n*3\\,360)-30',format=yuv420p",
+    '-c:v', 'libx264', '-qp', '0', '-preset', 'fast', '-g', '60'] },
 ];
 
 fs.mkdirSync(OUT, { recursive: true });
