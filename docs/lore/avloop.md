@@ -246,3 +246,27 @@ end of its section.
   shorter loop wins, then the earlier. (AV-012)
 - **A cancel test needs a search long enough to cancel**: a 20 s search ends in 0.3 s; the walk asks for loops up to
   30 s before pressing Cancel. (AV-012)
+
+## The batch and the other formats
+
+- **A walk reads the CLI's PASS line**: AV-015's GPU-off walk wants `, CPU` at its end; the encoder's name added after
+  the renderer failed it. Rule: a new field of a line a walk reads goes before the ones walks match at the end. (AV-013)
+- **PowerShell 5.1 rewrites a file it touches**: `Get-Content -Raw` reads UTF-8 without a BOM as ANSI and
+  `Set-Content -Encoding utf8` writes a BOM — every § and → in MainWindow.cpp came back mangled. Rule: files are
+  edited with Node or the Edit tool, never round-tripped through PowerShell. (AV-013)
+- **A Qt test run by hand needs its plugins**: without QT_PLUGIN_PATH the offscreen platform is not found and the
+  executable waits on Qt's error box. Rule: QT_PLUGIN_PATH and QT_QPA_PLATFORM=offscreen, or ctest. (AV-013)
+- **A batch walk writes into the lab run's own folder**: entries written into the walk folder would be committed, and
+  Ctrl+Shift+E's default folder is the owner's Videos. Rule: `batchAdd` takes `"temp": true` (the lab data folder,
+  gone with the run), and a lab run's default export folder is its data folder. (AV-013)
+- **A probe that shows an error shows its path**: the batch's failure reason named the temp folder (and the owner).
+  Rule: a probe that may carry a path replaces the temp and home folders. (AV-013)
+- **A menu makes Qt think the application active**: after a walk's menu step Qt's state was Active though Windows
+  never activated AvLoop; making the Settings dialog Qt's active window then asked the OS to activate it, and closing
+  it activated the main window for real — the README run took the owner's focus. Rule: before each step, while
+  another process holds the foreground, the walk runner tells Qt the application is inactive; it also logs the step
+  after which the focus came, if it ever does. (AV-013)
+- **At exit the render thread may hold a size estimate's frame**: members go in reverse order, the export thread's
+  context before the render service, and an estimate's last render task posted to the deleted context (a crash after
+  WALK PASSED). Rule: `~MainWindow` drops the batch, the export and the estimate, then drains render → export →
+  render before any thread goes. (AV-013)

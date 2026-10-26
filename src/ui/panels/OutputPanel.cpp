@@ -1,4 +1,5 @@
-// The side panel's Output section (spec §10.2): Format (WebM VP9 or VP8; the others at AV-013), Size (Crop size, Long
+// The side panel's Output section (spec §10.2): Format (the six of §10.4, one this FFmpeg cannot write disabled with
+// its reason; GIF at most 50 fps, MP4 without alpha), Size (Crop size, Long
 // side 1920 … 256, Custom W×H with its ratio lock), Alpha (Auto — only when there are transparent parts —, On, Off),
 // Background (behind the transparent parts when there is no alpha) and the frame rate (§8.3: Source — the stream's
 // rate, at most 60 —, the common rates or Custom 1–60). Sizes come out even, ≥ 16, the long side ≤ 1920; a note says
@@ -22,6 +23,7 @@
 #include <QPixmap>
 #include <QRegularExpression>
 #include <QRegularExpressionValidator>
+#include <QStandardItemModel>
 #include <QToolButton>
 
 #include <cmath>
@@ -60,8 +62,14 @@ void SidePanel::bindOutput(Project* project) {
 
     auto* format = new QComboBox(body);
     format->setObjectName(QStringLiteral("panel.output.format"));
-    for (const exporting::FormatProfile& p : exporting::formatProfiles())
+    for (const exporting::FormatProfile& p : exporting::formatProfiles()) {
         format->addItem(p.name, formatId(p.format));
+        QString reason;
+        if (exporting::available(p.format, &reason)) continue;
+        if (auto* model = qobject_cast<QStandardItemModel*>(format->model()))
+            model->item(format->count() - 1)->setEnabled(false);
+        format->setItemData(format->count() - 1, reason, Qt::ToolTipRole);
+    }
     s->addRow(tr("Format"), format);
 
     auto* size = new QComboBox(body);
@@ -95,7 +103,6 @@ void SidePanel::bindOutput(Project* project) {
     alpha->addItem(tr("Auto"), QStringLiteral("auto"));
     alpha->addItem(tr("On"), QStringLiteral("on"));
     alpha->addItem(tr("Off"), QStringLiteral("off"));
-    alpha->setToolTip(tr("Auto keeps alpha only when the output has transparent parts"));
     s->addRow(tr("Alpha"), alpha);
     auto* colour = new QLineEdit(body);
     colour->setObjectName(QStringLiteral("panel.output.background"));
@@ -141,13 +148,20 @@ void SidePanel::bindOutput(Project* project) {
         lock->setIcon(IconFactory::icon(o.lockRatio ? QStringLiteral("lock") : QStringLiteral("unlock")));
         bool limited = false;
         const QSize out = project->outputSize(&limited);
-        note->setText(limited ? tr("Limited to 1920 px on the long side: %1×%2").arg(out.width()).arg(out.height())
-                              : QString());
-        note->setVisible(open && limited);
+        const bool capped =
+            project->outputFps().value() + 1e-9 < o.sourceRate(project->source().fps, project->source().vfr).value();
+        QStringList notes;
+        if (limited) notes << tr("Limited to 1920 px on the long side: %1×%2").arg(out.width()).arg(out.height());
+        if (capped) notes << tr("GIF plays at most %1 fps").arg(formatMaxFps(o.format));
+        note->setText(notes.join(QLatin1Char('\n')));
+        note->setVisible(open && !notes.isEmpty());
         const bool needed = geometry::needsAlpha(project->crop(), project->transform(), project->source().size(),
                                                  project->source().hasAlpha);
         alpha->setItemText(0, open ? (needed ? tr("Auto (on)") : tr("Auto (off)")) : tr("Auto"));
         alpha->setCurrentIndex(std::max(0, alpha->findData(OutputSettings::alphaId(o.alpha))));
+        alpha->setEnabled(open && formatHasAlpha(o.format));
+        alpha->setToolTip(formatHasAlpha(o.format) ? tr("Auto keeps alpha only when the output has transparent parts")
+                                                   : tr("This format has no alpha"));
         if (!colour->hasFocus()) colour->setText(o.background.toUpper());
         QPixmap swatch(14, 14);
         swatch.fill(QColor(o.background));

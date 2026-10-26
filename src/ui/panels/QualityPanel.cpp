@@ -1,6 +1,8 @@
 // The side panel's Quality section (spec §10.3): Low, Medium (default), High or Custom — CRF 4–63 and Speed 0–8 show
 // what the preset uses, and typing either makes it Custom from those values; Custom adds Max bitrate (VP8's bitrate),
-// Two-pass and Target size (MB; two passes, CRF unused). Under it, the size estimate (`~1.8 MB`).
+// Two-pass and Target size (MB; two passes, CRF unused). Under it, the size estimate (`~1.8 MB`). WebM uses all of
+// it; MP4 H.264 only the preset's bitrate (Custom: Max bitrate); ProRes its profile; GIF and APNG none (a note says
+// so).
 #include "core/Project.h"
 #include "ui/WalkRunner.h"
 #include "ui/panels/Section.h"
@@ -29,6 +31,11 @@ void SidePanel::bindQuality(Project* project) {
     preset->addItem(tr("High"), QualitySettings::presetId(P::High));
     preset->addItem(tr("Custom"), QualitySettings::presetId(P::Custom));
     s->addRow(tr("Preset"), preset);
+    auto* formatNote = new QLabel(body);
+    formatNote->setObjectName(QStringLiteral("panel.quality.formatNote"));
+    formatNote->setProperty("quiet", true);
+    formatNote->setWordWrap(true);
+    s->addWide(formatNote);
     auto* crf = new StepSpinBox(QStringLiteral("panel.quality.crf"), 4, 63, 1, 0, body);
     crf->setToolTip(tr("Lower is better and larger"));
     s->addRow(tr("CRF"), crf);
@@ -71,11 +78,23 @@ void SidePanel::bindQuality(Project* project) {
         const QSignalBlocker b1(preset), b2(twoPass);
         preset->setCurrentIndex(std::max(0, preset->findData(QualitySettings::presetId(q.preset))));
         crf->setValueQuietly(q.crf);
-        crf->setEnabled(open && q.targetMB <= 0); // Target size sets the bitrate instead
+        const OutputFormat format = project->output().format;
+        const bool webm = format == OutputFormat::WebmVp9 || format == OutputFormat::WebmVp8;
+        const bool mp4 = format == OutputFormat::Mp4H264;
+        formatNote->setText(mp4 ? tr("H.264: the preset sets the bitrate")
+                            : format == OutputFormat::MovProRes
+                                ? tr("ProRes: its 4444 profile sets the quality")
+                                : tr("%1 has no quality settings").arg(formatName(format, false)));
+        formatNote->setVisible(open && !webm);
+        preset->setEnabled(open && (webm || mp4));
+        maxRate->setEnabled(open && (webm || mp4));
+        crf->setEnabled(open && webm && q.targetMB <= 0); // Target size sets the bitrate instead
+        speed->setEnabled(open && webm);
+        target->setEnabled(open && webm);
         speed->setValueQuietly(q.speed);
         maxRate->setValueQuietly(q.maxBitrate);
         twoPass->setChecked(q.twoPass || q.targetMB > 0);
-        twoPass->setEnabled(open && q.targetMB <= 0);
+        twoPass->setEnabled(open && webm && q.targetMB <= 0);
         target->setValueQuietly(q.targetMB);
     };
     connect(project, &Project::changed, this, [refresh](Project::Aspect a) {

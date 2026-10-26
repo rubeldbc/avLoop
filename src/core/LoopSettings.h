@@ -64,7 +64,8 @@ struct OutputSettings {
     friend bool operator==(const OutputSettings&, const OutputSettings&) = default;
     // The rate the output has: the chosen one, or the source's (avg_frame_rate; a VFR source's nearest common rate),
     // never above 60.
-    Rational effectiveFps(Rational sourceFps, bool vfr) const;
+    Rational effectiveFps(Rational sourceFps, bool vfr) const; // the rate, capped by the format (GIF 50)
+    Rational sourceRate(Rational sourceFps, bool vfr) const;   // the rate before the format's cap
     // "source", "30/1", "30000/1001" (spec §11.1).
     QString fpsId() const;
     static OutputSettings fromFpsId(const QString& id);

@@ -67,16 +67,58 @@ QualitySettings::Preset QualitySettings::presetFromId(const QString& id) {
 }
 
 QString formatId(OutputFormat f) {
-    return f == OutputFormat::WebmVp8 ? QStringLiteral("webm-vp8") : QStringLiteral("webm-vp9");
+    switch (f) {
+    case OutputFormat::WebmVp8:
+        return QStringLiteral("webm-vp8");
+    case OutputFormat::Gif:
+        return QStringLiteral("gif");
+    case OutputFormat::Apng:
+        return QStringLiteral("apng");
+    case OutputFormat::Mp4H264:
+        return QStringLiteral("mp4-h264");
+    case OutputFormat::MovProRes:
+        return QStringLiteral("mov-prores");
+    case OutputFormat::WebmVp9:
+        break;
+    }
+    return QStringLiteral("webm-vp9");
 }
 
 OutputFormat formatFromId(const QString& id) {
-    return id == QLatin1String("webm-vp8") ? OutputFormat::WebmVp8 : OutputFormat::WebmVp9;
+    for (OutputFormat f :
+         {OutputFormat::WebmVp8, OutputFormat::Gif, OutputFormat::Apng, OutputFormat::Mp4H264, OutputFormat::MovProRes})
+        if (formatId(f) == id) return f;
+    return OutputFormat::WebmVp9;
 }
 
 QString formatName(OutputFormat f, bool alpha) {
-    const QString codec = f == OutputFormat::WebmVp8 ? QStringLiteral("VP8") : QStringLiteral("VP9");
+    QString codec;
+    switch (f) {
+    case OutputFormat::WebmVp8:
+        codec = QStringLiteral("VP8");
+        break;
+    case OutputFormat::Gif:
+        return QStringLiteral("GIF");
+    case OutputFormat::Apng:
+        return QStringLiteral("APNG");
+    case OutputFormat::Mp4H264:
+        return QStringLiteral("H.264");
+    case OutputFormat::MovProRes:
+        codec = QStringLiteral("ProRes 4444");
+        break;
+    case OutputFormat::WebmVp9:
+        codec = QStringLiteral("VP9");
+        break;
+    }
     return alpha ? codec + QStringLiteral(" alpha") : codec;
+}
+
+bool formatHasAlpha(OutputFormat f) {
+    return f != OutputFormat::Mp4H264;
+}
+
+int formatMaxFps(OutputFormat f) {
+    return f == OutputFormat::Gif ? 50 : 60;
 }
 
 } // namespace avloop

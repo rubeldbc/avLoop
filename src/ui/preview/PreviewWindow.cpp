@@ -1,6 +1,7 @@
 #include "ui/preview/PreviewWindow.h"
 
 #include "core/Timecode.h"
+#include "export/FormatProfiles.h"
 #include "media/DiskCache.h"
 #include "render/RenderService.h"
 #include "ui/preview/PreviewPlayer.h"
@@ -172,7 +173,9 @@ void PreviewWindow::setJob(const render::RenderJob& job) {
 void PreviewWindow::startEncode() {
     const QString dir = disk_ ? disk_->sessionDir() : QDir::tempPath();
     if (!tempFile_.isEmpty()) QFile::remove(tempFile_);
-    tempFile_ = QDir(dir).filePath(QStringLiteral("preview-%1.webm").arg(++encodes_));
+    tempFile_ = QDir(dir).filePath(QStringLiteral("preview-%1.%2")
+                                       .arg(++encodes_)
+                                       .arg(exporting::profileOf(player_->job().output.format).extension));
     player_->encode(tempFile_);
 }
 

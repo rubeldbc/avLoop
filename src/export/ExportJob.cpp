@@ -133,8 +133,7 @@ ExportJob::ExportJob(const render::RenderJob& job, const QString& path, render::
                      QObject* encodeContext, media::DiskCache* disk, QObject* parent)
     : QObject(parent), job_(job), path_(path), service_(service), encodeContext_(encodeContext), disk_(disk),
       sh_(std::make_shared<ExportShared>()), preferGpu_(render::FrameRenderer::gpuSetting()) {
-    const bool custom = job.quality.preset == QualitySettings::Preset::Custom;
-    passes_ = custom && (job.quality.twoPass || job.quality.targetMB > 0) ? 2 : 1;
+    passes_ = twoPasses(job) ? 2 : 1;
     total_ = passes_ * job.plan.length;
 }
 
@@ -142,6 +141,14 @@ ExportJob::~ExportJob() {
     cancel();
     std::unique_lock lock(sh_->m);
     sh_->cv.wait(lock, [this] { return sh_->ended || state_ == State::Idle; });
+}
+
+bool ExportJob::twoPasses(const render::RenderJob& job) {
+    // GIF: its palette of every frame first (spec §10.4); WebM: Two-pass or Target size (§10.3).
+    if (job.output.format == OutputFormat::Gif) return true;
+    const bool vpx = job.output.format == OutputFormat::WebmVp9 || job.output.format == OutputFormat::WebmVp8;
+    const QualitySettings& q = job.quality;
+    return vpx && q.preset == QualitySettings::Preset::Custom && (q.twoPass || q.targetMB > 0);
 }
 
 int ExportJob::targetKbps(double targetMB, double seconds) {
@@ -198,8 +205,8 @@ void ExportJob::run() {
             sh->cv.wait(lock, [&] { return sh->opened || sh->stop; });
         }
         const QualitySettings& q = job_.quality;
-        const bool custom = q.preset == QualitySettings::Preset::Custom;
-        const bool target = custom && q.targetMB > 0;
+        const bool vpx = job_.output.format == OutputFormat::WebmVp9 || job_.output.format == OutputFormat::WebmVp8;
+        const bool target = vpx && q.preset == QualitySettings::Preset::Custom && q.targetMB > 0;
         media::EncodeSettings base;
         base.format = job_.output.format;
         base.size = job_.outputSize;
@@ -269,6 +276,7 @@ void ExportJob::run() {
                 return false;
             }
             if (which == 1) stats = encoder.stats();
+            result.encoder = encoder.encoderUsed();
             return true;
         };
 

@@ -114,6 +114,13 @@ Rational OutputSettings::customRate(double fps) {
 }
 
 Rational OutputSettings::effectiveFps(Rational source, bool vfr) const {
+    // GIF's frame delays are hundredths: at most 50 fps (spec §10.4).
+    const Rational rate = sourceRate(source, vfr);
+    const int cap = formatMaxFps(format);
+    return rate.value() > cap + 1e-9 ? Rational{cap, 1} : rate;
+}
+
+Rational OutputSettings::sourceRate(Rational source, bool vfr) const {
     if (!sourceFps) return fps.isValid() && fps.value() <= 60.0 + 1e-9 ? fps : Rational{60, 1};
     if (!source.isValid()) return {30, 1};
     if (vfr) {

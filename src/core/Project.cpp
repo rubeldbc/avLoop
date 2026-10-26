@@ -79,6 +79,7 @@ QSize Project::outputSize(bool* limited) const {
 
 bool Project::outputAlpha() const {
     using A = OutputSettings::Alpha;
+    if (!formatHasAlpha(output_.format)) return false; // MP4: the Background under
     if (output_.alpha != A::Auto) return output_.alpha == A::On;
     // Auto: alpha when the video leaves the output partly clear at any keyframe (between them it never goes further).
     for (const VideoTransform& t : keyframes::extremes(keyframes_, transform_))

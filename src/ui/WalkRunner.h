@@ -88,6 +88,7 @@ private:
     QJsonArray steps_;
     int at_ = 0;
     int failures_ = 0;
+    bool focusTaken_ = false; // the foreground window became AvLoop's (logged at the step after)
     int delay_ = 60;
     QStringList menuPath_;
     int waitTicks_ = 0;

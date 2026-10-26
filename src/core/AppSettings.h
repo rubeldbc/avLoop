@@ -48,5 +48,7 @@ QString dataDir();
 QString autosaveDir();
 QString logsDir();
 QString presetsDir();
+// The batch queue (spec §10.5): queue.json beside the settings (%APPDATA%\AvLoop), in AVLOOP_DATA_DIR when set.
+QString queueFile();
 
 } // namespace avloop::appsettings

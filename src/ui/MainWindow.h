@@ -33,11 +33,13 @@ class FrameCache;
 
 namespace exporting {
 class ExportJob;
+class ExportQueue;
 class SizeEstimator;
 } // namespace exporting
 
 class Canvas;
 class DropZone;
+class BatchWindow;
 class ExportBar;
 class LoopFinderWindow;
 class SettingsDialog;
@@ -157,6 +159,13 @@ private:
     void openAbout();
     void showQuietly(QWidget* window);
     void toggleShortcuts();
+    // MainWindowBatch.cpp — the batch queue and its window.
+    void buildBatch();
+    void openBatch();
+    void addToBatch(const QString& path = {}); // empty: the name template in the export folder, a free name
+    bool batchBusy() const;
+    QString exportFolder() const; // Settings' default folder, else the last one, else Videos
+    QString suggestedExportPath() const;
     // MainWindowFinder.cpp — the Loop Finder's window.
     void buildFinder();
     void openFinder();
@@ -201,6 +210,7 @@ private:
     QString autosaveFile_;
     QPointer<SettingsDialog> settings_;
     QPointer<LoopFinderWindow> finder_;
+    QPointer<BatchWindow> batch_;
     bool obsTipShown_ = false;
     Project* project_ = nullptr;
     Canvas* canvas_ = nullptr;
@@ -217,6 +227,7 @@ private:
     std::unique_ptr<media::WorkerThread> exportThread_; // the export's encoder and the estimate's (spec §10.1)
     std::unique_ptr<exporting::SizeEstimator> estimator_;
     std::unique_ptr<exporting::ExportJob> exportJob_; // the running or the last export: goes first
+    std::unique_ptr<exporting::ExportQueue> queue_;   // its export too, before the threads it uses
     std::optional<media::MediaInfo> video_;
     QString videoState_ = QStringLiteral("none"); // none, opening, ready, error
     QString lastError_;

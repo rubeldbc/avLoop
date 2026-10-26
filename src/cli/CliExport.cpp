@@ -1,7 +1,9 @@
 // avloop-cli's export (spec §2.6, §10.1): the app's ExportJob — the render thread, the export thread, the .part and the
 // rename, the check — from a project file.
-//   avloop-cli export <project.avloop> -o out.webm [--cpu] [--repeat N]
-//       the loop as Export writes it; --repeat exports it N times in a row and reports the memory after each
+//   avloop-cli export <project.avloop> -o out.webm [--format webm-vp9|webm-vp8|gif|apng|mp4-h264|mov-prores] [--cpu]
+//                     [--repeat N]
+//       the loop as Export writes it (--format: in that format instead of the project's); --repeat exports it N times
+//       in a row and reports the memory after each
 #include "core/ProjectJson.h"
 #include "export/ExportJob.h"
 #include "media/DiskCache.h"
@@ -36,7 +38,7 @@ QString arg(const QStringList& args, const QString& name, const QString& fallbac
 
 int exportLoop(const QStringList& args) {
     if (args.isEmpty() || !args.contains(QStringLiteral("-o"))) {
-        say(QStringLiteral("usage: avloop-cli export <project.avloop> -o out.webm [--cpu] [--repeat N]"));
+        say(QStringLiteral("usage: avloop-cli export <project.avloop> -o out.webm [--format id] [--cpu] [--repeat N]"));
         return 1;
     }
     ProjectData project;
@@ -44,6 +46,14 @@ int exportLoop(const QStringList& args) {
     if (!projectjson::load(args.first(), project, &error)) {
         say(QStringLiteral("ERROR %1").arg(error));
         return 1;
+    }
+    if (args.contains(QStringLiteral("--format"))) {
+        const QString id = arg(args, QStringLiteral("--format"));
+        if (formatId(formatFromId(id)) != id) {
+            say(QStringLiteral("ERROR unknown format %1").arg(id));
+            return 1;
+        }
+        project.output.format = formatFromId(id);
     }
     const media::MediaProbe::Result probed = media::MediaProbe::probe(project.source.path);
     if (!probed.info) {
@@ -81,7 +91,7 @@ int exportLoop(const QStringList& args) {
         const bool ok = exporter.state() == exporting::ExportJob::State::Done && r.verifyProblem.isEmpty();
         failures += ok ? 0 : 1;
         if (ok) {
-            say(QStringLiteral("PASS export %1: %2x%3, %4 frames at %5/%6, %7 bytes, %8 pass(es), %9 s, %10")
+            say(QStringLiteral("PASS export %1: %2x%3, %4 frames at %5/%6, %7 bytes, %8 pass(es), %9 s, %10, %11")
                     .arg(QDir::toNativeSeparators(r.path))
                     .arg(job.outputSize.width())
                     .arg(job.outputSize.height())
@@ -91,7 +101,7 @@ int exportLoop(const QStringList& args) {
                     .arg(r.bytes)
                     .arg(exporter.passes())
                     .arg(r.seconds, 0, 'f', 2)
-                    .arg(r.renderer));
+                    .arg(r.encoder, r.renderer));
             if (r.movedAside) say(QStringLiteral("moved aside: %1 was in use").arg(QDir::toNativeSeparators(out)));
         } else {
             say(QStringLiteral("FAIL export: %1").arg(!r.error.isEmpty() ? r.error : r.verifyProblem));

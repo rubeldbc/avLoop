@@ -1,0 +1,6 @@
+PASS a crash while the first entry runs: exit 3221225477
+PASS queue.json as the crash left it: running,pending
+PASS reopened: both Pending, then both Done: pending,pending → done,done
+PASS both files written, no .part left: first.mov 27744420 bytes, second.mov 27744420 bytes
+PASS no AvLoop left running: none
+WALK PASSED

@@ -12,6 +12,8 @@
 #include <QMap>
 #include <QTimer>
 #include <QWidget>
+#include <QWindow>
+#include <qpa/qwindowsysteminterface.h>
 
 #include <windows.h>
 
@@ -108,6 +110,22 @@ void WalkRunner::next() {
         log(failures_ ? QStringLiteral("WALK FAILED (%1)").arg(failures_) : QStringLiteral("WALK PASSED"));
         emit finished(failures_);
         return;
+    }
+    // Which step brought AvLoop to the front, if one did: said once, where it happened.
+    if (!focusTaken_ && GetForegroundWindow() == HWND(window_->winId())) {
+        focusTaken_ = true;
+        log(QStringLiteral("     the focus came to AvLoop before step %1").arg(at_ + 1));
+    }
+    // A menu's popup leaves Qt thinking the application active although Windows never activated it; Qt then asks
+    // the OS to activate the window a walk makes Qt's active one, and hiding that window activates its owner for real.
+    // While another program holds the foreground, Qt is told the application is inactive, as it is.
+    if (QGuiApplication::applicationState() == Qt::ApplicationActive) {
+        DWORD pid = 0;
+        GetWindowThreadProcessId(GetForegroundWindow(), &pid);
+        if (pid != GetCurrentProcessId()) {
+            QWindowSystemInterface::handleApplicationStateChanged<QWindowSystemInterface::SynchronousDelivery>(
+                Qt::ApplicationInactive);
+        }
     }
     const QJsonObject step = steps_.at(at_++).toObject();
     const QString label = step.value(QStringLiteral("label")).toString();

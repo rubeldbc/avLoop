@@ -37,6 +37,7 @@ public:
         bool outOfSpace = false;
         QString verifyProblem; // Done, but the check found this (spec §10.1 step 5)
         QString renderer;      // "GPU: …" or "CPU", with the GPU's note
+        QString encoder;       // "libvpx-vp9", "h264_mf" or its fallback "libopenh264" …
         double seconds = 0;
     };
 
@@ -62,6 +63,8 @@ public:
 
     // Target size's first bitrate: target_bytes × 8 / duration × 0.9, kbit/s (spec §10.3).
     static int targetKbps(double targetMB, double seconds);
+    // Whether the job takes two passes: GIF (its palette), WebM's Two-pass and Target size.
+    static bool twoPasses(const render::RenderJob& job);
 
 signals:
     void progressed();

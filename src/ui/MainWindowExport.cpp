@@ -7,12 +7,14 @@
 #include "core/Geometry.h"
 #include "core/Project.h"
 #include "export/ExportJob.h"
+#include "export/ExportQueue.h"
 #include "export/FormatProfiles.h"
 #include "export/SizeEstimator.h"
 #include "media/WorkerThread.h"
 #include "render/RenderService.h"
 #include "ui/MainWindow.h"
 #include "ui/WalkRunner.h"
+#include "ui/export/BatchWindow.h"
 #include "ui/export/ExportBar.h"
 #include "ui/panels/Section.h"
 #include "ui/panels/SidePanel.h"
@@ -172,11 +174,18 @@ QString MainWindow::exportBlocker() const {
 
 void MainWindow::refreshExportState() {
     const QString reason = exportBlocker();
-    const QString busy = exportRunning() ? tr("An export is running") : QString();
+    const QString busy = exportRunning() ? tr("An export is running")
+                         : batchBusy()   ? tr("The batch queue is running")
+                                         : QString();
     export_->setEnabled(reason.isEmpty() && busy.isEmpty());
     export_->setToolTip(!reason.isEmpty() ? reason : !busy.isEmpty() ? busy : tr("Export (Ctrl+E)"));
     preview_->setEnabled(reason.isEmpty());
     preview_->setToolTip(reason.isEmpty() ? tr("Preview (F5)") : reason);
+    if (QAction* add = findChild<QAction*>(QStringLiteral("action.batchAdd"))) add->setEnabled(reason.isEmpty());
+    if (batch_) {
+        batch_->setCanAdd(reason.isEmpty(), reason);
+        batch_->setCanStart(!exportRunning(), tr("An export is running"));
+    }
 }
 
 void MainWindow::requestEstimate() {
@@ -194,29 +203,47 @@ bool MainWindow::confirm(const QString& text) {
 }
 
 bool MainWindow::mayCloseDuringExport() {
+    if (batchBusy()) {
+        // Its entry under way is Pending again when AvLoop next opens.
+        if (!confirm(tr("The batch queue is running — stop it and quit?"))) return false;
+        queue_->pause();
+        return true;
+    }
     if (!exportRunning()) return true;
     if (!confirm(tr("Export in progress — cancel and quit?"))) return false;
     exportJob_->cancel();
     return true;
 }
 
+QString MainWindow::exportFolder() const {
+    const QString folder = appsettings::exportFolder();
+    // A lab run writes nothing into the owner's Videos: its own data folder instead.
+    const QString videos = qApp->property("avloop.lab").toBool()
+                               ? appsettings::dataDir()
+                               : QStandardPaths::writableLocation(QStandardPaths::MoviesLocation);
+    return !folder.isEmpty() ? folder : appsettings::value(appsettings::kLastExportFolder, videos).toString();
+}
+
+// The project's last export with the format's extension; else the name template in Settings' default folder, the
+// last folder or Videos.
+QString MainWindow::suggestedExportPath() const {
+    const QString extension = exporting::profileOf(project_->output().format).extension;
+    if (const QString last = project_->exportPath(); !last.isEmpty()) {
+        const QFileInfo info(last);
+        return info.dir().filePath(info.completeBaseName() + QLatin1Char('.') + extension);
+    }
+    return QDir(exportFolder())
+        .filePath(exporting::defaultFileName(project_->source().path, project_->outputSize(), project_->output().format,
+                                             appsettings::nameTemplate()));
+}
+
 void MainWindow::chooseExport() {
-    if (!video_ || exportRunning()) return;
+    if (!video_ || exportRunning() || batchBusy()) return;
     if (const QString reason = exportBlocker(); !reason.isEmpty()) {
         Toast::post(centralWidget(), reason, Toast::Kind::Warning);
         return;
     }
-    // The project's last export; else the name template in Settings' default folder, the last folder or Videos.
-    QString suggested = project_->exportPath();
-    if (suggested.isEmpty()) {
-        QString folder = appsettings::exportFolder();
-        if (folder.isEmpty())
-            folder = appsettings::value(appsettings::kLastExportFolder,
-                                        QStandardPaths::writableLocation(QStandardPaths::MoviesLocation))
-                         .toString();
-        suggested = QDir(folder).filePath(exporting::defaultFileName(
-            project_->source().path, project_->outputSize(), project_->output().format, appsettings::nameTemplate()));
-    }
+    const QString suggested = suggestedExportPath();
     const exporting::FormatProfile& profile = exporting::profileOf(project_->output().format);
     const QString path = QFileDialog::getSaveFileName(this, tr("Export loop"), suggested,
                                                       tr("%1 (*.%2)").arg(profile.name, profile.extension));
@@ -226,7 +253,7 @@ void MainWindow::chooseExport() {
 }
 
 void MainWindow::exportTo(const QString& path) {
-    if (!video_ || exportRunning()) return;
+    if (!video_ || exportRunning() || batchBusy()) return;
     if (const QString reason = exportBlocker(); !reason.isEmpty()) {
         Toast::post(centralWidget(), reason, Toast::Kind::Warning);
         return;

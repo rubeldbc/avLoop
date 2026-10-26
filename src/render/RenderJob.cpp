@@ -26,10 +26,11 @@ RenderJob RenderJob::of(const ProjectData& p, const media::MediaInfo& source) {
     job.outputSize = p.output.sizeFor(job.frame.size(), &job.sizeLimited);
     using A = OutputSettings::Alpha;
     // Auto: alpha when the video leaves the output partly clear at any keyframe (between them it never goes further).
-    job.alpha = p.output.alpha == A::On || (p.output.alpha == A::Auto &&
-                                            std::any_of(extremes.begin(), extremes.end(), [&](const VideoTransform& t) {
-                                                return geometry::needsAlpha(p.crop, t, video, source.hasAlpha);
-                                            }));
+    // A format without alpha (MP4) takes the Background under (spec §10.4).
+    const bool needed = std::any_of(extremes.begin(), extremes.end(), [&](const VideoTransform& t) {
+        return geometry::needsAlpha(p.crop, t, video, source.hasAlpha);
+    });
+    job.alpha = formatHasAlpha(p.output.format) && (p.output.alpha == A::On || (p.output.alpha == A::Auto && needed));
     job.background = QColor(p.output.background);
     job.plan = LoopPlan::of(job.loop, job.range.in, job.range.out, job.fps);
     // Decode no larger than the output needs: the display size × min(1, effective scale), long side ≤ 1920 (R-16).

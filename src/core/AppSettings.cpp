@@ -110,6 +110,12 @@ QString logsDir() {
     return made(QDir(dataDir()).filePath(QStringLiteral("logs")));
 }
 
+QString queueFile() {
+    const QString forced = qEnvironmentVariable("AVLOOP_DATA_DIR");
+    const QString dir = !forced.isEmpty() ? forced : QFileInfo(QSettings().fileName()).absolutePath();
+    return QDir(made(dir)).filePath(QStringLiteral("queue.json"));
+}
+
 QString presetsDir() {
     return made(QFileInfo(QSettings().fileName()).absoluteDir().filePath(QStringLiteral("presets")));
 }

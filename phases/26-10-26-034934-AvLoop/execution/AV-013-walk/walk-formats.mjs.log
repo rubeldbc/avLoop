@@ -1,0 +1,27 @@
+PASS GIF: exported and checked by the app: PASS export …\loop.gif: 400x280, 90 frames at 30/1, 1241016 bytes, 2 pass(es), 1.08 s, gif, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS GIF: codec and W×H: gif 400×280 bgra
+PASS GIF: frame count = L: 90 frames read, L = 90
+PASS GIF: no audio stream: video
+PASS GIF: alpha 1-bit: corner 0, centre 255, 0 partial pixels
+PASS APNG: exported and checked by the app: PASS export …\loop.apng: 400x280, 90 frames at 30/1, 2895348 bytes, 1 pass(es), 1.72 s, apng, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS APNG: codec and W×H: apng 400×280 rgba
+PASS APNG: frame count = L: 90 frames read, L = 90
+PASS APNG: no audio stream: video
+PASS APNG: alpha full: corner 0, centre 255, 8376 partial pixels
+PASS MP4 H.264: exported and checked by the app: PASS export …\loop.mp4: 400x280, 90 frames at 30/1, 414948 bytes, 1 pass(es), 0.52 s, h264_mf, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS MP4 H.264: codec and W×H: h264 400×280 yuv420p
+PASS MP4 H.264: frame count = L: 90 frames read, L = 90
+PASS MP4 H.264: no audio stream: video
+PASS MP4 H.264: no alpha, the Background colour (#ff00ff) behind: alpha min 255, corner rgb 254,0,254
+PASS MOV ProRes 4444: exported and checked by the app: PASS export …\loop.mov: 400x280, 90 frames at 30/1, 9015787 bytes, 1 pass(es), 1.66 s, prores_ks, GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2
+PASS MOV ProRes 4444: codec and W×H: prores 400×280 yuva444p12le
+PASS MOV ProRes 4444: frame count = L: 90 frames read, L = 90
+PASS MOV ProRes 4444: no audio stream: video
+PASS MOV ProRes 4444: alpha full: corner 0, centre 255, 8352 partial pixels
+PASS GIF: -loop 0 (for ever): NETSCAPE2.0 loop count 0
+PASS APNG: -plays 0 (for ever): acTL frames 90, plays 0
+PASS MP4: +faststart (moov before mdat): moov at 36, mdat at 1211
+PASS MP4: encoded by Media Foundation (h264_mf), no GPL encoder: h264_mf
+PASS ProRes: profile 4444 with alpha: profile 4444, yuva444p12le, tag ap4h
+PASS GIF: 60 fps asked, 50 written: 50/1 fps, 150 frames, delays 2 cs
+WALK PASSED

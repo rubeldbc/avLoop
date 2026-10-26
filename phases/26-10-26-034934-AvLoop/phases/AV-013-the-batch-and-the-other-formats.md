@@ -1,7 +1,7 @@
 ---
 phase: AV-013
 title: "The batch and the other formats"
-status: IN_PROGRESS
+status: DONE
 owner_item: 13
 track: B
 checkpoint_id: CP-B1

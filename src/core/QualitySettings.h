@@ -27,10 +27,12 @@ struct QualitySettings {
     static Preset presetFromId(const QString& id);
 };
 
-// The output's format (spec §10.2; the others arrive with item 13).
-enum class OutputFormat { WebmVp9, WebmVp8 };
-QString formatId(OutputFormat f); // "webm-vp9", "webm-vp8"
+// The output's format (spec §10.2, §10.4).
+enum class OutputFormat { WebmVp9, WebmVp8, Gif, Apng, Mp4H264, MovProRes };
+QString formatId(OutputFormat f); // "webm-vp9", "webm-vp8", "gif", "apng", "mp4-h264", "mov-prores"
 OutputFormat formatFromId(const QString& id);
-QString formatName(OutputFormat f, bool alpha); // "VP9 alpha", "VP8"
+QString formatName(OutputFormat f, bool alpha); // "VP9 alpha", "VP8", "GIF", "APNG", "H.264", "ProRes 4444 alpha"
+bool formatHasAlpha(OutputFormat f);            // what the format can carry: GIF 1-bit, MP4 none
+int formatMaxFps(OutputFormat f);               // GIF 50, the others 60
 
 } // namespace avloop

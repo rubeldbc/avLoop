@@ -166,6 +166,21 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
 50. **R-50** The Loop Finder's score: 100 × (1 − raw / the 95th percentile of every pair's raw score), at least 0; at a
     tie the shorter loop, then the earlier; a pair (a, b) is the loop In = frame a, Out = frame b (b the frame after the
     last), a from the range's second frame (its motion needs the one before); thumbnails of frames a and b − 1.
+51. **R-51** Pause stops the batch entry under way — an encode cannot wait half-written — and it goes back to Pending
+    (it starts over); a reopened queue waits for Start. An entry whose file the check finds wrong is Failed with "The
+    check found: …".
+52. **R-52** Ctrl+Shift+E adds the project as it is now (a snapshot), written where Export would suggest (the last
+    export's name in the format's extension, else the name template in the export folder); a name already on disk or
+    in the queue takes the first free "name (n)". Export waits while the queue runs, the
+    queue does not start while Export runs, and quitting during a batch asks first.
+53. **R-53** GIF's transparency is 1-bit at alpha 128; the export makes its palette from every frame (a first pass), the
+    size estimate and the Encoded preview from the first frame. Its delays are hundredths (30 fps: 3, 3, 4 …); a rate
+    above 50 is written at 50 (the Output section says so).
+54. **R-54** MP4 H.264 takes the preset's bitrate (Low 2, Medium 6, High 12 Mbit/s; Custom: Max bitrate), no B-frames,
+    one GOP; Media Foundation's encoder, else OpenH264 (BSD). ProRes is profile 4444 in yuva444p10le (yuv444p10le
+    without alpha). GIF and APNG have no quality settings, ProRes its profile (the Quality section says so).
+55. **R-55** queue.json lives beside the settings (`%APPDATA%\AvLoop`; AVLOOP_DATA_DIR when set) and is locked while an
+    AvLoop holds it: a second AvLoop's queue works but is not saved (its window says so).
 
 ## 4. What is not built
 

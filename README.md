@@ -114,8 +114,22 @@ frame rate and quality, and a preview that shows exactly what will be exported.
 
   ![An export just written, with the OBS tip](docs/screenshots/export.png)
 
+- **Four more formats**: **GIF** (a palette made from every frame, Bayer dithering, 1-bit transparency, loops for
+  ever, at most 50 fps), **APNG** (full transparency, plays for ever), **MP4 H.264** by Windows' Media Foundation
+  (hardware when there is a GPU; no transparency — the Background colour is behind; `+faststart`) and **MOV ProRes
+  4444** with its alpha (large files for editors). No GPL encoder is ever used; a format this FFmpeg cannot write is
+  shown disabled with the reason.
+- **A batch queue**: Ctrl+Shift+E adds the project as it is now (named as Export would suggest, never over a file
+  already there); Menu → Batch Queue lists the entries — name, format, size, state, progress —, drag one
+  to reorder; Start runs them one after another, Pause stops the one under way (it starts over next time), Remove and
+  Clear done tidy the list. A failed entry keeps its reason and the next one runs. The queue is kept in
+  `%APPDATA%\AvLoop\queue.json`: after a restart, unfinished entries are back as Pending.
+
+  ![The batch queue: two loops written, the third on its way](docs/screenshots/batch.png)
+
 - `avloop-cli probe <video>`, `avloop-cli frame <video> --at N -o x.png`, of a project
-  `avloop-cli frame <project.avloop> --at N -o x.png [--cpu]`, `avloop-cli export <project.avloop> -o x.webm` and
+  `avloop-cli frame <project.avloop> --at N -o x.png [--cpu]`, `avloop-cli export <project.avloop> -o x.webm
+  [--format webm-vp9|webm-vp8|gif|apng|mp4-h264|mov-prores]` and
   `avloop-cli find <video|project>` for scripts; `avloop-cli version` shows the FFmpeg build in use and refuses a
   GPL build.
 
@@ -123,13 +137,15 @@ frame rate and quality, and a preview that shows exactly what will be exported.
 
 Built in this order (each line is a phase of [the plan](phases/26-10-26-034934-AvLoop/control/01_PHASE_DEPENDENCY_GRAPH.md)):
 
-1. A batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
+1. A Windows installer (v1.0.0).
 
 ## Using a loop in OBS
 
 1. In OBS, add a **Media Source** and choose the exported `.webm` as the *Local File*.
 2. Turn **Loop** on.
 3. Turn **Use hardware decoding when available** off — OBS's hardware decoder drops the WebM's transparency.
+
+WebM is the format for OBS. MOV ProRes 4444 keeps the alpha too, at many times the size; MP4 has no transparency.
 
 ## Download and install
 
@@ -163,7 +179,7 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 | Zoom: Fit · 100% · in · out | Ctrl+0 · Ctrl+1 · Ctrl+= · Ctrl+- |
 | Zoom about the cursor · pan | Ctrl+wheel · wheel (Shift: across), middle-drag |
 | Preview window · in it: play/pause, a frame back / on | F5 · Space, ← / → |
-| Export | Ctrl+E |
+| Export · add to the batch queue | Ctrl+E · Ctrl+Shift+E |
 | Play / Pause · loop on/off | Space · L |
 | Previous / next frame · ten frames | ← / → · Shift+← / Shift+→ |
 | Go to In / Out · start / end of the file | Home / End · Ctrl+Home / Ctrl+End |

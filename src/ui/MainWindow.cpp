@@ -4,6 +4,7 @@
 #include "core/AppSettings.h"
 #include "core/Project.h"
 #include "export/ExportJob.h"
+#include "export/ExportQueue.h"
 #include "export/SizeEstimator.h"
 #include "media/DecodeWorker.h"
 #include "media/DiskCache.h"
@@ -132,6 +133,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     buildExport();
     buildProject();
     buildFinder();
+    buildBatch();
     registerProbes();
     registerMediaProbes();
     restoreLayout();
@@ -146,6 +148,17 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 
 MainWindow::~MainWindow() {
     removeAutosave(); // a clean exit leaves no autosave; a crash does (spec §11.1)
+    // The size estimate hands frames between the render thread and the export thread. With the batch, the export and
+    // the estimate gone, what each thread still holds runs out — render, export, render — before the export thread
+    // and its context go: a task left on the render thread would post to a deleted context.
+    queue_.reset();
+    exportJob_.reset();
+    estimator_.reset();
+    if (renderService_) {
+        renderService_->run([] {});
+        if (exportContext_) QMetaObject::invokeMethod(exportContext_.get(), [] {}, Qt::BlockingQueuedConnection);
+        renderService_->run([] {});
+    }
 }
 
 QWidget* MainWindow::buildTopBar() {

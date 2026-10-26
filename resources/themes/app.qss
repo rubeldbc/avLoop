@@ -260,6 +260,27 @@ QLabel[quiet="true"] {
     background: @accentSoft;
     color: @text;
 }
+/* The Batch Queue's entries */
+#BatchWindow QTreeWidget {
+    background: @bg;
+    border: 1px solid @border;
+    color: @text;
+    outline: none;
+}
+#BatchWindow QTreeWidget::item {
+    padding: 4px 2px;
+}
+#BatchWindow QTreeWidget::item:selected {
+    background: @accentSoft;
+    color: @text;
+}
+#BatchWindow QHeaderView::section {
+    background: @panel;
+    color: @text2;
+    border: none;
+    border-bottom: 1px solid @border;
+    padding: 4px 6px;
+}
 /* F1's list of shortcuts */
 #ShortcutOverlay {
     background: @panel;

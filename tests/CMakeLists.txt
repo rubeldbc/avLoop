@@ -38,6 +38,10 @@ endforeach()
 avloop_add_test(export-job SOURCES test-export-job.cpp Samples.h LIBS avloop_export)
 target_compile_definitions(test-export-job PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
 target_include_directories(test-export-job PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+# The batch queue: three entries in order, a failure, Pause, the queue file reopened.
+avloop_add_test(export-queue SOURCES test-export-queue.cpp Samples.h LIBS avloop_export)
+target_compile_definitions(test-export-queue PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
+target_include_directories(test-export-queue PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # The Loop Finder on synthetic fingerprints (and loop4s.mp4 when the samples are there).
 avloop_add_test(loopfinder SOURCES test-loopfinder.cpp Samples.h LIBS avloop_export)
 target_compile_definitions(test-loopfinder PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")

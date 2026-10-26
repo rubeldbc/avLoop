@@ -77,3 +77,8 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-48 | The keyframe acted on is the one at the playhead | §6.4 | `README.md` §3; AV-011 |
 | R-49 | No crop: the frame where the video stands at In; Alpha Auto over every keyframe | §1.3, §10.2 | `README.md` §3; AV-011 |
 | R-50 | The Finder's 0–100 score by the 95th percentile; ties to the shorter loop | §11.5 | `README.md` §3; AV-012 |
+| R-51 | Pause stops the entry under way (Pending again); a reopened queue waits for Start | §10.5 | `README.md` §3; AV-013 |
+| R-52 | Ctrl+Shift+E adds a snapshot, a free name; Export and the queue never at once | §10.5 | `README.md` §3; AV-013 |
+| R-53 | GIF: 1-bit alpha at 128, the palette of every frame, at most 50 fps | §10.4 | `README.md` §3; AV-013 |
+| R-54 | MP4: the preset's bitrate, h264_mf else OpenH264; ProRes its profile; GIF/APNG none | §10.4 | `README.md` §3; AV-013 |
+| R-55 | queue.json beside the settings, locked; a second AvLoop's queue not saved | §10.5 | `README.md` §3; AV-013 |

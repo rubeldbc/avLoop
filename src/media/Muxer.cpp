@@ -1,20 +1,23 @@
 #include "media/Muxer.h"
 
+#include "media/EncoderOptions.h"
+
 namespace avloop::media {
 
 Muxer::~Muxer() {
     close();
 }
 
-bool Muxer::open(const QString& path, const AVCodecContext* codec, bool alpha, QString* error) {
+bool Muxer::open(const QString& path, const AVCodecContext* codec, OutputFormat format, bool alpha, QString* error) {
     auto fail = [&](const QString& what, int r) {
         outOfSpace_ = r == AVERROR(ENOSPC);
         if (error) *error = QStringLiteral("%1: %2").arg(what, avError(r));
         close();
         return false;
     };
-    int r = avformat_alloc_output_context2(&fmt_, nullptr, "webm", path.toUtf8().constData());
-    if (r < 0 || !fmt_) return fail(QStringLiteral("webm"), r);
+    const char* container = containerName(format);
+    int r = avformat_alloc_output_context2(&fmt_, nullptr, container, path.toUtf8().constData());
+    if (r < 0 || !fmt_) return fail(QString::fromLatin1(container), r);
     stream_ = avformat_new_stream(fmt_, nullptr);
     if (!stream_) return fail(QStringLiteral("stream"), AVERROR(ENOMEM));
     r = avcodec_parameters_from_context(stream_->codecpar, codec);
@@ -23,10 +26,12 @@ bool Muxer::open(const QString& path, const AVCodecContext* codec, bool alpha, Q
     stream_->time_base = codec->time_base;
     stream_->avg_frame_rate = codec->framerate;
     // The Matroska muxer writes the AlphaMode element (and the alpha in BlockAdditions) only when told.
-    if (alpha) av_dict_set(&stream_->metadata, "alpha_mode", "1", 0);
+    if (alpha && QByteArray(container) == "webm") av_dict_set(&stream_->metadata, "alpha_mode", "1", 0);
     r = avio_open(&fmt_->pb, path.toUtf8().constData(), AVIO_FLAG_WRITE);
     if (r < 0) return fail(QStringLiteral("open %1").arg(path), r);
-    r = avformat_write_header(fmt_, nullptr);
+    AVDictionary* options = muxerOptions(format);
+    r = avformat_write_header(fmt_, &options);
+    av_dict_free(&options);
     if (r < 0) return fail(QStringLiteral("header"), r);
     headerWritten_ = true;
     return true;

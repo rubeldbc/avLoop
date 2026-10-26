@@ -1,13 +1,15 @@
 #pragma once
 
+#include "core/QualitySettings.h"
 #include "media/FfmpegPtr.h"
 
 #include <QString>
 
 namespace avloop::media {
 
-// The WebM container around an encoded loop (spec §10.1): one video stream copied from the encoder's parameters,
-// `alpha_mode` set when the frames carry alpha, packets rescaled from the encoder's time base, no audio.
+// The container around an encoded loop (spec §10.1, §10.4): WebM, GIF, APNG, MP4 or MOV by the format, one video
+// stream copied from the encoder's parameters, WebM's `alpha_mode` set when the frames carry alpha, the container's
+// options (GIF loop=0, APNG plays=0, MP4 +faststart), packets rescaled from the encoder's time base, no audio.
 class Muxer {
 public:
     Muxer() = default;
@@ -15,7 +17,8 @@ public:
     Muxer(const Muxer&) = delete;
     Muxer& operator=(const Muxer&) = delete;
 
-    bool open(const QString& path, const AVCodecContext* codec, bool alpha, QString* error = nullptr);
+    bool open(const QString& path, const AVCodecContext* codec, OutputFormat format, bool alpha,
+              QString* error = nullptr);
     bool write(AVPacket* packet, QString* error = nullptr);
     bool finish(QString* error = nullptr);
     void close();                                   // without the trailer

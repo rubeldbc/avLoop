@@ -6,6 +6,30 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-013 — The batch and the other formats (AV-013, 2026-10-26)
+
+- Output → Format offers WebM VP9, WebM VP8, GIF, APNG, MP4 H.264 and MOV ProRes 4444; one this FFmpeg cannot write is
+  disabled with the reason. GIF: `palettegen` (stats diff, 255 colours and a transparent one) over every frame in a
+  first pass, then `paletteuse` (Bayer, scale 3) with alpha cut at 128, `-loop 0`, at most 50 fps (the Output
+  section says so); APNG in RGBA, `-plays 0`; MP4 by `h264_mf` (Media Foundation; OpenH264 if it cannot open),
+  yuv420p BT.709, one GOP, no B-frames, the preset's bitrate, the Background colour behind, `+faststart`; ProRes by
+  `prores_ks` profile 4444 in yuva444p10le. Quality applies to WebM, and to MP4 by its bitrate; the Quality section
+  says that ProRes's profile sets its quality and that GIF and APNG have none. The check after writing reads each codec (GIF's rate is not read back; alpha by
+  the decoded frame, WebM by its alpha_mode too). Readings R-53, R-54.
+- The batch queue (`export/ExportQueue`): entries = a project snapshot + the file; Start runs them one at a time on the
+  window's render and export threads (Export waits meanwhile; the queue does not start while Export runs); a failure
+  keeps its reason and the next one runs; Pause stops the entry under way, which is Pending again; `queue.json`
+  beside the settings, locked, saved at every change; after a restart, unfinished entries are Pending. Ctrl+Shift+E
+  (Menu → Add to Batch Queue, the window's Add current) adds the project as it is, written where Export would suggest
+  (the last export's name, else the template in the export folder; the format's extension), never over a file already
+  there. Menu → Batch Queue opens the window: name, format, size, state, progress;
+  drag to reorder; Add current, Remove, Clear done, Pause, Start. Readings R-51, R-52, R-55.
+- `avloop-cli export … --format webm-vp9|webm-vp8|gif|apng|mp4-h264|mov-prores`; its PASS line names the encoder.
+- The bundled FFmpeg 7.1 (LGPL) has `h264_mf`, `libopenh264`, `gif`, `apng`, `prores_ks` and the palette
+  filters: every format is available on this build.
+- Measured (400×280, 3 s at 30 fps, an ellipse): GIF 1.24 MB in 1.1 s (two passes), APNG 2.9 MB in 1.7 s, MP4 0.41 MB
+  in 0.5 s (h264_mf), ProRes 9.0 MB in 1.6 s; a batch of three (ProRes, VP9, GIF at 640×360) in 18 s.
+
 ### D-012 — The Loop Finder (AV-012, 2026-10-26)
 
 - Menu → Loop Finder and Ctrl+L (with a video open) open its window: Search In–Out ± 5 s or the whole file, Length

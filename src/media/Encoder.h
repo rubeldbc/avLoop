@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <memory>
 
+struct AVFrame;
 struct AVPacket;
 
 namespace avloop::media {
@@ -31,10 +32,12 @@ struct EncodeSettings {
     int lagInFrames = 25; // VP9's look-ahead (§10.3); a short encode needs no more than its frames
 };
 
-// The WebM encoder AvLoop writes loops with (spec §10.1–§10.3; reading R-14 — Encoded preview first, Export at AV-009):
-// premultiplied RGBA frames in, made straight and converted to yuva420p (yuv420p without alpha; limited range, BT.709
-// for VP9 and BT.601 for VP8, tagged), libvpx-vp9 or libvpx with §10.3's parameters, pts = k in 1/fps, the first frame
-// a keyframe, the loop one GOP, no audio; the WebM muxer marks the alpha. Not thread-safe; one thread drives it.
+// The encoder AvLoop writes loops with (spec §10.1–§10.4): premultiplied RGBA frames in, made straight, then for
+// WebM yuva420p (yuv420p without alpha; limited range, BT.709 for VP9, BT.601 for VP8, tagged) through libvpx-vp9 or
+// libvpx with §10.3's parameters; GIF through its palette (two passes: the palette of every frame, then each frame
+// mapped onto it; one pass takes the first frame's); APNG as RGBA; MP4 H.264 by Media Foundation (OpenH264 when it
+// cannot); MOV ProRes 4444 in yuva444p10le. pts = k in 1/fps, the first frame a keyframe, no audio; WebM marks the
+// alpha. Not thread-safe; one thread drives it.
 class Encoder {
 public:
     explicit Encoder(const EncodeSettings& settings);
@@ -51,10 +54,11 @@ public:
     // Closes without finishing and deletes the file (a cancel or an error).
     void abort();
     int written() const { return written_; }
-    std::int64_t bytes() const { return bytes_; }       // the packets so far, alpha included
-    std::int64_t keyBytes() const { return keyBytes_; } // of which keyframes
-    QByteArray stats() const { return stats_; }         // pass 1's statistics, after finish()
-    bool outOfSpace() const { return outOfSpace_; }     // a write failed for want of disk space
+    std::int64_t bytes() const { return bytes_; }        // the packets so far, alpha included
+    std::int64_t keyBytes() const { return keyBytes_; }  // of which keyframes
+    QByteArray stats() const { return stats_; }          // pass 1's statistics, after finish()
+    bool outOfSpace() const { return outOfSpace_; }      // a write failed for want of disk space
+    QString encoderUsed() const { return encoderUsed_; } // "h264_mf", or its fallback "libopenh264" …
     const EncodeSettings& settings() const { return settings_; }
 
     struct State;
@@ -68,6 +72,9 @@ private:
     QByteArray stats_;
     bool outOfSpace_ = false;
     std::unique_ptr<State> s_;
+    QString encoderUsed_;
+    bool openCodec(QString* error);
+    bool send(AVFrame* frame, QString* error); // null: the flush
     bool put(AVPacket* packet, QString* error);
     void close();
 };

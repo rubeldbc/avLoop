@@ -21,6 +21,7 @@ add_library(avloop_media STATIC
     media/DecodeWorker.h media/DecodeWorker.cpp media/ThumbnailWorker.h media/ThumbnailWorker.cpp
     media/Interpolator.h media/Interpolator.cpp media/FrameIndex.h media/FrameIndex.cpp media/WorkerThread.h
     media/Encoder.h media/Encoder.cpp media/EncoderOptions.h media/EncoderOptions.cpp media/Muxer.h media/Muxer.cpp
+    media/GifPalette.h media/GifPalette.cpp
     media/SystemMemory.h media/SystemMemory.cpp)
 target_link_libraries(avloop_media
     PUBLIC avloop_core Qt6::Core
@@ -37,7 +38,7 @@ target_link_libraries(avloop_render PUBLIC avloop_core avloop_media Qt6::Gui Qt6
 add_library(avloop_export STATIC
     export/FormatProfiles.h export/FormatProfiles.cpp export/OutputVerify.h export/OutputVerify.cpp
     export/ExportJob.h export/ExportJob.cpp export/SizeEstimator.h export/SizeEstimator.cpp
-    export/LoopFinder.h export/LoopFinder.cpp)
+    export/LoopFinder.h export/LoopFinder.cpp export/ExportQueue.h export/ExportQueue.cpp)
 target_link_libraries(avloop_export PUBLIC avloop_core avloop_media avloop_render
     PRIVATE Qt6::Concurrent FFmpeg::avformat FFmpeg::avcodec FFmpeg::avutil FFmpeg::swscale avloop_warnings)
 
@@ -47,7 +48,7 @@ add_library(avloop_ui STATIC
     ui/dialogs/SettingsDialog.h ui/dialogs/SettingsDialog.cpp ui/dialogs/AboutDialog.h ui/dialogs/AboutDialog.cpp
     ui/dialogs/ShortcutOverlay.h ui/dialogs/ShortcutOverlay.cpp
     ui/export/ExportBar.h ui/export/ExportBar.cpp ui/export/LoopFinderWindow.h ui/export/LoopFinderWindow.cpp
-    ui/MainWindowFinder.cpp
+    ui/MainWindowFinder.cpp ui/MainWindowBatch.cpp ui/export/BatchWindow.h ui/export/BatchWindow.cpp
     ui/preview/PreviewWindow.h ui/preview/PreviewWindow.cpp ui/preview/PreviewWidgets.h ui/preview/PreviewWidgets.cpp
     ui/preview/PreviewPlayer.h ui/preview/PreviewPlayer.cpp ui/preview/PreviewEncode.cpp
     ui/WalkRunner.h ui/WalkRunner.cpp ui/WalkSteps.cpp
@@ -71,7 +72,7 @@ add_library(avloop_ui STATIC
     ui/timeline/PlaybackClock.h ui/timeline/PlaybackClock.cpp)
 target_link_libraries(avloop_ui
     PUBLIC avloop_core avloop_media avloop_render avloop_export Qt6::Widgets Qt6::Svg Qt6::OpenGLWidgets Qt6::Test Qt6::Concurrent
-    PRIVATE avloop_warnings)
+    PRIVATE Qt6::GuiPrivate avloop_warnings) # GuiPrivate: the walk runner's application state (WalkRunner.cpp)
 
 set(AVLOOP_RC "")
 if(EXISTS ${CMAKE_SOURCE_DIR}/resources/app/avloop.ico)

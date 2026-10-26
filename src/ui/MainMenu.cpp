@@ -44,7 +44,10 @@ void MainWindow::buildMenu() {
     QAction* redo = entry(menu_, QStringLiteral("action.redo"), tr("Redo"), QKeySequence(Qt::CTRL | Qt::Key_Y),
                           QStringLiteral("redo"));
     menu_->addSeparator();
-    QAction* batch = entry(menu_, QStringLiteral("action.batch"), tr("Batch Queue…"), {}, QStringLiteral("batch"));
+    entry(menu_, QStringLiteral("action.batch"), tr("Batch Queue…"), {},
+          QStringLiteral("batch")); // MainWindowBatch.cpp
+    entry(menu_, QStringLiteral("action.batchAdd"), tr("Add to Batch Queue"),
+          QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_E));
     entry(menu_, QStringLiteral("action.finder"), tr("Loop Finder…"), QKeySequence(Qt::CTRL | Qt::Key_L),
           QStringLiteral("finder")); // MainWindowFinder.cpp
 
@@ -71,8 +74,8 @@ void MainWindow::buildMenu() {
     QAction* exit = entry(menu_, QStringLiteral("action.exit"), tr("Exit"));
     connect(exit, &QAction::triggered, this, &QWidget::close);
 
-    // The Batch Queue is built later; Undo and Redo follow the stack.
-    for (QAction* a : {undo, redo, batch})
+    // Undo and Redo follow the stack.
+    for (QAction* a : {undo, redo})
         a->setEnabled(false);
     for (QAction* a : menu_->actions())
         addAction(a);

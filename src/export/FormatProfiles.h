@@ -9,7 +9,8 @@
 namespace avloop::exporting {
 
 // What each output format is (spec §10.2, §10.4): its name, its file extension, whether it carries alpha, its highest
-// rate. WebM VP9 and VP8 now; GIF, APNG, MP4 and ProRes join at AV-013.
+// rate — WebM VP9 and VP8, GIF (1-bit alpha, at most 50 fps), APNG, MP4 H.264 (no alpha: the Background under) and
+// MOV ProRes 4444.
 struct FormatProfile {
     OutputFormat format = OutputFormat::WebmVp9;
     QString name;      // "WebM VP9"
@@ -20,6 +21,8 @@ struct FormatProfile {
 
 const QList<FormatProfile>& formatProfiles();
 const FormatProfile& profileOf(OutputFormat format);
+// Whether this FFmpeg build has the format's encoder (MP4: Media Foundation's or OpenH264); `reason` when it has not.
+bool available(OutputFormat format, QString* reason = nullptr);
 // The name template (Settings → Export; spec §10.1's "<source>_loop_<W>x<H>") filled in: {source}, {w}, {h}; then
 // the format's extension.
 QString defaultFileName(const QString& sourcePath, QSize size, OutputFormat format,
