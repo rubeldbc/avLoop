@@ -1,0 +1,10 @@
+PASS simple: frame 40, GPU against CPU: frame 40 of 90 · 640x360 · simple · GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 · 52 ms → simple-gpu.png | CPU agrees: mean 0.0000, max 0
+PASS crossfade: frame 74, GPU against CPU: frame 74 of 75 · 640x360 · crossfade · GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 · 72 ms → crossfade-gpu.png | CPU agrees: mean 0.0026, max 1
+PASS pingpong: frame 120, GPU against CPU: frame 120 of 178 · 640x360 · pingpong · GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 · 58 ms → pingpong-gpu.png | CPU agrees: mean 0.0000, max 0
+PASS pingpong-smooth: frame 3, GPU against CPU: frame 3 of 178 · 640x360 · pingpong-smooth · GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 · 57 ms → pingpong-smooth-gpu.png | CPU agrees: mean 0.0031, max 1
+PASS rect-crop: frame 10, GPU against CPU: frame 10 of 90 · 300x200 · simple · GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 · 39 ms → rect-crop-gpu.png | CPU agrees: mean 0.0191, max 1
+PASS ellipse-feather: frame 10, GPU against CPU: frame 10 of 90 · 280x280 · simple · GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 · 40 ms → ellipse-feather-gpu.png | CPU agrees: mean 0.0072, max 1
+PASS rounded-flip: frame 20, GPU against CPU: frame 20 of 90 · 400x240 · simple · GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 · 42 ms → rounded-flip-gpu.png | CPU agrees: mean 0.0001, max 1
+PASS frame-blend-half-speed: frame 7, GPU against CPU: frame 7 of 180 · 640x360 · simple · GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 · 39 ms → frame-blend-half-speed-gpu.png | CPU agrees: mean 0.0700, max 1
+PASS motion-60fps: frame 7, GPU against CPU: frame 7 of 180 · 640x360 · simple · GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 · 8 ms → motion-60fps-gpu.png | CPU agrees: mean 0.0000, max 0
+WALK PASSED

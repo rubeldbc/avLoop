@@ -17,13 +17,13 @@
 AvLoop is a Windows desktop app (C++20, Qt 6, FFmpeg). You choose a time range (In to Out) and a screen area (the
 crop — a rectangle, a rounded rectangle or an ellipse) of any video, and AvLoop turns it into a **seamless looping
 WebM with transparency**, sized for OBS's Media Source — up to 1080p, with crossfade or ping-pong loops, adjustable
-frame rate and quality, and a preview that shows exactly what will be exported.
+frame rate and quality, and a preview that shows exactly what will be exported. GIF, APNG, MP4 and ProRes 4444 too.
 
-> **Status: early development (v0.1).** AvLoop is built in public, phase by phase
-> ([the plan](phases/26-10-26-034934-AvLoop/README.md)). The feature list below says only what works today; everything
-> else is on the [roadmap](#roadmap).
+> **v1.0.0** — every item of the specification is built and walked
+> ([the plan](phases/26-10-26-034934-AvLoop/README.md) and its execution records).
+> **[Download the installer](https://github.com/rubeldbc/avLoop/releases/tag/v1.0.0)** for Windows 10/11 x64.
 
-## Features — working today
+## Features
 
 - A compact window that opens maximized: the top bar (Open, Preview, Export only), the tool rail, the canvas with a
   drop zone, the side panel's Crop / Loop / Output / Quality sections (collapsible, remembered), the timeline's
@@ -133,11 +133,11 @@ frame rate and quality, and a preview that shows exactly what will be exported.
   `avloop-cli find <video|project>` for scripts; `avloop-cli version` shows the FFmpeg build in use and refuses a
   GPL build.
 
-## Roadmap
+## What is not in v1.0.0
 
-Built in this order (each line is a phase of [the plan](phases/26-10-26-034934-AvLoop/control/01_PHASE_DEPENDENCY_GRAPH.md)):
-
-1. Everything walked once more on a fresh build, installed by the installer, and the v1.0.0 release.
+Audio, output above 1080p, a rotation tool, colour correction, text or stickers, several layers or crop areas, keyframes
+of the crop, macOS or Linux, an auto-updater, licence keys, telemetry and code signing are outside this version's specification
+(`docs/SPEC.md` §1.3).
 
 ## Using a loop in OBS
 
@@ -149,8 +149,8 @@ WebM is the format for OBS. MOV ProRes 4444 keeps the alpha too, at many times t
 
 ## Download and install
 
-The installer (`AvLoop-<version>-setup.exe`, about 45 MB) arrives with v1.0.0 on the
-[Releases](https://github.com/rubeldbc/avLoop/releases) page; until then, build it from source (below).
+Download `AvLoop-1.0.0-setup.exe` (about 45 MB) from the
+[v1.0.0 release](https://github.com/rubeldbc/avLoop/releases/tag/v1.0.0) — its SHA-256 is beside it — and run it.
 
 - It installs for you alone (no administrator needed) or, if you choose, for everyone on the PC; it adds a Start menu
   entry, optionally a desktop icon, and opens `.avloop` projects with a double-click.
@@ -175,7 +175,7 @@ scripts\deploy.ps1 -NoBuild                # deploy\: what the installer install
 
 Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Keyboard shortcuts (working today)
+## Keyboard shortcuts
 
 | Action | Shortcut |
 | --- | --- |

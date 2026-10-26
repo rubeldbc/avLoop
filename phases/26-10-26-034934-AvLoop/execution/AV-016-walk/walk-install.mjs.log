@@ -1,0 +1,19 @@
+PASS scripts\deploy.ps1: Deployed AvLoop 1.0.0 in I:\AvLoop\deploy: 37 files, 141.2 MB
+PASS deploy: the VC++ runtime beside, no network module, no FFmpeg tools: 31 entries
+PASS ISCC installer\AvLoop.iss: AvLoop-1.0.0-setup.exe, 44.8 MB
+PASS installed (per user, silent): exit 0, 33 entries
+PASS the licences installed: GPL-3.0.txt, LGPL-3.0.txt, LICENSE-THIRD-PARTY.md, LICENSE.txt
+PASS .avloop → AvLoop.Project → "avloop.exe" "%1": "…\app\avloop.exe" "%1"
+PASS its icon: the app's: "…\app\avloop.exe",0
+PASS the Start menu entry: AvLoop.lnk
+PASS Apps & features lists it with its version: AvLoop 1.0.0
+PASS the installed app starts and draws: startup: 543 ms
+PASS shot …\installed.png
+PASS the association opens the project: PASS expect window.title: AvLoop — opened-by-double-click.avloop · PASS expect crop.kind: ellipse
+PASS the program folder gone: after 0 ms
+PASS the association gone: .avloop and AvLoop.Project
+PASS the Start menu entry gone: gone
+PASS the uninstall entry gone: Apps & features
+PASS the autosave, logs and disk cache gone: ~\AppData\Local\AvLoop gone, ~\AppData\Local\cache\AvLoop gone
+PASS the settings folder kept (%APPDATA%\AvLoop): kept
+WALK PASSED

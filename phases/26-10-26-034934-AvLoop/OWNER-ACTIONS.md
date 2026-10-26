@@ -12,7 +12,7 @@ read and open for a veto later; an answer that differs changes the reading in it
 | 3 | Install the tools on this PC. | Qt by aqtinstall, `gh` and Inno Setup by winget, FFmpeg by `fetch-deps.ps1`. | **Given** — spec §2.8 item 5 |
 | 4 | The credentials `gh` uses. | Git's credential manager's token passed per command (R-12). | **Decided by the agent** — §2.9 names the machine's credentials; `gh auth` was not logged in; nothing stored |
 | 5 | Code signing. | None. | **Closed — the owner: "No code signing"** |
-| 6 | The GitHub Release `v1.0.0`. | At CP-B1, with the installer (R-5). | **Decided by the agent** — the README's Download link must work |
+| 6 | The GitHub Release `v1.0.0`. | At CP-B1, with the installer (R-5). | **Taken at CP-B1 (AV-016)** — the installer and its SHA-256; the README's Download link works |
 | 7 | Where the owner's original specification and mock live. | Left untracked where the owner put them; copies in `docs/` (R-11). | **Decided by the agent** — never move the owner's files |
 | 8 | FFmpeg 7.1 from a dated release. | `n7.1.5` pinned, newest-7.1 fallback (R-9). | **Decided by the agent** — `latest` no longer carries 7.1 |
 | 9 | Qt 6.8's patch release. | 6.8.3 (R-10). | **Decided by the agent** — the last open-source 6.8 LTS patch |
@@ -28,6 +28,8 @@ read and open for a veto later; an answer that differs changes the reading in it
 | 19 | **R-15** Animated WebP refused (no FFmpeg decodes it). | `README.md` §3 15; AV-002. | Decided by the agent (AV-002); open for a veto — a WebP decoder of AvLoop's own would be a new item |
 | 20 | **R-16** The working size before a crop. | `README.md` §3 16; AV-002. | Decided by the agent (AV-002); open for a veto |
 | 21 | **R-17 … R-20** QUndoStack in core; Reset at (0,0); Fit without a crop; the border with the Selection. | `README.md` §3 17 … 20; AV-003. | Decided by the agent (AV-003); open for a veto |
+| 32 | **R-56 … R-58** Per-user install by default; what uninstalling keeps; no network module, the version from the exe. | `README.md` §3 56 … 58; AV-014. | Decided by the agent (AV-014); open for a veto |
+| 31 | **R-51 … R-55** Pause restarts the entry; Ctrl+Shift+E's snapshot and free name; GIF's rules; MP4's bitrate; queue.json locked. | `README.md` §3 51 … 55; AV-013. | Decided by the agent (AV-013); open for a veto |
 | 30 | **R-50** The Loop Finder's score and its ties. | `README.md` §3 50; AV-012. | Decided by the agent (AV-012); open for a veto |
 | 29 | **R-47 … R-49** Flips hold; the keyframe at the playhead is the one acted on; no crop: the frame at In. | `README.md` §3 47 … 49; AV-011. | Decided by the agent (AV-011); open for a veto |
 | 28 | **R-45, R-46** The Debug leak gate by heap growth; ASan judges errors, Release the growth. | `README.md` §3 45, 46; AV-015. | Decided by the agent (AV-015); open for a veto |

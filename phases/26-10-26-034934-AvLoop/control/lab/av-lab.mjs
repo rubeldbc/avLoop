@@ -16,9 +16,10 @@ const tool = (name) => (fs.existsSync(path.join(FFBIN, `${name}.exe`)) ? path.jo
 export const ffmpegExe = tool('ffmpeg');
 export const ffprobeExe = tool('ffprobe');
 
-/** The built binary: build/bin/<name>.exe (scripts/build.ps1's layout). */
+/** The binary walks run: build/bin/<name>.exe (scripts/build.ps1's layout), or AVLOOP_BIN_DIR's — an installed AvLoop
+ * (CP-B1 walks the installed app). */
 export function bin(name) {
-  return path.join(REPO, 'build', 'bin', `${name}.exe`);
+  return path.join(process.env.AVLOOP_BIN_DIR || path.join(REPO, 'build', 'bin'), `${name}.exe`);
 }
 
 /** Runs a command; returns { status, out, err, stdout (Buffer when raw) }. */

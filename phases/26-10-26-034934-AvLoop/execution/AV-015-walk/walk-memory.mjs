@@ -4,7 +4,8 @@
 // and this walk, run once it has ended, reads its memory log phase by phase (the walk's labels carry the same clock):
 // after warm-up — a minute of playback, the first export, the first Preview — Private Bytes grow < 50 MB and VRAM
 // < 32 MB: playback's 10th minute against its 2nd, the 3rd export against the 2nd, the later Previews against the
-// 2nd, and the app at rest at the end against the pause after the 1st export.
+// 2nd, and the app at rest at the end against the pause after the 1st export. Sampled every 200 ms: an export lasts
+// about 2 s and its GPU peak less than a second, which a sample a second can miss (CP-B1 found it).
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
@@ -44,7 +45,7 @@ if (process.argv[2] === 'start') {
   const script = path.join(RUN, 'memory.json');
   fs.writeFileSync(script, JSON.stringify({ delay: 120, settle: 800, steps }));
   // The app runs on its own; a small cmd marks when it has ended (its verdict is in out.txt).
-  const cmd = `"${lab.bin('avloop')}" --walk "${script}" --walk-out "${RUN}" --mem-log "${csv}" > "${path.join(RUN, 'out.txt')}" 2>&1 & echo ended > "${done}"`;
+  const cmd = `"${lab.bin('avloop')}" --walk "${script}" --walk-out "${RUN}" --mem-log "${csv}" --mem-log-ms 200 > "${path.join(RUN, 'out.txt')}" 2>&1 & echo ended > "${done}"`;
   const child = spawn('cmd.exe', ['/d', '/s', '/c', `"${cmd}"`], { cwd: lab.REPO, detached: true, stdio: 'ignore', windowsHide: true, windowsVerbatimArguments: true });
   child.unref();
   console.log('STARTED the memory run (about 12 minutes)');

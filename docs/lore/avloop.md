@@ -285,3 +285,12 @@ end of its section.
 - **An install walk changes the owner's machine**: it installs per user into a temporary folder, reads and runs what the
   registry holds, and uninstalls; the owner's AvLoop folders (which uninstalling removes) are copied aside first and
   put back, and a marker proves the settings folder stays. (AV-014)
+
+## The checkpoint (CP-B1)
+
+- **A peak shorter than the sampling interval can be missed**: the memory walk compared each export's peak with one
+  sample a second; an export lasts about 2 s and its GPU peak under one, so the 2nd export's peak (372 MB, as the 3rd's)
+  fell between samples and read 309 MB — a false "+63 MB". Rule: a walk that compares peaks samples faster than the
+  peak lasts (`--mem-log-ms 200`); the limits stay. (AV-016)
+- **The installed app is the one walked**: `AVLOOP_BIN_DIR` points every walk at an installed AvLoop instead of
+  `build/bin`; a lab run of it keeps its data in its temp folder as the build's does. (AV-016)

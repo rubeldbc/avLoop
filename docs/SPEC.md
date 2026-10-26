@@ -6,6 +6,18 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### CP-B1 — The whole walked, v1.0.0 (AV-016, 2026-10-26)
+
+- Version 1.0.0 (the root CMakeLists.txt; the About box, avloop.exe's VERSIONINFO, the installer).
+- Items 1–14 checked on one fresh Release build installed by its own installer: every unit test, the same under
+  AddressSanitizer and in Debug with the leak gate; every phase's walk run against the installed app
+  (`AVLOOP_BIN_DIR`), the GPU-off set, the 10-minute memory walk, the install walk (S15), the README's pictures taken
+  from the installed app.
+- Correction it delivered: the memory log can sample faster (`avloop.exe --mem-log <file> --mem-log-ms N`, at least
+  100 ms; a second by default), and the memory walk compares export peaks at 200 ms — a sample a second missed an
+  export's brief GPU peak.
+- The GitHub Release `v1.0.0` carries `AvLoop-1.0.0-setup.exe` and its SHA-256 (reading R-5).
+
 ### D-014 — The installer (AV-014, 2026-10-26)
 
 - `scripts\deploy.ps1` (or `cmake --build build --target deploy`): a Release build → `deploy\` with avloop.exe,

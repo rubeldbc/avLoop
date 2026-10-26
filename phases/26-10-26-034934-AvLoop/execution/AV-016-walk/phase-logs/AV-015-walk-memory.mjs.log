@@ -1,0 +1,11 @@
+PASS the run: playback, 3 exports, 5 Previews, idle: every step passed
+PASS playback, Private Bytes: the 10th minute against the 2nd: peaks 606 MB → 596 MB (-9.8 MB, limit 50)
+PASS playback, VRAM: the 10th minute against the 2nd: peaks 158 MB → 158 MB (-0.2 MB, limit 32)
+PASS exports, Private Bytes: the 3rd against the 2nd: peaks 1156 MB → 1154 MB (-1.8 MB, limit 50)
+PASS exports, VRAM: the 3rd against the 2nd: peaks 372 MB → 372 MB (+0.0 MB, limit 32)
+PASS Previews, Private Bytes: the 3rd–5th against the 2nd: peaks 1007 MB → 1018 MB (+10.9 MB, limit 50)
+PASS Previews, VRAM: the 3rd–5th against the 2nd: peaks 372 MB → 372 MB (+0.0 MB, limit 32)
+PASS at rest, Private Bytes: the end against the pause after the 1st export: floors 691 MB → 624 MB (-67.0 MB, limit 50)
+PASS at rest, VRAM: the end against the pause after the 1st export: floors 309 MB → 307 MB (-1.8 MB, limit 32)
+     662 samples over 11.0 minutes; playback 594 MB–596 MB; the highest 1156 MB, VRAM 372 MB; at rest after it all 624 MB, VRAM 307 MB
+WALK PASSED

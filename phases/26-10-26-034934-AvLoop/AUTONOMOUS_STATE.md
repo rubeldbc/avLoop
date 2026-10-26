@@ -2,15 +2,16 @@
 
 Program: AVLOOP
 Programme version: 1.0.0
-State: **STARTED 2026-10-26** on the owner's specification (*AvLoop — Software Specification*, Oct 26, 2026; its §2.8
+State: **COMPLETE 2026-10-26** — every phase DONE, `v1.0.0` released (AV-016).
+Was: **STARTED 2026-10-26** on the owner's specification (*AvLoop — Software Specification*, Oct 26, 2026; its §2.8
 "The go-ahead is given") and the owner's word "start". Was: **PLANNED 2026-10-26, 03:49 (Asia/Dhaka).** The owner's
 words: *"I want to build a piece of software called AvLoop. Its main job is to take any video, cut it at a specific
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: AV-016
-Next eligible: AV-016 (in progress)
-Completed: 15 of 16
+Active phase: none
+Next eligible: none — every phase is closed
+Completed: 16 of 16
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -59,7 +60,23 @@ where `--shot` and `--walk` open their window for seconds and close it.
 
 ## Completion record
 
+**The programme, complete (2026-10-26).** All fourteen items of the specification are built, in sixteen phases, each
+closed with its gates, its own walk and its record, and pushed with CI green; the two checkpoints walked every
+situation (S1–S13 on a fresh build at CP-A1; S1–S15 on the installed 1.0.0 at CP-B1). AvLoop 1.0.0: any video in;
+In/Out and a rectangle, rounded or ellipse crop with feather; the GPU canvas and the Selection; the frame-accurate
+timeline with playback; four loop modes, Speed and three FPS methods; one FrameRenderer for preview and export (GPU
+with a CPU twin); the Preview window, Live and Encoded; VP9/VP8 alpha WebM checked after writing, Target size, the
+estimate; GIF, APNG, MP4 H.264 (Media Foundation) and MOV ProRes 4444; the batch queue; keyframes; the Loop Finder;
+projects, autosave and recovery, presets, Settings, logs and minidumps; `avloop-cli`; the Inno Setup installer with
+the `.avloop` association; the GitHub Release `v1.0.0` with the installer and its SHA-256.
+
+Readings taken: R-1 … R-58 (`README.md` §3; `DECISIONS.md`; `OWNER-ACTIONS.md`) — every one open for the owner's
+veto. Dropped: nothing the specification names. Not done, and why: OBS itself was never driven (S11's second half needs
+obs-websocket, not on this PC; the libvpx half passes); no code signing (§1.3, the owner's word). `BLOCKED_EXTERNAL`:
+none. Waiting legs: none.
+
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-016** DONE 2026-10-26 — CP-B1: everything walked on the installed 1.0.0 — unit, ASan, Debug leaks, every walk, the memory walk, GPU off, S15; the Release v1.0.0 Record: `execution/AV-016-EXECUTION.md`.
 - **AV-014** DONE 2026-10-26 — A Windows installer: Inno Setup 6, per user or every user, the .avloop association, a clean uninstall Record: `execution/AV-014-EXECUTION.md`.
 - **AV-013** DONE 2026-10-26 — GIF, APNG, MP4 H.264 and MOV ProRes 4444 besides WebM; a batch queue that survives a restart Record: `execution/AV-013-EXECUTION.md`.
 - **AV-012** DONE 2026-10-26 — The Loop Finder: fingerprints, every pair scored in parallel, the best five, the window and avloop-cli find Record: `execution/AV-012-EXECUTION.md`.

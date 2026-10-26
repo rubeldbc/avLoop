@@ -1,0 +1,5 @@
+PASS AV-009-walk/walk-export.mjs with the GPU off: 49 checks passed
+PASS AV-009-walk/walk-loops.mjs with the GPU off: 31 checks passed
+PASS AV-009-walk/walk-fps.mjs with the GPU off: 62 checks passed
+PASS the exports were made on the CPU: 6 exports, renderer: 
+WALK PASSED

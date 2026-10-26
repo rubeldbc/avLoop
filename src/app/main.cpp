@@ -2,7 +2,8 @@
 //   --shot <file.png> [--theme navy|black] [--tool <id>]   open maximized, grab the window, exit
 //   --walk <script.json> --walk-out <folder>               replay a walk on the real widgets, exit with its verdict
 //   --scale <factor>                                       the display scale (S1 at 100/150/200%)
-//   --mem-log <file>                                       Private Bytes, VRAM and the cache every second (spec §3.7.8)
+//   --mem-log <file> [--mem-log-ms N]                      Private Bytes, VRAM and the cache every second, or every
+//                                                          N ms (100 or more; spec §3.7.8)
 // In lab mode the settings, the autosave and the logs live in a temporary folder (or AVLOOP_DATA_DIR), never the
 // owner's.
 #include "app/Diagnostics.h"
@@ -27,6 +28,7 @@
 #include <QTemporaryDir>
 #include <QTimer>
 
+#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <memory>
@@ -82,7 +84,9 @@ int main(int argc, char** argv) {
                                      QStringLiteral("file.avloop"));
     const QCommandLineOption memLog(QStringLiteral("mem-log"), QStringLiteral("Log memory every second."),
                                     QStringLiteral("file"));
-    cli.addOptions({shot, walk, walkOut, theme, tool, scale, project, memLog});
+    const QCommandLineOption memLogMs(QStringLiteral("mem-log-ms"), QStringLiteral("The memory log's interval."),
+                                      QStringLiteral("ms"));
+    cli.addOptions({shot, walk, walkOut, theme, tool, scale, project, memLog, memLogMs});
     cli.addPositionalArgument(QStringLiteral("file"), QStringLiteral("A video or project to open."));
     cli.process(app);
 
@@ -126,7 +130,8 @@ int main(int argc, char** argv) {
     // asks for the offer itself ("recover"), after its answer.
     if (!lab) QTimer::singleShot(0, &window, [&window] { window.offerRecovery(); });
 
-    // --mem-log: one line a second — ms since start, Private Bytes, VRAM, cache (MB).
+    // --mem-log: one line a second (or every --mem-log-ms) — ms since start, Private Bytes, VRAM, cache (MB). A peak
+    // shorter than the interval can fall between two lines: a walk that compares peaks asks for a shorter one.
     QFile memFile;
     QTimer memTimer;
     if (cli.isSet(memLog)) {
@@ -143,7 +148,7 @@ int main(int argc, char** argv) {
                                   .toLatin1());
                 memFile.flush();
             });
-            memTimer.start(1000);
+            memTimer.start(std::max(100, cli.isSet(memLogMs) ? cli.value(memLogMs).toInt() : 1000));
         }
     }
 
