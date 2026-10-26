@@ -310,3 +310,18 @@ end of its section.
   250 ms later; under load it was not open yet ("Theme" not found), and the shell walk once read the window before it
   was maximized. Rule: the step looks again for two seconds; a state the window reaches by itself is waited for
   (`waitFor`), not sampled once. (AV-017)
+
+## The wheel and the keyframe copy (late)
+
+- **A wheel event is not a notch**: a precision touchpad or a free-spinning wheel sends many small `angleDelta`s; a
+  zoom step an event would race through 10 … 800 %. Rule: add the deltas up to `QWheelEvent::DefaultDeltasPerStep`
+  and step once a notch; a turn the other way clears the count. (AV-018)
+- **A drag that tracks its keyframe by time can grab another**: refused over another keyframe, the drag looked up
+  "the keyframe at the pointer's time" and found the other one, which it then moved. Rule: the drag follows its own
+  keyframe only when the move (or copy) was taken — the keyframes changed — and stays put when refused. (AV-018)
+- **One Undo step across two kinds of command needs one id**: a copy and the moves that follow are one gesture, but
+  `QUndoCommand::mergeWith` merges only equal ids. Rule: the copy pushes with MoveKeyframe's id and the drag's merge
+  key; its text stays "Copy a keyframe". (AV-018)
+- **The owner's own AvLoop may be open while a walk runs**: the build's avloop.exe is locked (link fails LNK1104), and
+  the walk's "no AvLoop left" check saw it. Rule: never close the owner's app — rename the locked exe aside (Windows
+  allows renaming a running image) and relink; the check counts only processes that were not running before. (AV-018)

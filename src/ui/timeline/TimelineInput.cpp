@@ -3,7 +3,8 @@
 // a handle drags In or Out, the bar moves the range keeping its length (one Undo step each); the playhead snaps to In
 // and Out (and keyframes) within 8 px; Ctrl+wheel zooms about the pointer, the wheel and Shift+wheel scroll; a
 // double-click on the ruler switches timecode and frame numbers. On the keyframe row a diamond clicked takes the
-// playhead to it (it is then the one the options and Delete act on) and dragged moves it in time on the grid.
+// playhead to it (it is then the one the options and Delete act on), dragged moves it in time on the grid, and
+// Alt+dragged copies it there (the original stays; the drag is one Undo step).
 #include "core/LoopMap.h"
 #include "core/Project.h"
 #include "core/Timecode.h"
@@ -95,6 +96,7 @@ void Timeline::mousePressEvent(QMouseEvent* event) {
     if (drag_ == Drag::Key) {
         dragKeyTime_ = project_->keyframes()[keyAt(event->position())].t;
         dragKey_ = QStringLiteral("drag:key:%1").arg(drags_);
+        dragCopy_ = event->modifiers().testFlag(Qt::AltModifier);
         scrubTo(dragKeyTime_, false);
     }
 }
@@ -105,9 +107,12 @@ void Timeline::mouseMoveEvent(QMouseEvent* event) {
     switch (drag_) {
     case Drag::None: {
         const Drag h = hit(event->position());
-        setCursor(h == Drag::In || h == Drag::Out || h == Drag::Fade || h == Drag::Key ? Qt::SizeHorCursor
-                  : h == Drag::Bar                                                     ? Qt::OpenHandCursor
-                                                                                       : Qt::ArrowCursor);
+        if (h == Drag::Key && (event->modifiers() & Qt::AltModifier))
+            setCursor(Qt::DragCopyCursor);
+        else
+            setCursor(h == Drag::In || h == Drag::Out || h == Drag::Fade || h == Drag::Key ? Qt::SizeHorCursor
+                      : h == Drag::Bar                                                     ? Qt::OpenHandCursor
+                                                                                           : Qt::ArrowCursor);
         return;
     }
     case Drag::Scrub:
@@ -130,12 +135,18 @@ void Timeline::mouseMoveEvent(QMouseEvent* event) {
         project_->changeRange(timerange::moved(dragRange_, timeAt(x) - dragFrom_, d, fps()), dragKey_);
         return;
     case Drag::Key: {
-        // On the output grid; refused where another keyframe already is.
+        // On the output grid; refused where another keyframe already is. With Alt the first step off its frame
+        // copies it there and the copy moves on.
         const double t =
             std::min(timecode::secondsOf(timecode::nearestFrame(std::max(0.0, timeAt(x)), fps()), fps()), duration());
         const int i = keyframes::indexAt(project_->keyframes(), dragKeyTime_, project_->keyTolerance());
-        project_->moveKeyframe(i, t, dragKey_);
-        if (keyframes::indexAt(project_->keyframes(), t, project_->keyTolerance()) >= 0) {
+        const Keyframes before = project_->keyframes();
+        if (dragCopy_)
+            project_->copyKeyframe(i, t, dragKey_);
+        else
+            project_->moveKeyframe(i, t, dragKey_);
+        if (project_->keyframes() != before) { // the one dragged (or its copy) is at t; refused, it stays
+            dragCopy_ = false;
             dragKeyTime_ = t;
             scrubTo(t, true);
         }

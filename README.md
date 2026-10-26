@@ -39,8 +39,8 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   FFV1 and uncompressed. A file that cannot be opened says why. (Animated WebP: no FFmpeg decodes it — convert it first.)
 - **Frame-accurate decoding on the GPU** (D3D11VA, with a software fallback): phone rotation turned upright,
   anamorphic pixels made square, interlaced video deinterlaced, HDR tone-mapped to SDR, alpha kept.
-- **A GPU canvas** (OpenGL): zoom about the cursor (10–800%), pan with the wheel, a middle-drag or the Hand; Fit with
-  Ctrl+0, 100% with Ctrl+1. Transparent parts show a checkerboard.
+- **A GPU canvas** (OpenGL): the wheel zooms about the cursor (10–800%); pan with Shift+wheel, a middle-drag or the
+  Hand; Fit with Ctrl+0, 100% with Ctrl+1. Transparent parts show a checkerboard.
 - **The Selection tool** moves the video and scales it by its corner handles (Alt: about the centre), never
   distorting it; the options bar sets X, Y, Scale and W/H exactly, with Fit, Fill, Center, Flip H/V and Reset, and warns
   when the output would be upscaled.
@@ -69,8 +69,8 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   shows on the timeline as a band whose edge you drag.
 - **Keyframes** for the video's position and scale: **K** adds one at the playhead (or updates the one there); with
   keyframes, moving or scaling the video writes into the keyframe at the playhead, as in After Effects. Diamonds on the
-  timeline's keyframe row — drag one to move it in time, Delete removes it, **[** / **]** jump between them — and Linear
-  or Ease per keyframe. The Preview and the export follow them frame by frame.
+  timeline's keyframe row — drag one to move it in time, Alt+drag to copy it, Delete removes it, **[** / **]** jump
+  between them — and Linear or Ease per keyframe. The Preview and the export follow them frame by frame.
 - **The Loop Finder** (Ctrl+L) looks for the In and Out where the video joins itself best: every frame of the search
   range (In–Out ± 5 s, or the whole file) reduced to a small fingerprint of what will be exported, every pair of the
   allowed lengths (2–10 s by default) compared — the pictures and their motion —, the best five shown with a 0–100
@@ -190,7 +190,7 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 | Crop: nudge 1 px · 10 px · remove · cancel a drawing · the whole video | arrows · Shift+arrows · Delete · Esc · double-click |
 | Undo · Redo | Ctrl+Z · Ctrl+Y (Ctrl+Shift+Z) |
 | Zoom: Fit · 100% · in · out | Ctrl+0 · Ctrl+1 · Ctrl+= · Ctrl+- |
-| Zoom about the cursor · pan | Ctrl+wheel · wheel (Shift: across), middle-drag |
+| Zoom about the cursor · pan | wheel (or Ctrl+wheel) · Shift+wheel (across), middle-drag |
 | Preview window · in it: play/pause, a frame back / on | F5 · Space, ← / → |
 | Export · add to the batch queue | Ctrl+E · Ctrl+Shift+E |
 | Play / Pause · loop on/off | Space · L |
@@ -199,6 +199,7 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 | Set In / Out at the playhead · clear them | I / O · Alt+I / Alt+O |
 | Timeline: fit the file · fit In–Out · zoom · switch timecode/frames | `\` · `Shift+\` · Ctrl+wheel · double-click the ruler |
 | Keyframe: add or update at the playhead · previous / next · delete the one at the playhead | K · [ / ] · Delete |
+| Keyframe on the timeline: move · copy | drag · Alt+drag |
 | Save · Save As | Ctrl+S · Ctrl+Shift+S |
 | Settings · the list of shortcuts · the Loop Finder | Ctrl+, · F1 · Ctrl+L |
 

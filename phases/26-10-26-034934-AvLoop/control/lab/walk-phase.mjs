@@ -24,6 +24,7 @@ for (const exe of ['avloop', 'avloop-cli']) {
   if (!fs.existsSync(lab.bin(exe))) { line(`NOT BUILT: ${path.relative(lab.REPO, lab.bin(exe))} — run scripts\\build.ps1 first`); process.exit(2); }
 }
 const before = new Set(lab.cacheSessions());
+const running = new Set(lab.avloopProcesses()); // the owner's own AvLoop, open before the walks, is not the walk's
 // A lab run's own settings, autosave and logs folder: removed when the app ends (AV-012 found them left).
 const labFolders = () => fs.readdirSync(os.tmpdir()).filter((f) => f.startsWith('avloop-lab-'));
 const labBefore = new Set(labFolders());
@@ -45,7 +46,7 @@ for (const walk of walks) {
   for (const bad of out.split(/\r?\n/).filter((l) => /^FAIL /.test(l))) line(`   ${bad}`);
 }
 
-const left = lab.avloopProcesses();
+const left = lab.avloopProcesses().filter((p) => !running.has(p));
 if (left.length) { line(`FAIL a process of the walk left: ${left.join(', ')}`); failed++; }
 const sessions = lab.cacheSessions().filter((s) => !before.has(s));
 if (sessions.length) { line(`FAIL a session cache left: ${sessions.join(', ')}`); failed++; }

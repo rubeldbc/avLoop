@@ -1,0 +1,44 @@
+{
+  "delay": 120,
+  "settle": 700,
+  "steps": [
+    { "label": "two keyframes: K at 2 s, the Selection's X typed at 4 s" },
+    { "do": "open", "file": "samples/counter-640p30.mp4" },
+    { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 10000 },
+    { "do": "type", "on": "transport.time", "text": "2" },
+    { "do": "key", "keys": "K", "on": "MainWindow" },
+    { "do": "type", "on": "transport.time", "text": "4" },
+    { "do": "key", "keys": "V", "on": "MainWindow" },
+    { "do": "type", "on": "options.x", "text": "520" },
+    { "do": "expect", "probe": "keyframes.count", "eq": 2 },
+    { "do": "expect", "probe": "keyframes.list", "eq": "2.000:320.0,180.0,1.000|4.000:520.0,180.0,1.000" },
+    { "do": "expect", "probe": "undo.index", "eq": 2 },
+
+    { "label": "Alt+drag the 2 s diamond to 3 s: a copy there, the original kept, one Undo step" },
+    { "do": "drag", "on": "timeline", "space": "timelineKeys", "from": [2.0, 0], "to": [3.0, 0], "mods": "Alt",
+      "steps": 8 },
+    { "do": "expect", "probe": "keyframes.count", "eq": 3 },
+    { "do": "expect", "probe": "keyframes.list", "contains": "2.000:320.0,180.0,1.000|3.000:320.0,180.0,1.000|4.000:" },
+    { "do": "expect", "probe": "playhead", "near": [3, 0.001] },
+    { "do": "expect", "probe": "undo.index", "eq": 3 },
+    { "do": "shot", "on": "timeline", "file": "key-copied.png", "maxWidth": 1400 },
+    { "do": "key", "keys": "Ctrl+Z", "on": "MainWindow" },
+    { "do": "expect", "probe": "keyframes.count", "eq": 2 },
+    { "do": "expect", "probe": "keyframes.list", "lacks": "3.000:" },
+    { "do": "key", "keys": "Ctrl+Y", "on": "MainWindow" },
+    { "do": "expect", "probe": "keyframes.count", "eq": 3 },
+
+    { "label": "Alt+click without a drag copies nothing" },
+    { "do": "click", "on": "timeline", "space": "timelineKeys", "at": [3.0, 0], "mods": "Alt" },
+    { "do": "expect", "probe": "keyframes.count", "eq": 3 },
+    { "do": "expect", "probe": "undo.index", "eq": 3 },
+
+    { "label": "a plain drag still moves; over another keyframe it keeps its own (3 s → 4.5 s across 4 s)" },
+    { "do": "drag", "on": "timeline", "space": "timelineKeys", "from": [3.0, 0], "to": [4.5, 0], "steps": 12 },
+    { "do": "expect", "probe": "keyframes.count", "eq": 3 },
+    { "do": "expect", "probe": "keyframes.list", "contains": "|4.000:520.0,180.0,1.000|4.500:320.0,180.0,1.000" },
+    { "do": "expect", "probe": "keyframes.list", "lacks": "3.000:" },
+    { "do": "expect", "probe": "playhead", "near": [4.5, 0.001] },
+    { "do": "shot", "on": "timeline", "file": "key-moved-across.png", "maxWidth": 1400 }
+  ]
+}

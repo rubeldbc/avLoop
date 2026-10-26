@@ -1,7 +1,8 @@
 // Keyframes (spec §6.2, §6.4, §11.1, §11.2, §12.2): the value between two keyframes, Linear and Ease (smoothstep) at
 // u = ¼, ½, ¾; before the first and after the last; the flips hold; a keyframe per frame (replaced, a move refused
 // where one is); the previous and the next; the project — the Selection writing into the keyframe at the playhead
-// (made there if none), Undo, the last one deleted leaving the video where it is, a drag one step, Ease set; the file.
+// (made there if none), Undo, the last one deleted leaving the video where it is, a drag one step, a copy and its
+// drag one step, Ease set; the file.
 #include "core/Commands.h"
 #include "core/Keyframes.h"
 #include "core/Project.h"
@@ -93,7 +94,15 @@ private slots:
         QCOMPARE(keyframes::indexAt(m, 5.0 + half / 2, half), 2);
         QCOMPARE(keyframes::previous(m, 5.0, half), 4.0);
         QCOMPARE(keyframes::next(m, 3.01, half), 4.0);
-        QCOMPARE(keyframes::next(m, 5.0, half), 5.0); // none after: where it is
+        QCOMPARE(keyframes::next(m, 5.0, half), 5.0);           // none after: where it is
+        const Keyframes c = keyframes::copied(m, 0, 6.0, half); // a copy: the original kept, in order
+        QCOMPARE(c.size(), 4);
+        QCOMPARE(c.front(), m.front());
+        QCOMPARE(c.back().t, 6.0);
+        QCOMPARE(c.back().x, m.front().x);
+        QVERIFY(c.back().ease);
+        QCOMPARE(keyframes::copied(m, 0, 3.01, half), m); // onto itself: refused
+        QCOMPARE(keyframes::copied(m, 0, 4.0, half), m);  // where another one is: refused
     }
     void selectionWritesIntoKeyframes() {
         Project p;
@@ -154,6 +163,18 @@ private slots:
         for (double to : {2.1, 2.2, 2.5})
             p.moveKeyframe(0, to, QStringLiteral("drag:key:1"));
         QCOMPARE(p.undoStack()->count(), before + 1); // one drag, one step
+        QCOMPARE(p.keyframes()[0].t, 2.5);
+        // Alt+drag: a copy, then the copy moved in the same drag — one step, the original where it was.
+        p.copyKeyframe(0, 3.0, QStringLiteral("drag:key:2"));
+        p.moveKeyframe(1, 3.5, QStringLiteral("drag:key:2"));
+        QCOMPARE(p.undoStack()->count(), before + 2);
+        QCOMPARE(p.keyframes().size(), 3);
+        QCOMPARE(p.keyframes()[0].t, 2.5);
+        QCOMPARE(p.keyframes()[1].t, 3.5);
+        QCOMPARE(p.keyframes()[1].x, p.keyframes()[0].x);
+        QVERIFY(p.keyframes()[1].ease);
+        p.undoStack()->undo();
+        QCOMPARE(p.keyframes().size(), 2);
         QCOMPARE(p.keyframes()[0].t, 2.5);
         // Deleting down to none leaves the video where it is shown.
         p.setTime(4.0);

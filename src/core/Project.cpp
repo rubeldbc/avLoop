@@ -178,6 +178,12 @@ void Project::moveKeyframe(int index, double seconds, const QString& mergeKey) {
     pushKeyframes(MoveKeyframeId, tr("Move a keyframe"), after, mergeKey);
 }
 
+void Project::copyKeyframe(int index, double seconds, const QString& mergeKey) {
+    // A move's id: the copy's moves later in the same drag merge into this step.
+    const Keyframes after = keyframes::copied(keyframes_, index, std::max(0.0, seconds), keyTolerance());
+    pushKeyframes(MoveKeyframeId, tr("Copy a keyframe"), after, mergeKey);
+}
+
 void Project::setKeyframeEase(int index, bool ease) {
     if (index < 0 || index >= keyframes_.size() || keyframes_[index].ease == ease) return;
     Keyframes after = keyframes_;

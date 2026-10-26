@@ -7,8 +7,8 @@ Track A — the loop maker (items 1-10)
 AV-001 ──► AV-002 ──► AV-003 ──► AV-004 ──► AV-005 ──► AV-006 ──► AV-007 ──► AV-008 ──► AV-009 ──► AV-010 ──► AV-015 (CP-A1; every item of A also ──► AV-015)
 Track B — the extras (items 11-14)
 AV-015 ──► AV-011 ──► AV-012 ──► AV-013 ──► AV-014 ──► AV-016 (CP-B1; every item of B and AV-015 also ──► AV-016)
-Late — the owner's wish after both checkpoints (item 15)
-AV-016 ──► AV-017
+Late — the owner's wishes after both checkpoints (items 15, 16)
+AV-016 ──► AV-017 ──► AV-018
 ```
 
 | Phase | Depends on | Why |
@@ -30,6 +30,7 @@ AV-016 ──► AV-017
 | AV-014 | AV-013 | the installer ships the app as it finally stands |
 | AV-016 | AV-011 … AV-014, AV-015 | CP-B1 walks the whole, installed, and releases `v1.0.0` |
 | AV-017 | AV-016 | late: the name and the About box change the app as CP-B1 left it, and walk it themselves |
+| AV-018 | AV-017 | late: the wheel and the keyframe copy change the app as AV-017 left it, and walk it themselves |
 
 Only the lowest ordinal of each track may have no dependency: AV-001 (track A). Track B's lowest, AV-011, depends on
 AV-015 by the spec's order (§13).

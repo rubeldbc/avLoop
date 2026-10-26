@@ -66,6 +66,13 @@ Keyframes moved(Keyframes keys, int index, double t, double tolerance) {
     return withKey(keys, k, 0);
 }
 
+Keyframes copied(Keyframes keys, int index, double t, double tolerance) {
+    if (index < 0 || index >= keys.size() || indexAt(keys, t, tolerance) >= 0) return keys;
+    Keyframe k = keys[index];
+    k.t = t;
+    return withKey(keys, k, 0);
+}
+
 double previous(const Keyframes& keys, double t, double tolerance) {
     for (auto it = keys.rbegin(); it != keys.rend(); ++it)
         if (it->t < t - tolerance) return it->t;

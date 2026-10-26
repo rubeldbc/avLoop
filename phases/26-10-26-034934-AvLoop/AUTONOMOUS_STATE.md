@@ -2,7 +2,9 @@
 
 Program: AVLOOP
 Programme version: 1.0.0
-State: **COMPLETE 2026-10-26** — every phase DONE, `v1.0.1` released (AV-017, the owner's late item 15).
+State: **COMPLETE 2026-10-27** — every phase DONE (AV-018, the owner's late item 16; no Release, R-65).
+Was: **ACTIVE 2026-10-27** — the owner's late wishes (item 16): AV-018, the wheel and the keyframe copy.
+Was: **COMPLETE 2026-10-26** — every phase DONE, `v1.0.1` released (AV-017, the owner's late item 15).
 Was: **ACTIVE 2026-10-26** — the owner's late wish (item 15): AV-017, the name and the About box.
 Was: **COMPLETE 2026-10-26** — every phase DONE, `v1.0.0` released (AV-016).
 Was: **STARTED 2026-10-26** on the owner's specification (*AvLoop — Software Specification*, Oct 26, 2026; its §2.8
@@ -13,7 +15,7 @@ feels like a loop."* — with the ten decisions and the five later words of `REA
 a checkpoint after each.
 Active phase: none
 Next eligible: none — every phase is closed
-Completed: 17 of 17
+Completed: 18 of 18
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -78,12 +80,17 @@ the `.avloop` association; the GitHub Release `v1.0.0` with the installer and it
 window, the About box, avloop.exe's details, the installer and its shortcuts — while its folders and association keep
 "AvLoop"; the About box gives the developer and the ways to reach them. Version 1.0.1, the Release `v1.0.1`.
 
-Readings taken: R-1 … R-62 (`README.md` §3; `DECISIONS.md`; `OWNER-ACTIONS.md`) — every one open for the owner's
+**Item 16, late (AV-018, 2026-10-27).** The owner's two wishes of one sitting: the canvas's wheel zooms about the
+pointer (Ctrl or not; Shift+wheel pans across), and an Alt+drag on the timeline copies a keyframe in one Undo step.
+No new version: main runs ahead of `v1.0.1`.
+
+Readings taken: R-1 … R-65 (`README.md` §3; `DECISIONS.md`; `OWNER-ACTIONS.md`) — every one open for the owner's
 veto. Dropped: nothing the specification names. Not done, and why: OBS itself was never driven (S11's second half needs
 obs-websocket, not on this PC; the libvpx half passes); no code signing (§1.3, the owner's word). `BLOCKED_EXTERNAL`:
 none. Waiting legs: none.
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-018** DONE 2026-10-27 — The wheel and the keyframe copy (late, item 16): the wheel zooms the canvas about the pointer; Alt+drag copies a keyframe, one Undo step; walks wheel and key-copy PASSED, AV-003 and AV-011 again Record: `execution/AV-018-EXECUTION.md`.
 - **AV-017** DONE 2026-10-26 — The name and the About box (late, item 15): AvLoop by Rubel in the app, its exe and its installer; About with the developer's contact; 1.0.1; walks about and name PASSED, the old name's walks again Record: `execution/AV-017-EXECUTION.md`.
 - **AV-016** DONE 2026-10-26 — CP-B1: everything walked on the installed 1.0.0 — unit, ASan, Debug leaks, every walk, the memory walk, GPU off, S15; the Release v1.0.0 Record: `execution/AV-016-EXECUTION.md`.
 - **AV-014** DONE 2026-10-26 — A Windows installer: Inno Setup 6, per user or every user, the .avloop association, a clean uninstall Record: `execution/AV-014-EXECUTION.md`.

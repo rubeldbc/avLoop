@@ -11,7 +11,7 @@ risk: Low
 permission_class: VERIFY_ENVIRONMENT_FIRST
 code_budget: 200
 depends_on: [AV-016]
-unlocks: []
+unlocks: [AV-018]
 requirements: [REQ-AV-022]
 read_scope:
   - phases/26-10-26-034934-AvLoop/control/18_SHAPES_THE_NAME_AND_ABOUT.md

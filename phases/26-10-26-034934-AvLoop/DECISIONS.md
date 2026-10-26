@@ -2,7 +2,7 @@
 
 Reserved numbers, newest first in `docs/SPEC.md` §0 when taken — delivered behaviour only. AvLoop's series starts at
 D-001: **D-001 … D-014 are this programme's, reserved 2026-10-26 as the fourteen items were planned**, one an item; D-015
-the late fifteenth (AV-017). Two
+the late fifteenth (AV-017); D-016 the late sixteenth (AV-018). Two
 ADRs are owed: **AVADR-0001** (one renderer, GPU/CPU parity), accepted by AV-007 before the code it governs, and
 **AVADR-0002** (memory budgets and caches), accepted by AV-002. The readings (`README.md` §3) are listed after the
 D-numbers; each is the agent's decision under autonomous mode, open for the owner's veto.
@@ -24,6 +24,7 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | D-013 | **The batch and the other formats**: the queue; GIF, APNG, MP4 H.264 (no GPL), ProRes 4444. | "All suggested features are kept" | AV-013 |
 | D-014 | **The installer**: Inno Setup 6, `.avloop` association, no signing. | "No code signing. Windows only." | AV-014 |
 | D-015 | **The name and the About box** (late): "AvLoop by Rubel" shown in the app, its executable and its installer; the About box with the developer and the ways to reach them; version 1.0.1. | "The applicaiton name will be AvLoop by Rubel. There will be a about section where my information will be available." | AV-017 |
+| D-016 | **The wheel and the keyframe copy** (late): the wheel zooms the canvas about the pointer; Alt+drag on the timeline copies a keyframe. | "mouse wheen move will zoom in out targeted to the mous pointer area in canvas"; "alt drag will copy a keyframe in time line" | AV-018 |
 
 ## The readings (the agent's decisions)
 
@@ -91,3 +92,6 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-60 | About's details from the owner's gLayer About; the email the owner's correction; no website | the owner's words | `README.md` §3; AV-017 |
 | R-61 | The secrets gate allows that one address in AboutDialog.cpp only | the gate stays whole for everything else | `README.md` §3; AV-017 |
 | R-62 | Version 1.0.1, released as `v1.0.1` with its installer | a build unlike 1.0.0 is not 1.0.0; the README's Download link (R-5) | `README.md` §3; AV-017 |
+| R-63 | The canvas's wheel zooms about the pointer, Ctrl or not, a step a notch; Shift/sideways pans across; the timeline's wheel unchanged | the owner's words name the canvas | `README.md` §3; AV-018 |
+| R-64 | Alt+drag copies a keyframe, one Undo step; a refused drag keeps its own keyframe | After Effects' and Premiere's Alt+drag | `README.md` §3; AV-018 |
+| R-65 | No new version, no Release for item 16 | a Release is published only when asked or at a checkpoint | `README.md` §3; AV-018 |

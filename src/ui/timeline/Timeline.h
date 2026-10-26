@@ -118,6 +118,7 @@ private:
     double dragFrom_ = 0; // the time under the pointer when the drag began
     TimeRange dragRange_;
     double dragKeyTime_ = 0; // the keyframe being dragged, by its time (its index changes as it passes others)
+    bool dragCopy_ = false;  // Alt: the drag's first step copies the keyframe instead of moving it
     QString dragKey_;
     int drags_ = 0;
     int overlaps_ = 0;

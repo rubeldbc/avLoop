@@ -98,12 +98,16 @@ void Canvas::mouseDoubleClickEvent(QMouseEvent* e) {
 void Canvas::wheelEvent(QWheelEvent* e) {
     const QPoint delta = e->angleDelta();
     const int notch = delta.y() != 0 ? delta.y() : delta.x();
-    if (e->modifiers() & Qt::ControlModifier) { // zoom about the cursor
-        zoomStep(notch > 0 ? 1 : -1, e->position());
-    } else if ((e->modifiers() & Qt::ShiftModifier) || delta.y() == 0) {
-        panBy(QPointF(notch / 2.0, 0)); // across
+    if ((e->modifiers() & Qt::ShiftModifier) || delta.y() == 0) {
+        panBy(QPointF(notch / 2.0, 0)); // across (Windows turns Shift+wheel sideways)
     } else {
-        panBy(QPointF(0, notch / 2.0));
+        // The wheel (Ctrl or not) zooms about the cursor, a step a notch; a finer wheel or a touchpad adds up to one.
+        if (wheelZoom_ * notch < 0) wheelZoom_ = 0;
+        wheelZoom_ += notch;
+        for (; wheelZoom_ >= QWheelEvent::DefaultDeltasPerStep; wheelZoom_ -= QWheelEvent::DefaultDeltasPerStep)
+            zoomStep(1, e->position());
+        for (; wheelZoom_ <= -QWheelEvent::DefaultDeltasPerStep; wheelZoom_ += QWheelEvent::DefaultDeltasPerStep)
+            zoomStep(-1, e->position());
     }
     e->accept();
 }

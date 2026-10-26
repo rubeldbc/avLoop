@@ -112,6 +112,7 @@ public:
     void addKeyframe(); // at the playhead with the transform shown; one there is updated
     void deleteKeyframe(int index);
     void moveKeyframe(int index, double seconds, const QString& mergeKey = {});
+    void copyKeyframe(int index, double seconds, const QString& mergeKey = {}); // Alt+drag; the original stays
     void setKeyframeEase(int index, bool ease);
 
     // Only commands call these.

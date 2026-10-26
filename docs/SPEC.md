@@ -6,6 +6,21 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-016 — The wheel and the keyframe copy (AV-018, late, 2026-10-27)
+
+- The canvas's wheel, with Ctrl or without, zooms about the pointer: the scene point under it stays under it. One
+  notch (120 eighths of a degree) is one step of §6.3's list (10 … 800 %); a finer wheel or a touchpad adds up to a
+  notch, a turn the other way starting the count again. Shift+wheel and a sideways wheel pan across, as before;
+  panning up and down is by a middle-drag or the Hand — the wheel no longer pans up/down (D-003's "the wheel pans
+  up/down" and §6's "wheel = vertical pan" give way, R-63). The timeline's wheel is unchanged.
+- On the timeline's keyframe row an Alt+drag of a diamond copies the keyframe — position, scale, interpolation — to
+  the output grid frame it is dropped on; the original stays; refused where another keyframe already is. One Undo step,
+  "Copy a keyframe" (MoveKeyframe's id, the copy's moves merged into it). Alt+click alone copies nothing. The copy
+  cursor shows with Alt over a diamond (R-64).
+- Mended: a keyframe drag refused over another keyframe keeps the one it drags (it used to pick the other one up).
+- The walk tool's check that a walk left no AvLoop running counts only processes it did not find running before
+  (the owner's own AvLoop may be open). No new version (R-65).
+
 ### D-015 — The name and the About box, v1.0.1 (AV-017, late, 2026-10-26)
 
 - The name shown is "AvLoop by Rubel" (`AppInfo::displayName()`): the window's title ("AvLoop by Rubel — <file>"),

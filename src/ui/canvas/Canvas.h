@@ -14,8 +14,8 @@ class Project;
 class Tool;
 
 // The canvas (spec §3.3, §6.3): an unbounded scene in pixels drawn by OpenGL 3.3 (the transform shader the renderer
-// shares, AVADR-0001), with a QPainter overlay for the tools. Zoom and pan are the view's, never in Undo; middle-drag,
-// the wheel (Shift: across) and Ctrl+wheel (zoom about the cursor) work in every tool.
+// shares, AVADR-0001), with a QPainter overlay for the tools. Zoom and pan are the view's, never in Undo; the wheel
+// (zoom about the cursor, Ctrl or not), Shift+wheel (pan across) and middle-drag (pan) work in every tool.
 class Canvas : public QOpenGLWidget {
     Q_OBJECT
 public:
@@ -81,6 +81,7 @@ private:
     QPointF pan_; // the scene point at the canvas's centre
     bool panning_ = false;
     QPointF lastPanPos_;
+    int wheelZoom_ = 0;        // the wheel's eighths of a degree not yet a zoom step
     bool fitMode_ = true;      // Fit holds until the user zooms or pans; a resize fits again
     bool fitNextFrame_ = true; // a new source: its first frame is fitted
 };

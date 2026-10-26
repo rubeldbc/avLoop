@@ -1,0 +1,43 @@
+startup: 500 ms
+walk walk-keyframes.json: 58 steps
+-- K at 2 s: the first keyframe, the transform shown @1201 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect keyframes.count: 0
+PASS expect keyframes.count: 1
+PASS expect keyframes.list: 2.000:320.0,180.0,1.000
+PASS expect options.keyframe.status: Keyframe 1 of 1 at 00:00:02.00
+-- the Selection at 4 s writes a second keyframe (none was there) @2514 ms
+PASS expect keyframes.count: 2
+PASS expect transform.x: 519.9431818
+-- Linear: halfway at 3 s; the canvas shows the video there @3212 ms
+PASS expect transform.x: 419.9715909
+PASS expect keyframes.current: -1
+PASS shot keyframes-halfway.png: 1000x489 px
+-- [ to the first, the Keyframe tool's Interpolation: Ease — a quarter of the way is 15.6 % @3741 ms
+PASS expect playhead: 2
+PASS expect keyframes.current: 0
+PASS expect keyframes.list: 2.000:320.0,180.0,1.000 ease|4.000:519.9,180.0,1.000
+PASS expect transform.x: 351.2411222
+PASS expect playhead: 4
+PASS shot keyframe-options.png: 1400x26 px
+-- a diamond dragged from 4 s to 4.5 s (the playhead goes with it); the row pictured @5075 ms
+PASS expect keyframes.list: 2.000:320.0,180.0,1.000 ease|4.500:519.9,180.0,1.000
+PASS expect keyframes.list: 2.000:320.0,180.0,1.000 ease|4.500:519.9,180.0,1.000
+PASS expect playhead: 4.5
+PASS shot keyframes-row.png: 1400x102 px
+-- Delete on the timeline removes the keyframe at the playhead; Undo brings it back @5767 ms
+PASS expect keyframes.count: 1
+PASS expect keyframes.count: 2
+-- the options' Delete and Add; the last one deleted leaves the video where it is @6391 ms
+PASS expect keyframes.count: 1
+PASS expect transform.x: 320
+PASS expect keyframes.count: 0
+PASS expect options.keyframe.status: No keyframes: the video stays where it is
+PASS expect transform.x: 320
+PASS expect keyframes.count: 2
+PASS expect keyframes.count: 2
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 000001aa2b146100] v1.16.0
+[libvpx-vp9 @ 000001aa2b144740] v1.16.0

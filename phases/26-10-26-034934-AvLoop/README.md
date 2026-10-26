@@ -47,9 +47,14 @@ by Rubel. There will be a about section where my information will be available. 
 glayer.app which is in my repo"*; then *"Email: [the owner's address — written in
 `src/ui/dialogs/AboutDialog.cpp` alone, R-61], website not required."*
 
+Added by the owner on 2026-10-27, item 16, verbatim: *"mouse wheen move will zoom in out targeted to the mous pointer
+area in canvas"*; then, while it was being built, *"alt drag will copy a keyframe in time line"*. Two wishes of one
+sitting: one item, one late phase.
+
 ## 2. The items
 
-Fifteen, in two tracks; a checkpoint closes each track. The fifteenth came after both had closed: a late phase.
+Sixteen, in two tracks; a checkpoint closes each track. The fifteenth and the sixteenth came after both had closed:
+late phases.
 
 | # | Item | What it gives |
 | --- | --- | --- |
@@ -68,6 +73,7 @@ Fifteen, in two tracks; a checkpoint closes each track. The fifteenth came after
 | 13 | **The batch and the other formats** (AV-013) | the export queue; GIF, APNG, MP4 H.264, ProRes 4444 |
 | 14 | **The installer** (AV-014) | an Inno Setup installer with the `.avloop` association |
 | 15 | **The name and the About box** (AV-017, late) | "AvLoop by Rubel" in the app, its executable and its installer; the About box with the developer and the ways to reach them |
+| 16 | **The wheel and the keyframe copy** (AV-018, late) | the wheel zooms the canvas about the pointer; Alt+drag on the timeline copies a keyframe |
 
 Checkpoints: CP-A1 (AV-015) walks track A on one fresh build; CP-B1 (AV-016) walks the whole, installed, and makes
 the GitHub Release `v1.0.0`.
@@ -206,6 +212,15 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
 62. **R-62** The renamed build is version 1.0.1 (it differs from the Release 1.0.0) and is released as `v1.0.1` with
     its installer and SHA-256, as R-5 did for 1.0.0, so the README's Download link gives the app as it stands; an
     install over 1.0.0 removes 1.0.0's "AvLoop" shortcuts.
+63. **R-63** The canvas's wheel zooms about the pointer with Ctrl or without, a step of §6.3's list a notch; a finer
+    wheel or a touchpad adds up to a notch. Shift+wheel and a sideways wheel still pan across; panning up and down by
+    the wheel gives way to the zoom (a middle-drag or the Hand pan every way). Ctrl+wheel is kept: the hand that
+    learned it, and the walks, still zoom. The timeline's wheel is unchanged — the owner named the canvas.
+64. **R-64** Alt+drag on a keyframe's diamond copies it, as After Effects and Premiere do: the first step off its frame
+    makes the copy (position, scale, interpolation), the original stays, the copy follows on the grid and is refused
+    where another keyframe is; one Undo step, "Copy a keyframe"; Alt+click alone copies nothing. A drag refused over
+    another keyframe now keeps its own (AV-011's drag picked the other one up).
+65. **R-65** No new version and no Release for item 16: main runs ahead of `v1.0.1` until the next Release carries it.
 
 ## 4. What is not built
 

@@ -35,6 +35,8 @@ int indexAt(const Keyframes& keys, double t, double tolerance);
 Keyframes withKey(Keyframes keys, const Keyframe& key, double tolerance);
 // Keyframe `index` moved to time `t`; refused (unchanged) when another one is already within `tolerance` there.
 Keyframes moved(Keyframes keys, int index, double t, double tolerance);
+// Keyframe `index` copied to time `t`, itself kept; refused (unchanged) when one is already within `tolerance` there.
+Keyframes copied(Keyframes keys, int index, double t, double tolerance);
 // The time of the keyframe before / after `t` (beyond `tolerance`); `t` itself when there is none.
 double previous(const Keyframes& keys, double t, double tolerance);
 double next(const Keyframes& keys, double t, double tolerance);

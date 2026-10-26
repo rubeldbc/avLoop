@@ -1,0 +1,47 @@
+{
+  "delay": 120,
+  "settle": 700,
+  "steps": [
+    { "label": "the wheel alone zooms the canvas about the pointer: the scene point under it stays put" },
+    { "do": "open", "file": "samples/counter-640p30.mp4" },
+    { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 10000 },
+    { "do": "wait", "ms": 300 },
+    { "do": "key", "keys": "Ctrl+0", "on": "MainWindow" },
+    { "do": "key", "keys": "Ctrl+1", "on": "MainWindow" },
+    { "do": "expect", "probe": "canvas.zoom", "eq": 1 },
+    { "do": "expect", "probe": "canvas.panX", "near": [320, 0.01] },
+    { "do": "expect", "probe": "canvas.panY", "near": [180, 0.01] },
+    { "do": "shot", "on": "CanvasArea", "file": "wheel-100.png", "maxWidth": 1200 },
+    { "do": "wheel", "on": "canvas", "space": "canvas", "at": [100, 50], "delta": 120 },
+    { "do": "expect", "probe": "canvas.zoom", "eq": 1.5 },
+    { "do": "expect", "probe": "canvas.panX", "near": [246.67, 1] },
+    { "do": "expect", "probe": "canvas.panY", "near": [136.67, 1] },
+    { "do": "wheel", "on": "canvas", "space": "canvas", "at": [100, 50], "delta": 120 },
+    { "do": "expect", "probe": "canvas.zoom", "eq": 2 },
+    { "do": "expect", "probe": "canvas.panX", "near": [210, 1] },
+    { "do": "expect", "probe": "canvas.panY", "near": [115, 1] },
+    { "do": "shot", "on": "CanvasArea", "file": "wheel-200.png", "maxWidth": 1200 },
+
+    { "label": "a finer wheel adds up: half a notch out changes nothing, the second half is a step" },
+    { "do": "wheel", "on": "canvas", "space": "canvas", "at": [100, 50], "delta": -60 },
+    { "do": "expect", "probe": "canvas.zoom", "eq": 2 },
+    { "do": "wheel", "on": "canvas", "space": "canvas", "at": [100, 50], "delta": -60 },
+    { "do": "expect", "probe": "canvas.zoom", "eq": 1.5 },
+    { "do": "expect", "probe": "canvas.panX", "near": [246.67, 1] },
+
+    { "label": "Ctrl+wheel zooms as before; back to 100 % the view is where it began" },
+    { "do": "wheel", "on": "canvas", "space": "canvas", "at": [100, 50], "delta": -120, "mods": "Ctrl" },
+    { "do": "expect", "probe": "canvas.zoom", "eq": 1 },
+    { "do": "expect", "probe": "canvas.panX", "near": [320, 1] },
+    { "do": "expect", "probe": "canvas.panY", "near": [180, 1] },
+
+    { "label": "Shift+wheel and a sideways wheel pan across, the zoom kept; the view is never in Undo" },
+    { "do": "wheel", "on": "canvas", "space": "canvas", "at": [320, 180], "delta": -120, "mods": "Shift" },
+    { "do": "expect", "probe": "canvas.zoom", "eq": 1 },
+    { "do": "expect", "probe": "canvas.panX", "near": [380, 1] },
+    { "do": "wheel", "on": "canvas", "space": "canvas", "at": [320, 180], "delta": 120, "horizontal": true },
+    { "do": "expect", "probe": "canvas.panX", "near": [320, 1] },
+    { "do": "expect", "probe": "canvas.panY", "near": [180, 1] },
+    { "do": "expect", "probe": "undo.count", "eq": 0 }
+  ]
+}

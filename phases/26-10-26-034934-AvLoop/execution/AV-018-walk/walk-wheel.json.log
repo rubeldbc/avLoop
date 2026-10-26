@@ -1,0 +1,32 @@
+startup: 491 ms
+walk walk-wheel.json: 38 steps
+-- the wheel alone zooms the canvas about the pointer: the scene point under it stays put @1193 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect canvas.zoom: 1
+PASS expect canvas.panX: 320
+PASS expect canvas.panY: 180
+PASS shot wheel-100.png: 1200x587 px
+PASS expect canvas.zoom: 1.5
+PASS expect canvas.panX: 246.8333333
+PASS expect canvas.panY: 136.6666667
+PASS expect canvas.zoom: 2
+PASS expect canvas.panX: 210.0833333
+PASS expect canvas.panY: 115
+PASS shot wheel-200.png: 1200x587 px
+-- a finer wheel adds up: half a notch out changes nothing, the second half is a step @3968 ms
+PASS expect canvas.zoom: 2
+PASS expect canvas.zoom: 1.5
+PASS expect canvas.panX: 246.8333333
+-- Ctrl+wheel zooms as before; back to 100 % the view is where it began @4571 ms
+PASS expect canvas.zoom: 1
+PASS expect canvas.panX: 320.3333333
+PASS expect canvas.panY: 180
+-- Shift+wheel and a sideways wheel pan across, the zoom kept; the view is never in Undo @5054 ms
+PASS expect canvas.zoom: 1
+PASS expect canvas.panX: 380.3333333
+PASS expect canvas.panX: 320.3333333
+PASS expect canvas.panY: 180
+PASS expect undo.count: 0
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

@@ -117,10 +117,11 @@ export function pixelAt(png, x, y) {
   return [...r.stdout];
 }
 
-/** Processes of AvLoop still running (a walk must leave none). */
+/** Processes of AvLoop still running, "<image> <pid>" (a walk must leave none of its own; the owner's open app is not one). */
 export function avloopProcesses() {
   const r = run('tasklist', ['/FO', 'CSV', '/NH']);
-  return r.out.split(/\r?\n/).filter((l) => /^"avloop(-cli)?\.exe"/i.test(l)).map((l) => l.split('","')[0].replace(/"/g, ''));
+  return r.out.split(/\r?\n/).filter((l) => /^"avloop(-cli)?\.exe"/i.test(l))
+    .map((l) => l.split('","').slice(0, 2).join(' ').replace(/"/g, ''));
 }
 
 /** Session cache folders still on disk (spec §3.5: deleted on exit), under the disk cache's default root: Qt's

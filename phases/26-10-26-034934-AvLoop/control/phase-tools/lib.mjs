@@ -1,5 +1,5 @@
 // Shared helpers for the AVLOOP phase tools: the owner's example programme's helpers (CABTV-AIRTICKER2) ported with
-// this programme's id, its prefix (`AV-`), its two tracks and its fifteen items.
+// this programme's id, its prefix (`AV-`), its two tracks and its sixteen items.
 // Node built-ins only. The root rule (`trackRoots`) and the chain rule's pick (`pickNext`): a FAILED_RETRYABLE phase
 // first, then a checkpoint whose track is done, then the lowest ordinal.
 import fs from 'node:fs';
@@ -20,15 +20,16 @@ export const PROGRAM_ID = 'AVLOOP';
 export const PHASE_PREFIX = 'AV';
 export const TRACKS = {
   A: 'The loop maker — the ground, the media, the canvas and the Selection, the crop tools, the timeline, the loop engine, the renderer, the preview window, the export, the project and the settings',
-  B: 'The extras — the keyframes, the loop finder, the batch and the other formats, the installer, the name and the About box',
+  B: 'The extras — the keyframes, the loop finder, the batch and the other formats, the installer, the name and the About box, the wheel and the keyframe copy',
 };
 
 /**
- * The items of `README.md` §2: 15. A non-checkpoint phase's ordinal is its item. A checkpoint takes the free ordinal
+ * The items of `README.md` §2: 16. A non-checkpoint phase's ordinal is its item. A checkpoint takes the free ordinal
  * after the last item (CP-A1 = AV-015, CP-B1 = AV-016). An item the owner adds after a checkpoint has closed is a late
- * phase — `late: true`, the next free ordinal above it (`control/01_PHASE_DEPENDENCY_GRAPH.md`): item 15, AV-017.
+ * phase — `late: true`, the next free ordinal above it (`control/01_PHASE_DEPENDENCY_GRAPH.md`): item 15, AV-017;
+ * item 16, AV-018.
  */
-export const OWNER_ITEMS = 15;
+export const OWNER_ITEMS = 16;
 
 export const STATUSES = [
   'NOT_STARTED', 'READY', 'IN_PROGRESS', 'TESTING', 'RECOVERY', 'BLOCKED_EXTERNAL',
