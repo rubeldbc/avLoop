@@ -101,7 +101,10 @@ bool FrameRenderer::compose(int k, Composite& c, QString* error) {
         return false;
     }
     const Pick pick = loopmap::pick(job_.loop.mode, plan.segment, plan.fade, plan.turn, job_.loop.curve, k);
-    const Placement place = Placement::of(job_);
+    // Each source frame where the video stands at its own time (the keyframes; spec §3.4 step 4).
+    const bool moving = !job_.keyframes.isEmpty();
+    const Placement still = Placement::of(job_);
+    auto placeAt = [&](double seconds) { return moving ? Placement::of(job_, job_.transformAt(seconds)) : still; };
     c.size = job_.outputSize;
     c.layers.clear();
     c.mask = mask_.isNull() ? nullptr : &mask_;
@@ -114,14 +117,14 @@ bool FrameRenderer::compose(int k, Composite& c, QString* error) {
             media::Frame f = motion_ ? motion_->frame(motionJob_, i) : media::Frame{};
             if (f.isNull()) return false;
             f.pts = -1 - i; // its own key in the GPU's texture pool
-            c.layers.append({f, weight, place});
+            c.layers.append({f, weight, placeAt(job_.tau(i))});
             return true;
         }
         const SourceMix mix = timemap::sources(job_.loop.method, job_.tau(i), times_);
         for (int m = 0; m < mix.count; ++m) {
             const media::Frame f = sourceFrame(mix.seconds[m], lane);
             if (f.isNull()) return false;
-            c.layers.append({f, weight * mix.weight[m], place});
+            c.layers.append({f, weight * mix.weight[m], placeAt(mix.seconds[m])});
         }
         return true;
     };

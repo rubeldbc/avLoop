@@ -1,6 +1,7 @@
 // The timeline's painting (spec §7.1): the ruler with labels that never overlap, the thumbnails (a `panel2` block
 // until each is made), the In/Out overlay — `accentSoft` inside, 50% black outside, the 3 px orange bar and the two
-// bracket handles —, the empty crossfade band and keyframe row, and the playhead over all.
+// bracket handles —, the crossfade band, the keyframe row (diamonds: the one at the playhead solid orange, the others
+// hollow; Ease ones with rounded corners) and the playhead over all.
 #include "core/LoopMap.h"
 #include "core/Project.h"
 #include "media/ThumbnailWorker.h"
@@ -30,6 +31,7 @@ void Timeline::paintEvent(QPaintEvent*) {
     paintStrip(p, r);
     paintRange(p, r);
     paintBand(p, r);
+    paintKeys(p, r);
     paintPlayhead(p, r);
 }
 
@@ -114,6 +116,26 @@ void Timeline::paintRange(QPainter& p, const Rows& r) {
     };
     bracket(xin, 1);
     bracket(xout, -1);
+}
+
+void Timeline::paintKeys(QPainter& p, const Rows& r) {
+    const ThemeTokens& t = Theme::instance().tokens();
+    const Keyframes& keys = project_->keyframes();
+    const int current = project_->keyframeAtTime();
+    p.save();
+    p.setRenderHint(QPainter::Antialiasing);
+    const double cy = r.keys.center().y() + 0.5;
+    for (int i = 0; i < keys.size(); ++i) {
+        const double x = xOf(keys[i].t);
+        if (x < -10 || x > width() + 10) continue;
+        QPainterPath diamond;
+        diamond.addRoundedRect(QRectF(-4, -4, 8, 8), keys[i].ease ? 2.5 : 0, keys[i].ease ? 2.5 : 0);
+        p.setTransform(QTransform().translate(x, cy).rotate(45));
+        p.setPen(QPen(t.accent, 1.5));
+        p.setBrush(i == current ? QBrush(t.accent) : QBrush(t.bg));
+        p.drawPath(diamond);
+    }
+    p.restore();
 }
 
 void Timeline::paintBand(QPainter& p, const Rows& r) {

@@ -66,6 +66,10 @@ frame rate and quality, and a preview that shows exactly what will be exported.
   with a smooth turn; Speed 0.10–4.00×; the output frame rate (Source, 15 … 60 or custom) with Nearest, Frame Blend
   or Motion Interpolation. The Loop panel shows the result ("Loop 4.50 s · 135 frames @ 30 fps"), and the crossfade
   shows on the timeline as a band whose edge you drag.
+- **Keyframes** for the video's position and scale: **K** adds one at the playhead (or updates the one there); with
+  keyframes, moving or scaling the video writes into the keyframe at the playhead, as in After Effects. Diamonds on the
+  timeline's keyframe row — drag one to move it in time, Delete removes it, **[** / **]** jump between them — and Linear
+  or Ease per keyframe. The Preview and the export follow them frame by frame.
 - **Undo and Redo** for every change (200 steps; one drag is one step).
 - **Projects** (`.avloop`, plain JSON): New, Open, Save (Ctrl+S), Save As, Recent (10 projects and 10 videos), drag and
   drop or `avloop.exe <project>`. The title shows the project and `*` while it has unsaved changes; closing asks Save /
@@ -111,7 +115,7 @@ frame rate and quality, and a preview that shows exactly what will be exported.
 
 Built in this order (each line is a phase of [the plan](phases/26-10-26-034934-AvLoop/control/01_PHASE_DEPENDENCY_GRAPH.md)):
 
-1. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
+1. The **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
 
 ## Using a loop in OBS
 
@@ -157,7 +161,7 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 | Go to In / Out · start / end of the file | Home / End · Ctrl+Home / Ctrl+End |
 | Set In / Out at the playhead · clear them | I / O · Alt+I / Alt+O |
 | Timeline: fit the file · fit In–Out · zoom · switch timecode/frames | `\` · `Shift+\` · Ctrl+wheel · double-click the ruler |
-| Keyframe tool | K |
+| Keyframe: add or update at the playhead · previous / next · delete the one at the playhead | K · [ / ] · Delete |
 | Save · Save As | Ctrl+S · Ctrl+Shift+S |
 | Settings · the list of shortcuts | Ctrl+, · F1 |
 

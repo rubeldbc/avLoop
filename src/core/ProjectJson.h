@@ -16,6 +16,7 @@ struct ProjectData {
     OutputSettings output;
     QualitySettings quality;
     VideoTransform transform;
+    Keyframes keyframes; // "transform": {"keyframes": […]} (spec §11.1)
     CropShape crop;
     ViewState view;
     QString exportPath;   // "export": {"lastPath"} — the last file this project was exported to

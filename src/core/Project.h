@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/CropShape.h"
+#include "core/Keyframes.h"
 #include "core/LoopSettings.h"
 #include "core/Rational.h"
 #include "core/TimeRange.h"
@@ -50,7 +51,8 @@ struct ViewState {
 class Project : public QObject {
     Q_OBJECT
 public:
-    enum class Aspect { Source, Range, Transform, Crop, Loop, Output, Quality, Keyframes, View };
+    // Time: the playhead moved and, with keyframes, the transform shown with it (nothing to export changed).
+    enum class Aspect { Source, Range, Transform, Crop, Loop, Output, Quality, Keyframes, View, Time };
     Q_ENUM(Aspect)
     static constexpr int kUndoLimit = 200;
 
@@ -58,7 +60,17 @@ public:
 
     const SourceInfo& source() const { return source_; }
     const TimeRange& range() const { return range_; }
-    const VideoTransform& transform() const { return transform_; }
+    // The transform at the playhead: the keyframes' value there, else the one transform (spec §6.2, §6.4).
+    const VideoTransform& transform() const { return current_; }
+    // The transform without keyframes, and the flips always (they hold — reading R-47).
+    const VideoTransform& baseTransform() const { return transform_; }
+    VideoTransform transformAt(double seconds) const;
+    const Keyframes& keyframes() const { return keyframes_; }
+    double time() const { return time_; }
+    // The playhead (no Undo): with keyframes the transform shown follows it.
+    void setTime(double seconds);
+    double keyTolerance() const; // half an output frame: one keyframe a frame
+    int keyframeAtTime() const;  // the keyframe at the playhead, else −1
     const CropShape& crop() const { return crop_; }
     const LoopSettings& loop() const { return loop_; }
     const OutputSettings& output() const { return output_; }
@@ -95,6 +107,12 @@ public:
     // A preset (spec §11.3): its Loop, Output and Quality as one Undo step.
     void changeSettings(const LoopSettings& loop, const OutputSettings& output, const QualitySettings& quality,
                         const QString& name);
+    // Keyframes (spec §6.4, §11.2: AddKeyframe, MoveKeyframe, DeleteKeyframe). With keyframes, changeTransform writes
+    // into the keyframe at the playhead, making one there if none (like After Effects).
+    void addKeyframe(); // at the playhead with the transform shown; one there is updated
+    void deleteKeyframe(int index);
+    void moveKeyframe(int index, double seconds, const QString& mergeKey = {});
+    void setKeyframeEase(int index, bool ease);
 
     // Only commands call these.
     void applyTransform(const VideoTransform& t);
@@ -103,6 +121,7 @@ public:
     void applyLoop(const LoopSettings& l);
     void applyOutput(const OutputSettings& o);
     void applyQuality(const QualitySettings& q);
+    void applyKeyframes(const Keyframes& k);
 
 signals:
     void changed(avloop::Project::Aspect aspect);
@@ -110,7 +129,13 @@ signals:
 private:
     SourceInfo source_;
     TimeRange range_;
+    void refreshCurrent(Aspect aspect);
+    void pushKeyframes(int id, const QString& text, const Keyframes& after, const QString& mergeKey = {});
+
     VideoTransform transform_;
+    VideoTransform current_; // transform_ with the keyframes at time_
+    Keyframes keyframes_;
+    double time_ = 0;
     CropShape crop_;
     LoopSettings loop_;
     OutputSettings output_;

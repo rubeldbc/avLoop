@@ -73,3 +73,6 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-44 | Settings saved at once, each applied when it can be | §11.3 | `README.md` §3; AV-010 |
 | R-45 | The Debug leak gate: no heap block left by repeated cycles | §3.7.8 | `README.md` §3; AV-015 |
 | R-46 | ASan judges memory errors; growth thresholds judged in Release | §3.7.8 | `README.md` §3; AV-015 |
+| R-47 | Flips hold: not keyframed | §6.4 | `README.md` §3; AV-011 |
+| R-48 | The keyframe acted on is the one at the playhead | §6.4 | `README.md` §3; AV-011 |
+| R-49 | No crop: the frame where the video stands at In; Alpha Auto over every keyframe | §1.3, §10.2 | `README.md` §3; AV-011 |

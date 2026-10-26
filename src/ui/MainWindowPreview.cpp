@@ -46,7 +46,7 @@ void MainWindow::buildPreview() {
         if (previewWindow_ && video_) previewWindow_->setJob(render::RenderJob::of(project_->snapshot(), *video_));
     });
     connect(project_, &Project::changed, this, [this](Project::Aspect a) {
-        if (a != Project::Aspect::View && previewWindow_) previewDue_->start();
+        if (a != Project::Aspect::View && a != Project::Aspect::Time && previewWindow_) previewDue_->start();
     });
     connect(preview_, &QPushButton::clicked, this, &MainWindow::openPreview);
     auto* f5 = new QAction(tr("Preview"), this);

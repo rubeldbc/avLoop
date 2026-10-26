@@ -5,6 +5,8 @@
 #include "core/ProjectJson.h"
 #include "core/Timecode.h"
 
+#include <algorithm>
+
 namespace avloop {
 
 Project::Project(QObject* parent) : QObject(parent) {
@@ -15,6 +17,8 @@ void Project::setSource(const SourceInfo& source) {
     source_ = source;
     range_ = timerange::whole(source.duration, outputFps());
     transform_ = VideoTransform::initial(source.size());
+    keyframes_.clear();
+    current_ = transform_;
     crop_ = CropShape{};
     undo_.clear();
     emit changed(Aspect::Source);
@@ -31,6 +35,7 @@ ProjectData Project::snapshot() const {
     d.output = output_;
     d.quality = quality_;
     d.transform = transform_;
+    d.keyframes = keyframes_;
     d.crop = crop_;
     d.view = view_;
     d.exportPath = exportPath_;
@@ -45,6 +50,8 @@ void Project::restore(const ProjectData& data) {
     quality_ = data.quality;
     range_ = timerange::valid(data.range, source_.duration, outputFps());
     transform_ = data.transform;
+    keyframes_ = data.keyframes;
+    current_ = transformAt(time_);
     crop_ = data.crop.clamped();
     view_ = data.view;
     exportPath_ = data.exportPath;
@@ -53,6 +60,7 @@ void Project::restore(const ProjectData& data) {
     emit changed(Aspect::Source);
     emit changed(Aspect::Range);
     emit changed(Aspect::Transform);
+    emit changed(Aspect::Keyframes);
     emit changed(Aspect::Crop);
     emit changed(Aspect::Loop);
     emit changed(Aspect::Output);
@@ -61,7 +69,8 @@ void Project::restore(const ProjectData& data) {
 }
 
 QRectF Project::exportFrame() const {
-    return geometry::exportFrame(crop_.rect, transform_, source_.size());
+    // Without a crop the video's own rectangle, where it stands at In (the crop itself is never keyframed, §1.3).
+    return geometry::exportFrame(crop_.rect, transformAt(range_.in), source_.size());
 }
 
 QSize Project::outputSize(bool* limited) const {
@@ -70,8 +79,11 @@ QSize Project::outputSize(bool* limited) const {
 
 bool Project::outputAlpha() const {
     using A = OutputSettings::Alpha;
-    return output_.alpha == A::On ||
-           (output_.alpha == A::Auto && geometry::needsAlpha(crop_, transform_, source_.size(), source_.hasAlpha));
+    if (output_.alpha != A::Auto) return output_.alpha == A::On;
+    // Auto: alpha when the video leaves the output partly clear at any keyframe (between them it never goes further).
+    for (const VideoTransform& t : keyframes::extremes(keyframes_, transform_))
+        if (geometry::needsAlpha(crop_, t, source_.size(), source_.hasAlpha)) return true;
+    return false;
 }
 
 void Project::setView(const ViewState& view) {
@@ -85,10 +97,110 @@ void Project::setExtra(const QJsonObject& extra) {
 
 void Project::changeTransform(const VideoTransform& after, const QString& mergeKey) {
     const VideoTransform target = after.clamped();
-    if (target == transform_) return;
+    if (keyframes_.isEmpty()) {
+        if (target == transform_) return;
+        undo_.push(new SetTransformCommand(
+            SetTransformId, tr("Move or scale the video"), transform_, target,
+            [this](const VideoTransform& t) { applyTransform(t); }, mergeKey));
+        return;
+    }
+    // With keyframes: the flips on the one transform (they hold), the position and scale into the keyframe at the
+    // playhead — made there if there is none (spec §6.2).
+    if (target == current_) return;
+    const bool flips = target.flipH != transform_.flipH || target.flipV != transform_.flipV;
+    const bool moved = target.x != current_.x || target.y != current_.y || target.scale != current_.scale;
+    if (flips && moved) undo_.beginMacro(tr("Move or scale the video"));
+    if (flips) {
+        VideoTransform base = transform_;
+        base.flipH = target.flipH;
+        base.flipV = target.flipV;
+        undo_.push(new SetTransformCommand(
+            SetTransformId, tr("Flip the video"), transform_, base,
+            [this](const VideoTransform& t) { applyTransform(t); }, mergeKey));
+    }
+    if (moved) {
+        const int at = keyframeAtTime();
+        const Keyframe k{time_, target.x, target.y, target.scale, at >= 0 && keyframes_[at].ease};
+        pushKeyframes(AddKeyframeId, tr("Set a keyframe"), keyframes::withKey(keyframes_, k, keyTolerance()), mergeKey);
+    }
+    if (flips && moved) undo_.endMacro();
+}
+
+VideoTransform Project::transformAt(double seconds) const {
+    return keyframes::valueAt(keyframes_, transform_, seconds);
+}
+
+void Project::setTime(double seconds) {
+    if (seconds == time_) return;
+    time_ = seconds;
+    if (keyframes_.isEmpty()) return;
+    // With keyframes the playhead always says so: the keyframe at it may change even where the transform does not.
+    current_ = transformAt(time_);
+    emit changed(Aspect::Time);
+}
+
+double Project::keyTolerance() const {
+    return 0.5 / std::max(1.0, outputFps().value());
+}
+
+int Project::keyframeAtTime() const {
+    return keyframes::indexAt(keyframes_, time_, keyTolerance());
+}
+
+void Project::addKeyframe() {
+    if (!source_.isValid()) return;
+    const int at = keyframeAtTime();
+    const double t = at >= 0 ? keyframes_[at].t : time_;
+    const Keyframe k{t, current_.x, current_.y, current_.scale, at >= 0 && keyframes_[at].ease};
+    pushKeyframes(AddKeyframeId, tr("Add a keyframe"), keyframes::withKey(keyframes_, k, keyTolerance()));
+}
+
+void Project::deleteKeyframe(int index) {
+    if (index < 0 || index >= keyframes_.size()) return;
+    Keyframes after = keyframes_;
+    after.removeAt(index);
+    if (!after.isEmpty()) {
+        pushKeyframes(DeleteKeyframeId, tr("Delete a keyframe"), after);
+        return;
+    }
+    // The last one: the video stays where it is shown (the one transform takes its value), as After Effects does.
+    undo_.beginMacro(tr("Delete a keyframe"));
     undo_.push(new SetTransformCommand(
-        SetTransformId, tr("Move or scale the video"), transform_, target,
-        [this](const VideoTransform& t) { applyTransform(t); }, mergeKey));
+        SetTransformId, tr("Delete a keyframe"), transform_, current_,
+        [this](const VideoTransform& t) { applyTransform(t); }, QString()));
+    pushKeyframes(DeleteKeyframeId, tr("Delete a keyframe"), after);
+    undo_.endMacro();
+}
+
+void Project::moveKeyframe(int index, double seconds, const QString& mergeKey) {
+    const Keyframes after = keyframes::moved(keyframes_, index, std::max(0.0, seconds), keyTolerance());
+    pushKeyframes(MoveKeyframeId, tr("Move a keyframe"), after, mergeKey);
+}
+
+void Project::setKeyframeEase(int index, bool ease) {
+    if (index < 0 || index >= keyframes_.size() || keyframes_[index].ease == ease) return;
+    Keyframes after = keyframes_;
+    after[index].ease = ease;
+    pushKeyframes(AddKeyframeId, ease ? tr("Ease a keyframe") : tr("Make a keyframe linear"), after);
+}
+
+void Project::pushKeyframes(int id, const QString& text, const Keyframes& after, const QString& mergeKey) {
+    if (after == keyframes_) return;
+    undo_.push(new SetKeyframesCommand(
+        id, text, keyframes_, after, [this](const Keyframes& k) { applyKeyframes(k); }, mergeKey));
+}
+
+void Project::applyKeyframes(const Keyframes& k) {
+    keyframes_ = k;
+    emit changed(Aspect::Keyframes);
+    refreshCurrent(Aspect::Transform);
+}
+
+void Project::refreshCurrent(Aspect aspect) {
+    const VideoTransform now = transformAt(time_);
+    if (now == current_) return;
+    current_ = now;
+    emit changed(aspect);
 }
 
 void Project::changeCrop(const CropShape& after, const QString& mergeKey) {
@@ -174,6 +286,7 @@ void Project::applyCrop(const CropShape& c) {
 
 void Project::applyTransform(const VideoTransform& t) {
     transform_ = t;
+    current_ = transformAt(time_);
     emit changed(Aspect::Transform);
 }
 

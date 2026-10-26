@@ -1,13 +1,15 @@
 // The timeline's input (spec §7.2, §6.4): a click or drag on the ruler or the strip scrubs (fast while moving, exact
 // when it rests 150 ms or ends — the two-speed rule); with the In or Out tool active a click sets In or Out there;
 // a handle drags In or Out, the bar moves the range keeping its length (one Undo step each); the playhead snaps to In
-// and Out within 8 px; Ctrl+wheel zooms about the pointer, the wheel and Shift+wheel scroll; a double-click on the
-// ruler switches timecode and frame numbers.
+// and Out (and keyframes) within 8 px; Ctrl+wheel zooms about the pointer, the wheel and Shift+wheel scroll; a
+// double-click on the ruler switches timecode and frame numbers. On the keyframe row a diamond clicked takes the
+// playhead to it (it is then the one the options and Delete act on) and dragged moves it in time on the grid.
 #include "core/LoopMap.h"
 #include "core/Project.h"
 #include "core/Timecode.h"
 #include "ui/timeline/Timeline.h"
 
+#include <QKeyEvent>
 #include <QMouseEvent>
 #include <QTimer>
 #include <QWheelEvent>
@@ -16,10 +18,26 @@
 
 namespace avloop {
 
+int Timeline::keyAt(const QPointF& at) const {
+    if (!rows().keys.adjusted(0, -2, 0, 2).contains(at.toPoint())) return -1;
+    const Keyframes& keys = project_->keyframes();
+    int best = -1;
+    double nearest = kHandlePx + 0.5;
+    for (int i = 0; i < keys.size(); ++i) {
+        const double d = std::abs(at.x() - xOf(keys[i].t));
+        if (d < nearest) {
+            nearest = d;
+            best = i;
+        }
+    }
+    return best;
+}
+
 Timeline::Drag Timeline::hit(const QPointF& at) const {
     const Rows r = rows();
     const TimeRange range = project_->range();
     if (!project_->source().isValid()) return Drag::None;
+    if (keyAt(at) >= 0) return Drag::Key;
     // The crossfade band's left edge sets F.
     if (r.band.contains(at.toPoint()) && project_->loop().mode == LoopSettings::Mode::Crossfade &&
         std::abs(at.x() - xOf(fadeEdge())) <= kHandlePx)
@@ -39,6 +57,8 @@ double Timeline::scrubTime(double x) const {
     const TimeRange range = project_->range();
     for (double edge : {range.in, range.out})
         if (std::abs(x - xOf(edge)) <= kSnapPx) return edge;
+    for (const Keyframe& k : project_->keyframes())
+        if (std::abs(x - xOf(k.t)) <= kSnapPx) return k.t;
     const double t = std::clamp(timeAt(x), 0.0, duration());
     return std::min(timecode::secondsOf(timecode::frameOf(t, fps()), fps()), duration());
 }
@@ -72,6 +92,11 @@ void Timeline::mousePressEvent(QMouseEvent* event) {
         rest_->start();
     }
     if (drag_ == Drag::Bar) setCursor(Qt::ClosedHandCursor);
+    if (drag_ == Drag::Key) {
+        dragKeyTime_ = project_->keyframes()[keyAt(event->position())].t;
+        dragKey_ = QStringLiteral("drag:key:%1").arg(drags_);
+        scrubTo(dragKeyTime_, false);
+    }
 }
 
 void Timeline::mouseMoveEvent(QMouseEvent* event) {
@@ -80,9 +105,9 @@ void Timeline::mouseMoveEvent(QMouseEvent* event) {
     switch (drag_) {
     case Drag::None: {
         const Drag h = hit(event->position());
-        setCursor(h == Drag::In || h == Drag::Out || h == Drag::Fade ? Qt::SizeHorCursor
-                  : h == Drag::Bar                                   ? Qt::OpenHandCursor
-                                                                     : Qt::ArrowCursor);
+        setCursor(h == Drag::In || h == Drag::Out || h == Drag::Fade || h == Drag::Key ? Qt::SizeHorCursor
+                  : h == Drag::Bar                                                     ? Qt::OpenHandCursor
+                                                                                       : Qt::ArrowCursor);
         return;
     }
     case Drag::Scrub:
@@ -104,6 +129,18 @@ void Timeline::mouseMoveEvent(QMouseEvent* event) {
     case Drag::Bar:
         project_->changeRange(timerange::moved(dragRange_, timeAt(x) - dragFrom_, d, fps()), dragKey_);
         return;
+    case Drag::Key: {
+        // On the output grid; refused where another keyframe already is.
+        const double t =
+            std::min(timecode::secondsOf(timecode::nearestFrame(std::max(0.0, timeAt(x)), fps()), fps()), duration());
+        const int i = keyframes::indexAt(project_->keyframes(), dragKeyTime_, project_->keyTolerance());
+        project_->moveKeyframe(i, t, dragKey_);
+        if (keyframes::indexAt(project_->keyframes(), t, project_->keyTolerance()) >= 0) {
+            dragKeyTime_ = t;
+            scrubTo(t, true);
+        }
+        return;
+    }
     case Drag::Fade: {
         // F = the frames from the pointer to Out, within 1 … ⌊D/2⌋.
         const TimeRange r = project_->range();
@@ -122,8 +159,18 @@ void Timeline::mouseReleaseEvent(QMouseEvent* event) {
     const Drag was = drag_;
     drag_ = Drag::None;
     rest_->stop();
-    if (was == Drag::Scrub || was == Drag::In || was == Drag::Out) emit scrubbed(playhead_, false);
+    if (was == Drag::Scrub || was == Drag::In || was == Drag::Out || was == Drag::Key) emit scrubbed(playhead_, false);
     setCursor(Qt::ArrowCursor);
+}
+
+void Timeline::keyPressEvent(QKeyEvent* event) {
+    // Delete (or Backspace) removes the keyframe at the playhead — the one shown solid.
+    if ((event->key() == Qt::Key_Delete || event->key() == Qt::Key_Backspace) && project_->keyframeAtTime() >= 0) {
+        project_->deleteKeyframe(project_->keyframeAtTime());
+        event->accept();
+        return;
+    }
+    QWidget::keyPressEvent(event);
 }
 
 void Timeline::mouseDoubleClickEvent(QMouseEvent* event) {

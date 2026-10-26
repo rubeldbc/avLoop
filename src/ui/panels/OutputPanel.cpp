@@ -162,7 +162,9 @@ void SidePanel::bindOutput(Project* project) {
         fpsCustom->setVisible(isCustom && open);
         fpsCustom->setValueQuietly(o.fps.value());
     };
-    connect(project, &Project::changed, this, [refresh](Project::Aspect) { refresh(); });
+    connect(project, &Project::changed, this, [refresh](Project::Aspect a) {
+        if (a != Project::Aspect::Time) refresh(); // the playhead changes nothing here
+    });
 
     connect(format, &QComboBox::activated, this, [=] {
         OutputSettings o = project->output();

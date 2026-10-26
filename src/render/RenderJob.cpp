@@ -13,21 +13,30 @@ RenderJob RenderJob::of(const ProjectData& p, const media::MediaInfo& source) {
     job.source = source;
     job.range = p.range;
     job.transform = p.transform;
+    job.keyframes = p.keyframes;
     job.crop = p.crop;
     job.loop = p.loop.clamped();
     job.output = p.output;
     job.quality = p.quality;
     const QSizeF video(source.width, source.height);
     job.fps = p.output.effectiveFps(source.avgFps.isValid() ? source.avgFps : source.realFps, source.vfr);
-    job.frame = geometry::exportFrame(p.crop.rect, p.transform, video);
+    // Without a crop the frame is the video where it stands at In; the crop is never keyframed (spec §1.3).
+    job.frame = geometry::exportFrame(p.crop.rect, job.transformAt(p.range.in), video);
+    const QList<VideoTransform> extremes = keyframes::extremes(p.keyframes, p.transform);
     job.outputSize = p.output.sizeFor(job.frame.size(), &job.sizeLimited);
     using A = OutputSettings::Alpha;
-    job.alpha = p.output.alpha == A::On ||
-                (p.output.alpha == A::Auto && geometry::needsAlpha(p.crop, p.transform, video, source.hasAlpha));
+    // Auto: alpha when the video leaves the output partly clear at any keyframe (between them it never goes further).
+    job.alpha = p.output.alpha == A::On || (p.output.alpha == A::Auto &&
+                                            std::any_of(extremes.begin(), extremes.end(), [&](const VideoTransform& t) {
+                                                return geometry::needsAlpha(p.crop, t, video, source.hasAlpha);
+                                            }));
     job.background = QColor(p.output.background);
     job.plan = LoopPlan::of(job.loop, job.range.in, job.range.out, job.fps);
     // Decode no larger than the output needs: the display size × min(1, effective scale), long side ≤ 1920 (R-16).
-    const double scale = std::min(1.0, geometry::effectiveScale(p.transform, job.frame));
+    double largest = 0;
+    for (const VideoTransform& t : extremes)
+        largest = std::max(largest, geometry::effectiveScale(t, job.frame));
+    const double scale = std::min(1.0, largest);
     QSize working(std::max(16, int(std::lround(source.width * scale))),
                   std::max(16, int(std::lround(source.height * scale))));
     if (std::max(working.width(), working.height()) > 1920) working = working.scaled(1920, 1920, Qt::KeepAspectRatio);
@@ -39,8 +48,16 @@ double RenderJob::tau(int i) const {
     return timemap::tau(range.in, i, loop.speed, fps);
 }
 
+VideoTransform RenderJob::transformAt(double seconds) const {
+    return keyframes::valueAt(keyframes, transform, seconds);
+}
+
 Placement Placement::of(const RenderJob& job) {
-    const QRectF v = job.transform.rect(QSizeF(job.source.width, job.source.height));
+    return of(job, job.transform);
+}
+
+Placement Placement::of(const RenderJob& job, const VideoTransform& transform) {
+    const QRectF v = transform.rect(QSizeF(job.source.width, job.source.height));
     const double W = job.outputSize.width();
     const double H = job.outputSize.height();
     Placement p;
@@ -49,11 +66,11 @@ Placement Placement::of(const RenderJob& job) {
     p.bx = (job.frame.left() - v.left()) / v.width();
     p.ay = job.frame.height() / (H * v.height());
     p.by = (job.frame.top() - v.top()) / v.height();
-    if (job.transform.flipH) {
+    if (transform.flipH) {
         p.ax = -p.ax;
         p.bx = 1 - p.bx;
     }
-    if (job.transform.flipV) {
+    if (transform.flipV) {
         p.ay = -p.ay;
         p.by = 1 - p.by;
     }

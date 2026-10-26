@@ -222,3 +222,16 @@ end of its section.
   Rule: the verdict is matched at the start of a line, with the exit code. (AV-015)
 - **In Bash, a double-quoted `node -e` runs backticks**: a comment with `` `node walk-memory.mjs start` `` was executed
   as a command substitution. Rule: scripts with backticks or backslashes are written with the Write tool. (AV-015)
+
+## The keyframes
+
+- **"The transform" became a value at a time**: with keyframes the project's transform is the one at the playhead, so
+  the canvas, the options bar and the Selection kept working unchanged; the playhead moving is its own aspect
+  (`Aspect::Time`), which the export, the Preview and the panels ignore. (AV-011)
+- **A playhead move must be said even where the transform does not change**: between two equal keyframes the value
+  stays, but the keyframe at the playhead changes — the options' Delete stayed disabled. Rule: with keyframes, every
+  playhead move notifies. (AV-011)
+- **The options row prefixes its names**: `OptionsRow::addIcon("keyframe.add")` is `options.keyframe.add`; a name given
+  with the prefix doubles it. (AV-011)
+- **A walk mapper must exist in the binary that runs the walk**: an unknown `space` falls back to raw pixels — [4, 0]
+  became a ruler click at time 0. Rebuild before walking new steps. (AV-011)

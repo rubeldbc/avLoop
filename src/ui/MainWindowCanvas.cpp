@@ -28,6 +28,7 @@ void MainWindow::buildCanvasTools() {
         tools_->add(createCropTool(int(kind), canvas_, project_));
     tools_->add(createInOutTool(false, canvas_, project_));
     tools_->add(createInOutTool(true, canvas_, project_));
+    tools_->add(createKeyframeTool(canvas_, project_, [this](double t) { seek(t); }));
     side_->bindCrop(project_);
     side_->bindLoop(project_);
     side_->bindOutput(project_);

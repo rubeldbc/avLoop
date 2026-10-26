@@ -6,6 +6,26 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-011 — The keyframes (AV-011, 2026-10-26)
+
+- `core/Keyframes`: a keyframe is a source time, a centre, a scale and Linear or Ease; at most one an output frame.
+  The value at t: none — the one transform; before the first — the first; after the last — the last; between two —
+  their mix at u, eased by u²(3 − 2u) when the earlier one is Ease. Keyframes outside In–Out count (§12.2). Flips are
+  not keyframed: they hold (reading R-47).
+- K adds a keyframe at the playhead with the transform shown, or updates the one there. With keyframes the Selection
+  (and the options bar's X, Y, Scale) writes into the keyframe at the playhead, making one there if none; a flip changes
+  the one transform. AddKeyframe, MoveKeyframe (one step a drag), DeleteKeyframe; deleting the last leaves the video
+  where it was shown. The file keeps `transform.keyframes` as §11.1 shows.
+- The Keyframe tool's options: Add, Delete, ◀ / ▶ (as `[` / `]`), Interpolation (Linear / Ease) and "Keyframe 2 of 3
+  at 00:00:04.00". The timeline's keyframe row: diamonds — the one at the playhead solid orange (it is the one acted on,
+  R-48), the others hollow, Ease ones with rounded corners; a click takes the playhead to it, a drag moves it on the
+  output grid (refused onto another), Delete removes it; the playhead snaps to them within 8 px.
+- The canvas shows the video where it stands at the playhead; the FrameRenderer gives every source frame drawn the
+  transform at its own time (Preview, export, avloop-cli). Without a crop the frame is the video's rectangle at In;
+  Alpha Auto and the working size look at every keyframe (R-49).
+- Measured: a white clip moved 200 → 1000 px between 1 s and 3 s renders at 600.00 halfway (Linear), 325.00 a quarter of
+  the way (Ease), 200 and 1000 before and after — on the GPU and the CPU alike.
+
 ### CP-A1 — Track A walked whole (AV-015, 2026-10-26)
 
 - Items 1–10 checked on one fresh Release build: every unit test, the same under AddressSanitizer and in Debug (no

@@ -15,7 +15,8 @@ namespace avloop::render {
 struct RenderJob {
     media::MediaInfo source;
     TimeRange range;
-    VideoTransform transform;
+    VideoTransform transform; // without keyframes; the flips always
+    Keyframes keyframes;      // position and scale over source time (spec §6.4)
     CropShape crop;
     LoopSettings loop;
     OutputSettings output;
@@ -33,6 +34,8 @@ struct RenderJob {
     static RenderJob of(const ProjectData& project, const media::MediaInfo& source);
     // The source time of segment frame i (τ(i), spec §8.1).
     double tau(int i) const;
+    // Where the video stands at a source time: each source frame drawn takes its own (spec §3.4 step 4).
+    VideoTransform transformAt(double seconds) const;
 };
 
 // Where one source frame lands in the output (AVADR-0001's shared convention): output pixel centre (x + ½, y + ½) →
@@ -40,7 +43,8 @@ struct RenderJob {
 // centres at +½, transparent outside.
 struct Placement {
     double ax = 1, bx = 0, ay = 1, by = 0;
-    static Placement of(const RenderJob& job);
+    static Placement of(const RenderJob& job); // the transform without keyframes
+    static Placement of(const RenderJob& job, const VideoTransform& transform);
 };
 
 } // namespace avloop::render

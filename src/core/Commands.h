@@ -69,5 +69,6 @@ using SetRangeCommand = ValueCommand<TimeRange>;
 using SetLoopCommand = ValueCommand<LoopSettings>;
 using SetOutputCommand = ValueCommand<OutputSettings>;
 using SetQualityCommand = ValueCommand<QualitySettings>;
+using SetKeyframesCommand = ValueCommand<Keyframes>; // AddKeyframe, MoveKeyframe, DeleteKeyframe by their ids
 
 } // namespace avloop

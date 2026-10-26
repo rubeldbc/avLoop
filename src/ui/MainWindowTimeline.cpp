@@ -17,6 +17,7 @@
 #include <QAction>
 #include <QLabel>
 #include <QStatusBar>
+#include <QStringList>
 #include <QToolButton>
 
 #include <algorithm>
@@ -42,6 +43,7 @@ void MainWindow::buildTimeline() {
     connect(clock_, &PlaybackClock::frameShown, this, [this](const media::Frame& f) {
         canvas_->setFrame(f);
         shownSeconds_ = f.seconds;
+        project_->setTime(f.seconds); // with keyframes, the video where it stands at this frame
         // The timeline and the time field follow at most 30 times a second: next to the GL canvas a raster repaint
         // costs a whole-window composition (about 6 ms), too much to pay at every frame of a 60 fps video.
         if (rasterClock_.isValid() && rasterClock_.elapsed() < 33) return;
@@ -106,6 +108,24 @@ void MainWindow::buildTimeline() {
     });
     key({QKeySequence(Qt::ALT | Qt::Key_I)}, [setRange] { setRange(timerange::clearIn); });
     key({QKeySequence(Qt::ALT | Qt::Key_O)}, [setRange] { setRange(timerange::clearOut); });
+    // [ and ]: the previous and the next keyframe (spec §6.4).
+    key({QKeySequence(Qt::Key_BracketLeft)},
+        [this] { seek(keyframes::previous(project_->keyframes(), timeline_->playhead(), project_->keyTolerance())); });
+    key({QKeySequence(Qt::Key_BracketRight)},
+        [this] { seek(keyframes::next(project_->keyframes(), timeline_->playhead(), project_->keyTolerance())); });
+    WalkProbes::add(QStringLiteral("keyframes.count"), [this] { return int(project_->keyframes().size()); });
+    WalkProbes::add(QStringLiteral("keyframes.list"), [this] {
+        QStringList list;
+        for (const Keyframe& k : project_->keyframes())
+            list << QStringLiteral("%1:%2,%3,%4%5")
+                        .arg(k.t, 0, 'f', 3)
+                        .arg(k.x, 0, 'f', 1)
+                        .arg(k.y, 0, 'f', 1)
+                        .arg(k.scale, 0, 'f', 3)
+                        .arg(k.ease ? QStringLiteral(" ease") : QString());
+        return list.join(QLatin1Char('|'));
+    });
+    WalkProbes::add(QStringLiteral("keyframes.current"), [this] { return project_->keyframeAtTime(); });
 
     WalkProbes::add(QStringLiteral("playhead"), [this] { return timeline_->playhead(); });
     WalkProbes::add(QStringLiteral("playback.playing"), [this] { return clock_->running(); });
@@ -128,6 +148,9 @@ void MainWindow::buildTimeline() {
     // Walks give timeline points as [seconds, y px]: {"space": "timeline", "at": [2.5, 40]}.
     WalkProbes::addMapper(QStringLiteral("timeline"),
                           [this](const QPointF& p) { return QPointF(timeline_->xOf(p.x()), p.y()); });
+    // … and the keyframe row's diamonds by their time: {"space": "timelineKeys", "at": [4.0, 0]}.
+    WalkProbes::addMapper(QStringLiteral("timelineKeys"),
+                          [this](const QPointF& p) { return QPointF(timeline_->xOf(p.x()), timeline_->keysRowY()); });
     refreshTransport();
 }
 
@@ -143,6 +166,7 @@ void MainWindow::seek(double t, bool fast) {
     t = timecode::secondsOf(timecode::nearestFrame(t, fps), fps);
     timeline_->setPlayhead(t);
     transport_->timeEdit()->setSeconds(t);
+    project_->setTime(t);
     worker_->requestFrame(t, fast ? media::DecodeWorker::Mode::Fast : media::DecodeWorker::Mode::Exact);
 }
 

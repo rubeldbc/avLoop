@@ -82,7 +82,7 @@ void MainWindow::buildExport() {
     connect(side_->quality(), &Section::toggled, this, [this](bool) { requestEstimate(); });
     auto opening = std::make_shared<bool>(false); // a new document's range, transform and crop follow its Source
     connect(project_, &Project::changed, this, [this, opening](Project::Aspect a) {
-        if (a == Project::Aspect::View) return;
+        if (a == Project::Aspect::View || a == Project::Aspect::Time) return;
         refreshExportState();
         if (a == Project::Aspect::Source) {
             if (estimator_) estimator_->clear();

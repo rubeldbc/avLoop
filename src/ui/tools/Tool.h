@@ -4,6 +4,8 @@
 #include <QPointF>
 #include <QString>
 
+#include <functional>
+
 class QKeyEvent;
 class QPainter;
 class QWidget;
@@ -66,5 +68,7 @@ Tool* createHandTool(Canvas* canvas, Project* project);
 Tool* createCropTool(int kind, Canvas* canvas, Project* project);
 // InOutTool.cpp: "in" or "out" — a click on the timeline sets it there (spec §6.4).
 Tool* createInOutTool(bool out, Canvas* canvas, Project* project);
+// KeyframeTool.cpp: `seek` takes the playhead to a keyframe (◀ / ▶).
+Tool* createKeyframeTool(Canvas* canvas, Project* project, std::function<void(double)> seek);
 
 } // namespace avloop

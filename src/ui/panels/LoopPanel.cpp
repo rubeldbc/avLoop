@@ -127,7 +127,9 @@ void SidePanel::bindLoop(Project* project) {
                                     .arg(timecode::rateText(fps))
                               : QString());
     };
-    connect(project, &Project::changed, this, [refresh](Project::Aspect) { refresh(); });
+    connect(project, &Project::changed, this, [refresh](Project::Aspect a) {
+        if (a != Project::Aspect::Time) refresh(); // the playhead changes nothing here
+    });
 
     auto edit = [project](const QString& field, auto change) {
         LoopSettings l = project->loop();

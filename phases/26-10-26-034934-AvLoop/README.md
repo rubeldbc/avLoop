@@ -157,6 +157,12 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
 46. **R-46** Under AddressSanitizer the process-memory growth thresholds are reported, not judged (ASan's quarantine
     keeps freed memory); they are judged in the Release run. §3.7.8's memory walk: after warm-up — a minute of playback,
     the first export, the first Preview — phase against phase.
+47. **R-47** Flips are not keyframed: they hold (the one transform's flips apply at every time); a flip made with
+    keyframes changes them, not the keyframes.
+48. **R-48** The keyframe the options and Delete act on is the one at the playhead (shown solid); a diamond clicked takes
+    the playhead to it. Deleting the last keyframe leaves the video where it was shown.
+49. **R-49** Without a crop the export's frame is the video where it stands at In; Alpha Auto looks at every keyframe
+    (between two, the video never goes beyond them).
 
 ## 4. What is not built
 

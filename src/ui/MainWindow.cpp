@@ -238,6 +238,11 @@ QWidget* MainWindow::buildRail() {
         auto* key = new QAction(b);
         key->setShortcut(tool.key);
         connect(key, &QAction::triggered, this, [this, id = tool.id] { selectTool(id); });
+        // K also adds a keyframe at the playhead, or updates the one there (spec §6.4).
+        if (tool.id == QLatin1String("keyframe"))
+            connect(key, &QAction::triggered, this, [this] {
+                if (video_) project_->addKeyframe();
+            });
         addAction(key);
         column->addWidget(b, 0, Qt::AlignHCenter);
         if (groupEnds.contains(tool.id))

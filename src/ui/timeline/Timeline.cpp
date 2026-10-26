@@ -16,6 +16,7 @@ namespace avloop {
 Timeline::Timeline(Project* project, QWidget* parent) : QWidget(parent), project_(project) {
     setObjectName(QStringLiteral("timeline"));
     setMouseTracking(true);
+    setFocusPolicy(Qt::ClickFocus);        // Delete on a keyframe
     setAttribute(Qt::WA_OpaquePaintEvent); // it fills itself: the panels behind it are not repainted
     setMinimumHeight(kRuler + kBar + kStripMin + kBand + kKeys);
     thumbsDue_ = new QTimer(this);
@@ -34,7 +35,7 @@ Timeline::Timeline(Project* project, QWidget* parent) : QWidget(parent), project
             fitFile();
         }
         if (a == Project::Aspect::Range || a == Project::Aspect::Source || a == Project::Aspect::Loop ||
-            a == Project::Aspect::Output)
+            a == Project::Aspect::Output || a == Project::Aspect::Keyframes)
             update();
     });
 }
@@ -52,6 +53,10 @@ void Timeline::setSource(const media::MediaInfo* info) {
         });
     }
     fitFile();
+}
+
+int Timeline::keysRowY() const {
+    return rows().keys.center().y();
 }
 
 int Timeline::thumbnailsMade() const {

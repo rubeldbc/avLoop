@@ -58,6 +58,7 @@ public:
     void setFrameLabels(bool on);
     int labelOverlaps() const { return overlaps_; } // in the last paint; never more than 0
     int thumbnailsMade() const;
+    int keysRowY() const; // the keyframe row's middle (walks drag its diamonds)
     // Where the crossfade band's left edge is (the F frames before Out start), in seconds; Out when no crossfade.
     double fadeEdge() const;
 
@@ -71,11 +72,12 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void mouseDoubleClickEvent(QMouseEvent* event) override;
+    void keyPressEvent(QKeyEvent* event) override;
     void wheelEvent(QWheelEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
 
 private:
-    enum class Drag { None, Scrub, In, Out, Bar, Fade };
+    enum class Drag { None, Scrub, In, Out, Bar, Fade, Key };
     struct Rows {
         QRect ruler, bar, strip, band, keys;
         int overlayTop() const { return strip.top(); }
@@ -93,10 +95,12 @@ private:
     void paintStrip(QPainter& p, const Rows& r);
     void paintRange(QPainter& p, const Rows& r);
     void paintBand(QPainter& p, const Rows& r);
+    void paintKeys(QPainter& p, const Rows& r);
     void paintPlayhead(QPainter& p, const Rows& r);
     // TimelineInput.cpp
     Drag hit(const QPointF& at) const;
-    double scrubTime(double x) const; // the grid, In and Out within kSnapPx
+    int keyAt(const QPointF& at) const; // the diamond under the pointer in the keyframe row, else −1
+    double scrubTime(double x) const;   // the grid, In and Out within kSnapPx
     void scrubTo(double t, bool fast);
 
     Project* project_;
@@ -113,6 +117,7 @@ private:
     Drag drag_ = Drag::None;
     double dragFrom_ = 0; // the time under the pointer when the drag began
     TimeRange dragRange_;
+    double dragKeyTime_ = 0; // the keyframe being dragged, by its time (its index changes as it passes others)
     QString dragKey_;
     int drags_ = 0;
     int overlaps_ = 0;

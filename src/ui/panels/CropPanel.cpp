@@ -92,7 +92,9 @@ void SidePanel::bindCrop(Project* project) {
             QStringLiteral("%1 × %2%3").arg(out.width()).arg(out.height()).arg(alpha ? tr(" · alpha") : QString()));
         setEnabled(project->source().isValid());
     };
-    connect(project, &Project::changed, this, [refresh](Project::Aspect) { refresh(); });
+    connect(project, &Project::changed, this, [refresh](Project::Aspect a) {
+        if (a != Project::Aspect::Time) refresh(); // the playhead changes nothing here
+    });
 
     auto edit = [project](const QString& field, auto change) {
         CropShape c = project->crop();

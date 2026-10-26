@@ -10,6 +10,8 @@
 #include <QJsonDocument>
 #include <QSaveFile>
 
+#include <algorithm>
+
 namespace avloop::projectjson {
 
 namespace {
@@ -59,8 +61,15 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
         {QStringLiteral("scale"), d.transform.scale}, {QStringLiteral("flipH"), d.transform.flipH},
         {QStringLiteral("flipV"), d.transform.flipV},
     };
-    if (!d.original.value(QStringLiteral("transform")).toObject().contains(QStringLiteral("keyframes")))
-        transform.insert(QStringLiteral("keyframes"), QJsonArray());
+    QJsonArray keys;
+    for (const Keyframe& k : d.keyframes)
+        keys.append(
+            QJsonObject{{QStringLiteral("t"), k.t},
+                        {QStringLiteral("x"), k.x},
+                        {QStringLiteral("y"), k.y},
+                        {QStringLiteral("scale"), k.scale},
+                        {QStringLiteral("interp"), k.ease ? QStringLiteral("ease") : QStringLiteral("linear")}});
+    transform.insert(QStringLiteral("keyframes"), keys);
     root.insert(QStringLiteral("transform"), merged(d.original, QStringLiteral("transform"), transform));
 
     QJsonObject crop{
@@ -123,6 +132,14 @@ bool fromJson(const QJsonObject& read, ProjectData& d, QString* error, const QSt
     d.transform.flipH = t.value(QStringLiteral("flipH")).toBool();
     d.transform.flipV = t.value(QStringLiteral("flipV")).toBool();
     d.transform = d.transform.clamped();
+    for (const QJsonValue& v : t.value(QStringLiteral("keyframes")).toArray()) {
+        const QJsonObject o = v.toObject();
+        Keyframe k{o.value(QStringLiteral("t")).toDouble(), o.value(QStringLiteral("x")).toDouble(),
+                   o.value(QStringLiteral("y")).toDouble(), o.value(QStringLiteral("scale")).toDouble(1.0),
+                   o.value(QStringLiteral("interp")).toString() == QLatin1String("ease")};
+        k.scale = std::clamp(k.scale, VideoTransform::kMinScale, VideoTransform::kMaxScale);
+        d.keyframes = keyframes::withKey(d.keyframes, k, 0); // kept in order whatever the file's order
+    }
 
     const QJsonObject c = json.value(QStringLiteral("crop")).toObject();
     d.crop.kind = CropShape::kindFromId(c.value(QStringLiteral("kind")).toString());
