@@ -1,0 +1,32 @@
+startup: 469 ms
+walk walk-effects.json: 46 steps
+-- the Clip effects section: none set, the canvas as the video is @1171 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect effects.summary: 
+PASS expect effects.on: true
+PASS shot canvas-none.png: 1000x489 px
+-- a look typed field by field: each one Undo step, the canvas follows at once @2447 ms
+PASS expect effects.summary: contrast=20 exposure=0.6 hue=-150 sharpen=30 temperature=40 vibrance=50 vignette=60
+PASS expect undo.count: 7
+PASS shot canvas-look.png: 1000x489 px
+PASS shot panel-effects.png: 252x1239 px
+-- Invert, Posterize, Blur, Opacity: the checkerboard shows through @3866 ms
+PASS expect effects.summary: blur=8 contrast=20 exposure=0.6 hue=-150 invert=1 opacity=60 posterize=4 sharpen=30 temperature=40 vibrance=50 vignette=60
+PASS shot canvas-creative.png: 1000x489 px
+PASS shot panel-effects-creative.png: 252x1239 px
+-- Undo takes the last field back; Off shows the clip as it is, the values kept @4809 ms
+PASS expect effects.summary: blur=8 contrast=20 exposure=0.6 hue=-150 invert=1 posterize=4 sharpen=30 temperature=40 vibrance=50 vignette=60
+PASS expect effects.on: false
+PASS expect effects.summary: blur=8 contrast=20 exposure=0.6 hue=-150 invert=1 on=0 posterize=4 sharpen=30 temperature=40 vibrance=50 vignette=60
+PASS shot canvas-off.png: 1000x489 px
+PASS expect effects.on: true
+-- the Preview shows the exact output with the effects @5819 ms
+PASS waitFor preview.frame: 640x360 after 0 ms
+PASS shot preview-effects.png: 680x500 px
+-- Reset: none, one Undo step @7089 ms
+PASS expect effects.summary: 
+PASS expect effects.summary: blur=8 contrast=20 exposure=0.6 hue=-150 invert=1 posterize=4 sharpen=30 temperature=40 vibrance=50 vignette=60
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 000001f4262e1780] v1.16.0

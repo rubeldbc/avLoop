@@ -344,3 +344,18 @@ end of its section.
 - **A narrow value column cuts a suffix**: "0.6 EV" and "0.0 px" lost their last letters in the side panel's 58 px
   fields. Rule: a field's longest text, suffix included, fits in six characters — the unit goes in the tooltip, or
   the decimals go. (AV-019)
+
+## The colour theme (late)
+
+- **A picked colour must meet itself**: an eyedropper samples the clip as decoded; an effect matching that colour
+  after exposure or white balance has moved it misses. Rule: Replace colour runs first, on the clip's own colours.
+  (AV-020)
+- **A value that does nothing still counted** (seen in review, before it bit): Vignette size, or a theme's colour at
+  0 %, made the effects "not none", and the per-pixel pass's unpremultiply → premultiply round trip would move
+  half-clear pixels by a step. Rule: what an
+  effect at 0 % holds is left out of `isNeutral`. (AV-020)
+- **A new icon is counted twice**: the icons' gate and the shell walk's `icons.count` both pin the number; the shell
+  walk of AV-001 failed at 44. Rule: a new icon updates `test-icons` and `AV-001-walk/walk-shell.json` together.
+  (AV-020)
+- **A `&&` chain stops at the first red**: a regression walk after a failed one never ran, and a log line almost
+  said it had. Rule: a walk is PASSED only by its own run's line in walk-phase.log. (AV-020)

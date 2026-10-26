@@ -11,7 +11,7 @@ risk: Medium
 permission_class: VERIFY_ENVIRONMENT_FIRST
 code_budget: 900
 depends_on: [AV-018]
-unlocks: []
+unlocks: [AV-020]
 requirements: [REQ-AV-024]
 read_scope:
   - phases/26-10-26-034934-AvLoop/control/20_SHAPES_THE_CLIP_EFFECTS.md

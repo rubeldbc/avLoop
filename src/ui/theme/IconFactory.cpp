@@ -196,6 +196,7 @@ const QStringList& IconFactory::allNames() {
         QStringLiteral("check"),
         QStringLiteral("close"),
         QStringLiteral("chevron"),
+        QStringLiteral("eyedropper"),
     };
     // icons:end
     return names;

@@ -54,9 +54,13 @@ sitting: one item, one late phase.
 Added by the owner on 2026-10-27, item 17, verbatim: *"add a righ side group, Clip effects. where a lots of clip effect
 could be applied to the clip to change or color correction the clip before export"*.
 
+Added by the owner on 2026-10-27, item 18, verbatim: *"need more effect like i want to change the color theme of a clip,
+say a clip is orange color but i want to change it to red color theme. this kind of effect needed"*; then *"after
+completing everything push to main then forcly shutdown my pc"*.
+
 ## 2. The items
 
-Seventeen, in two tracks; a checkpoint closes each track. The fifteenth to the seventeenth came after both had
+Eighteen, in two tracks; a checkpoint closes each track. The fifteenth to the eighteenth came after both had
 closed: late phases.
 
 | # | Item | What it gives |
@@ -78,6 +82,7 @@ closed: late phases.
 | 15 | **The name and the About box** (AV-017, late) | "AvLoop by Rubel" in the app, its executable and its installer; the About box with the developer and the ways to reach them |
 | 16 | **The wheel and the keyframe copy** (AV-018, late) | the wheel zooms the canvas about the pointer; Alt+drag on the timeline copies a keyframe |
 | 17 | **The clip effects** (AV-019, late) | a Clip effects section: light, colour, creative and detail effects on the clip, on the canvas, in the Preview and in every export |
+| 18 | **The colour theme** (AV-020, late) | Replace colour (an orange made red; the colour picked from the clip), Colourise, Split toning, Duotone |
 
 Checkpoints: CP-A1 (AV-015) walks track A on one fresh build; CP-B1 (AV-016) walks the whole, installed, and makes
 the GitHub Release `v1.0.0`.
@@ -241,6 +246,17 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
 70. **R-70** The section is the fifth, "Clip effects", after Quality and open by default — it is long, and the four
     before it keep their places; its words in the app's British English ("Colour"). No new version and no Release
     (as R-65).
+71. **R-71** "Change the colour theme" read as four effects in the Clip effects section, after Colour: Replace colour
+    — From (picked from the clip) and To, Hue range, Softness, Amount: a pixel's hue near From's is turned by the
+    From → To turn and its saturation and value scaled by To's over From's, greys kept —; Colourise (every pixel one
+    hue, its lightness kept); Split toning (shadow and highlight tints); Duotone (black and white become two colours).
+    Replace comes first, on the clip's own colours, so a colour picked from it is found; the others after Saturation.
+72. **R-72** The eyedropper beside From takes the clip's colour as it is (before effects) where the canvas is
+    clicked; Esc or a click beside the video picks nothing, and the pick's click is not the tool's. Each colour is a
+    hex field, a swatch (the colour dialog) — a colour chosen while its effect's Amount is 0 sets it to 100 %.
+73. **R-73** The file stays at version 2 (AV-019's version 2 was never released); an effect at 0 % keeps its colours
+    without counting (the frame untouched). The eyedropper is the app's 44th icon. No Release (as R-65). The owner's
+    "forcly shutdown my pc" after the push: `shutdown /s /f` once CI is green, the open AvLoop's autosave kept.
 
 ## 4. What is not built
 

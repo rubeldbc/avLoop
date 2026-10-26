@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QJsonObject>
+#include <QString>
 
 #include <cstdint>
 
@@ -10,9 +11,10 @@ namespace avloop {
 // before it is placed — on the canvas, in the Preview and in the export alike. Not keyframed; a new video starts with
 // none. Neutral (off, or every value its default): the frames pass through untouched, byte for byte.
 //
-// Order: blur, sharpen (premultiplied, in the frame's pixels), then each pixel straight: exposure and white balance in
-// linear light, contrast, the four tones, hue, saturation and vibrance, sepia, invert, posterize, the vignette, the
-// opacity. Values outside their ranges are clamped.
+// Order: blur, sharpen (premultiplied, in the frame's pixels), then each pixel straight: the colour replaced (on the
+// clip's own colours, so a colour picked from it is found), exposure and white balance in linear light, contrast, the
+// four tones, hue, saturation and vibrance, colourise, split toning, duotone, sepia, invert, posterize, the vignette,
+// the opacity. Values outside their ranges are clamped; colours are 0xRRGGBB.
 struct ClipEffects {
     bool on = true; // off: kept in the project, not applied (before / after)
     // Light
@@ -28,6 +30,20 @@ struct ClipEffects {
     double saturation = 100; // %, 0 … 200
     double vibrance = 0;     // −100 … 100: the less saturated colours more
     double hue = 0;          // degrees, −180 … 180
+    // Colour theme (D-018): each its colours and an amount, 0 % off
+    std::uint32_t replaceFrom = 0xff8000;     // Replace: the clip's colour …
+    std::uint32_t replaceTo = 0xe01010;       // … and the colour it becomes
+    double replaceRange = 30;                 // degrees of hue either side taken whole, 0 … 180
+    double replaceSoftness = 20;              // and the degrees beyond it fading out, 0 … 180
+    double replace = 0;                       // %, 0 … 100
+    std::uint32_t colouriseColour = 0xe02020; // Colourise: every pixel this hue, its lightness kept
+    double colourise = 0;
+    std::uint32_t splitShadows = 0x2060ff; // Split toning: the shadows' tint and the highlights'
+    std::uint32_t splitHighlights = 0xffa040;
+    double split = 0;
+    std::uint32_t duotoneDark = 0x1a1040; // Duotone: black becomes the one, white the other
+    std::uint32_t duotoneLight = 0xffb060;
+    double duotone = 0;
     // Creative
     double sepia = 0; // %, 0 … 100
     bool invert = false;
@@ -60,6 +76,7 @@ struct ClipEffects {
     double blurSigma() const { return blur / 2; }
     static constexpr double kSharpenSigma = 1.0;
 
+    static QString hex(std::uint32_t colour); // "#rrggbb"
     QJsonObject toJson() const;
     static ClipEffects fromJson(const QJsonObject& json);
 };
@@ -77,6 +94,10 @@ public:
 
 private:
     bool light_, contrast_, tones_, hue_, saturate_, sepia_, invert_;
+    float replace_ = 0, fromHue_ = 0, turn_ = 0, ratioS_ = 1, ratioV_ = 1, range_ = 0, soft_ = 0;
+    float colourise_ = 0, ciHue_ = 0, ciSat_ = 0;
+    float split_ = 0, tintS_[3] = {}, tintH_[3] = {};
+    float duotone_ = 0, dark_[3] = {}, light3_[3] = {};
     float gain_[3] = {1, 1, 1};    // exposure × white balance, linear
     float k_ = 1;                  // contrast about 0.5
     float tone_[4] = {0, 0, 0, 0}; // shadows, highlights, whites, blacks

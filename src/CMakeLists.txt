@@ -57,7 +57,7 @@ add_library(avloop_ui STATIC
     ui/widgets/Toast.h ui/widgets/Toast.cpp
     ui/panels/Section.h ui/panels/Section.cpp
     ui/panels/SidePanel.h ui/panels/SidePanel.cpp ui/panels/CropPanel.cpp ui/panels/LoopPanel.cpp
-    ui/panels/OutputPanel.cpp ui/panels/QualityPanel.cpp ui/panels/PresetPanel.cpp ui/panels/EffectsPanel.cpp
+    ui/panels/OutputPanel.cpp ui/panels/QualityPanel.cpp ui/panels/PresetPanel.cpp ui/panels/EffectsPanel.cpp ui/widgets/ColourField.h ui/widgets/ColourField.cpp
     ui/canvas/DropZone.h ui/canvas/DropZone.cpp
     ui/canvas/Canvas.h ui/canvas/Canvas.cpp ui/canvas/CanvasView.cpp ui/canvas/CanvasGl.cpp ui/canvas/CanvasGlState.h ui/canvas/CanvasOverlay.cpp
     ui/tools/Tool.h ui/tools/ToolManager.h ui/tools/ToolManager.cpp

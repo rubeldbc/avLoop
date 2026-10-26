@@ -75,9 +75,13 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   Contrast, Highlights, Shadows, Whites and Blacks; Temperature, Tint, Saturation, Vibrance and Hue; Sepia, Invert,
   Posterize, a Vignette and Opacity; Sharpen and Blur. The canvas shows them as you type, the Preview and every export
   exactly (made once, before the GPU or the CPU draws); **On** compares with the clip as it is, **Reset** clears
-  them, each change is one Undo step.
+  them, each change is one Undo step. **Colour themes**: Replace colour turns one colour of the clip into another (an
+  orange made red — pick it from the video with the eyedropper), Colourise makes the whole clip one colour, Split toning
+  tints the shadows and the highlights, Duotone maps dark and light to two colours.
 
   <img src="docs/screenshots/clip-effects.png" alt="A warmer, livelier look with a vignette on the canvas" width="74%"> <img src="docs/screenshots/clip-effects-panel.png" alt="The Clip effects section" width="20%">
+
+  ![Replace colour: the demo clip's orange made red](docs/screenshots/clip-theme.png)
 
 - **The Loop Finder** (Ctrl+L) looks for the In and Out where the video joins itself best: every frame of the search
   range (In–Out ± 5 s, or the whole file) reduced to a small fingerprint of what will be exported, every pair of the

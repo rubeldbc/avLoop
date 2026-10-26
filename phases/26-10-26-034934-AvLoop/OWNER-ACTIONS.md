@@ -45,3 +45,5 @@ read and open for a veto later; an answer that differs changes the reading in it
 | 36 | **R-63 … R-65** Ctrl+wheel kept, up/down panning by the wheel gone, the timeline's wheel unchanged; the copy one Undo step; no Release. | `README.md` §3 63 … 65; AV-018. | Decided by the agent (AV-018); open for a veto |
 | 37 | **Item 17**: the Clip effects section — colour correction and looks before export. | AV-019 (late). | **Given 2026-10-27** — the owner's words (`README.md` §1) |
 | 38 | **R-66 … R-70** Which effects; made on the CPU for the output, a close look on the canvas; the file's version 2; Opacity and Alpha; the section's place. | `README.md` §3 66 … 70; AV-019. | Decided by the agent (AV-019); open for a veto |
+| 39 | **Item 18**: the colour theme — an orange clip made red, and the like. | AV-020 (late). | **Given 2026-10-27** — the owner's words (`README.md` §1) |
+| 40 | **R-71 … R-73** The four theme effects and their order; the eyedropper; version 2 kept; the PC shut down after the push. | `README.md` §3 71 … 73; AV-020. | Decided by the agent (AV-020); the shutdown the owner's own word |

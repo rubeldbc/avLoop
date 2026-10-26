@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ui/widgets/ColourField.h"
+
 #include <QWidget>
 
 #include <functional>
@@ -33,8 +35,8 @@ public:
     void bindOutput(Project* project);
     // QualityPanel.cpp: the Quality section, with the size estimate's row.
     void bindQuality(Project* project);
-    // EffectsPanel.cpp: the Clip effects section (D-017), bound to the project.
-    void bindEffects(Project* project);
+    // EffectsPanel.cpp: the Clip effects section (D-017, D-018), bound to the project; `pick` the canvas's eyedropper.
+    void bindEffects(Project* project, const ColourField::Picker& pick = {});
     // PresetPanel.cpp: the preset row (spec §11.3) — choosing one applies it (one Undo step); save asks a name,
     // delete asks first (a lab run answers both from its walk).
     void bindPresets(Project* project, std::function<QString()> askName, std::function<bool(const QString&)> confirm);

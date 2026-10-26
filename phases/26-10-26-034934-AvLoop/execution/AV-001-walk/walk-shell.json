@@ -8,7 +8,7 @@
     { "do": "expect", "probe": "topbar.buttons", "eq": "Open,Preview,Export" },
     { "do": "expect", "probe": "window.title", "eq": "AvLoop by Rubel" },
     { "label": "every icon of spec §5.3 is there and renders" },
-    { "do": "expect", "probe": "icons.count", "eq": 43 },
+    { "do": "expect", "probe": "icons.count", "eq": 44 },
     { "do": "expect", "probe": "icons.missing", "eq": "none" },
     { "do": "expect", "probe": "rail.count", "eq": 9 },
     { "do": "expect", "probe": "dropzone.visible", "eq": true },

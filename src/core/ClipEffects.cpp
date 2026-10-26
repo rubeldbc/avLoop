@@ -1,5 +1,6 @@
 #include "core/ClipEffects.h"
 
+#include <QColor>
 #include <QHashFunctions>
 
 #include <algorithm>
@@ -41,6 +42,67 @@ float clamp01(float v) {
 float smoothstep(float e0, float e1, float x) {
     const float t = clamp01((x - e0) / (e1 - e0));
     return t * t * (3 - 2 * t);
+}
+
+float luma(const float c[3]) {
+    return 0.2126f * c[0] + 0.7152f * c[1] + 0.0722f * c[2];
+}
+
+void rgbOf(std::uint32_t c, float out[3]) {
+    out[0] = float((c >> 16) & 0xff) / 255;
+    out[1] = float((c >> 8) & 0xff) / 255;
+    out[2] = float(c & 0xff) / 255;
+}
+
+// Hue in degrees 0 … 360, saturation and value 0 … 1.
+struct Hsv {
+    float h = 0, s = 0, v = 0;
+};
+
+Hsv toHsv(const float c[3]) {
+    const float mx = std::max({c[0], c[1], c[2]});
+    const float d = mx - std::min({c[0], c[1], c[2]});
+    Hsv o{0, mx > 0 ? d / mx : 0, mx};
+    if (d > 0) {
+        if (mx == c[0])
+            o.h = 60 * std::fmod((c[1] - c[2]) / d + 6, 6.f);
+        else if (mx == c[1])
+            o.h = 60 * ((c[2] - c[0]) / d + 2);
+        else
+            o.h = 60 * ((c[0] - c[1]) / d + 4);
+    }
+    return o;
+}
+
+// A hue's colour of chroma c, its smallest channel m.
+void fromHue(float h, float c, float m, float out[3]) {
+    const float hp = std::fmod(h + 360, 360.f) / 60;
+    const float x = c * (1 - std::abs(std::fmod(hp, 2.f) - 1));
+    const int sector = std::min(5, int(hp));
+    const float r[6] = {c, x, 0, 0, x, c}, g[6] = {x, c, c, x, 0, 0}, b[6] = {0, 0, x, c, c, x};
+    out[0] = clamp01(r[sector] + m);
+    out[1] = clamp01(g[sector] + m);
+    out[2] = clamp01(b[sector] + m);
+}
+
+void fromHsv(const Hsv& p, float out[3]) {
+    fromHue(p.h, p.v * p.s, p.v - p.v * p.s, out);
+}
+
+void fromHsl(float h, float s, float l, float out[3]) {
+    const float c = (1 - std::abs(2 * l - 1)) * s;
+    fromHue(h, c, l - c / 2, out);
+}
+
+// A colour's hue and HSL saturation.
+void hueSat(std::uint32_t colour, float& h, float& s) {
+    float c[3];
+    rgbOf(colour, c);
+    const float mx = std::max({c[0], c[1], c[2]});
+    const float mn = std::min({c[0], c[1], c[2]});
+    const float l = (mx + mn) / 2;
+    h = toHsv(c).h;
+    s = mx == mn ? 0 : (mx - mn) / (1 - std::abs(2 * l - 1));
 }
 
 } // namespace
@@ -85,9 +147,51 @@ Colour::Colour(const ClipEffects& e)
     sat_ = float(e.saturation / 100);
     vib_ = float(e.vibrance / 100);
     sepiaP_ = float(e.sepia / 100);
+    // Replace: the hue turned by the From → To turn, saturation and value scaled by To over From, by the weight of how
+    // near the pixel's hue is to From's (and how coloured it is — greys stay).
+    replace_ = float(e.replace / 100);
+    float from[3], to[3];
+    rgbOf(e.replaceFrom, from);
+    rgbOf(e.replaceTo, to);
+    const Hsv hf = toHsv(from), ht = toHsv(to);
+    fromHue_ = hf.h;
+    turn_ = std::fmod(ht.h - hf.h + 540, 360.f) - 180;
+    ratioS_ = hf.s > 0.05f ? ht.s / hf.s : 1;
+    ratioV_ = hf.v > 0.05f ? ht.v / hf.v : 1;
+    range_ = float(e.replaceRange);
+    soft_ = float(e.replaceSoftness);
+    colourise_ = float(e.colourise / 100);
+    hueSat(e.colouriseColour, ciHue_, ciSat_);
+    // Split toning's tints: each colour at half lightness, less grey — what it adds.
+    split_ = float(e.split / 100);
+    float hue = 0, sat = 0;
+    hueSat(e.splitShadows, hue, sat);
+    fromHsl(hue, sat, 0.5f, tintS_);
+    hueSat(e.splitHighlights, hue, sat);
+    fromHsl(hue, sat, 0.5f, tintH_);
+    for (int i = 0; i < 3; ++i) {
+        tintS_[i] -= 0.5f;
+        tintH_[i] -= 0.5f;
+    }
+    duotone_ = float(e.duotone / 100);
+    rgbOf(e.duotoneDark, dark_);
+    rgbOf(e.duotoneLight, light3_);
 }
 
 void Colour::operator()(float rgb[3]) const {
+    if (replace_ > 0) {
+        Hsv p = toHsv(rgb);
+        float d = std::abs(p.h - fromHue_);
+        if (d > 180) d = 360 - d;
+        const float near = soft_ > 0 ? 1 - smoothstep(range_, range_ + soft_, d) : (d <= range_ ? 1.f : 0.f);
+        const float w = replace_ * near * smoothstep(0.08f, 0.25f, p.s);
+        if (w > 0) {
+            p.h += w * turn_;
+            p.s = clamp01(p.s * (1 + w * (ratioS_ - 1)));
+            p.v = clamp01(p.v * (1 + w * (ratioV_ - 1)));
+            fromHsv(p, rgb);
+        }
+    }
     if (light_)
         for (int i = 0; i < 3; ++i)
             rgb[i] = toSrgb(std::min(1.f, toLinear(rgb[i]) * gain_[i]));
@@ -114,6 +218,25 @@ void Colour::operator()(float rgb[3]) const {
         for (int i = 0; i < 3; ++i)
             rgb[i] = clamp01(luma + (rgb[i] - luma) * f);
     }
+    if (colourise_ > 0) {
+        // Every pixel the colour's hue and saturation at its own HSL lightness.
+        const float l = (std::max({rgb[0], rgb[1], rgb[2]}) + std::min({rgb[0], rgb[1], rgb[2]})) / 2;
+        float c[3];
+        fromHsl(ciHue_, ciSat_, l, c);
+        for (int i = 0; i < 3; ++i)
+            rgb[i] += (c[i] - rgb[i]) * colourise_;
+    }
+    if (split_ > 0) {
+        const float y = luma(rgb);
+        const float ws = (1 - y) * (1 - y), wh = y * y;
+        for (int i = 0; i < 3; ++i)
+            rgb[i] = clamp01(rgb[i] + split_ * 0.6f * (tintS_[i] * ws + tintH_[i] * wh));
+    }
+    if (duotone_ > 0) {
+        const float y = luma(rgb);
+        for (int i = 0; i < 3; ++i)
+            rgb[i] += (dark_[i] + (light3_[i] - dark_[i]) * y - rgb[i]) * duotone_;
+    }
     if (sepia_) {
         const float r = rgb[0], g = rgb[1], b = rgb[2];
         const float s[3] = {0.393f * r + 0.769f * g + 0.189f * b, 0.349f * r + 0.686f * g + 0.168f * b,
@@ -139,19 +262,43 @@ ClipEffects ClipEffects::clamped() const {
     for (double* v : {&e.sepia, &e.vignetteSize, &e.opacity, &e.sharpen, &e.blur})
         *v = std::clamp(*v, 0.0, 100.0);
     e.posterize = posterize < 2 ? 0 : std::min(posterize, 32);
+    e.replaceRange = std::clamp(replaceRange, 0.0, 180.0);
+    e.replaceSoftness = std::clamp(replaceSoftness, 0.0, 180.0);
+    for (double* v : {&e.replace, &e.colourise, &e.split, &e.duotone})
+        *v = std::clamp(*v, 0.0, 100.0);
+    for (std::uint32_t* c : {&e.replaceFrom, &e.replaceTo, &e.colouriseColour, &e.splitShadows, &e.splitHighlights,
+                             &e.duotoneDark, &e.duotoneLight})
+        *c &= 0xffffffu;
     return e;
 }
 
 bool ClipEffects::isNeutral() const {
+    // What an effect at 0 % holds (its colours, the vignette's size) changes nothing.
     ClipEffects none;
     none.on = on;
+    if (vignette == 0) none.vignetteSize = vignetteSize;
+    if (replace == 0) {
+        none.replaceFrom = replaceFrom;
+        none.replaceTo = replaceTo;
+        none.replaceRange = replaceRange;
+        none.replaceSoftness = replaceSoftness;
+    }
+    if (colourise == 0) none.colouriseColour = colouriseColour;
+    if (split == 0) {
+        none.splitShadows = splitShadows;
+        none.splitHighlights = splitHighlights;
+    }
+    if (duotone == 0) {
+        none.duotoneDark = duotoneDark;
+        none.duotoneLight = duotoneLight;
+    }
     return !on || *this == none;
 }
 
 bool ClipEffects::changesColour() const {
-    return on &&
-           (exposure != 0 || contrast != 0 || highlights != 0 || shadows != 0 || whites != 0 || blacks != 0 ||
-            temperature != 0 || tint != 0 || saturation != 100 || vibrance != 0 || hue != 0 || sepia > 0 || invert);
+    return on && (exposure != 0 || contrast != 0 || highlights != 0 || shadows != 0 || whites != 0 || blacks != 0 ||
+                  temperature != 0 || tint != 0 || saturation != 100 || vibrance != 0 || hue != 0 || sepia > 0 ||
+                  invert || replace > 0 || colourise > 0 || split > 0 || duotone > 0);
 }
 
 std::uint64_t ClipEffects::key() const {
@@ -159,7 +306,10 @@ std::uint64_t ClipEffects::key() const {
     const std::size_t h =
         qHashMulti(0x5eed, exposure, contrast, highlights, shadows, whites, blacks, temperature, tint, saturation,
                    vibrance, hue, sepia, invert, posterize, vignette, vignetteSize, opacity, sharpen, blur);
-    return h ? std::uint64_t(h) : 1;
+    const std::size_t theme =
+        qHashMulti(h, replaceFrom, replaceTo, replaceRange, replaceSoftness, replace, colouriseColour, colourise,
+                   splitShadows, splitHighlights, split, duotoneDark, duotoneLight, duotone);
+    return theme ? std::uint64_t(theme) : 1;
 }
 
 void ClipEffects::colour(float rgb[3]) const {
@@ -187,6 +337,10 @@ void ClipEffects::vignetteOn(float rgb[3], float w) const {
         rgb[i] = a >= 0 ? rgb[i] * (1 - a * w) : rgb[i] + (-a) * w * (1 - rgb[i]);
 }
 
+QString ClipEffects::hex(std::uint32_t colour) {
+    return QStringLiteral("#%1").arg(colour & 0xffffffu, 6, 16, QLatin1Char('0'));
+}
+
 QJsonObject ClipEffects::toJson() const {
     return {
         {QStringLiteral("on"), on},
@@ -209,6 +363,19 @@ QJsonObject ClipEffects::toJson() const {
         {QStringLiteral("opacity"), opacity},
         {QStringLiteral("sharpen"), sharpen},
         {QStringLiteral("blur"), blur},
+        {QStringLiteral("replaceFrom"), hex(replaceFrom)},
+        {QStringLiteral("replaceTo"), hex(replaceTo)},
+        {QStringLiteral("replaceRange"), replaceRange},
+        {QStringLiteral("replaceSoftness"), replaceSoftness},
+        {QStringLiteral("replace"), replace},
+        {QStringLiteral("colouriseColour"), hex(colouriseColour)},
+        {QStringLiteral("colourise"), colourise},
+        {QStringLiteral("splitShadows"), hex(splitShadows)},
+        {QStringLiteral("splitHighlights"), hex(splitHighlights)},
+        {QStringLiteral("split"), split},
+        {QStringLiteral("duotoneDark"), hex(duotoneDark)},
+        {QStringLiteral("duotoneLight"), hex(duotoneLight)},
+        {QStringLiteral("duotone"), duotone},
     };
 }
 
@@ -233,6 +400,23 @@ ClipEffects ClipEffects::fromJson(const QJsonObject& j) {
     read("opacity", e.opacity);
     read("sharpen", e.sharpen);
     read("blur", e.blur);
+    read("replaceRange", e.replaceRange);
+    read("replaceSoftness", e.replaceSoftness);
+    read("replace", e.replace);
+    read("colourise", e.colourise);
+    read("split", e.split);
+    read("duotone", e.duotone);
+    auto colour = [&j](const char* key, std::uint32_t& c) {
+        const QColor read(j.value(QLatin1String(key)).toString());
+        if (read.isValid()) c = read.rgb() & 0xffffffu;
+    };
+    colour("replaceFrom", e.replaceFrom);
+    colour("replaceTo", e.replaceTo);
+    colour("colouriseColour", e.colouriseColour);
+    colour("splitShadows", e.splitShadows);
+    colour("splitHighlights", e.splitHighlights);
+    colour("duotoneDark", e.duotoneDark);
+    colour("duotoneLight", e.duotoneLight);
     e.invert = j.value(QStringLiteral("invert")).toBool(false);
     e.posterize = j.value(QStringLiteral("posterize")).toInt(0);
     return e.clamped();

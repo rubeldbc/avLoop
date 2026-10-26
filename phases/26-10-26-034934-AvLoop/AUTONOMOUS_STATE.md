@@ -2,7 +2,9 @@
 
 Program: AVLOOP
 Programme version: 1.0.0
-State: **COMPLETE 2026-10-27** — every phase DONE (AV-019, the owner's late item 17; no Release, R-70).
+State: **COMPLETE 2026-10-27** — every phase DONE (AV-020, the owner's late item 18; no Release, R-73).
+Was: **ACTIVE 2026-10-27** — the owner's late wish (item 18): AV-020, the colour theme.
+Was: **COMPLETE 2026-10-27** — every phase DONE (AV-019, the owner's late item 17; no Release, R-70).
 Was: **ACTIVE 2026-10-27** — the owner's late wish (item 17): AV-019, the clip effects.
 Was: **COMPLETE 2026-10-27** — every phase DONE (AV-018, the owner's late item 16; no Release, R-65).
 Was: **ACTIVE 2026-10-27** — the owner's late wishes (item 16): AV-018, the wheel and the keyframe copy.
@@ -17,7 +19,7 @@ feels like a loop."* — with the ten decisions and the five later words of `REA
 a checkpoint after each.
 Active phase: none
 Next eligible: none — every phase is closed
-Completed: 19 of 19
+Completed: 20 of 20
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -91,12 +93,17 @@ of light, colour, looks and detail with On and Reset — applied to every source
 the canvas, in the Preview, in every export and in avloop-cli (the GPU and the CPU given the same frame); the project
 file's version 2. Mended on the way: a crash at quit with the Preview open.
 
-Readings taken: R-1 … R-70 (`README.md` §3; `DECISIONS.md`; `OWNER-ACTIONS.md`) — every one open for the owner's
+**Item 18, late (AV-020, 2026-10-27).** The colour theme: Replace colour (a colour of the clip — picked from it by
+the eyedropper — turned into another, an orange made red), Colourise, Split toning and Duotone, in the Clip effects
+section; the file still version 2.
+
+Readings taken: R-1 … R-73 (`README.md` §3; `DECISIONS.md`; `OWNER-ACTIONS.md`) — every one open for the owner's
 veto. Dropped: nothing the specification names. Not done, and why: OBS itself was never driven (S11's second half needs
 obs-websocket, not on this PC; the libvpx half passes); no code signing (§1.3, the owner's word). `BLOCKED_EXTERNAL`:
 none. Waiting legs: none.
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-020** DONE 2026-10-27 — The colour theme (late, item 18): Replace colour with an eyedropper (orange → red), Colourise, Split toning, Duotone; walks theme and render PASSED, five earlier walks again Record: `execution/AV-020-EXECUTION.md`.
 - **AV-019** DONE 2026-10-27 — The clip effects (late, item 17): a Clip effects section — light, colour, creative, detail — on the canvas, in the Preview and every export, GPU = CPU; the file's version 2; walks effects and render PASSED, eleven earlier walks again Record: `execution/AV-019-EXECUTION.md`.
 - **AV-018** DONE 2026-10-27 — The wheel and the keyframe copy (late, item 16): the wheel zooms the canvas about the pointer; Alt+drag copies a keyframe, one Undo step; walks wheel and key-copy PASSED, AV-003 and AV-011 again Record: `execution/AV-018-EXECUTION.md`.
 - **AV-017** DONE 2026-10-26 — The name and the About box (late, item 15): AvLoop by Rubel in the app, its exe and its installer; About with the developer's contact; 1.0.1; walks about and name PASSED, the old name's walks again Record: `execution/AV-017-EXECUTION.md`.

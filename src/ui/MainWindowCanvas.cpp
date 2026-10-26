@@ -32,7 +32,8 @@ void MainWindow::buildCanvasTools() {
     side_->bindCrop(project_);
     side_->bindLoop(project_);
     side_->bindOutput(project_);
-    side_->bindEffects(project_);
+    side_->bindEffects(project_,
+                       [this](std::function<void(const QColor&)> done) { canvas_->pickColour(std::move(done)); });
 
     // "Transparent area in output" / "Output is fully transparent" (spec §6.2, §12.2).
     auto* notice = new QLabel(statusBar());

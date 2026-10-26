@@ -4,9 +4,12 @@
 #include "core/Project.h"
 #include "ui/tools/Tool.h"
 
+#include <QColor>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QWheelEvent>
+
+#include <algorithm>
 
 namespace avloop {
 
@@ -53,8 +56,41 @@ void Canvas::setTool(Tool* tool) {
     update();
 }
 
+void Canvas::pickColour(std::function<void(const QColor&)> done) {
+    pickDone_ = std::move(done);
+    setCursor(Qt::CrossCursor);
+    setFocus(Qt::OtherFocusReason); // Esc reaches the canvas
+}
+
+QColor Canvas::colourAt(const QPointF& view) const {
+    if (frame_.isNull()) return {};
+    const QRectF r = videoRect();
+    const QPointF p = viewToScene(view);
+    double u = (p.x() - r.left()) / r.width();
+    double v = (p.y() - r.top()) / r.height();
+    if (u < 0 || u >= 1 || v < 0 || v >= 1) return {};
+    const VideoTransform& t = project_->transform();
+    if (t.flipH) u = 1 - u;
+    if (t.flipV) v = 1 - v;
+    const int x = std::clamp(int(u * frame_.width), 0, frame_.width - 1);
+    const int y = std::clamp(int(v * frame_.height), 0, frame_.height - 1);
+    const std::uint8_t* px = frame_.data.get() + std::ptrdiff_t(y) * frame_.stride + x * 4;
+    if (px[3] == 0) return {};
+    auto straight = [&](int c) { return std::min(255, (px[c] * 255 + px[3] / 2) / px[3]); };
+    return QColor(straight(0), straight(1), straight(2));
+}
+
 void Canvas::mousePressEvent(QMouseEvent* e) {
     setFocus(Qt::MouseFocusReason);
+    if (pickDone_ && e->button() == Qt::LeftButton) {
+        const QColor c = colourAt(e->position());
+        auto done = std::move(pickDone_);
+        pickDone_ = nullptr;
+        pickRelease_ = true;
+        unsetCursor();
+        if (c.isValid()) done(c);
+        return;
+    }
     if (e->button() == Qt::MiddleButton) { // pan in every tool (spec §6.3)
         panning_ = true;
         lastPanPos_ = e->position();
@@ -74,13 +110,17 @@ void Canvas::mouseMoveEvent(QMouseEvent* e) {
     if (!tool_) return;
     const ToolEvent t = toolEvent(this, e);
     if (e->buttons() == Qt::NoButton)
-        setCursor(tool_->cursor(t));
+        setCursor(pickDone_ ? QCursor(Qt::CrossCursor) : tool_->cursor(t));
     else
         tool_->mouseMove(t);
     update();
 }
 
 void Canvas::mouseReleaseEvent(QMouseEvent* e) {
+    if (pickRelease_ && e->button() == Qt::LeftButton) {
+        pickRelease_ = false;
+        return;
+    }
     if (e->button() == Qt::MiddleButton && panning_) {
         panning_ = false;
         unsetCursor();
@@ -114,6 +154,11 @@ void Canvas::wheelEvent(QWheelEvent* e) {
 
 bool Canvas::event(QEvent* e) {
     // The active tool's keys come before the window's shortcuts: the crop's arrows, not the timeline's frame steps.
+    // While picking, Esc is the canvas's (it cancels the pick).
+    if (e->type() == QEvent::ShortcutOverride && pickDone_ && static_cast<QKeyEvent*>(e)->key() == Qt::Key_Escape) {
+        e->accept();
+        return true;
+    }
     if (e->type() == QEvent::ShortcutOverride && tool_ && tool_->wantsKey(static_cast<QKeyEvent*>(e))) {
         e->accept();
         return true;
@@ -122,6 +167,11 @@ bool Canvas::event(QEvent* e) {
 }
 
 void Canvas::keyPressEvent(QKeyEvent* e) {
+    if (pickDone_ && e->key() == Qt::Key_Escape) {
+        pickDone_ = nullptr;
+        unsetCursor();
+        return;
+    }
     if (tool_ && tool_->keyPress(e)) {
         update();
         return;

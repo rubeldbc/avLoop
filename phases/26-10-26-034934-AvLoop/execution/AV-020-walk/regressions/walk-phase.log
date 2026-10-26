@@ -1,0 +1,10 @@
+FAILED walk-shell.json (8 s)
+   FAIL expect icons.count: 44 (wanted = 43)
+PASSED walk-selection.json (11 s)
+PASSED walk-keyframes.json (8 s)
+PASSED walk-effects.json (8 s)
+PHASE WALKS FAILED: 1
+PASSED walk-shell.json (8 s)
+PHASE WALKS PASSED
+PASSED walk-effects-render.mjs (5 s)
+PHASE WALKS PASSED

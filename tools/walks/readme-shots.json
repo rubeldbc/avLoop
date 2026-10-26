@@ -79,6 +79,14 @@
     { "do": "type", "on": "panel.effects.vignette", "text": "45" },
     { "do": "wait", "ms": 300 },
     { "do": "shot", "on": "CanvasArea", "file": "clip-effects.png", "maxWidth": 1100 },
-    { "do": "shot", "on": "Section.effects", "file": "clip-effects-panel.png" }
+    { "do": "shot", "on": "Section.effects", "file": "clip-effects-panel.png" },
+
+    { "label": "a colour theme: the orange made red by Replace colour" },
+    { "do": "click", "on": "panel.effects.reset" },
+    { "do": "type", "on": "panel.effects.replaceFrom", "text": "#ff8000" },
+    { "do": "type", "on": "panel.effects.replaceTo", "text": "#e0102a" },
+    { "do": "type", "on": "panel.effects.replaceRange", "text": "40" },
+    { "do": "wait", "ms": 300 },
+    { "do": "shot", "on": "CanvasArea", "file": "clip-theme.png", "maxWidth": 1100 }
   ]
 }

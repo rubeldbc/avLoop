@@ -7,6 +7,7 @@
 #include <QPointF>
 #include <QRectF>
 
+#include <functional>
 #include <memory>
 
 namespace avloop {
@@ -49,6 +50,10 @@ public:
     QRectF fitTarget() const;
     QRectF videoRect() const;
     bool glReady() const;
+    // The eyedropper (D-018): the next click on the video gives its colour there, as the clip is (before effects);
+    // Esc or a click beside the video gives none. Overrides the tool for that one click.
+    void pickColour(std::function<void(const QColor&)> done);
+    bool picking() const { return bool(pickDone_); }
 
 signals:
     void viewChanged();
@@ -87,9 +92,12 @@ private:
     QPointF pan_; // the scene point at the canvas's centre
     bool panning_ = false;
     QPointF lastPanPos_;
-    int wheelZoom_ = 0;        // the wheel's eighths of a degree not yet a zoom step
-    bool fitMode_ = true;      // Fit holds until the user zooms or pans; a resize fits again
-    bool fitNextFrame_ = true; // a new source: its first frame is fitted
+    std::function<void(const QColor&)> pickDone_;
+    bool pickRelease_ = false;                  // the pick's click: its release is not the tool's
+    QColor colourAt(const QPointF& view) const; // the clip's straight colour under a view point, invalid beside it
+    int wheelZoom_ = 0;                         // the wheel's eighths of a degree not yet a zoom step
+    bool fitMode_ = true;                       // Fit holds until the user zooms or pans; a resize fits again
+    bool fitNextFrame_ = true;                  // a new source: its first frame is fitted
 };
 
 } // namespace avloop

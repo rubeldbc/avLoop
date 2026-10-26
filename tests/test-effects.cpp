@@ -1,8 +1,10 @@
 // The clip effects (D-017): none leaves the frame untouched, byte for byte; each effect moves a pixel the way its name
 // says (exposure in linear light, contrast about the middle, the four tones, white balance, hue, saturation, sepia,
-// invert, posterize, the vignette); the pass keeps transparent pixels clear, halves a pixel at Opacity 50 %, spreads a
-// point by Blur keeping its sum and holding the edges, overshoots an edge by Sharpen; the file's keys, clamped; the
-// project — one Undo step a field, a new video without effects, Opacity under 100 % asking for alpha.
+// invert, posterize, the vignette; a colour replaced — yellow to red, orange to a deep red, by half, within its range
+// and softness, greys kept —, colourise, split toning, duotone, a theme at 0 % none); the pass keeps transparent pixels
+// clear, halves a pixel at Opacity 50 %, spreads a point by Blur keeping its sum and holding the edges, overshoots an
+// edge by Sharpen; the file's keys, clamped; the project — one Undo step a field, a new video without effects, Opacity
+// under 100 % asking for alpha.
 #include "core/ClipEffects.h"
 #include "core/Project.h"
 #include "core/ProjectJson.h"
@@ -134,6 +136,73 @@ private slots:
         QCOMPARE(e.posterized(0.6f), 1.0f);
         e.posterize = 3;
         QCOMPARE(e.posterized(0.4f), 0.5f);
+    }
+    void replaceColour() {
+        ClipEffects e;
+        e.replace = 100;
+        e.replaceFrom = 0xffff00; // yellow …
+        e.replaceTo = 0xff0000;   // … to red
+        const auto red = coloured(e, 1, 1, 0);
+        QVERIFY(std::abs(red[0] - 1) < 1e-5f && red[1] < 1e-5f && red[2] < 1e-5f);
+        const auto keptRed = coloured(e, 1, 0, 0); // 60° away: past the range and the softness
+        QVERIFY(keptRed[0] == 1 && keptRed[1] == 0 && keptRed[2] == 0);
+        const auto grey = coloured(e, 0.5f, 0.5f, 0.5f); // greys stay whatever the hue
+        QVERIFY(grey[0] == 0.5f && grey[1] == 0.5f && grey[2] == 0.5f);
+        // Orange to a deep red: the hue turned, saturation and value scaled to the target's.
+        e.replaceFrom = 0xff8000;
+        e.replaceTo = 0xe01010;
+        const auto deep = coloured(e, 1.0f, 0.5f, 0.0f);
+        QVERIFY2(deep[0] > 0.85f && deep[1] < 0.08f && deep[2] < 0.08f,
+                 qPrintable(QStringLiteral("%1,%2,%3").arg(deep[0]).arg(deep[1]).arg(deep[2])));
+        // Half the amount: half the turn (30° → 15°).
+        e.replace = 50;
+        const auto half = coloured(e, 1.0f, 0.5f, 0.0f);
+        QVERIFY(half[1] > 0.15f && half[1] < 0.35f);
+        // Softness: a hue past the range changes less than one inside it.
+        e.replace = 100;
+        e.replaceTo = 0xff0080;                             // pink, a long turn
+        const auto inside = coloured(e, 1.0f, 0.75f, 0.0f); // 45° (15° from orange) → 345°: 1, 0, 0.25
+        QVERIFY2(std::abs(inside[2] - 0.25f) < 0.01f && inside[1] < 1e-5f, qPrintable(QString::number(inside[2])));
+        const auto soft = coloured(e, 0.9f, 1.0f, 0.0f); // 66° (36°): in the softness, turned 78 % → 19°
+        QVERIFY2(soft[0] == 1.0f && soft[1] > 0.25f && soft[1] < 0.4f, qPrintable(QString::number(soft[1])));
+        const auto past = coloured(e, 0.5f, 1.0f, 0.0f); // 90° (60°): past the range and the softness
+        QVERIFY(past[0] == 0.5f && past[2] == 0.0f);
+        e.replaceSoftness = 0; // a hard edge: 36° is now past it, 30° still taken whole
+        QVERIFY(coloured(e, 0.9f, 1.0f, 0.0f)[0] == 0.9f);
+        QVERIFY(coloured(e, 1.0f, 1.0f, 0.0f)[1] < 1e-5f);
+    }
+    void themes() {
+        ClipEffects e;
+        e.colourise = 100;
+        e.colouriseColour = 0xe02020;
+        const auto tinted = coloured(e, 0.5f, 0.5f, 0.5f); // grey takes the hue, its lightness kept
+        QVERIFY(tinted[0] > tinted[1] && std::abs(tinted[1] - tinted[2]) < 1e-5f);
+        QVERIFY(
+            std::abs((std::max({tinted[0], tinted[1], tinted[2]}) + std::min({tinted[0], tinted[1], tinted[2]})) / 2 -
+                     0.5f) < 1e-5f);
+        e = {};
+        e.split = 100; // blue shadows, orange highlights
+        const auto dark = coloured(e, 0.2f, 0.2f, 0.2f);
+        const auto light = coloured(e, 0.8f, 0.8f, 0.8f);
+        QVERIFY(dark[2] > dark[0]);
+        QVERIFY(light[0] > light[2]);
+        e = {};
+        e.duotone = 100;
+        e.duotoneDark = 0x102030;
+        e.duotoneLight = 0xf0e0d0;
+        const auto black = coloured(e, 0, 0, 0);
+        const auto white = coloured(e, 1, 1, 1);
+        QVERIFY(std::abs(black[0] - 0x10 / 255.f) < 1e-5f && std::abs(black[2] - 0x30 / 255.f) < 1e-5f);
+        QVERIFY(std::abs(white[0] - 0xf0 / 255.f) < 1e-4f && std::abs(white[2] - 0xd0 / 255.f) < 1e-4f);
+        // A theme's colours at 0 % change nothing: still none, the frame untouched.
+        ClipEffects idle;
+        idle.replaceFrom = 0x123456;
+        idle.duotoneLight = 0x654321;
+        idle.vignetteSize = 80;
+        QVERIFY(idle.isNeutral());
+        QCOMPARE(idle.key(), std::uint64_t(0));
+        QCOMPARE(ClipEffects::fromJson(idle.toJson()), idle);
+        QCOMPARE(idle.toJson().value(QStringLiteral("replaceFrom")).toString(), QStringLiteral("#123456"));
     }
     void vignette() {
         ClipEffects e;

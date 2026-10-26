@@ -1,0 +1,10 @@
+PASS a version-1 project renders as before: 921600 bytes
+PASS the red bar without effects: 253,0,0,255
+PASS Invert: red turns cyan: 2,255,255,255
+PASS Saturation 0: the grey of red's luma (≈ 54): 54,54,54,255
+PASS Opacity 50 %: alpha and colour halved: 127,0,0,128
+PASS Off: byte for byte the frame without effects: max diff 0
+PASS Blur 20 px: green spread into the red bar's edge: 253,0,0,255 → 194,59,0,255
+PASS a whole look: the GPU and the CPU draw the same: max diff 0
+PASS the look changed the picture: max diff from none 247
+WALK PASSED

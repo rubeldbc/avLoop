@@ -6,6 +6,22 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-018 — The colour theme (AV-020, late, 2026-10-27)
+
+- Four effects join the Clip effects section, after Colour (R-71): **Replace colour** — From (typed, chosen, or picked
+  from the clip by the eyedropper), To, Hue range (0 … 180°, 30), Softness (0 … 180°, 20), Amount: the hues near
+  From's turned the From → To way, their saturation and value scaled by To's over From's, the others and greys
+  untouched; **Colourise** — Colour, Amount: every pixel that hue, its lightness kept; **Split toning** — Shadows,
+  Highlights, Amount; **Duotone** — Dark, Light, Amount. The maths: `control/21_SHAPES_THE_COLOUR_THEME.md` §1.
+- Order: Replace first (on the clip's own colours, so a picked colour is found), Colourise, Split toning and Duotone
+  after Saturation and Vibrance. They are colour functions: the canvas's table and the CPU pass carry them as D-017's.
+- Each colour a hex field and a swatch (the colour dialog); a colour chosen while its effect is at 0 % sets it to
+  100 %; an effect at 0 % keeps its colours and changes no byte. The eyedropper (the 44th icon): the next click on the
+  video gives the clip's colour there, before effects; Esc or a click beside it gives none (R-72).
+- The file stays at version 2 — `"replaceFrom"`, `"replaceTo"` (#rrggbb), `"replaceRange"`, `"replaceSoftness"`,
+  `"replace"`, `"colouriseColour"`, `"colourise"`, `"splitShadows"`, `"splitHighlights"`, `"split"`,
+  `"duotoneDark"`, `"duotoneLight"`, `"duotone"` (R-73).
+
 ### D-017 — The clip effects (AV-019, late, 2026-10-27)
 
 - The side panel's fifth section, "Clip effects" (after Quality, open by default): On and Reset; Light — Exposure

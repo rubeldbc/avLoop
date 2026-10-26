@@ -2,13 +2,13 @@
   "programId": "AVLOOP",
   "programmeVersion": "1.0.0",
   "generatedBy": "control/phase-tools/sync-progress.mjs",
-  "generatedAt": "2026-10-26T20:14:16.935Z",
+  "generatedAt": "2026-10-26T21:25:15.643Z",
   "state": "COMPLETE",
   "activePhase": null,
   "nextEligiblePhase": null,
-  "lastCompletedPhase": "AV-019",
-  "completed": 19,
-  "total": 19,
+  "lastCompletedPhase": "AV-020",
+  "completed": 20,
+  "total": 20,
   "blocked": [],
   "deferred": [],
   "branch": "main",
@@ -490,7 +490,9 @@
       "dependsOn": [
         "AV-018"
       ],
-      "unlocks": [],
+      "unlocks": [
+        "AV-020"
+      ],
       "requirements": [
         "REQ-AV-024"
       ],
@@ -499,6 +501,27 @@
       "ownerItem": 17,
       "file": "phases/AV-019-the-clip-effects.md",
       "record": "execution/AV-019-EXECUTION.md"
+    },
+    {
+      "id": "AV-020",
+      "title": "The colour theme",
+      "status": "DONE",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Low",
+      "dependsOn": [
+        "AV-019"
+      ],
+      "unlocks": [],
+      "requirements": [
+        "REQ-AV-025"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 500,
+      "ownerItem": 18,
+      "file": "phases/AV-020-the-colour-theme.md",
+      "record": "execution/AV-020-EXECUTION.md"
     }
   ]
 }
