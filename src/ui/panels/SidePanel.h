@@ -7,6 +7,7 @@ class QToolButton;
 
 namespace avloop {
 
+class Project;
 class Section;
 
 // The right panel (spec §5.1): the preset row above four collapsible sections — Crop, Loop, Output, Quality.
@@ -21,6 +22,8 @@ public:
     Section* output() const { return output_; }
     Section* quality() const { return quality_; }
     QComboBox* presetBox() const { return presets_; }
+    // CropPanel.cpp: the Crop section's rows, bound to the project.
+    void bindCrop(Project* project);
 
 private:
     QComboBox* presets_ = nullptr;

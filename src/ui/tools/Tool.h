@@ -12,6 +12,7 @@ namespace avloop {
 
 class Canvas;
 class Project;
+struct CropShape;
 
 // A pointer event on the canvas, in scene and view coordinates.
 struct ToolEvent {
@@ -41,6 +42,8 @@ public:
     virtual bool keyPress(QKeyEvent*) { return false; }
     virtual void paintOverlay(QPainter&) {}
     virtual Qt::CursorShape cursor(const ToolEvent&) const { return Qt::ArrowCursor; }
+    // A crop being drawn, shown instead of the project's until it is committed (the crop tools).
+    virtual const CropShape* previewCrop() const { return nullptr; }
     // The options bar's widget for this tool (spec §6's table); null when it has none.
     virtual QWidget* createOptions(QWidget* parent) {
         Q_UNUSED(parent);
@@ -57,5 +60,7 @@ protected:
 Tool* createSelectionTool(Canvas* canvas, Project* project);
 Tool* createZoomTool(Canvas* canvas, Project* project);
 Tool* createHandTool(Canvas* canvas, Project* project);
+// CropTool.cpp: one tool a kind — M Rect, U Rounded, E Ellipse.
+Tool* createCropTool(int kind, Canvas* canvas, Project* project);
 
 } // namespace avloop

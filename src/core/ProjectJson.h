@@ -12,6 +12,7 @@ struct ProjectData {
     SourceInfo source;
     QString relativePath; // the source relative to the project file, as read
     VideoTransform transform;
+    CropShape crop;
     ViewState view;
     QJsonObject original; // the JSON as read: unknown keys are written back unchanged (spec §11.1)
 };

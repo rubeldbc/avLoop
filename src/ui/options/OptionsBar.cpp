@@ -1,11 +1,14 @@
 #include "ui/options/OptionsBar.h"
 
+#include "ui/WalkRunner.h"
+
 #include "ui/theme/IconFactory.h"
 #include "ui/widgets/StepSpinBox.h"
 
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPointer>
 #include <QPushButton>
 #include <QToolButton>
 
@@ -67,12 +70,22 @@ QLabel* OptionsRow::addLabel(const QString& text) {
     return l;
 }
 
+void OptionsRow::add(QWidget* widget, const QString& label) {
+    if (!label.isEmpty()) addLabel(label);
+    widget->setParent(this);
+    row_->insertWidget(row_->count() - 1, widget);
+}
+
 void OptionsRow::addSeparator() {
     auto* line = new QFrame(this);
     line->setObjectName(QStringLiteral("TopBarSeparator"));
     line->setAttribute(Qt::WA_StyledBackground);
     line->setFixedSize(1, 18);
     row_->insertWidget(row_->count() - 1, line);
+}
+
+void probeValue(const QString& name, StepSpinBox* box) {
+    WalkProbes::add(name, [p = QPointer<StepSpinBox>(box)] { return p ? QVariant(p->value()) : QVariant(); });
 }
 
 } // namespace avloop

@@ -37,6 +37,20 @@ double effectiveScale(const VideoTransform& t, const QRectF& frame) {
     return t.scale * double(out.width()) / frame.width();
 }
 
+bool needsAlpha(const CropShape& crop, const VideoTransform& t, const QSizeF& video, bool sourceAlpha) {
+    if (sourceAlpha) return true;
+    if (crop.isEmpty()) return false; // the whole video rectangle
+    if (crop.kind != CropShape::Kind::Rect || crop.feather > 0) return true;
+    return coverage(crop, t, video) != Coverage::Full;
+}
+
+Coverage coverage(const CropShape& crop, const VideoTransform& t, const QSizeF& video) {
+    if (crop.isEmpty()) return Coverage::Full;
+    const QRectF v = t.rect(video);
+    if (v.contains(crop.rect)) return Coverage::Full;
+    return v.intersects(crop.rect) ? Coverage::Partly : Coverage::None;
+}
+
 QPointF corner(const QRectF& r, Corner c) {
     switch (c) {
     case Corner::TopLeft:

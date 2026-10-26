@@ -77,3 +77,21 @@ end of its section.
   included it. Rule: no identifiers `near`, `far`; `NOMINMAX` is already set. (AV-003)
 - **A drag in scene px lands on whole view pixels**: at a fit zoom of 1.62 a 100 px scene move came out 99.4. Rule:
   canvas expectations allow one view pixel (±1 scene px at fit zooms). (AV-003)
+
+## The crop
+
+- **A mask is sampled at pixel centres**: for a shape of whole-pixel size the edge falls between pixels on the axes,
+  so a row through the centre has no partly covered pixel at all and "count the grey pixels on a row" tests nothing.
+  Rule: test the anti-aliased band geometrically — every partly covered pixel within half a pixel of the true edge.
+  (AV-004)
+- **Every tool's options row exists at once**: the options bar keeps all rows and shows one, so a walk probe named
+  once per tool kind is overwritten by the last row made. Rule: an options probe carries its row's name
+  (`options.rect.w`, `options.ellipse.feather`); a probe to a widget that a later change may delete holds a
+  `QPointer` (`probeValue`). (AV-004)
+- **`class QComboBox* f();` inside `namespace avloop` declares `avloop::QComboBox`**: the build then fails far away,
+  where the real Qt class meets the invented one. Rule: forward declarations of Qt classes go at global scope, before
+  the namespace. (AV-004)
+- **A Qt Test executable's output can vanish in these shells**: a failing test printed nothing and exited 2. Rule:
+  run it with `-o <file>,txt` and read the file. (AV-004)
+- **A custom ratio taken from a crop's size can be large** (180 × 320): fields capped at 100 clipped it. Rule: Custom…
+  reduces the crop's size to lowest terms (9:16), and the W:H fields take up to 9999. (AV-004)

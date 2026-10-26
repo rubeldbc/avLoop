@@ -103,6 +103,12 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     is the video rectangle itself (R-8), so there is nothing else to fit to.
 20. **R-20** The video's dashed border and its handles show while the Selection is active (the owner's mock draws them
     so); the crop's outline (AV-004) shows in every tool.
+21. **R-21** Custom… starts from the crop's own proportions in lowest terms (180 × 320 → 9:16; 1:1 with no crop); a W
+    or H typed with a ratio set moves the other side, the top-left staying (§6.1 names no anchor for typing).
+22. **R-22** The canvas shows the crop by its outline and the dim outside; the Feather's softness is seen in the
+    Preview and the export, which apply the mask (§6.1's overlay list names no soft edge on the canvas).
+23. **R-23** What snaps (§6.1 says "to the video's edges and centre"): a drawing's corners, a moved crop's edges or
+    centre lines, a resized crop's moving edges — to the transformed video's edges and centre lines.
 
 ## 4. What is not built
 

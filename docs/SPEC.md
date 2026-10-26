@@ -6,6 +6,34 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-004 — The crop tools (AV-004, 2026-10-26)
+
+- One crop at a time (reading R-8): a Rect (M), Rounded (U) or Ellipse (E) in scene px with its ratio, Radius and
+  Feather, kept in the project and the `.avloop` file (`crop`: kind, x, y, w, h, ratio, radius, feather). With no crop
+  the export is the whole video.
+- On the canvas: with no crop a drag draws one; with a crop a drag inside moves it, the eight handles resize it, a
+  drag outside draws a new one in its place — each one Undo step. Shift keeps the ratio (1:1 when Free, a circle for
+  the Ellipse), Alt draws and resizes from the centre, Ctrl turns snapping off; snapping brings a drawing's corners, a
+  moved crop's edges or centre and a resized crop's moving edges to the video's edges and centre within 8 screen px
+  (reading R-23). Arrows move it 1 px, Shift+arrows 10 px (presses in a row are one step); Esc cancels a drawing;
+  Delete removes the crop; a double-click makes it the whole video; a drawing under 16 px is cancelled. Switching crop
+  tools changes the kind and keeps the rectangle.
+- The overlay: 60% black outside the crop, a 1.5 px orange border (rounded or elliptic), a dashed bounding box for the
+  Rounded rect and the Ellipse, eight 8×8 white handles with orange borders, and while dragging the rule-of-thirds
+  guides, the snap lines and the label `W × H → output W × H`. The canvas shows the crop by this outline; the
+  Feather's softness is seen in the Preview and the export (reading R-22).
+- Ratios: Free, Original, 1:1, 4:3, 3:4, 16:9, 9:16, 21:9, 3:2, 2:3, 4:5 and Custom… (two W:H fields; it starts from
+  the crop's own proportions in lowest terms — reading R-21). A new ratio keeps the crop's centre and area; W or H
+  typed with a ratio set moves the other side, the top-left staying. Rect: Swap W/H (the ratio swapped too) and Clear.
+- The options bar: Ratio, X, Y, W, H and Swap W/H, Clear (Rect) / Radius (Rounded) / Feather (Rounded, Ellipse). The
+  side panel's Crop section: Shape, Ratio, X / Y, W / H, Radius, Feather and the output's size with "· alpha" when the
+  export needs alpha (a Rounded rect or Ellipse, a Feather, a crop past the video, or a source with alpha). The status
+  bar says "Transparent area in output" for a crop partly outside the video, "Output is fully transparent" for one
+  wholly outside. Ctrl+0 fits the crop.
+- The mask (`render/MaskBuilder`): built on the CPU at the output size from the shape's signed distance — a 1 px
+  anti-aliased edge at Feather 0, Feather 0–200 output px softening inward, Radius up to half the short side — and
+  kept until the shape, the size, the radius or the feather changes.
+
 ### D-003 — The canvas and the Selection (AV-003, 2026-10-26)
 
 - The canvas is an OpenGL 3.3 core widget over an unbounded scene in pixels: the video drawn by the transform shader

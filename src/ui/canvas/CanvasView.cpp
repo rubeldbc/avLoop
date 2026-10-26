@@ -74,7 +74,8 @@ QRectF Canvas::videoRect() const {
 }
 
 QRectF Canvas::fitTarget() const {
-    return videoRect();
+    const CropShape& c = project_->crop();
+    return c.isEmpty() ? videoRect() : c.rect;
 }
 
 void Canvas::fitView() {

@@ -8,6 +8,16 @@
     { "do": "open", "file": "samples/readme-demo.mp4" },
     { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 15000 },
     { "do": "wait", "ms": 500 },
+    { "do": "key", "keys": "U", "on": "MainWindow" },
+    { "do": "drag", "on": "canvas", "space": "canvas", "from": [660, 240], "to": [1260, 840], "steps": 20 },
+    { "do": "type", "on": "options.rounded.w", "text": "600" },
+    { "do": "type", "on": "options.rounded.h", "text": "600" },
+    { "do": "type", "on": "options.rounded.x", "text": "660" },
+    { "do": "type", "on": "options.rounded.y", "text": "240" },
+    { "do": "type", "on": "options.rounded.radius", "text": "96" },
+    { "do": "type", "on": "options.rounded.feather", "text": "24" },
+    { "do": "click", "on": "canvas", "space": "canvas", "at": [960, 540] },
+    { "do": "wait", "ms": 300 },
     { "do": "shot", "file": "main-window.png", "maxWidth": 1440 }
   ]
 }

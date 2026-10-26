@@ -43,6 +43,12 @@ frame rate and quality, and a preview that shows exactly what will be exported.
 - **The Selection tool** moves the video and scales it by its corner handles (Alt: about the centre), never
   distorting it; the options bar sets X, Y, Scale and W/H exactly, with Fit, Fill, Center, Flip H/V and Reset, and warns
   when the output would be upscaled.
+- **Three crop tools** decide what is exported: a rectangle (**M**), a rounded rectangle (**U**) or an ellipse (**E**),
+  drawn, moved and resized by eight handles; Shift keeps the ratio (a square, a circle), Alt works from the centre,
+  the edges snap to the video's edges and centre (Ctrl: no snapping), arrows nudge 1 px (Shift: 10). Aspect ratios
+  Free, Original, 1:1, 4:3, 3:4, 16:9, 9:16, 21:9, 3:2, 2:3, 4:5 or a custom W:H keep the crop's centre and area.
+  Radius and Feather (0–200 px, softening inward) for the round shapes; the outside is dimmed; the side panel shows the
+  output size and whether it needs transparency, and the status bar warns when the crop leaves the video.
 - **Undo and Redo** for every change (200 steps; one drag is one step).
 - **Memory under control**: a bounded frame cache (1.5 GB by default) with a disk spill; the status bar shows the
   source, the GPU and RAM / VRAM / cache use.
@@ -53,15 +59,15 @@ frame rate and quality, and a preview that shows exactly what will be exported.
 
 Built in this order (each line is a phase of [the plan](phases/26-10-26-034934-AvLoop/control/01_PHASE_DEPENDENCY_GRAPH.md)):
 
-1. **Crop tools**: rectangle, rounded rectangle, ellipse; aspect ratios (1:1, 16:9, 9:16, 4:5, custom …); feather.
-2. **Timeline**: thumbnails, In/Out, frame-accurate playback.
-3. **Loop engine**: Simple, Crossfade (inside the range), Ping-pong, Ping-pong with a smooth turn; Speed; frame rate with
+1. **Timeline**: thumbnails, In/Out, frame-accurate playback.
+2. **Loop engine**: Simple, Crossfade (inside the range), Ping-pong, Ping-pong with a smooth turn; Speed; frame rate with
    Nearest, Frame Blend or Motion Interpolation.
-4. **One renderer** for preview and export, on the GPU with a CPU fallback of the same result.
-5. **Preview window**: Live and Encoded, the seam marked, Around seam, backgrounds.
-6. **Export**: VP9/VP8 alpha WebM, quality presets, target file size, verification.
-7. **Projects** (`.avloop`), Undo/Redo, presets, autosave, settings.
-8. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
+3. **One renderer** for preview and export, on the GPU with a CPU fallback of the same result — the crop's mask and
+   feather applied.
+4. **Preview window**: Live and Encoded, the seam marked, Around seam, backgrounds.
+5. **Export**: VP9/VP8 alpha WebM, quality presets, target file size, verification.
+6. **Projects** (`.avloop`), presets, autosave, settings.
+7. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
 
 ## Using a loop in OBS
 
@@ -95,6 +101,8 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 | Open a video | Ctrl+O |
 | Selection · Crop: Rectangle · Rounded · Ellipse | V · M · U · E |
 | Hand · Zoom | H · Z |
+| Crop: keep the ratio · from the centre · no snapping (while dragging) | Shift · Alt · Ctrl |
+| Crop: nudge 1 px · 10 px · remove · cancel a drawing · the whole video | arrows · Shift+arrows · Delete · Esc · double-click |
 | Undo · Redo | Ctrl+Z · Ctrl+Y (Ctrl+Shift+Z) |
 | Zoom: Fit · 100% · in · out | Ctrl+0 · Ctrl+1 · Ctrl+= · Ctrl+- |
 | Zoom about the cursor · pan | Ctrl+wheel · wheel (Shift: across), middle-drag |

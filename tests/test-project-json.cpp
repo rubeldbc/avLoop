@@ -47,6 +47,27 @@ private slots:
         QCOMPARE(json.value(QStringLiteral("source")).toObject().value(QStringLiteral("mtime")).toString(),
                  QStringLiteral("2026-10-26T10:12:00Z"));
     }
+    void cropRoundTrip() {
+        ProjectData d = sample(QStringLiteral("a.mp4"));
+        d.crop.kind = CropShape::Kind::Rounded;
+        d.crop.rect = QRectF(100, 50, 640, 360);
+        d.crop.ratio = QStringLiteral("16:9");
+        d.crop.radius = 24;
+        d.crop.feather = 4;
+        QJsonObject json = projectjson::toJson(d);
+        const QJsonObject crop = json.value(QStringLiteral("crop")).toObject();
+        QCOMPARE(crop.value(QStringLiteral("kind")).toString(), QStringLiteral("rounded"));
+        QCOMPARE(crop.value(QStringLiteral("w")).toDouble(), 640.0);
+        QCOMPARE(crop.value(QStringLiteral("ratio")).toString(), QStringLiteral("16:9"));
+        ProjectData back;
+        QVERIFY(projectjson::fromJson(json, back, nullptr));
+        QCOMPARE(back.crop, d.crop);
+        // No crop written, none read: the whole video (reading R-8).
+        json.remove(QStringLiteral("crop"));
+        ProjectData none;
+        QVERIFY(projectjson::fromJson(json, none, nullptr));
+        QVERIFY(none.crop.isEmpty());
+    }
     void unknownKeysStay() {
         QJsonObject json = projectjson::toJson(sample(QStringLiteral("a.mp4")));
         json.insert(QStringLiteral("future"), QStringLiteral("kept"));

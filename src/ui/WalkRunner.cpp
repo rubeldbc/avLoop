@@ -131,6 +131,7 @@ int WalkRunner::run(const QJsonObject& step) {
     if (what == QLatin1String("wheel")) return stepWheel(step);
     if (what == QLatin1String("key")) return stepKey(step);
     if (what == QLatin1String("type")) return stepType(step);
+    if (what == QLatin1String("choose")) return stepChoose(step);
     if (what == QLatin1String("shot")) return stepShot(step);
     if (what == QLatin1String("expect")) return stepExpect(step);
     if (what == QLatin1String("waitFor")) return stepWaitFor(step);

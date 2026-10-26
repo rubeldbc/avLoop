@@ -3,6 +3,7 @@
 #include <QString>
 #include <QWidget>
 
+class QComboBox;
 class QHBoxLayout;
 class QLabel;
 class QPushButton;
@@ -26,6 +27,8 @@ public:
     QToolButton* addIcon(const QString& name, const QString& icon, const QString& tip, bool checkable = false);
     QPushButton* addButton(const QString& name, const QString& text);
     QLabel* addLabel(const QString& text);
+    // Any other widget (a ratio list), with a quiet label before it.
+    void add(QWidget* widget, const QString& label = {});
     void addSeparator();
 
 private:
@@ -36,5 +39,12 @@ private:
 // SelectionOptions.cpp, ZoomOptions.cpp
 QWidget* createSelectionOptions(Project* project, Canvas* canvas, QWidget* parent);
 QWidget* createZoomOptions(Canvas* canvas, QWidget* parent);
+// CropOptions.cpp: a crop tool's row (`kind`: CropShape::Kind), and the ratio list shared with the Crop panel.
+QWidget* createCropOptions(Project* project, Canvas* canvas, int kind, QWidget* parent);
+QComboBox* createRatioBox(QWidget* parent);
+// Applies the ratio chosen in a ratio box to the project's crop (one Undo step); Custom… takes the crop's own.
+void applyRatio(Project* project, const QString& id);
+// What walks read of a bar's field: its value while its row is shown, nothing once a tool switch has removed it.
+void probeValue(const QString& name, StepSpinBox* box);
 
 } // namespace avloop

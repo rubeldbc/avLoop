@@ -72,6 +72,7 @@ private:
     int stepWheel(const QJsonObject& step);
     int stepKey(const QJsonObject& step);
     int stepType(const QJsonObject& step);
+    int stepChoose(const QJsonObject& step);
     int stepShot(const QJsonObject& step);
     int stepExpect(const QJsonObject& step);
     int stepWaitFor(const QJsonObject& step);

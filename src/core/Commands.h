@@ -64,5 +64,6 @@ enum CommandId {
 };
 
 using SetTransformCommand = ValueCommand<VideoTransform>;
+using SetCropCommand = ValueCommand<CropShape>;
 
 } // namespace avloop

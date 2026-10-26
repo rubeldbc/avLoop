@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/CropShape.h"
 #include "core/Rational.h"
 #include "core/VideoTransform.h"
 
@@ -52,6 +53,7 @@ public:
 
     const SourceInfo& source() const { return source_; }
     const VideoTransform& transform() const { return transform_; }
+    const CropShape& crop() const { return crop_; }
     const ViewState& view() const { return view_; }
     const QJsonObject& extra() const { return extra_; }
     QUndoStack* undoStack() { return &undo_; }
@@ -67,9 +69,11 @@ public:
 
     // Pushes the change as one Undo step; changes under the same merge key within 500 ms (or one drag) merge.
     void changeTransform(const VideoTransform& after, const QString& mergeKey = {});
+    void changeCrop(const CropShape& after, const QString& mergeKey = {});
 
     // Only commands call these.
     void applyTransform(const VideoTransform& t);
+    void applyCrop(const CropShape& c);
 
 signals:
     void changed(avloop::Project::Aspect aspect);
@@ -77,6 +81,7 @@ signals:
 private:
     SourceInfo source_;
     VideoTransform transform_;
+    CropShape crop_;
     ViewState view_;
     QJsonObject extra_;
     QUndoStack undo_;

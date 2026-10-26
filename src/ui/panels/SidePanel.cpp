@@ -73,7 +73,6 @@ SidePanel::SidePanel(QWidget* parent) : QWidget(parent) {
     loop_ = new Section(QStringLiteral("loop"), tr("Loop"), body);
     output_ = new Section(QStringLiteral("output"), tr("Output"), body);
     quality_ = new Section(QStringLiteral("quality"), tr("Quality"), body);
-    crop_->addWide(hint(tr("No crop: the whole video is exported."), crop_->body()));
     loop_->addWide(hint(tr("Open a video to set its loop."), loop_->body()));
     output_->addWide(hint(tr("Open a video to set its output."), output_->body()));
     quality_->addWide(hint(tr("Open a video to set its quality."), quality_->body()));

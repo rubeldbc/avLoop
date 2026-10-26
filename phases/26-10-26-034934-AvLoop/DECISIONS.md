@@ -47,3 +47,6 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-18 | Reset and load: the video's top-left at (0,0), 100% | §3.3, §6.2 and §11.1's example agree | `README.md` §3; AV-003 |
 | R-19 | Fit/Fill/Center without a crop act on the video's 100% frame | no crop = the video rectangle (R-8) | `README.md` §3; AV-003 |
 | R-20 | The video border and handles show with the Selection only | the owner's mock | `README.md` §3; AV-003 |
+| R-21 | Custom… takes the crop's proportions in lowest terms; typed W/H keep the top-left | §6.1 names no anchor | `README.md` §3; AV-004 |
+| R-22 | The canvas shows the crop's outline; Feather is seen in Preview and export | §6.1's overlay list | `README.md` §3; AV-004 |
+| R-23 | Snapping: corners, edges or centre lines to the video's edges and centre | §6.1 | `README.md` §3; AV-004 |

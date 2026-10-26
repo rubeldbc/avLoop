@@ -1,7 +1,7 @@
 ---
 phase: AV-005
 title: "The timeline"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 5
 track: A
 checkpoint_id: CP-A1

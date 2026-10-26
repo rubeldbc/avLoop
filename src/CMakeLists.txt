@@ -3,6 +3,7 @@
 add_library(avloop_core STATIC
     core/AppInfo.h core/AppInfo.cpp core/Rational.h
     core/Geometry.h core/Geometry.cpp core/VideoTransform.h core/VideoTransform.cpp
+    core/CropShape.h core/CropShape.cpp core/AspectRatio.h core/AspectRatio.cpp
     core/Project.h core/Project.cpp core/Commands.h core/ProjectJson.h core/ProjectJson.cpp)
 target_include_directories(avloop_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/generated)
 # Qt Gui only for QUndoStack/QUndoCommand, which Qt 6 moved there from Widgets (spec §11.2).
@@ -20,7 +21,7 @@ target_link_libraries(avloop_media
     PRIVATE FFmpeg::avformat FFmpeg::avcodec FFmpeg::avutil FFmpeg::swscale FFmpeg::avfilter dxgi psapi avloop_warnings)
 
 add_library(avloop_render STATIC
-    render/Shaders.h render/Shaders.cpp)
+    render/Shaders.h render/Shaders.cpp render/MaskBuilder.h render/MaskBuilder.cpp)
 target_link_libraries(avloop_render PUBLIC avloop_core avloop_media Qt6::Gui Qt6::OpenGL PRIVATE avloop_warnings)
 
 add_library(avloop_ui STATIC
@@ -30,12 +31,14 @@ add_library(avloop_ui STATIC
     ui/theme/IconFactory.h ui/theme/IconFactory.cpp
     ui/widgets/Toast.h ui/widgets/Toast.cpp
     ui/panels/Section.h ui/panels/Section.cpp
-    ui/panels/SidePanel.h ui/panels/SidePanel.cpp
+    ui/panels/SidePanel.h ui/panels/SidePanel.cpp ui/panels/CropPanel.cpp
     ui/canvas/DropZone.h ui/canvas/DropZone.cpp
     ui/canvas/Canvas.h ui/canvas/Canvas.cpp ui/canvas/CanvasView.cpp ui/canvas/CanvasGl.cpp ui/canvas/CanvasGlState.h ui/canvas/CanvasOverlay.cpp
     ui/tools/Tool.h ui/tools/ToolManager.h ui/tools/ToolManager.cpp
     ui/tools/SelectionTool.cpp ui/tools/ZoomTool.cpp ui/tools/HandTool.cpp
+    ui/tools/CropTool.cpp ui/tools/CropHandles.h ui/tools/CropHandles.cpp
     ui/options/OptionsBar.h ui/options/OptionsBar.cpp ui/options/SelectionOptions.cpp ui/options/ZoomOptions.cpp
+    ui/options/CropOptions.cpp
     ui/widgets/StepSpinBox.h ui/widgets/StepSpinBox.cpp
     ui/timeline/Transport.h ui/timeline/Transport.cpp)
 target_link_libraries(avloop_ui

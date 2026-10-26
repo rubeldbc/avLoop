@@ -1,16 +1,20 @@
 // The main window's canvas side (spec §6, §6.3, §11.2): the tools and their options bar, Undo and Redo on the
 // project's stack, the view's keys (Ctrl+0 Fit, Ctrl+1 100%, Ctrl+= / Ctrl+- zoom), and what walks read of them.
+#include "core/Geometry.h"
 #include "core/Project.h"
 #include "ui/MainWindow.h"
 #include "ui/WalkRunner.h"
 #include "ui/canvas/Canvas.h"
+#include "ui/panels/SidePanel.h"
 #include "ui/tools/Tool.h"
 #include "ui/tools/ToolManager.h"
 
 #include <QAction>
 #include <QDir>
 #include <QJsonObject>
+#include <QLabel>
 #include <QStackedWidget>
+#include <QStatusBar>
 #include <QUndoStack>
 
 namespace avloop {
@@ -20,6 +24,20 @@ void MainWindow::buildCanvasTools() {
     tools_->add(createSelectionTool(canvas_, project_));
     tools_->add(createHandTool(canvas_, project_));
     tools_->add(createZoomTool(canvas_, project_));
+    for (CropShape::Kind kind : {CropShape::Kind::Rect, CropShape::Kind::Rounded, CropShape::Kind::Ellipse})
+        tools_->add(createCropTool(int(kind), canvas_, project_));
+    side_->bindCrop(project_);
+
+    // "Transparent area in output" / "Output is fully transparent" (spec §6.2, §12.2).
+    auto* notice = new QLabel(statusBar());
+    notice->setObjectName(QStringLiteral("status.notice"));
+    statusBar()->addWidget(notice);
+    connect(project_, &Project::changed, notice, [this, notice](Project::Aspect) {
+        const auto cover = geometry::coverage(project_->crop(), project_->transform(), project_->source().size());
+        notice->setText(cover == geometry::Coverage::None     ? tr("Output is fully transparent")
+                        : cover == geometry::Coverage::Partly ? tr("Transparent area in output")
+                                                              : QString());
+    });
 
     QUndoStack* stack = project_->undoStack();
     if (auto* undo = findChild<QAction*>(QStringLiteral("action.undo"))) {
@@ -52,6 +70,27 @@ void MainWindow::buildCanvasTools() {
     WalkProbes::add(QStringLiteral("transform.scale"), [t] { return t().scale; });
     WalkProbes::add(QStringLiteral("transform.flipH"), [t] { return t().flipH; });
     WalkProbes::add(QStringLiteral("transform.flipV"), [t] { return t().flipV; });
+    const auto& c = [this]() -> const CropShape& { return project_->crop(); };
+    WalkProbes::add(QStringLiteral("crop.empty"), [c] { return c().isEmpty(); });
+    WalkProbes::add(QStringLiteral("crop.kind"), [c] { return CropShape::kindId(c().kind); });
+    WalkProbes::add(QStringLiteral("crop.ratio"), [c] { return c().ratio; });
+    WalkProbes::add(QStringLiteral("crop.x"), [c] { return c().rect.x(); });
+    WalkProbes::add(QStringLiteral("crop.y"), [c] { return c().rect.y(); });
+    WalkProbes::add(QStringLiteral("crop.w"), [c] { return c().rect.width(); });
+    WalkProbes::add(QStringLiteral("crop.h"), [c] { return c().rect.height(); });
+    WalkProbes::add(QStringLiteral("crop.cx"), [c] { return c().rect.center().x(); });
+    WalkProbes::add(QStringLiteral("crop.cy"), [c] { return c().rect.center().y(); });
+    WalkProbes::add(QStringLiteral("crop.radius"), [c] { return c().radius; });
+    WalkProbes::add(QStringLiteral("crop.feather"), [c] { return c().feather; });
+    WalkProbes::add(QStringLiteral("crop.output"), [this] {
+        const QSize out = geometry::outputSize(
+            geometry::exportFrame(project_->crop().rect, project_->transform(), project_->source().size()).size());
+        return QStringLiteral("%1x%2").arg(out.width()).arg(out.height());
+    });
+    WalkProbes::add(QStringLiteral("status.notice"), [this] {
+        auto* l = statusBar()->findChild<QLabel*>(QStringLiteral("status.notice"));
+        return l ? l->text() : QString();
+    });
     WalkProbes::add(QStringLiteral("canvas.zoom"), [this] { return canvas_->zoom(); });
     WalkProbes::add(QStringLiteral("canvas.panX"), [this] { return canvas_->pan().x(); });
     WalkProbes::add(QStringLiteral("canvas.panY"), [this] { return canvas_->pan().y(); });

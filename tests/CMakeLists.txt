@@ -20,6 +20,8 @@ endfunction()
 
 avloop_add_test(theme RESOURCES SOURCES test-theme.cpp LIBS avloop_ui)
 avloop_add_test(icons RESOURCES SOURCES test-icons.cpp LIBS avloop_ui)
+avloop_add_test(aspect SOURCES test-aspect.cpp LIBS avloop_ui)
+avloop_add_test(mask SOURCES test-mask.cpp LIBS avloop_render avloop_core)
 foreach(_t geometry commands project-json)
     avloop_add_test(${_t} SOURCES test-${_t}.cpp LIBS avloop_core)
 endforeach()

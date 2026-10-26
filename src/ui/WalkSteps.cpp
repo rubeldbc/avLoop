@@ -3,6 +3,7 @@
 #include "ui/WalkRunner.h"
 
 #include <QApplication>
+#include <QComboBox>
 #include <QDir>
 #include <QJsonArray>
 #include <QMenu>
@@ -144,6 +145,11 @@ int WalkRunner::stepDrag(const QJsonObject& step) {
         sendMouse(w, QEvent::MouseMove, p.toPoint(), Qt::NoButton, b, mods);
         QApplication::processEvents();
     }
+    // "keyBeforeRelease": a key pressed while the button is still down (Esc cancelling a drawing).
+    if (const QString key = step.value(QStringLiteral("keyBeforeRelease")).toString(); !key.isEmpty()) {
+        const QKeyCombination k = QKeySequence::fromString(key)[0];
+        QTest::keyClick(w, k.key(), k.keyboardModifiers());
+    }
     sendMouse(w, QEvent::MouseButtonRelease, to, b, Qt::NoButton, mods);
     return delay_;
 }
@@ -198,6 +204,23 @@ int WalkRunner::stepType(const QJsonObject& step) {
     QTest::keyClick(w, Qt::Key_A, Qt::ControlModifier);
     QTest::keyClicks(w, step.value(QStringLiteral("text")).toString());
     if (step.value(QStringLiteral("enter")).toBool(true)) QTest::keyClick(w, Qt::Key_Return);
+    return delay_;
+}
+
+// A combo box's item picked as the user picks one: by its data ("data") or its text ("text"), `activated` sent.
+int WalkRunner::stepChoose(const QJsonObject& step) {
+    auto* box = qobject_cast<QComboBox*>(target(step));
+    const int i = !box ? -1
+                  : step.contains(QStringLiteral("data"))
+                      ? box->findData(step.value(QStringLiteral("data")).toVariant())
+                      : box->findText(step.value(QStringLiteral("text")).toString());
+    if (i < 0) {
+        check(false, QStringLiteral("choose"), QStringLiteral("no item in \"%1\"").arg(step.value("on").toString()));
+        return -1;
+    }
+    box->setCurrentIndex(i);
+    emit box->activated(i);
+    emit box->textActivated(box->itemText(i));
     return delay_;
 }
 

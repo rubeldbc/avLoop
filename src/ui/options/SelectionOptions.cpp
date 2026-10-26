@@ -11,6 +11,7 @@
 
 #include <QBoxLayout>
 #include <QLabel>
+#include <QPointer>
 #include <QToolButton>
 
 namespace avloop {
@@ -19,7 +20,7 @@ namespace {
 
 // What Fit, Fill and Center act on: the crop (AV-004), else the video's own frame at 100%.
 QRectF frameOf(const Project* p) {
-    return QRectF(QPointF(0, 0), p->source().size());
+    return p->crop().isEmpty() ? QRectF(QPointF(0, 0), p->source().size()) : p->crop().rect;
 }
 
 } // namespace
@@ -67,7 +68,7 @@ QWidget* createSelectionOptions(Project* project, Canvas* canvas, QWidget* paren
         lock->setIcon(IconFactory::icon(lock->isChecked() ? QStringLiteral("lock") : QStringLiteral("unlock")));
         flipH->setChecked(t.flipH);
         flipV->setChecked(t.flipV);
-        const QRectF frame = geometry::exportFrame(QRectF(), t, video);
+        const QRectF frame = geometry::exportFrame(project->crop().rect, t, video);
         warning->setVisible(project->source().isValid() && geometry::effectiveScale(t, frame) > 1.0 + 1e-9);
         row->setEnabled(project->source().isValid());
     };
@@ -114,11 +115,12 @@ QWidget* createSelectionOptions(Project* project, Canvas* canvas, QWidget* paren
     QObject::connect(reset, &QToolButton::clicked, row,
                      [=] { project->changeTransform(VideoTransform::initial(project->source().size())); });
 
-    WalkProbes::add(QStringLiteral("options.scale"), [scale] { return scale->value(); });
-    WalkProbes::add(QStringLiteral("options.x"), [x] { return x->value(); });
-    WalkProbes::add(QStringLiteral("options.y"), [y] { return y->value(); });
-    WalkProbes::add(QStringLiteral("options.w"), [w] { return w->value(); });
-    WalkProbes::add(QStringLiteral("options.upscaleWarning"), [warning] { return !warning->isHidden(); });
+    probeValue(QStringLiteral("options.scale"), scale);
+    probeValue(QStringLiteral("options.x"), x);
+    probeValue(QStringLiteral("options.y"), y);
+    probeValue(QStringLiteral("options.w"), w);
+    WalkProbes::add(QStringLiteral("options.upscaleWarning"),
+                    [p = QPointer<QLabel>(warning)] { return p ? QVariant(!p->isHidden()) : QVariant(); });
     Q_UNUSED(canvas);
     refresh();
     return row;

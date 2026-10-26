@@ -52,6 +52,18 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
         transform.insert(QStringLiteral("keyframes"), QJsonArray());
     root.insert(QStringLiteral("transform"), merged(d.original, QStringLiteral("transform"), transform));
 
+    QJsonObject crop{
+        {QStringLiteral("kind"), CropShape::kindId(d.crop.kind)},
+        {QStringLiteral("x"), d.crop.rect.x()},
+        {QStringLiteral("y"), d.crop.rect.y()},
+        {QStringLiteral("w"), d.crop.rect.width()},
+        {QStringLiteral("h"), d.crop.rect.height()},
+        {QStringLiteral("ratio"), d.crop.ratio},
+        {QStringLiteral("radius"), d.crop.radius},
+        {QStringLiteral("feather"), d.crop.feather},
+    };
+    root.insert(QStringLiteral("crop"), merged(d.original, QStringLiteral("crop"), crop));
+
     QJsonObject view{
         {QStringLiteral("zoom"), d.view.zoom},
         {QStringLiteral("panX"), d.view.panX},
@@ -95,6 +107,15 @@ bool fromJson(const QJsonObject& json, ProjectData& d, QString* error, const QSt
     d.transform.flipH = t.value(QStringLiteral("flipH")).toBool();
     d.transform.flipV = t.value(QStringLiteral("flipV")).toBool();
     d.transform = d.transform.clamped();
+
+    const QJsonObject c = json.value(QStringLiteral("crop")).toObject();
+    d.crop.kind = CropShape::kindFromId(c.value(QStringLiteral("kind")).toString());
+    d.crop.rect = QRectF(c.value(QStringLiteral("x")).toDouble(), c.value(QStringLiteral("y")).toDouble(),
+                         c.value(QStringLiteral("w")).toDouble(), c.value(QStringLiteral("h")).toDouble());
+    d.crop.ratio = c.value(QStringLiteral("ratio")).toString(QStringLiteral("free"));
+    d.crop.radius = c.value(QStringLiteral("radius")).toDouble();
+    d.crop.feather = c.value(QStringLiteral("feather")).toDouble();
+    d.crop = d.crop.clamped();
 
     const QJsonObject v = json.value(QStringLiteral("view")).toObject();
     d.view.zoom = v.value(QStringLiteral("zoom")).toDouble(1.0);
