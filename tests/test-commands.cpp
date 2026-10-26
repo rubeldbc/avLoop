@@ -2,6 +2,7 @@
 // field merges within 500 ms; at most 200 steps; a new source clears the stack.
 #include "core/Commands.h"
 #include "core/Project.h"
+#include "core/ProjectJson.h"
 
 #include <QTest>
 #include <QThread>
@@ -122,6 +123,62 @@ private slots:
         p.undoStack()->undo();
         p.undoStack()->undo();
         QCOMPARE(p.range(), (TimeRange{0, 10}));
+    }
+    void everyCommandUndoes() {
+        // Spec §11.2: SetCrop, SetTransform, SetRange, SetLoop, SetOutput, SetQuality — each undone and redone.
+        Project p;
+        p.setSource(source());
+        const ProjectData before = p.snapshot();
+        CropShape crop;
+        crop.kind = CropShape::Kind::Ellipse;
+        crop.rect = QRectF(10, 10, 200, 100);
+        LoopSettings loop;
+        loop.mode = LoopSettings::Mode::PingPong;
+        OutputSettings output;
+        output.setSizeId(QStringLiteral("long-512"));
+        QualitySettings quality;
+        quality.preset = QualitySettings::Preset::High;
+        p.changeCrop(crop);
+        p.changeTransform(at(400));
+        p.changeRange(timerange::withIn(p.range(), 1, 10, p.outputFps()));
+        p.changeLoop(loop);
+        p.changeOutput(output);
+        p.changeQuality(quality);
+        QCOMPARE(p.undoStack()->count(), 6);
+        const ProjectData after = p.snapshot();
+        while (p.undoStack()->canUndo())
+            p.undoStack()->undo();
+        QCOMPARE(p.crop(), before.crop);
+        QCOMPARE(p.transform(), before.transform);
+        QCOMPARE(p.range(), before.range);
+        QCOMPARE(p.loop(), before.loop);
+        QCOMPARE(p.output(), before.output);
+        QCOMPARE(p.quality(), before.quality);
+        while (p.undoStack()->canRedo())
+            p.undoStack()->redo();
+        QCOMPARE(p.crop(), after.crop);
+        QCOMPARE(p.output(), after.output);
+        QCOMPARE(p.quality(), after.quality);
+    }
+    void aPresetIsOneStep() {
+        // Spec §11.3: applying a preset changes Loop, Output and Quality in one Undo step; the same again is none.
+        Project p;
+        p.setSource(source());
+        LoopSettings loop;
+        loop.mode = LoopSettings::Mode::Simple;
+        OutputSettings output;
+        output.setSizeId(QStringLiteral("long-1280"));
+        QualitySettings quality;
+        quality.preset = QualitySettings::Preset::Low;
+        p.changeSettings(loop, output, quality, QStringLiteral("Mine"));
+        QCOMPARE(p.undoStack()->count(), 1);
+        QCOMPARE(p.output().sizeId(), QStringLiteral("long-1280"));
+        p.changeSettings(loop, output, quality, QStringLiteral("Mine"));
+        QCOMPARE(p.undoStack()->count(), 1);
+        p.undoStack()->undo();
+        QCOMPARE(p.loop(), LoopSettings{});
+        QCOMPARE(p.output().sizeId(), QStringLiteral("crop"));
+        QCOMPARE(p.quality().preset, QualitySettings::Preset::Medium);
     }
 };
 

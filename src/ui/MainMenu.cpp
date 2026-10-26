@@ -31,11 +31,11 @@ void MainWindow::buildMenu() {
     menu_ = new QMenu(this);
     menu_->setObjectName(QStringLiteral("menu.main"));
 
-    QAction* newProject = entry(menu_, QStringLiteral("action.new"), tr("New"));
-    QAction* openProject = entry(menu_, QStringLiteral("action.openProject"), tr("Open Project…"));
-    QAction* save = entry(menu_, QStringLiteral("action.save"), tr("Save"), QKeySequence(Qt::CTRL | Qt::Key_S));
-    QAction* saveAs =
-        entry(menu_, QStringLiteral("action.saveAs"), tr("Save As…"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S));
+    // MainWindowProject.cpp connects New, Open Project, Save, Save As, Recent, Settings, the shortcuts and About.
+    entry(menu_, QStringLiteral("action.new"), tr("New"));
+    entry(menu_, QStringLiteral("action.openProject"), tr("Open Project…"));
+    entry(menu_, QStringLiteral("action.save"), tr("Save"), QKeySequence(Qt::CTRL | Qt::Key_S));
+    entry(menu_, QStringLiteral("action.saveAs"), tr("Save As…"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S));
     QMenu* recent = menu_->addMenu(tr("Recent"));
     recent->setObjectName(QStringLiteral("menu.recent"));
     menu_->addSeparator();
@@ -63,19 +63,17 @@ void MainWindow::buildMenu() {
     connect(themeGroup_, &QActionGroup::triggered, this,
             [this](QAction* a) { setThemeFromMenu(a->data().toString()); });
 
-    QAction* settings = entry(menu_, QStringLiteral("action.settings"), tr("Settings…"),
-                              QKeySequence(Qt::CTRL | Qt::Key_Comma), QStringLiteral("settings"));
-    QAction* shortcuts =
-        entry(menu_, QStringLiteral("action.shortcuts"), tr("Keyboard shortcuts"), QKeySequence(Qt::Key_F1));
+    entry(menu_, QStringLiteral("action.settings"), tr("Settings…"), QKeySequence(Qt::CTRL | Qt::Key_Comma),
+          QStringLiteral("settings"));
+    entry(menu_, QStringLiteral("action.shortcuts"), tr("Keyboard shortcuts"), QKeySequence(Qt::Key_F1));
     menu_->addSeparator();
-    QAction* about = entry(menu_, QStringLiteral("action.about"), tr("About AvLoop"));
+    entry(menu_, QStringLiteral("action.about"), tr("About AvLoop"));
     QAction* exit = entry(menu_, QStringLiteral("action.exit"), tr("Exit"));
     connect(exit, &QAction::triggered, this, &QWidget::close);
 
-    // Entries whose behaviour later phases build.
-    for (QAction* a : {newProject, openProject, save, saveAs, undo, redo, batch, finder, settings, shortcuts, about})
+    // Entries whose behaviour later phases build (the Batch Queue and the Loop Finder); Undo and Redo follow the stack.
+    for (QAction* a : {undo, redo, batch, finder})
         a->setEnabled(false);
-    recent->setEnabled(false);
     for (QAction* a : menu_->actions())
         addAction(a);
 

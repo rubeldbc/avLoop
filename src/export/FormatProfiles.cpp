@@ -22,13 +22,15 @@ const FormatProfile& profileOf(OutputFormat format) {
     return formatProfiles().front();
 }
 
-QString defaultFileName(const QString& sourcePath, QSize size, OutputFormat format) {
+QString defaultFileName(const QString& sourcePath, QSize size, OutputFormat format, const QString& pattern) {
     const QString base = sourcePath.isEmpty() ? QStringLiteral("loop") : QFileInfo(sourcePath).completeBaseName();
-    return QStringLiteral("%1_loop_%2x%3.%4")
-        .arg(base)
-        .arg(size.width())
-        .arg(size.height())
-        .arg(profileOf(format).extension);
+    QString name = pattern;
+    name.replace(QStringLiteral("{source}"), base)
+        .replace(QStringLiteral("{w}"), QString::number(size.width()))
+        .replace(QStringLiteral("{h}"), QString::number(size.height()));
+    for (QChar& c : name)
+        if (QStringLiteral("<>:\"/\\|?*").contains(c)) c = QLatin1Char('_'); // nothing a file name cannot hold
+    return name + QLatin1Char('.') + profileOf(format).extension;
 }
 
 QString alternativePath(const QString& path) {

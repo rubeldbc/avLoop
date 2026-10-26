@@ -1,6 +1,7 @@
 #include "ui/MainWindow.h"
 
 #include "core/AppInfo.h"
+#include "core/AppSettings.h"
 #include "core/Project.h"
 #include "export/ExportJob.h"
 #include "export/SizeEstimator.h"
@@ -73,9 +74,11 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setWindowTitle(AppInfo::name());
     setMinimumSize(1280, 720);
     setAcceptDrops(true);
-    disk_ = std::make_unique<media::DiskCache>();
-    const qint64 ramMb = QSettings().value(QStringLiteral("performance/ramCacheMB"), 1536).toLongLong();
-    cache_ = std::make_unique<media::FrameCache>(ramMb << 20);
+    // Settings → Performance: the disk cache's folder and size, the RAM cache's (spec §3.7.1, §11.3).
+    const QString diskRoot = appsettings::diskCacheFolder();
+    disk_ = std::make_unique<media::DiskCache>(diskRoot.isEmpty() ? media::DiskCache::defaultRoot() : diskRoot,
+                                               std::int64_t(appsettings::diskCacheGB()) << 30);
+    cache_ = std::make_unique<media::FrameCache>(std::int64_t(appsettings::ramCacheMB()) << 20);
     cache_->setDiskCache(disk_.get());
 
     auto* central = new QWidget(this);
@@ -127,6 +130,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     buildTimeline();
     buildPreview();
     buildExport();
+    buildProject();
     registerProbes();
     registerMediaProbes();
     restoreLayout();
@@ -139,7 +143,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     updateStatus();
 }
 
-MainWindow::~MainWindow() = default;
+MainWindow::~MainWindow() {
+    removeAutosave(); // a clean exit leaves no autosave; a crash does (spec §11.1)
+}
 
 QWidget* MainWindow::buildTopBar() {
     auto* bar = new QWidget(this);
@@ -171,7 +177,7 @@ QWidget* MainWindow::buildTopBar() {
     open_->setObjectName(QStringLiteral("topbar.open"));
     open_->setToolTip(tr("Open a video or project (Ctrl+O)"));
     connect(open_, &QPushButton::clicked, this, &MainWindow::chooseFile);
-    auto* openKey = new QAction(open_);
+    auto* openKey = new QAction(tr("Open a video or project"), open_);
     openKey->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O));
     connect(openKey, &QAction::triggered, this, &MainWindow::chooseFile);
     addAction(openKey);
@@ -292,7 +298,6 @@ void MainWindow::registerProbes() {
             .arg(a.width())
             .arg(a.height());
     });
-    WalkProbes::add(QStringLiteral("window.title"), [this] { return windowTitle(); });
     WalkProbes::add(QStringLiteral("window.size"),
                     [this] { return QStringLiteral("%1x%2").arg(width()).arg(height()); });
     WalkProbes::add(QStringLiteral("topbar.buttons"), [this] { return topBarButtons().join(QLatin1Char(',')); });
@@ -337,10 +342,11 @@ void MainWindow::showEvent(QShowEvent* event) {
 }
 
 void MainWindow::closeEvent(QCloseEvent* event) {
-    if (!mayCloseDuringExport()) {
+    if (!mayCloseDuringExport() || !maySaveChanges()) {
         event->ignore();
         return;
     }
+    removeAutosave();
     saveLayout();
     QMainWindow::closeEvent(event);
 }

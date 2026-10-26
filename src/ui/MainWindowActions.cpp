@@ -3,6 +3,7 @@
 // GPU and the memory. Opening a new video releases everything of the previous one (spec §3.7.5).
 #include "ui/MainWindow.h"
 
+#include "core/AppSettings.h"
 #include "media/DecodeWorker.h"
 #include "media/DiskCache.h"
 #include "media/FrameCache.h"
@@ -61,11 +62,13 @@ SourceInfo sourceInfoOf(const media::MediaInfo& m) {
 } // namespace
 
 void MainWindow::chooseFile() {
+    if (!maySaveChanges()) return;
     QSettings settings;
     const QString dir = settings.value(QStringLiteral("ui/lastOpenDir"), QDir::homePath()).toString();
     const QString filter = tr("All media (*.*);;Video files (*.mp4 *.mov *.mkv *.webm *.avi *.wmv *.asf *.flv *.ts "
-                              "*.m2ts *.mts *.mpg *.mpeg *.vob *.mxf *.3gp *.ogv *.y4m *.gif *.apng *.webp *.m4v)");
-    const QString path = QFileDialog::getOpenFileName(this, tr("Open a video"), dir, filter);
+                              "*.m2ts *.mts *.mpg *.mpeg *.vob *.mxf *.3gp *.ogv *.y4m *.gif *.apng *.webp *.m4v);;"
+                              "AvLoop projects (*.avloop)");
+    const QString path = QFileDialog::getOpenFileName(this, tr("Open a video or a project"), dir, filter);
     if (path.isEmpty()) return;
     settings.setValue(QStringLiteral("ui/lastOpenDir"), QFileInfo(path).absolutePath());
     openFiles({path});
@@ -87,12 +90,24 @@ void MainWindow::openProject(const QString& path) {
                     Toast::Kind::Error, 8000);
         return;
     }
+    // Spec §11.1: the path, then the path relative to the project (projectjson::load), then Locate source….
     if (!QFileInfo::exists(loaded.source.path)) {
-        Toast::post(centralWidget(), tr("The project's video was not found: %1").arg(loaded.source.path),
-                    Toast::Kind::Error, 8000);
-        return;
+        qInfo().noquote() << "[project] the video was not found by its path or beside the project:"
+                          << loaded.source.path << "— Locate source…";
+        QString located = labText_; // a lab run: the walk's answer
+        if (!qApp->property("avloop.lab").toBool())
+            located = QFileDialog::getOpenFileName(
+                this, tr("Locate source… — %1").arg(QFileInfo(loaded.source.path).fileName()),
+                QFileInfo(path).absolutePath(), tr("All media (*.*)"));
+        if (located.isEmpty() || !QFileInfo::exists(located)) {
+            lastError_ = tr("The project's video was not found: %1").arg(loaded.source.path);
+            Toast::post(centralWidget(), lastError_, Toast::Kind::Error, 8000);
+            return;
+        }
+        loaded.source.path = QDir::toNativeSeparators(located);
     }
     pendingProject_ = loaded;
+    pendingProjectPath_ = path;
     openVideo(loaded.source.path);
 }
 
@@ -124,14 +139,15 @@ void MainWindow::probed(const QString& path, const std::optional<media::MediaInf
         ProjectData restored = *pendingProject_;
         restored.source = source;
         project_->restore(restored);
+        projectOpened(pendingProjectPath_, *pendingProject_);
     } else {
         project_->setSource(source);
+        videoOpened(path);
     }
     pendingProject_.reset();
+    pendingProjectPath_.clear();
     media::Decoder::Options options;
-    options.hardware =
-        QSettings().value(QStringLiteral("performance/hardwareDecoding"), QStringLiteral("auto")).toString() !=
-        QLatin1String("off");
+    options.hardware = appsettings::hardwareDecoding();
     if (!decodeThread_) decodeThread_ = std::make_unique<media::WorkerThread>(QStringLiteral("avloop-decode"));
     worker_ = std::make_unique<media::DecodeWorker>(*info, options, cache_.get(), decodeThread_.get());
     connect(worker_.get(), &media::DecodeWorker::opened, this,
@@ -222,7 +238,7 @@ void MainWindow::dropEvent(QDropEvent* event) {
         if (url.isLocalFile()) paths << url.toLocalFile();
     if (paths.isEmpty()) return;
     event->acceptProposedAction();
-    openFiles(paths);
+    if (maySaveChanges()) openFiles(paths);
 }
 
 void MainWindow::registerMediaProbes() {

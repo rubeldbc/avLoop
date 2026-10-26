@@ -1,7 +1,7 @@
 ---
 phase: AV-015
 title: "CP-A1 the loop maker walked"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 0
 track: A
 checkpoint_id: CP-A1

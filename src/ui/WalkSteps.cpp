@@ -95,6 +95,12 @@ QPixmap WalkRunner::grabWidget(QWidget* widget) {
         if (!gl->isVisible()) continue;
         p.drawImage(QRect(gl->mapTo(widget, QPoint(0, 0)), gl->size()), gl->grabFramebuffer());
     }
+    // What floats over the GL widgets (a toast, the F1 list) goes back on top of them.
+    for (QWidget* over : widget->findChildren<QWidget*>()) {
+        const QString name = over->objectName();
+        if (over->isVisible() && (name == QLatin1String("Toast") || name == QLatin1String("ShortcutOverlay")))
+            over->render(&p, over->mapTo(widget, QPoint(0, 0)));
+    }
     return pm;
 }
 

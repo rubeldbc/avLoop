@@ -102,6 +102,16 @@ Rational Project::outputFps() const {
     return output_.effectiveFps(source_.fps, source_.vfr);
 }
 
+void Project::changeSettings(const LoopSettings& loop, const OutputSettings& output, const QualitySettings& quality,
+                             const QString& name) {
+    if (loop.clamped() == loop_ && output == output_ && quality == quality_) return;
+    undo_.beginMacro(tr("Apply the preset %1").arg(name));
+    changeLoop(loop);
+    changeOutput(output);
+    changeQuality(quality);
+    undo_.endMacro();
+}
+
 void Project::changeLoop(const LoopSettings& after, const QString& mergeKey) {
     const LoopSettings target = after.clamped();
     if (target == loop_) return;

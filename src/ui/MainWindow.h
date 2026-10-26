@@ -39,6 +39,7 @@ class SizeEstimator;
 class Canvas;
 class DropZone;
 class ExportBar;
+class SettingsDialog;
 class PreviewWindow;
 namespace render {
 class RenderService;
@@ -77,6 +78,8 @@ public:
     void closeVideo();
     // A project file (spec §11.1): its source opened, then the rest restored (the file's UX is AV-010's).
     void openProject(const QString& path);
+    // MainWindowProject.cpp — an autosave a crashed AvLoop left, offered back (spec §11.1); called once at start.
+    void offerRecovery();
     Project* project() const { return project_; }
     Canvas* canvas() const { return canvas_; }
     media::FrameCache* frameCache() const { return cache_.get(); }
@@ -134,6 +137,25 @@ private:
     bool mayCloseDuringExport();
     // A yes/no question; a lab run answers it from the walk ("answer" step) and never opens a dialog.
     bool confirm(const QString& text);
+    // MainWindowProject.cpp — the project file, its title, autosave; Settings, About, F1.
+    void buildProject();
+    void newProject();
+    void chooseProject();
+    bool saveProject(); // to its file, else Save As
+    bool saveProjectAs(const QString& path = {});
+    bool maySaveChanges(); // Save / Don't save / Cancel when there are changes; false: stay
+    bool projectDirty() const;
+    void refreshTitle();
+    int ask(const QString& text, const QStringList& choices); // the chosen one's index; a lab run: the walk's
+    void projectOpened(const QString& projectFile, const ProjectData& read);
+    void videoOpened(const QString& path);
+    void fillRecent(QMenu* menu);
+    void autosave();
+    void removeAutosave();
+    void openSettings();
+    void openAbout();
+    void showQuietly(QWidget* window);
+    void toggleShortcuts();
     QObject* exportContext(); // made at first use, as the estimator
     exporting::SizeEstimator* estimator();
 
@@ -166,6 +188,14 @@ private:
     ExportBar* exportBar_ = nullptr;
     QString lastQuestion_;
     bool labAnswer_ = true;
+    QString labChoice_;   // the walk's answer to the next question with choices (empty: the first)
+    QString labText_;     // the walk's answer to a name or a file asked for
+    QString projectPath_; // the open project's file; empty: not saved yet
+    QString pendingProjectPath_;
+    bool recoveredDirty_ = false; // a recovered autosave: changes not saved yet
+    QTimer* autosaveTimer_ = nullptr;
+    QString autosaveFile_;
+    QPointer<SettingsDialog> settings_;
     bool obsTipShown_ = false;
     Project* project_ = nullptr;
     Canvas* canvas_ = nullptr;

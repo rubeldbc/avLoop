@@ -3,8 +3,11 @@
 //   --walk <script.json> --walk-out <folder>               replay a walk on the real widgets, exit with its verdict
 //   --scale <factor>                                       the display scale (S1 at 100/150/200%)
 //   --mem-log <file>                                       Private Bytes, VRAM and the cache every second (spec §3.7.8)
-// In lab mode the settings live in a temporary folder, never the owner's.
+// In lab mode the settings, the autosave and the logs live in a temporary folder (or AVLOOP_DATA_DIR), never the
+// owner's.
+#include "app/Diagnostics.h"
 #include "core/AppInfo.h"
+#include "core/AppSettings.h"
 #include "media/DiskCache.h"
 #include "media/FrameCache.h"
 #include "media/SystemMemory.h"
@@ -87,7 +90,12 @@ int main(int argc, char** argv) {
     if (lab) {
         labSettings = std::make_unique<QTemporaryDir>(QDir::temp().filePath(QStringLiteral("avloop-lab-XXXXXX")));
         QSettings::setPath(QSettings::IniFormat, QSettings::UserScope, labSettings->path());
+        if (qEnvironmentVariableIsEmpty("AVLOOP_DATA_DIR")) qputenv("AVLOOP_DATA_DIR", labSettings->path().toUtf8());
     }
+    // Spec §11.3: the log of the day and, on a crash, a minidump beside it.
+    avloop::diagnostics::installLog(avloop::appsettings::logsDir());
+    avloop::diagnostics::installCrashHandler(avloop::appsettings::logsDir());
+    qInfo().noquote() << "[app] AvLoop" << avloop::AppInfo::version() << "started";
 
     const QString themeName =
         cli.isSet(theme) ? cli.value(theme) : QSettings().value(QStringLiteral("ui/theme")).toString();
@@ -109,6 +117,12 @@ int main(int argc, char** argv) {
         window.openProject(cli.value(project));
     else if (!cli.positionalArguments().isEmpty())
         window.openFiles(cli.positionalArguments());
+    else if (avloop::appsettings::openLastProject() && !lab &&
+             !avloop::appsettings::recent(avloop::appsettings::Recent::Projects).isEmpty())
+        window.openProject(avloop::appsettings::recent(avloop::appsettings::Recent::Projects).first());
+    // An autosave a crashed AvLoop left behind is offered back once the window is up (spec §11.1); a lab run's walk
+    // asks for the offer itself ("recover"), after its answer.
+    if (!lab) QTimer::singleShot(0, &window, [&window] { window.offerRecovery(); });
 
     // --mem-log: one line a second — ms since start, Private Bytes, VRAM, cache (MB).
     QFile memFile;

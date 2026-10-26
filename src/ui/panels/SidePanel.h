@@ -2,6 +2,8 @@
 
 #include <QWidget>
 
+#include <functional>
+
 class QComboBox;
 class QLabel;
 class QToolButton;
@@ -30,6 +32,9 @@ public:
     void bindOutput(Project* project);
     // QualityPanel.cpp: the Quality section, with the size estimate's row.
     void bindQuality(Project* project);
+    // PresetPanel.cpp: the preset row (spec §11.3) — choosing one applies it (one Undo step); save asks a name,
+    // delete asks first (a lab run answers both from its walk).
+    void bindPresets(Project* project, std::function<QString()> askName, std::function<bool(const QString&)> confirm);
     void setEstimate(const QString& text);
 
 private:

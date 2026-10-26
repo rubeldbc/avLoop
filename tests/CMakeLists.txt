@@ -24,7 +24,7 @@ avloop_add_test(aspect SOURCES test-aspect.cpp LIBS avloop_ui)
 avloop_add_test(mask SOURCES test-mask.cpp LIBS avloop_render avloop_core)
 avloop_add_test(renderer-cpu SOURCES test-renderer-cpu.cpp RenderCases.h LIBS avloop_render)
 avloop_add_test(timecode SOURCES test-timecode.cpp LIBS avloop_ui)
-foreach(_t geometry commands project-json loopmap timemap)
+foreach(_t geometry commands project-json loopmap timemap presets)
     avloop_add_test(${_t} SOURCES test-${_t}.cpp LIBS avloop_core)
 endforeach()
 

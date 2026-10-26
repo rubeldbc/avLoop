@@ -76,6 +76,49 @@ private slots:
         QCOMPARE(plain.output.background, QStringLiteral("#000000"));
         QVERIFY(plain.output.lockRatio);
     }
+    // Spec §11.1: ProjectMigrate — a file without a version (version 0) reads as the first format and is written as
+    // version 1; a newer one is refused with the message that says so.
+    void migration() {
+        QJsonObject old = projectjson::toJson(sample(QStringLiteral("D:/a.mp4")));
+        old.remove(QStringLiteral("version"));
+        ProjectData back;
+        QString error;
+        QVERIFY2(projectjson::fromJson(old, back, &error), qPrintable(error));
+        QCOMPARE(back.transform.scale, 1.25);
+        QCOMPARE(projectjson::toJson(back).value(QStringLiteral("version")).toInt(), 1);
+        QJsonObject newer = old;
+        newer.insert(QStringLiteral("version"), 7);
+        QVERIFY(!projectjson::fromJson(newer, back, &error));
+        QCOMPARE(error,
+                 QStringLiteral("This project was saved by a newer AvLoop (version 7); update AvLoop to open it."));
+    }
+    // Save → open → save: the same bytes (nothing lost or reordered on the way).
+    void saveOpenSaveIsIdentical() {
+        QTemporaryDir dir;
+        ProjectData d = sample(QStringLiteral("D:/clips/fire.mp4"));
+        d.crop.kind = CropShape::Kind::Rounded;
+        d.crop.rect = QRectF(100, 50, 300, 200);
+        d.crop.radius = 12;
+        d.loop.mode = LoopSettings::Mode::PingPongSmooth;
+        d.output.setSizeId(QStringLiteral("custom"));
+        d.output.custom = QSize(320, 240);
+        d.quality.preset = QualitySettings::Preset::Custom;
+        d.quality.targetMB = 1.5;
+        d.original.insert(QStringLiteral("someday"), QStringLiteral("kept"));
+        const QString a = dir.filePath(QStringLiteral("a.avloop"));
+        const QString b = dir.filePath(QStringLiteral("b.avloop"));
+        QString error;
+        QVERIFY(projectjson::save(d, a, &error));
+        ProjectData read;
+        QVERIFY2(projectjson::load(a, read, &error), qPrintable(error));
+        QVERIFY(projectjson::save(read, b, &error));
+        QFile fa(a), fb(b);
+        QVERIFY(fa.open(QIODevice::ReadOnly) && fb.open(QIODevice::ReadOnly));
+        QCOMPARE(fb.readAll(), fa.readAll());
+        QCOMPARE(read.output, d.output);
+        QCOMPARE(read.loop, d.loop);
+        QCOMPARE(read.quality, d.quality);
+    }
     void cropRoundTrip() {
         ProjectData d = sample(QStringLiteral("a.mp4"));
         d.crop.kind = CropShape::Kind::Rounded;

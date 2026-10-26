@@ -195,4 +195,12 @@ QString MediaInfo::statusLine() const {
     return line;
 }
 
+QString MediaProbe::libraryVersions() {
+    auto v = [](unsigned n) {
+        return QStringLiteral("%1.%2.%3").arg(AV_VERSION_MAJOR(n)).arg(AV_VERSION_MINOR(n)).arg(AV_VERSION_MICRO(n));
+    };
+    return QStringLiteral("FFmpeg %1 · libavcodec %2 · libavformat %3")
+        .arg(QString::fromUtf8(av_version_info()), v(avcodec_version()), v(avformat_version()));
+}
+
 } // namespace avloop::media

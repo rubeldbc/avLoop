@@ -49,7 +49,8 @@ void MainWindow::buildPreview() {
         if (a != Project::Aspect::View && previewWindow_) previewDue_->start();
     });
     connect(preview_, &QPushButton::clicked, this, &MainWindow::openPreview);
-    auto* f5 = new QAction(this);
+    auto* f5 = new QAction(tr("Preview"), this);
+    f5->setObjectName(QStringLiteral("action.preview"));
     f5->setShortcut(QKeySequence(Qt::Key_F5));
     connect(f5, &QAction::triggered, this, &MainWindow::openPreview);
     addAction(f5);

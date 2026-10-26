@@ -41,14 +41,11 @@ SidePanel::SidePanel(QWidget* parent) : QWidget(parent) {
     row->setSpacing(4);
     presets_ = new QComboBox(presetRow);
     presets_->setObjectName(QStringLiteral("preset.box"));
-    presets_->addItem(tr("— Preset —"));
-    presets_->setEnabled(false);
+    presets_->addItem(tr("— Preset —"), QString());
     row->addWidget(presets_, 1);
     savePreset_ = iconButton(QStringLiteral("preset.save"), QStringLiteral("check"), tr("Save preset"), presetRow);
     deletePreset_ =
         iconButton(QStringLiteral("preset.delete"), QStringLiteral("close"), tr("Delete preset"), presetRow);
-    savePreset_->setEnabled(false);
-    deletePreset_->setEnabled(false);
     row->addWidget(savePreset_);
     row->addWidget(deletePreset_);
     column->addWidget(presetRow);

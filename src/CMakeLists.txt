@@ -7,7 +7,8 @@ add_library(avloop_core STATIC
     core/Timecode.h core/Timecode.cpp core/TimeRange.h core/TimeRange.cpp
     core/LoopSettings.h core/LoopSettings.cpp core/LoopMap.h core/LoopMap.cpp core/TimeMap.h core/TimeMap.cpp
     core/QualitySettings.h core/QualitySettings.cpp
-    core/Project.h core/Project.cpp core/Commands.h core/ProjectJson.h core/ProjectJson.cpp)
+    core/Project.h core/Project.cpp core/Commands.h core/ProjectJson.h core/ProjectJson.cpp core/ProjectSections.cpp
+    core/ProjectMigrate.h core/ProjectMigrate.cpp core/Presets.h core/Presets.cpp core/AppSettings.h core/AppSettings.cpp)
 target_include_directories(avloop_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/generated)
 # Qt Gui only for QUndoStack/QUndoCommand, which Qt 6 moved there from Widgets (spec §11.2).
 target_link_libraries(avloop_core PUBLIC Qt6::Core Qt6::Gui PRIVATE avloop_warnings)
@@ -41,7 +42,9 @@ target_link_libraries(avloop_export PUBLIC avloop_core avloop_media avloop_rende
 
 add_library(avloop_ui STATIC
     ui/MainWindow.h ui/MainWindow.cpp ui/MainMenu.cpp ui/MainWindowActions.cpp ui/MainWindowCanvas.cpp
-    ui/MainWindowTimeline.cpp ui/MainWindowPreview.cpp ui/MainWindowExport.cpp
+    ui/MainWindowTimeline.cpp ui/MainWindowPreview.cpp ui/MainWindowExport.cpp ui/MainWindowProject.cpp
+    ui/dialogs/SettingsDialog.h ui/dialogs/SettingsDialog.cpp ui/dialogs/AboutDialog.h ui/dialogs/AboutDialog.cpp
+    ui/dialogs/ShortcutOverlay.h ui/dialogs/ShortcutOverlay.cpp
     ui/export/ExportBar.h ui/export/ExportBar.cpp
     ui/preview/PreviewWindow.h ui/preview/PreviewWindow.cpp ui/preview/PreviewWidgets.h ui/preview/PreviewWidgets.cpp
     ui/preview/PreviewPlayer.h ui/preview/PreviewPlayer.cpp ui/preview/PreviewEncode.cpp
@@ -51,7 +54,7 @@ add_library(avloop_ui STATIC
     ui/widgets/Toast.h ui/widgets/Toast.cpp
     ui/panels/Section.h ui/panels/Section.cpp
     ui/panels/SidePanel.h ui/panels/SidePanel.cpp ui/panels/CropPanel.cpp ui/panels/LoopPanel.cpp
-    ui/panels/OutputPanel.cpp ui/panels/QualityPanel.cpp
+    ui/panels/OutputPanel.cpp ui/panels/QualityPanel.cpp ui/panels/PresetPanel.cpp
     ui/canvas/DropZone.h ui/canvas/DropZone.cpp
     ui/canvas/Canvas.h ui/canvas/Canvas.cpp ui/canvas/CanvasView.cpp ui/canvas/CanvasGl.cpp ui/canvas/CanvasGlState.h ui/canvas/CanvasOverlay.cpp
     ui/tools/Tool.h ui/tools/ToolManager.h ui/tools/ToolManager.cpp
@@ -72,8 +75,9 @@ set(AVLOOP_RC "")
 if(EXISTS ${CMAKE_SOURCE_DIR}/resources/app/avloop.ico)
     set(AVLOOP_RC ${CMAKE_SOURCE_DIR}/resources/app/avloop.rc)
 endif()
-add_executable(avloop WIN32 app/main.cpp ${CMAKE_SOURCE_DIR}/resources/resources.qrc ${AVLOOP_RC})
-target_link_libraries(avloop PRIVATE avloop_ui avloop_warnings)
+add_executable(avloop WIN32 app/main.cpp app/Diagnostics.h app/Diagnostics.cpp ${CMAKE_SOURCE_DIR}/resources/resources.qrc
+    ${AVLOOP_RC})
+target_link_libraries(avloop PRIVATE avloop_ui dbghelp avloop_warnings)
 avloop_copy_ffmpeg_dlls(avloop)
 
 add_executable(avloop-cli cli/main.cpp cli/CliMedia.cpp cli/CliRender.cpp cli/CliExport.cpp)

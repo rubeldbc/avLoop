@@ -191,3 +191,16 @@ end of its section.
   with no more look-ahead than the frames encoded. (AV-009)
 - **A wrapped QLabel beside buttons asks for too little width**: the toast clipped its second line under its buttons.
   Rule: the text above, the buttons in a row beneath, the label fixed to its longest line (at most 340 px). (AV-009)
+
+## The project and the settings
+
+- **A QOpenGLWidget's grab paints over what floats above it**: the walk's window picture lost the F1 list over the
+  canvas (the toast over the raster timeline survived). Rule: the picture draws the GL frames, then renders the
+  floating widgets (toast, F1 list) on top again. (AV-010)
+- **A probe name has one owner**: the window's old `window.title` (registered later) replaced the project's, which
+  shows the `*`. Rule: a probe is registered once, where its meaning lives. (AV-010)
+- **An unhandled-exception filter that returns EXECUTE_HANDLER ends a crash quietly**: the minidump is written and the
+  process exits with 0xC0000005, no Windows Error Reporting dialog — so a walk can crash the app on purpose. (AV-010)
+- **A walk answers what a user would be asked**: modal questions (Save / Don't save / Cancel, Recover / Discard, a
+  name, Locate source…) take the walk's `answer` in a lab run instead of opening, so the focus stays the owner's.
+  (AV-010)

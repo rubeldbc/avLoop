@@ -20,8 +20,10 @@ struct FormatProfile {
 
 const QList<FormatProfile>& formatProfiles();
 const FormatProfile& profileOf(OutputFormat format);
-// "<source>_loop_<W>x<H>.<ext>" (spec §10.1).
-QString defaultFileName(const QString& sourcePath, QSize size, OutputFormat format);
+// The name template (Settings → Export; spec §10.1's "<source>_loop_<W>x<H>") filled in: {source}, {w}, {h}; then
+// the format's extension.
+QString defaultFileName(const QString& sourcePath, QSize size, OutputFormat format,
+                        const QString& pattern = QStringLiteral("{source}_loop_{w}x{h}"));
 // The first free "name (1).webm", "name (2).webm" … beside `path` (spec §12.3: a file OBS holds).
 QString alternativePath(const QString& path);
 

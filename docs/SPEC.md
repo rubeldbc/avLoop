@@ -6,6 +6,41 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-010 — The project and the settings (AV-010, 2026-10-26)
+
+- The ☰ menu's New, Open Project…, Save (Ctrl+S), Save As… (Ctrl+Shift+S) and Recent (the last 10 projects, then the
+  last 10 videos, Clear the list) work; Ctrl+O, drag and drop and `avloop.exe <file>` open a video or an `.avloop`.
+  Saving is atomic (`QSaveFile`). The title is `AvLoop — <name>.avloop` (a video not saved as a project: its file name —
+  reading R-41) with `*` while there are unsaved changes (the Undo stack away from its saved point, or a recovered
+  autosave). Opening, New, Recent and closing the window ask Save / Don't save / Cancel when there are changes.
+- Finding the source: its path, then its path relative to the project, then *Locate source…* (a file dialog; the log
+  says it was needed); a video whose size or date changed since the save opens with a warning toast (R-43).
+- `core/ProjectMigrate`: older versions brought up step by step; a newer file is refused ("This project was saved by a
+  newer AvLoop (version N); update AvLoop to open it."); version 1 is the first format (R-39). Unknown keys are kept.
+- Autosave every N minutes (2 by default) while there are changes, to `%LOCALAPPDATA%\AvLoop\autosave\session-<pid>
+  .avloop` (with the PID and the project's own path); a clean exit deletes it; at the next start an autosave whose
+  process is gone is offered: "Recover unsaved project? (autosaved at HH:MM)" — Recover (the work back, still unsaved,
+  saving to its own file) or Discard.
+- Settings (Ctrl+,; `%APPDATA%\AvLoop\AvLoop.ini`), a window of three tabs whose changes are saved at once (R-44):
+  General (Theme — applied at once —, open the last project at start, autosave minutes), Performance (Hardware decoding
+  and GPU rendering Auto/Off — from the next video —, RAM cache 256–8192 MB — at once —, the disk cache's folder and GB
+  — from the next start —, Clear cache), Export (default folder, name template `{source}_loop_{w}x{h}`, the OBS tips).
+  The keys, frozen from here on (§2.7): `ui/theme`, `general/openLastProject`, `general/autosaveMinutes`,
+  `performance/hardwareDecoding`, `performance/gpuRendering`, `performance/ramCacheMB`, `performance/diskCacheFolder`,
+  `performance/diskCacheGB`, `export/defaultFolder`, `export/nameTemplate`, `export/showObsTips`, `export/lastFolder`,
+  `recent/projects`, `recent/videos` (and the window's `ui/…` and `preview/geometry`).
+- Presets (`core/Presets`): Loop + Output + Quality under a name in `%APPDATA%\AvLoop\presets\<name>.json`; built in:
+  "OBS Overlay 1:1 512", "OBS Lower Third 16:9 1280", "OBS Vertical 9:16 1080" (long sides 512 / 1280 / 1080 —
+  R-40). The row above the side panel: choosing one applies it as one Undo step and the box shows the preset the
+  settings match; ✓ saves under a name, ✕ deletes a user preset.
+- Logs: `%LOCALAPPDATA%\AvLoop\logs\avloop-YYYYMMDD.log`, lines `HH:MM:SS.mmm [module] text`, a part over 10 MB goes on
+  in `-2`, 7 days kept; an unhandled exception writes `avloop-YYYYMMDD-HHMMSS.dmp` there (`MiniDumpWriteDump`).
+- About AvLoop: the version, the licence, the libraries and their licences (§3.8). F1 shows the shortcuts — the
+  actions' own, the tools', the transport's — over the window; F1, Esc or a click closes it.
+- Measured: save → open → save writes the same bytes and `avloop-cli frame` of both is identical (max difference 0); a
+  moved folder opens by relativePath; a crash leaves a minidump and the autosave, killed or crashed the next start
+  recovers it.
+
 ### D-009 — The export (AV-009, 2026-10-26)
 
 - Export and Ctrl+E open the Save dialog (each time — reading R-34), filled with the project's last export, else

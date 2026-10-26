@@ -1,0 +1,44 @@
+walk walk-settings.json: 59 steps
+-- a video open, so the Export tab's name template has a name to make
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect window.title: AvLoop — counter-640p30.mp4
+-- Settings (Ctrl+,): General — the theme switched without a restart, the autosave minutes
+PASS expect settings.open: true
+PASS shot settings-general.png: 520x400 px
+PASS expect theme: black
+PASS shot settings-black.png: 1400x730 px
+PASS expect theme: navy
+PASS expect autosave.minutes: 5
+-- Performance: the RAM cache applied at once
+PASS expect cache.budgetMB: 1024
+PASS shot settings-performance.png: 520x400 px
+-- Export: the name template
+PASS expect export.defaultName: counter-640p30_loop_640x360.webm
+PASS expect export.defaultName: counter-640p30-640.webm
+PASS shot settings-export.png: 520x400 px
+PASS expect settings.open: false
+-- F1: the list of shortcuts, from the actions' own; Esc closes it
+PASS expect shortcuts.open: true
+PASS shot shortcuts.png: 1400x730 px
+PASS expect shortcuts.open: false
+-- About
+     menu: About AvLoop
+PASS shot about.png: 520x360 px
+-- Presets: a built-in one applied (one Undo step), one saved and deleted
+PASS expect preset.current: 
+PASS expect output.sizeMode: long-1280
+PASS expect preset.current: OBS Lower Third 16:9 1280
+PASS expect output.sizeMode: crop
+PASS expect preset.current: 
+PASS expect preset.current: OBS Lower Third 16:9 1280
+PASS expect preset.current: 
+     answer yes
+PASS expect preset.names: OBS Overlay 1:1 512|OBS Lower Third 16:9 1280|OBS Vertical 9:16 1080|My overlay
+PASS expect preset.current: My overlay
+PASS shot presets.png: 260x41 px
+     answer yes
+PASS expect question.last: Delete the preset “My overlay”?
+PASS expect preset.names: OBS Overlay 1:1 512|OBS Lower Third 16:9 1280|OBS Vertical 9:16 1080
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

@@ -3,6 +3,7 @@
 // its bar in the status bar, the toast says how it ended (Show in folder; the OBS tip once a session, Don't show
 // again), quitting asks first. Export and Preview stand disabled with the reason when they cannot run. The size
 // estimate follows the project's changes while the Quality section is open.
+#include "core/AppSettings.h"
 #include "core/Geometry.h"
 #include "core/Project.h"
 #include "export/ExportJob.h"
@@ -92,7 +93,8 @@ void MainWindow::buildExport() {
         }
     });
     connect(export_, &QPushButton::clicked, this, &MainWindow::chooseExport);
-    auto* ctrlE = new QAction(this);
+    auto* ctrlE = new QAction(tr("Export"), this);
+    ctrlE->setObjectName(QStringLiteral("action.export"));
     ctrlE->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_E));
     connect(ctrlE, &QAction::triggered, this, &MainWindow::chooseExport);
     addAction(ctrlE);
@@ -117,7 +119,7 @@ void MainWindow::buildExport() {
     WalkProbes::add(QStringLiteral("export.text"), [this] { return exportBar_->text(); });
     WalkProbes::add(QStringLiteral("export.defaultName"), [this] {
         return video_ ? exporting::defaultFileName(project_->source().path, project_->outputSize(),
-                                                   project_->output().format)
+                                                   project_->output().format, appsettings::nameTemplate())
                       : QString();
     });
     WalkProbes::add(QStringLiteral("question.last"), [this] { return lastQuestion_; });
@@ -135,16 +137,20 @@ void MainWindow::buildExport() {
         exportTo(file);
         return 200;
     });
-    // {"do": "answer", "yes": true}: how the walk answers the questions that follow (no dialog opens in a lab run).
+    // {"do": "answer", "yes": true, "choice": "Don't save", "text": "…"}: how the walk answers the questions that
+    // follow — yes/no, one of several choices, a name or a file — as no dialog opens in a lab run.
     WalkRunner::addStep(QStringLiteral("answer"), [this](WalkRunner& walk, const QJsonObject& step) {
         labAnswer_ = step.value(QStringLiteral("yes")).toBool(true);
+        labChoice_ = step.value(QStringLiteral("choice")).toString();
+        labText_ = step.value(QStringLiteral("text")).toString();
         lastQuestion_.clear();
         walk.log(QStringLiteral("     answer %1").arg(labAnswer_ ? QStringLiteral("yes") : QStringLiteral("no")));
         return 50;
     });
-    // {"do": "closeWindow"}: the window's close button, as the user presses it (the quit question comes first).
+    // {"do": "closeWindow"}: the window's close button, as the user presses it — the export's question, then the save
+    // question — without closing a lab run's window.
     WalkRunner::addStep(QStringLiteral("closeWindow"), [this](WalkRunner& walk, const QJsonObject&) {
-        const bool closed = mayCloseDuringExport();
+        const bool closed = mayCloseDuringExport() && maySaveChanges();
         walk.log(QStringLiteral("     closeWindow: %1")
                      .arg(closed ? QStringLiteral("would close") : QStringLiteral("stays open")));
         if (closed && exportJob_) exportJob_->cancel();
@@ -200,21 +206,22 @@ void MainWindow::chooseExport() {
         Toast::post(centralWidget(), reason, Toast::Kind::Warning);
         return;
     }
-    QSettings settings;
+    // The project's last export; else the name template in Settings' default folder, the last folder or Videos.
     QString suggested = project_->exportPath();
     if (suggested.isEmpty()) {
-        const QString folder = settings
-                                   .value(QStringLiteral("export/lastFolder"),
-                                          QStandardPaths::writableLocation(QStandardPaths::MoviesLocation))
-                                   .toString();
-        suggested = QDir(folder).filePath(
-            exporting::defaultFileName(project_->source().path, project_->outputSize(), project_->output().format));
+        QString folder = appsettings::exportFolder();
+        if (folder.isEmpty())
+            folder = appsettings::value(appsettings::kLastExportFolder,
+                                        QStandardPaths::writableLocation(QStandardPaths::MoviesLocation))
+                         .toString();
+        suggested = QDir(folder).filePath(exporting::defaultFileName(
+            project_->source().path, project_->outputSize(), project_->output().format, appsettings::nameTemplate()));
     }
     const exporting::FormatProfile& profile = exporting::profileOf(project_->output().format);
     const QString path = QFileDialog::getSaveFileName(this, tr("Export loop"), suggested,
                                                       tr("%1 (*.%2)").arg(profile.name, profile.extension));
     if (path.isEmpty()) return;
-    settings.setValue(QStringLiteral("export/lastFolder"), QFileInfo(path).absolutePath());
+    appsettings::setValue(appsettings::kLastExportFolder, QFileInfo(path).absolutePath());
     exportTo(path);
 }
 
@@ -270,8 +277,7 @@ void MainWindow::exportFinished() {
         text = tr("%1 was in use, so the loop was saved as %2.")
                    .arg(QFileInfo(job.path()).fileName(), QFileInfo(r.path).fileName()) +
                QLatin1Char('\n') + text;
-    QSettings settings;
-    const bool tip = !obsTipShown_ && !settings.value(QStringLiteral("export/obsTipHidden")).toBool();
+    const bool tip = !obsTipShown_ && appsettings::showObsTips();
     if (tip)
         text += QLatin1Char('\n') + tr("OBS: Media Source → Loop on · Use hardware decoding off (keeps transparency)");
     obsTipShown_ = obsTipShown_ || tip;
@@ -284,9 +290,7 @@ void MainWindow::exportFinished() {
                         QProcess::startDetached(QStringLiteral("explorer.exe"),
                                                 {QStringLiteral("/select,"), QDir::toNativeSeparators(file)});
                     });
-    if (tip)
-        toast->addButton(tr("Don't show again"),
-                         [] { QSettings().setValue(QStringLiteral("export/obsTipHidden"), true); });
+    if (tip) toast->addButton(tr("Don't show again"), [] { appsettings::setValue(appsettings::kShowObsTips, false); });
 }
 
 } // namespace avloop

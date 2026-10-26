@@ -61,6 +61,18 @@ frame rate and quality, and a preview that shows exactly what will be exported.
   or Motion Interpolation. The Loop panel shows the result ("Loop 4.50 s · 135 frames @ 30 fps"), and the crossfade
   shows on the timeline as a band whose edge you drag.
 - **Undo and Redo** for every change (200 steps; one drag is one step).
+- **Projects** (`.avloop`, plain JSON): New, Open, Save (Ctrl+S), Save As, Recent (10 projects and 10 videos), drag and
+  drop or `avloop.exe <project>`. The title shows the project and `*` while it has unsaved changes; closing asks Save /
+  Don't save / Cancel. A moved project finds its video beside it, else asks you to locate it. Work is **autosaved**
+  every 2 minutes and offered back after a crash.
+- **Presets**: the three built-in OBS presets (Overlay 512, Lower Third 1280, Vertical 1080) and your own — Loop,
+  Output and Quality saved under a name, applied in one Undo step.
+- **Settings** (Ctrl+,): theme, open the last project at start, autosave interval; hardware decoding, GPU rendering,
+  RAM and disk cache, Clear cache; the export folder, the file name template, the OBS tips. **F1** lists the shortcuts.
+  A daily log and, on a crash, a minidump in `%LOCALAPPDATA%\AvLoop\logs`.
+
+  ![Settings, the Performance tab](docs/screenshots/settings.png)
+
 - **Memory under control**: a bounded frame cache (1.5 GB by default) with a disk spill; the status bar shows the
   source, the GPU and RAM / VRAM / cache use.
 - **A Preview window** (F5) that shows only the exported part, exactly as it will be exported: always looping, a
@@ -93,8 +105,7 @@ frame rate and quality, and a preview that shows exactly what will be exported.
 
 Built in this order (each line is a phase of [the plan](phases/26-10-26-034934-AvLoop/control/01_PHASE_DEPENDENCY_GRAPH.md)):
 
-1. **Projects** (`.avloop`), presets, autosave, settings.
-2. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
+1. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
 
 ## Using a loop in OBS
 
@@ -125,7 +136,7 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 | Action | Shortcut |
 | --- | --- |
-| Open a video | Ctrl+O |
+| Open a video or a project | Ctrl+O |
 | Selection · Crop: Rectangle · Rounded · Ellipse | V · M · U · E |
 | Hand · Zoom | H · Z |
 | Crop: keep the ratio · from the centre · no snapping (while dragging) | Shift · Alt · Ctrl |
@@ -139,8 +150,10 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 | Previous / next frame · ten frames | ← / → · Shift+← / Shift+→ |
 | Go to In / Out · start / end of the file | Home / End · Ctrl+Home / Ctrl+End |
 | Set In / Out at the playhead · clear them | I / O · Alt+I / Alt+O |
-| Timeline: fit the file · fit In–Out · zoom · switch timecode/frames |  · Shift+ · Ctrl+wheel · double-click the ruler |
+| Timeline: fit the file · fit In–Out · zoom · switch timecode/frames | `\` · `Shift+\` · Ctrl+wheel · double-click the ruler |
 | Keyframe tool | K |
+| Save · Save As | Ctrl+S · Ctrl+Shift+S |
+| Settings · the list of shortcuts | Ctrl+, · F1 |
 
 ## Project structure
 

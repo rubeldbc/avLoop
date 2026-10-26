@@ -1,6 +1,7 @@
 #include "core/ProjectJson.h"
 
-#include <QColor>
+#include "core/ProjectMigrate.h"
+
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -8,8 +9,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QSaveFile>
-
-#include <algorithm>
 
 namespace avloop::projectjson {
 
@@ -48,38 +47,12 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
 
     const QJsonObject range{{QStringLiteral("in"), d.range.in}, {QStringLiteral("out"), d.range.out}};
     root.insert(QStringLiteral("range"), merged(d.original, QStringLiteral("range"), range));
-    const QJsonObject loop{
-        {QStringLiteral("mode"), LoopSettings::modeId(d.loop.mode)},
-        {QStringLiteral("fade"), d.loop.fade},
-        {QStringLiteral("curve"), LoopSettings::curveId(d.loop.curve)},
-        {QStringLiteral("turn"), d.loop.turn},
-        {QStringLiteral("speed"), d.loop.speed},
-        {QStringLiteral("fpsMethod"), LoopSettings::methodId(d.loop.method)},
-    };
-    root.insert(QStringLiteral("loop"), merged(d.original, QStringLiteral("loop"), loop));
-    const QJsonObject output{
-        {QStringLiteral("format"), formatId(d.output.format)},
-        {QStringLiteral("size"), d.output.sizeId()},
-        {QStringLiteral("w"), d.output.custom.width()},
-        {QStringLiteral("h"), d.output.custom.height()},
-        {QStringLiteral("lock"), d.output.lockRatio},
-        {QStringLiteral("alpha"), OutputSettings::alphaId(d.output.alpha)},
-        {QStringLiteral("background"), d.output.background},
-        {QStringLiteral("fps"), d.output.fpsId()},
-    };
-    root.insert(QStringLiteral("output"), merged(d.original, QStringLiteral("output"), output));
+    root.insert(QStringLiteral("loop"), merged(d.original, QStringLiteral("loop"), loopToJson(d.loop)));
+    root.insert(QStringLiteral("output"), merged(d.original, QStringLiteral("output"), outputToJson(d.output)));
     if (!d.exportPath.isEmpty())
         root.insert(QStringLiteral("export"), merged(d.original, QStringLiteral("export"),
                                                      QJsonObject{{QStringLiteral("lastPath"), d.exportPath}}));
-    const QJsonObject quality{
-        {QStringLiteral("preset"), QualitySettings::presetId(d.quality.preset)},
-        {QStringLiteral("crf"), d.quality.crf},
-        {QStringLiteral("speed"), d.quality.speed},
-        {QStringLiteral("maxBitrate"), d.quality.maxBitrate},
-        {QStringLiteral("twoPass"), d.quality.twoPass},
-        {QStringLiteral("targetMB"), d.quality.targetMB},
-    };
-    root.insert(QStringLiteral("quality"), merged(d.original, QStringLiteral("quality"), quality));
+    root.insert(QStringLiteral("quality"), merged(d.original, QStringLiteral("quality"), qualityToJson(d.quality)));
 
     QJsonObject transform{
         {QStringLiteral("x"), d.transform.x},         {QStringLiteral("y"), d.transform.y},
@@ -112,18 +85,13 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
     return root;
 }
 
-bool fromJson(const QJsonObject& json, ProjectData& d, QString* error, const QString& projectPath) {
-    if (json.value(QStringLiteral("format")).toString() != QLatin1String("avloop")) {
+bool fromJson(const QJsonObject& read, ProjectData& d, QString* error, const QString& projectPath) {
+    if (read.value(QStringLiteral("format")).toString() != QLatin1String("avloop")) {
         if (error) *error = tr("This is not an AvLoop project.");
         return false;
     }
-    const int version = json.value(QStringLiteral("version")).toInt(0);
-    if (version > kVersion) {
-        if (error)
-            *error =
-                tr("This project was saved by a newer AvLoop (version %1); update AvLoop to open it.").arg(version);
-        return false;
-    }
+    QJsonObject json = read;
+    if (!projectmigrate::upgrade(json, kVersion, error)) return false;
     d = ProjectData{};
     d.original = json;
     const QJsonObject source = json.value(QStringLiteral("source")).toObject();
@@ -143,40 +111,10 @@ bool fromJson(const QJsonObject& json, ProjectData& d, QString* error, const QSt
     d.range.in = r.value(QStringLiteral("in")).toDouble();
     d.range.out = r.value(QStringLiteral("out")).toDouble();
 
-    const QJsonObject l = json.value(QStringLiteral("loop")).toObject();
-    const LoopSettings defaults;
-    d.loop.mode = l.contains(QStringLiteral("mode"))
-                      ? LoopSettings::modeFromId(l.value(QStringLiteral("mode")).toString())
-                      : defaults.mode;
-    d.loop.fade = l.value(QStringLiteral("fade")).toDouble(defaults.fade);
-    d.loop.curve = l.contains(QStringLiteral("curve"))
-                       ? LoopSettings::curveFromId(l.value(QStringLiteral("curve")).toString())
-                       : defaults.curve;
-    d.loop.turn = l.value(QStringLiteral("turn")).toDouble(defaults.turn);
-    d.loop.speed = l.value(QStringLiteral("speed")).toDouble(defaults.speed);
-    d.loop.method = LoopSettings::methodFromId(l.value(QStringLiteral("fpsMethod")).toString());
-    d.loop = d.loop.clamped();
-    const QJsonObject o = json.value(QStringLiteral("output")).toObject();
-    d.output = OutputSettings::fromFpsId(o.value(QStringLiteral("fps")).toString());
-    d.output.format = formatFromId(o.value(QStringLiteral("format")).toString());
-    d.output.setSizeId(o.value(QStringLiteral("size")).toString());
-    d.output.custom = QSize(std::clamp(o.value(QStringLiteral("w")).toInt(640), 16, 9999),
-                            std::clamp(o.value(QStringLiteral("h")).toInt(640), 16, 9999));
-    d.output.lockRatio = o.value(QStringLiteral("lock")).toBool(true);
-    d.output.alpha = OutputSettings::alphaFromId(o.value(QStringLiteral("alpha")).toString());
-    const QString background = o.value(QStringLiteral("background")).toString();
-    d.output.background = QColor::isValidColorName(background) ? QColor(background).name() : QStringLiteral("#000000");
+    d.loop = loopFromJson(json.value(QStringLiteral("loop")).toObject());
+    d.output = outputFromJson(json.value(QStringLiteral("output")).toObject());
+    d.quality = qualityFromJson(json.value(QStringLiteral("quality")).toObject());
     d.exportPath = json.value(QStringLiteral("export")).toObject().value(QStringLiteral("lastPath")).toString();
-    const QJsonObject q = json.value(QStringLiteral("quality")).toObject();
-    const QualitySettings qd;
-    d.quality.preset = q.contains(QStringLiteral("preset"))
-                           ? QualitySettings::presetFromId(q.value(QStringLiteral("preset")).toString())
-                           : qd.preset;
-    d.quality.crf = q.value(QStringLiteral("crf")).toInt(qd.crf);
-    d.quality.speed = q.value(QStringLiteral("speed")).toInt(qd.speed);
-    d.quality.maxBitrate = q.value(QStringLiteral("maxBitrate")).toInt(0);
-    d.quality.twoPass = q.value(QStringLiteral("twoPass")).toBool(false);
-    d.quality.targetMB = q.value(QStringLiteral("targetMB")).toDouble(0);
 
     const QJsonObject t = json.value(QStringLiteral("transform")).toObject();
     d.transform.x = t.value(QStringLiteral("x")).toDouble();

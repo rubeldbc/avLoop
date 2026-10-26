@@ -249,6 +249,16 @@ QLabel[quiet="true"] {
 *[mono="true"] {
     font-family: Consolas;
 }
+/* F1's list of shortcuts */
+#ShortcutOverlay {
+    background: @panel;
+    border: 1px solid @border;
+    border-radius: 4px;
+}
+#ShortcutOverlayTitle {
+    font-weight: bold;
+    color: @text;
+}
 /* The Preview's Live | Encoded: the mode on show */
 #PreviewWindow QPushButton:checked {
     color: @accent;

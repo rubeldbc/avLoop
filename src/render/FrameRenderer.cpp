@@ -1,10 +1,9 @@
 #include "render/FrameRenderer.h"
 
+#include "core/AppSettings.h"
 #include "media/Decoder.h"
 #include "media/FrameIndex.h"
 #include "render/GlRenderer.h"
-
-#include <QSettings>
 
 #include <cmath>
 
@@ -28,8 +27,7 @@ FrameRenderer::FrameRenderer(const RenderJob& job, media::DiskCache* diskCache, 
 FrameRenderer::~FrameRenderer() = default;
 
 bool FrameRenderer::gpuSetting() {
-    return QSettings().value(QStringLiteral("performance/gpuRendering"), QStringLiteral("auto")).toString() !=
-           QLatin1String("off");
+    return appsettings::gpuRendering();
 }
 
 bool FrameRenderer::open(QString* error) {

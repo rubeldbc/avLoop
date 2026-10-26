@@ -92,6 +92,9 @@ public:
     // A new frame rate keeps In and Out in seconds, on the new grid (one Undo step with the range — reading R-29).
     void changeOutput(const OutputSettings& after, const QString& mergeKey = {});
     void changeQuality(const QualitySettings& after, const QString& mergeKey = {});
+    // A preset (spec §11.3): its Loop, Output and Quality as one Undo step.
+    void changeSettings(const LoopSettings& loop, const OutputSettings& output, const QualitySettings& quality,
+                        const QString& name);
 
     // Only commands call these.
     void applyTransform(const VideoTransform& t);

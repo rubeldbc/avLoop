@@ -141,6 +141,17 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     quality comes out smaller: libvpx cannot spend bits a loop does not need.
 38. **R-38** The `.avloop` `output` keeps `size` (`crop`, `long-<N>`, `custom`), `w`/`h` (the Custom size), `lock`,
     `alpha` (`auto`, `on`, `off`), `background` (`#rrggbb`); `export.lastPath` the last file written.
+39. **R-39** Version 1 is the first `.avloop` format: `ProjectMigrate`'s chain starts with "no version = version 1";
+    a newer version is refused with §11.1's message.
+40. **R-40** The built-in presets' sizes are long sides (512, 1280, 1080): a preset holds no crop, so a fixed W×H
+    would stretch one; the names keep the spec's ratios as the crop to pair them with.
+41. **R-41** A video open without a project file is titled by the video's name; its Save asks for a file (Save As).
+42. **R-42** A lab run answers every question from its walk (`answer`), asks for the recovery offer itself
+    (`recover`) and keeps its settings, autosave and logs in its own folder (`AVLOOP_DATA_DIR`).
+43. **R-43** A source whose size or date changed since the save opens with a warning toast — the status bar's left
+    side already shows the source, so the toast is where §11.1's warning is seen.
+44. **R-44** Settings is a window whose changes are saved at once (no OK/Cancel): the theme and the RAM cache apply
+    at once, decoding and GPU rendering from the next video, the disk cache from the next start (said in the tab).
 
 ## 4. What is not built
 

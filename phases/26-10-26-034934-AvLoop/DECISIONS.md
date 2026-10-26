@@ -65,3 +65,9 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-36 | A locked destination: `name (1).webm` at once, with a toast | §12.3 | `README.md` §3; AV-009 |
 | R-37 | Target size in MiB; one correction pass when > 5 % off either way | §10.3 | `README.md` §3; AV-009 |
 | R-38 | The `.avloop` output keys: size, w, h, lock, alpha, background; export.lastPath | §11.1 | `README.md` §3; AV-009 |
+| R-39 | Version 1 is the first format; no version reads as 1 | §11.1 | `README.md` §3; AV-010 |
+| R-40 | The built-in presets' sizes are long sides | §11.3; no crop in a preset | `README.md` §3; AV-010 |
+| R-41 | A video without a project is titled by its name | §11.1 | `README.md` §3; AV-010 |
+| R-42 | A lab run answers questions from its walk; its own data folder | §2.8.6 | `README.md` §3; AV-010 |
+| R-43 | A changed source: a warning toast | §11.1 | `README.md` §3; AV-010 |
+| R-44 | Settings saved at once, each applied when it can be | §11.3 | `README.md` §3; AV-010 |
