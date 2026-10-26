@@ -1,0 +1,7 @@
+PASS gpu: 18000 frames rendered: 18000 frames of a 135-frame loop · 300x300 · GPU: NVIDIA GeForce RTX 2060 SUPER/PCIe/SSE2 · 33.7 s · 534.3 fps
+PASS gpu: Private Bytes, the last third against the first: peaks 270 / 272 / 273 MB → growth 2.2 MB, 34 samples
+PASS gpu: VRAM: peaks 40 / 40 / 40 MB → growth 0.0 MB
+PASS cpu: 3000 frames rendered: 3000 frames of a 135-frame loop · 300x300 · CPU · 9.8 s · 304.7 fps
+PASS cpu: Private Bytes, the last third against the first: peaks 184 / 185 / 185 MB → growth 0.7 MB, 10 samples
+PASS cpu: VRAM: peaks 27 / 27 / 27 MB → growth 0.0 MB
+WALK PASSED

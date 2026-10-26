@@ -63,19 +63,21 @@ frame rate and quality, and a preview that shows exactly what will be exported.
 - **Undo and Redo** for every change (200 steps; one drag is one step).
 - **Memory under control**: a bounded frame cache (1.5 GB by default) with a disk spill; the status bar shows the
   source, the GPU and RAM / VRAM / cache use.
-- `avloop-cli probe <video>` and `avloop-cli frame <video> --at N -o x.png` for scripts; `avloop-cli version` shows the
-  FFmpeg build in use and refuses a GPL build.
+- **One renderer** for what you will see and what you will export: output frame N of a loop is made on the GPU
+  (OpenGL 3.3) or, without one, on the CPU with the same result (within 2/255) — the crop's mask and feather, the
+  loop's blends and Motion Interpolation applied.
+- `avloop-cli probe <video>`, `avloop-cli frame <video> --at N -o x.png` and, of a project,
+  `avloop-cli frame <project.avloop> --at N -o x.png [--cpu]` for scripts; `avloop-cli version` shows the FFmpeg build
+  in use and refuses a GPL build.
 
 ## Roadmap
 
 Built in this order (each line is a phase of [the plan](phases/26-10-26-034934-AvLoop/control/01_PHASE_DEPENDENCY_GRAPH.md)):
 
-1. **One renderer** for preview and export, on the GPU with a CPU fallback of the same result — the crop's mask and
-   feather, the loop's blends and Motion Interpolation applied.
-2. **Preview window**: Live and Encoded, the seam marked, Around seam, backgrounds.
-3. **Export**: VP9/VP8 alpha WebM, quality presets, target file size, verification.
-4. **Projects** (`.avloop`), presets, autosave, settings.
-5. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
+1. **Preview window**: Live and Encoded, the seam marked, Around seam, backgrounds.
+2. **Export**: VP9/VP8 alpha WebM, quality presets, target file size, verification.
+3. **Projects** (`.avloop`), presets, autosave, settings.
+4. Keyframes, the **Loop Finder**, a batch queue, GIF/APNG/MP4/ProRes 4444, and a Windows installer (v1.0.0).
 
 ## Using a loop in OBS
 

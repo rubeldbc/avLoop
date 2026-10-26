@@ -8,6 +8,7 @@
 #include "media/FrameCache.h"
 #include "media/MediaProbe.h"
 #include "media/SystemMemory.h"
+#include "media/WorkerThread.h"
 #include "ui/WalkRunner.h"
 #include "ui/canvas/Canvas.h"
 #include "ui/canvas/DropZone.h"
@@ -131,7 +132,8 @@ void MainWindow::probed(const QString& path, const std::optional<media::MediaInf
     options.hardware =
         QSettings().value(QStringLiteral("performance/hardwareDecoding"), QStringLiteral("auto")).toString() !=
         QLatin1String("off");
-    worker_ = std::make_unique<media::DecodeWorker>(*info, options, cache_.get());
+    if (!decodeThread_) decodeThread_ = std::make_unique<media::WorkerThread>(QStringLiteral("avloop-decode"));
+    worker_ = std::make_unique<media::DecodeWorker>(*info, options, cache_.get(), decodeThread_.get());
     connect(worker_.get(), &media::DecodeWorker::opened, this,
             [this, w = worker_.get()](bool ok, const QString& err, bool, const QString& note) {
                 if (worker_.get() != w) return;

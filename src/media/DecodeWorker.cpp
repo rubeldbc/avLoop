@@ -6,24 +6,33 @@
 
 namespace avloop::media {
 
-DecodeWorker::DecodeWorker(const MediaInfo& info, const Decoder::Options& options, FrameCache* cache, QObject* parent)
+DecodeWorker::DecodeWorker(const MediaInfo& info, const Decoder::Options& options, FrameCache* cache, QThread* thread,
+                           QObject* parent)
     : QObject(parent), info_(info), options_(options), cache_(cache), sourceId_(FrameCache::sourceId(info.path)) {
     qRegisterMetaType<avloop::media::Frame>("avloop::media::Frame");
-    thread_.setObjectName(QStringLiteral("avloop-decode"));
-    inThread_.moveToThread(&thread_);
-    thread_.start();
+    if (!thread) {
+        ownThread_ = std::make_unique<QThread>();
+        ownThread_->setObjectName(QStringLiteral("avloop-decode"));
+        ownThread_->start();
+        thread = ownThread_.get();
+    }
+    inThread_ = new QObject;
+    inThread_->moveToThread(thread);
 }
 
 DecodeWorker::~DecodeWorker() {
     stopPlayback();
-    // The decoder is destroyed on the thread that used it, then the thread stops.
-    QMetaObject::invokeMethod(&inThread_, [this] { decoder_.reset(); }, Qt::BlockingQueuedConnection);
-    thread_.quit();
-    thread_.wait();
+    // The decoder is destroyed on the thread that used it (after any work still queued there), then the context.
+    QMetaObject::invokeMethod(inThread_, [this] { decoder_.reset(); }, Qt::BlockingQueuedConnection);
+    inThread_->deleteLater();
+    if (ownThread_) {
+        ownThread_->quit();
+        ownThread_->wait();
+    }
 }
 
 void DecodeWorker::start() {
-    QMetaObject::invokeMethod(&inThread_, [this] {
+    QMetaObject::invokeMethod(inThread_, [this] {
         decoder_ = std::make_unique<Decoder>(info_, options_);
         QString error;
         const bool ok = decoder_->open(&error);
@@ -41,7 +50,7 @@ void DecodeWorker::requestFrame(double seconds, Mode mode) {
     hasPending_ = true;
     if (serving_) return;
     serving_ = true;
-    QMetaObject::invokeMethod(&inThread_, [this] { serve(); });
+    QMetaObject::invokeMethod(inThread_, [this] { serve(); });
 }
 
 void DecodeWorker::serve() {
@@ -74,7 +83,7 @@ void DecodeWorker::play(double from, double until, double loopFrom, bool loop) {
         ring_.clear();
         stopPlay_ = false;
     }
-    QMetaObject::invokeMethod(&inThread_, [=, this] { produce(from, until, loopFrom, loop); });
+    QMetaObject::invokeMethod(inThread_, [=, this] { produce(from, until, loopFrom, loop); });
 }
 
 void DecodeWorker::stopPlayback() {

@@ -133,3 +133,30 @@ end of its section.
   fields take 44 px at least. (AV-006)
 - **Crossfade's last frame is mostly S[F − 1]** — exactly half when F is 1, and O[0] is itself blended when D = 2F:
   tests of §8.2 allow both. (AV-006)
+
+## The renderer
+
+- **One pass over the output, not a quad per layer**: a quad leaves the half pixel at the video's edge to the
+  rasteriser, where the CPU twin samples the transparent border — the two disagreed on every edge. Rule: both back
+  ends map each output pixel back to texel space by the same affine. (AV-007)
+- **A texture pool sized by bytes alone filled 512 MB of frames that never came back** — 1.1 GB of Private Bytes at
+  1080p. Rule: the pool keeps the last two frames' layers; the byte budget is only the ceiling. (AV-007)
+- **GL needs a QGuiApplication and a surface made on the GUI thread**: the CLI makes a GUI application only for the
+  commands that render; `GlRenderer` makes its `QOffscreenSurface` in its constructor, so it is constructed there.
+  (AV-007)
+- **windeployqt deploys what the exe it is given imports**: the CLI's new Qt6Concurrent import was missing beside it
+  and it would not start. Rule: `scripts\build.ps1` runs windeployqt for every program. (AV-007)
+- **A walk's 295 s timeout kills the Node script, not the program it started**: an over-long leg left avloop-cli
+  running. Rule: size a walk's legs well under the limit (the memory walk renders the 640p sample). (AV-007)
+- **Without `accurate_rnd`, swscale converts NV12 by a coarser chroma path than yuv420p**: hardware-decoded frames
+  came out up to 180 apart from software-decoded ones at colour edges (AV-005's change; AV-002's walk caught it at
+  AV-007). Rule: the normalizer makes NV12/P010 planar first, so both decoders' frames take one path. Regression runs
+  replay every earlier walk, scripts included. (AV-007)
+- **In AvLoop's process the GPU driver's memory grows with every thread started**: an NVIDIA OpenGL arena (its shader
+  cache paths and extension strings fill it) took ~60 KB a thread and never gave it back — ~4 MB a video opened, as
+  decoders, filter graphs and workers each started threads. A test process (no window composed by GL) shows none of
+  it; only the whole app does. Found by `cdb -pv` snapshots: the heaps stayed level while one VirtualAlloc region grew.
+  Rule: open a video without starting threads — one D3D11 device for every decoder, filter graphs on one thread, the
+  decode and thumbnail workers on threads that live with the window, the thumbnail decoder single-threaded. (AV-007)
+- **A memory check compares the floor, not the last sample**: Private Bytes after a burst swings with the heap's
+  timing. Rule: the late rounds' minimum against the early rounds' maximum (test-memory `decodersComeAndGo`). (AV-007)

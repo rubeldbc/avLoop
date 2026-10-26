@@ -138,7 +138,7 @@ bool Decoder::Impl::openCodec(bool hardware, QString* error) {
         c->pkt_timebase = stream->time_base;
         const bool hw = tryHw && setupHardware(c.get(), codec);
         if (!hw) {
-            c->thread_count = 0; // as many as the logical cores
+            c->thread_count = options.threads; // 0: as many as the logical cores
             c->thread_type = FF_THREAD_FRAME | FF_THREAD_SLICE;
         }
         const int r = avcodec_open2(c.get(), codec, nullptr);

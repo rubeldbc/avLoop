@@ -1,11 +1,12 @@
 // avloop-cli.exe (spec §2.6, §3.2): the same core without a GUI, for the lab and for scripts.
 //   avloop-cli version     AvLoop's version and FFmpeg's libraries, configuration and licence; refuses a GPL build
 //   avloop-cli probe …     a video's reading (CliMedia.cpp)
-//   avloop-cli frame …     a normalized frame as a PNG (CliMedia.cpp)
+//   avloop-cli frame …     a normalized frame as a PNG (CliMedia.cpp); of a project: output frame N (CliRender.cpp)
+//   avloop-cli frames …    output frames in a row, round the loop (CliRender.cpp)
 // Later phases add: export.
 #include "core/AppInfo.h"
 
-#include <QCoreApplication>
+#include <QGuiApplication>
 #include <QStringList>
 
 extern "C" {
@@ -15,10 +16,14 @@ extern "C" {
 }
 
 #include <cstdio>
+#include <cstring>
+#include <memory>
 
 namespace avloop::cli {
 int probe(const QStringList& args);
 int frame(const QStringList& args);
+int renderFrame(const QStringList& args);
+int renderFrames(const QStringList& args);
 } // namespace avloop::cli
 
 namespace {
@@ -50,19 +55,29 @@ int version() {
 }
 
 int usage() {
-    out(QStringLiteral("usage: avloop-cli version | probe <video> | frame <video> --at N -o x.png"));
+    out(QStringLiteral("usage: avloop-cli version | probe <video> | frame <video|project> --at N -o x.png | "
+                       "frames <project> [--count N]"));
     return 1;
 }
 
 } // namespace
 
 int main(int argc, char** argv) {
-    QCoreApplication app(argc, argv);
+    // Rendering a project needs OpenGL, so a GUI application (no window is shown); everything else does not.
+    const bool renders = argc > 2 && (std::strcmp(argv[1], "frames") == 0 ||
+                                      (std::strcmp(argv[1], "frame") == 0 && std::strstr(argv[2], ".avloop")));
+    std::unique_ptr<QCoreApplication> app;
+    if (renders)
+        app = std::make_unique<QGuiApplication>(argc, argv);
+    else
+        app = std::make_unique<QCoreApplication>(argc, argv);
     QCoreApplication::setApplicationName(avloop::AppInfo::name());
     const QStringList args = QCoreApplication::arguments().mid(1);
     if (args.isEmpty()) return usage();
     if (args.first() == QLatin1String("version")) return version();
     if (args.first() == QLatin1String("probe")) return avloop::cli::probe(args.mid(1));
-    if (args.first() == QLatin1String("frame")) return avloop::cli::frame(args.mid(1));
+    if (args.first() == QLatin1String("frames")) return avloop::cli::renderFrames(args.mid(1));
+    if (args.first() == QLatin1String("frame"))
+        return renders ? avloop::cli::renderFrame(args.mid(1)) : avloop::cli::frame(args.mid(1));
     return usage();
 }

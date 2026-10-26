@@ -10,6 +10,7 @@
 #include <QVector>
 
 #include <atomic>
+#include <memory>
 
 namespace avloop::media {
 
@@ -25,7 +26,8 @@ public:
     static constexpr int kWidth = 160;
     static constexpr int kHeight = 90;
 
-    explicit ThumbnailWorker(const MediaInfo& info, QObject* parent = nullptr);
+    // On `thread` when given (a WorkerThread that outlives it), else on a thread of its own.
+    explicit ThumbnailWorker(const MediaInfo& info, QThread* thread = nullptr, QObject* parent = nullptr);
     ~ThumbnailWorker() override;
 
     const MediaInfo& info() const { return info_; }
@@ -44,9 +46,9 @@ private:
 
     MediaInfo info_;
     int count_ = 0;
-    QThread thread_;
-    QObject inThread_;
-    Decoder* decoder_ = nullptr; // made, used and destroyed on thread_
+    std::unique_ptr<QThread> ownThread_;
+    QObject* inThread_ = nullptr;
+    Decoder* decoder_ = nullptr; // made, used and destroyed on the worker's thread
     mutable QMutex mutex_;
     QList<int> queue_;
     QVector<QImage> images_;

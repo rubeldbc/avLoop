@@ -15,6 +15,7 @@ namespace avloop {
 namespace media {
 struct MediaInfo;
 class ThumbnailWorker;
+class WorkerThread;
 } // namespace media
 
 class Project;
@@ -99,6 +100,7 @@ private:
     void scrubTo(double t, bool fast);
 
     Project* project_;
+    std::unique_ptr<media::WorkerThread> thumbThread_; // every video's thumbnails: declared first, gone last
     std::unique_ptr<media::ThumbnailWorker> thumbs_;
     QTimer* thumbsDue_ = nullptr; // coalesces repaints as thumbnails arrive
     QTimer* rest_ = nullptr;      // a scrub that rests turns exact

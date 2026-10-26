@@ -6,6 +6,29 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-007 — The renderer (AV-007, 2026-10-26)
+
+- One `render::FrameRenderer` makes output frame k from a `RenderJob` snapshot (source, range, transform, crop,
+  loop, output rate; the output size, the loop plan and the working size worked out once): LoopMap → TimeMap → the
+  normalized source frames (two decoders, one for each stream of a blend; a variable rate by its packets' times;
+  Motion's frames from the pre-pass) → one pass over the output → premultiplied RGBA8. AVADR-0001 is accepted.
+- The pass, on the GPU and on the CPU alike: each output pixel centre maps to the video's texture coordinates by one
+  affine (flips folded in), bilinear with texel centres at +½ and transparent outside, up to four layers summed by
+  weight (the loop's blend × the FPS method's), times the crop's mask (built once on the CPU), over the background
+  when the output has no alpha (Alpha Auto until AV-009), rounded once. Blending in premultiplied sRGB (reading R-7).
+- The GPU back end: its own OpenGL 3.3 core context on an offscreen surface, an RGBA8 FBO, textures from a pool
+  (the last two frames' layers, never over 512 MB or a quarter of the adapter's memory), the readback through two
+  PBOs taking turns. Without OpenGL 3.3, with "GPU rendering: Off" (`performance/gpuRendering`) or after a GPU
+  failure that one retry does not mend, the CPU back end renders (rows in parallel) and says why.
+- GPU and CPU agree within 2/255 on the unit cases and within a mean of 1.0, a maximum of 4 on whole projects
+  (measured: mean ≤ 0.075, max 1).
+- Opening a video releases everything of the last one and starts no thread (spec §3.7.5): one D3D11 device serves every
+  hardware decoder, filter graphs run on one thread, the decode and thumbnail workers run on threads that live with
+  the window, the thumbnail decoder is single-threaded. Hardware- and software-decoded frames are identical again
+  (NV12 made planar before the conversion).
+- `avloop-cli frame <project.avloop> --at N -o x.png [--raw x.rgba] [--cpu]` renders output frame N;
+  `avloop-cli frames <project.avloop> [--count N] [--cpu] [--mem-log x.csv]` renders N frames round the loop.
+
 ### D-006 — The loop engine (AV-006, 2026-10-26)
 
 - The loop's maths are pure functions in `core`: `LoopMap` gives D = round((Out − In) × fps / Speed) (at least 2, 3

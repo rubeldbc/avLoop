@@ -3,6 +3,7 @@
 #include "core/LoopMap.h"
 #include "core/Project.h"
 #include "media/ThumbnailWorker.h"
+#include "media/WorkerThread.h"
 #include "ui/timeline/TimelineScale.h"
 
 #include <QTimer>
@@ -43,7 +44,9 @@ Timeline::~Timeline() = default;
 void Timeline::setSource(const media::MediaInfo* info) {
     thumbs_.reset(); // the last video's thumbnails and their decoder go first
     if (info && info->isValid()) {
-        thumbs_ = std::make_unique<media::ThumbnailWorker>(*info);
+        if (!thumbThread_)
+            thumbThread_ = std::make_unique<media::WorkerThread>(QStringLiteral("avloop-thumbs"), QThread::LowPriority);
+        thumbs_ = std::make_unique<media::ThumbnailWorker>(*info, thumbThread_.get());
         connect(thumbs_.get(), &media::ThumbnailWorker::ready, this, [this](int) {
             if (!thumbsDue_->isActive()) thumbsDue_->start();
         });

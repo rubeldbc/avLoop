@@ -23,7 +23,7 @@ public:
     bool convert(const AVFrame* prev, const AVFrame* cur, const AVFrame* next, Frame& out, QString* error = nullptr);
 
     // The filter chain for an input of this format (exposed for tests and the log).
-    QString chain(int inWidth, int inHeight) const;
+    QString chain(int inFormat) const;
 
 private:
     bool build(const AVFrame* sample, QString* error);

@@ -8,9 +8,9 @@ words: *"I want to build a piece of software called AvLoop. Its main job is to t
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: AV-007
-Next eligible: AV-007 (in progress)
-Completed: 6 of 16
+Active phase: AV-008
+Next eligible: AV-008 (in progress)
+Completed: 7 of 16
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -60,6 +60,7 @@ where `--shot` and `--walk` open their window for seconds and close it.
 ## Completion record
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-007** DONE 2026-10-26 — The renderer (D-007, AVADR-0001 accepted): one FrameRenderer for every output frame — a GPU back end (OpenGL 3.3, one output pass, texture pool, double-PBO readback) and a CPU twin within 2/255 (measured mean ≤ 0.075, max 1) — avloop-cli frame/frames for projects; video opens no longer leak (shared D3D11 device, one-thread filter graphs, persistent worker threads) and HW = SW frames again; 16 test suites, walk-render and walk-memory-render PASSED, every earlier walk re-run. Record: `execution/AV-007-EXECUTION.md`. Record: `execution/AV-007-EXECUTION.md`.
 - **AV-006** DONE 2026-10-26 — The loop engine (D-006): LoopMap and TimeMap as tested pure functions for the four modes and three FPS methods, Speed, the output frame rate (R-28, R-29), the Motion Interpolation pre-pass with progress and cancel (R-30), the Loop panel with its summary and the Output FPS row, the crossfade band dragged on the timeline; 14 test suites, walk-loop 74 steps PASSED. Record: `execution/AV-006-EXECUTION.md`. Record: `execution/AV-006-EXECUTION.md`.
 - **AV-005** DONE 2026-10-26 — The timeline (D-005): the output frame grid and timecode, In/Out by keys, tools and drags (R-24), the ruler with labels that never overlap, thumbnails on their own decoder, the transport and TimeEdit, playback decoding ahead into a ring with drops counted (R-25, R-26), the scrub's two speeds (R-27); 11 test suites, walk-timeline 153 steps and walk-playback (0 dropped at 30/60 fps, memory flat) PASSED. Record: `execution/AV-005-EXECUTION.md`. Record: `execution/AV-005-EXECUTION.md`.
 - **AV-004** DONE 2026-10-26 — The crop tools (D-004): Rect/Rounded/Ellipse drawn, moved and resized with ratios (Custom in lowest terms), Shift/Alt/Ctrl, snapping, arrows, Esc, Delete, double-click; the dim and outline overlay; MaskBuilder (1 px edge, Feather inward, cached); options and Crop panel with Alpha Auto and the transparency notices; 10 test suites, walk-crop 177 steps PASSED. Record: `execution/AV-004-EXECUTION.md`. Record: `execution/AV-004-EXECUTION.md`.

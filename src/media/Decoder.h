@@ -19,6 +19,7 @@ public:
         bool hardware = true;   // "Hardware decoding: Auto" (false = Off)
         QSize workingSize;      // display orientation; empty = the display size, long side capped at maxLongSide
         int maxLongSide = 1920; // a 4K source is scaled down right after decoding (spec §3.7.3)
+        int threads = 0;        // software decoding's threads; 0 = one a logical core (each holds frames: memory)
     };
 
     explicit Decoder(const MediaInfo& info);

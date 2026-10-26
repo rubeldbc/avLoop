@@ -9,26 +9,35 @@
 
 namespace avloop::media {
 
-ThumbnailWorker::ThumbnailWorker(const MediaInfo& info, QObject* parent) : QObject(parent), info_(info) {
+ThumbnailWorker::ThumbnailWorker(const MediaInfo& info, QThread* thread, QObject* parent)
+    : QObject(parent), info_(info) {
     const double frames = info.frameCount > 0 ? double(info.frameCount) : info.duration * std::max(1.0, info.fps());
     count_ = info.duration > 0 ? std::clamp(int(std::lround(frames)), 1, kMaxSamples) : 0;
     images_.resize(count_);
-    thread_.setObjectName(QStringLiteral("avloop-thumbs"));
-    inThread_.moveToThread(&thread_);
-    thread_.start(QThread::LowPriority);
+    if (!thread) {
+        ownThread_ = std::make_unique<QThread>();
+        ownThread_->setObjectName(QStringLiteral("avloop-thumbs"));
+        ownThread_->start(QThread::LowPriority);
+        thread = ownThread_.get();
+    }
+    inThread_ = new QObject;
+    inThread_->moveToThread(thread);
 }
 
 ThumbnailWorker::~ThumbnailWorker() {
     stop_ = true;
     QMetaObject::invokeMethod(
-        &inThread_,
+        inThread_,
         [this] {
             delete decoder_;
             decoder_ = nullptr;
         },
         Qt::BlockingQueuedConnection);
-    thread_.quit();
-    thread_.wait();
+    inThread_->deleteLater();
+    if (ownThread_) {
+        ownThread_->quit();
+        ownThread_->wait();
+    }
 }
 
 double ThumbnailWorker::timeOf(int index) const {
@@ -47,7 +56,7 @@ void ThumbnailWorker::request(const QList<int>& order) {
         if (i >= 0 && i < count_ && images_[i].isNull()) queue_.append(i);
     if (working_ || queue_.isEmpty()) return;
     working_ = true;
-    QMetaObject::invokeMethod(&inThread_, [this] { work(); });
+    QMetaObject::invokeMethod(inThread_, [this] { work(); });
 }
 
 QImage ThumbnailWorker::image(int index) const {
@@ -56,9 +65,11 @@ QImage ThumbnailWorker::image(int index) const {
 }
 
 void ThumbnailWorker::work() {
+    if (stop_) return; // queued before the worker began to go
     if (!decoder_) {
         Decoder::Options options;
         options.hardware = false; // the playback decoder keeps the GPU's decoder
+        options.threads = 1;      // keyframes need no threads; a 4K decoder on every core holds ~300 MB
         options.workingSize = QSize(info_.width, info_.height).scaled(kWidth, kHeight, Qt::KeepAspectRatio);
         decoder_ = new Decoder(info_, options);
         if (!decoder_->open()) {

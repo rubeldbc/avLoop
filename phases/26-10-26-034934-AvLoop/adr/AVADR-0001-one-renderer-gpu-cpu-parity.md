@@ -1,6 +1,6 @@
 # AVADR-0001 — One renderer, GPU/CPU parity
 
-Status: **Drafted 2026-10-26** by the plan; accepted by AV-007 before the renderer's code.
+Status: **Accepted 2026-10-26** by AV-007 (drafted by the plan).
 
 ## Context
 
@@ -26,6 +26,20 @@ a guaranteed CPU fallback; results differ by ≤ 2/255. CI and Remote Desktop ha
    max ≤ 4); the GPU half is skipped, and says so, without a context.
 5. **Fallback**: "GPU rendering: Auto / Off"; no GL 3.3 → CPU from the start with one toast; device loss → recreate
    once, else CPU, the running export continuing from that frame.
+
+## As built (AV-007)
+
+- Both back ends make a frame in **one pass over the output**: every output pixel centre maps back to the video's
+  texture coordinates by the same affine (`Placement`), up to four layers are summed by weight, the mask texel at
+  the pixel multiplies them, an opaque output goes over the background — the GLSL of `Shaders.cpp` and the C++ of
+  `CpuRenderer.cpp` say the same thing line for line. A quad per layer would leave the half pixel at the video's edge
+  to the rasteriser, where the CPU samples the transparent border.
+- The canvas keeps its quad shader in the same `Shaders.cpp`; what the canvas, the preview and the export share is the
+  sampling convention — premultiplied RGBA8, GL_LINEAR, texel centres at +½, transparent outside.
+- Measured: the unit cases within 2/255; three projects mean ≤ 1.0, max ≤ 4 (`test-renderer`); nine loop modes and
+  crops through `avloop-cli frame` mean ≤ 0.075, max 1 (`walk-render.mjs`).
+- The GPU texture pool keeps the last two frames' layers (eight textures) under the byte budget: source frames almost
+  never come back, and a 512 MB pool of them cost 1.1 GB of Private Bytes at 1080p.
 
 ## Consequences
 

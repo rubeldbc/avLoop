@@ -2,16 +2,20 @@
 // spills marked frames to the session's disk cache and reads them back; the disk cache's session goes with it and
 // stale sessions go at the next start; decoding with random seeks into a bounded cache keeps Private Bytes flat.
 #include "Samples.h"
+#include "media/DecodeWorker.h"
 #include "media/Decoder.h"
 #include "media/DiskCache.h"
 #include "media/FrameCache.h"
 #include "media/MediaProbe.h"
 #include "media/SystemMemory.h"
+#include "media/ThumbnailWorker.h"
 
 #include <QDir>
 #include <QRandomGenerator>
 #include <QTemporaryDir>
 #include <QTest>
+
+#include <limits>
 
 using namespace avloop;
 using avloop::test::samplePath;
@@ -130,6 +134,86 @@ private slots:
         }
         QVERIFY(cache.used() <= cache.budget());
         QVERIFY2(growth < 50 * MB, qPrintable(QStringLiteral("grew %1 MB").arg(growth / MB)));
+    }
+    void decodersComeAndGo_data() {
+        QTest::addColumn<QString>("sample");
+        QTest::addColumn<bool>("hardware");
+        QTest::addColumn<bool>("thumbnails");
+        QTest::addColumn<int>("what"); // 0 decoder or thumbnails, 1 probe, 2 decode worker with a frame cache
+        QTest::newRow("4K, hardware") << QStringLiteral("uhd-4k.mp4") << true << false << 0;
+        QTest::newRow("4K, software") << QStringLiteral("uhd-4k.mp4") << false << false << 0;
+        QTest::newRow("4K, thumbnails") << QStringLiteral("uhd-4k.mp4") << false << true << 0;
+        QTest::newRow("HDR, thumbnails") << QStringLiteral("hdr-pq.mkv") << false << true << 0;
+        QTest::newRow("4K, probe") << QStringLiteral("uhd-4k.mp4") << false << false << 1;
+        QTest::newRow("HDR, probe") << QStringLiteral("hdr-pq.mkv") << false << false << 1;
+        QTest::newRow("4K, decode worker") << QStringLiteral("uhd-4k.mp4") << true << false << 2;
+        QTest::newRow("HDR, decode worker") << QStringLiteral("hdr-pq.mkv") << true << false << 2;
+        QTest::newRow("640p, decode worker") << QStringLiteral("counter-640p30.mp4") << true << false << 2;
+        QTest::newRow("640p, software worker") << QStringLiteral("counter-640p30.mp4") << false << false << 2;
+        QTest::newRow("640p, thumbnails") << QStringLiteral("counter-640p30.mp4") << false << true << 0;
+        QTest::newRow("640p, probe") << QStringLiteral("counter-640p30.mp4") << false << false << 1;
+        QTest::newRow("640p, software worker opened") << QStringLiteral("counter-640p30.mp4") << false << false << 3;
+    }
+    void decodersComeAndGo() {
+        // Every video opened makes a decoder (and the timeline's thumbnail worker) and every one closed frees it:
+        // over twenty, the floor of the last five rounds stays within 20 MB of the early rounds' peak (a leak lifts
+        // the floor; the heap's own timing only the peaks).
+        QFETCH(QString, sample);
+        QFETCH(bool, hardware);
+        QFETCH(bool, thumbnails);
+        QFETCH(int, what);
+        media::FrameCache cache(256 * MB);
+        AVLOOP_NEED_SAMPLE(sample);
+        const auto probe = media::MediaProbe::probe(samplePath(sample));
+        QVERIFY(probe.info);
+        std::int64_t early = 0;
+        std::int64_t late = std::numeric_limits<std::int64_t>::max();
+        for (int round = 0; round < 20; ++round) {
+            if (what == 1) {
+                QVERIFY(media::MediaProbe::probe(samplePath(sample)).info);
+            } else if (what == 3) {
+                media::Decoder::Options o;
+                o.hardware = hardware;
+                media::DecodeWorker worker(*probe.info, o, &cache);
+                bool opened = false;
+                connect(&worker, &media::DecodeWorker::opened, this, [&](bool ok) { opened = ok; });
+                worker.start();
+                QTRY_VERIFY_WITH_TIMEOUT(opened, 10000);
+            } else if (what == 2) {
+                media::Decoder::Options o;
+                o.hardware = hardware;
+                media::DecodeWorker worker(*probe.info, o, &cache);
+                int got = 0;
+                connect(&worker, &media::DecodeWorker::frameReady, this,
+                        [&](double, const media::Frame& f) { got += !f.isNull(); });
+                worker.start();
+                worker.requestFrame(0);
+                QTRY_VERIFY_WITH_TIMEOUT(got >= 1, 10000);
+                cache.removeSource(worker.sourceId());
+            } else if (thumbnails) {
+                media::ThumbnailWorker w(*probe.info);
+                QList<int> all;
+                for (int i = 0; i < w.count(); ++i)
+                    all << i;
+                w.request(all);
+                QTRY_VERIFY_WITH_TIMEOUT(w.made() >= std::min(12, w.count()), 10000);
+            } else {
+                media::Decoder::Options o;
+                o.hardware = hardware;
+                media::Decoder d(*probe.info, o);
+                QVERIFY(d.open());
+                for (int i = 0; i < 12; ++i)
+                    QVERIFY(!d.frameAtIndex(i * 7).isNull());
+            }
+            const std::int64_t now = media::SystemMemory::read().privateBytes;
+            if (round >= 2 && round <= 4) early = std::max(early, now);
+            if (round >= 15) late = std::min(late, now);
+        }
+        qInfo().noquote() << QStringLiteral("%1: early peak %2 MB, late floor %3 MB")
+                                 .arg(QString::fromLatin1(QTest::currentDataTag()))
+                                 .arg(early / MB)
+                                 .arg(late / MB);
+        QVERIFY2(late - early < 20 * MB, qPrintable(QStringLiteral("the floor rose %1 MB").arg((late - early) / MB)));
     }
 };
 

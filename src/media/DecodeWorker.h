@@ -26,7 +26,9 @@ public:
     enum class Mode { Exact, Fast };
     static constexpr int kRing = 6;
 
-    DecodeWorker(const MediaInfo& info, const Decoder::Options& options, FrameCache* cache, QObject* parent = nullptr);
+    // On `thread` when given (a WorkerThread that outlives it), else on a thread of its own.
+    DecodeWorker(const MediaInfo& info, const Decoder::Options& options, FrameCache* cache, QThread* thread = nullptr,
+                 QObject* parent = nullptr);
     ~DecodeWorker() override;
 
     const MediaInfo& info() const { return info_; }
@@ -71,8 +73,8 @@ private:
     Decoder::Options options_;
     FrameCache* cache_;
     quint64 sourceId_;
-    QThread thread_;
-    QObject inThread_; // lives on thread_: the context the decoder's work is queued on
+    std::unique_ptr<QThread> ownThread_;
+    QObject* inThread_ = nullptr; // lives on the worker's thread: the context the decoder's work is queued on
     std::unique_ptr<Decoder> decoder_;
     QMutex mutex_;
     double pending_ = 0;

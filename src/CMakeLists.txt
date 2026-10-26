@@ -17,15 +17,18 @@ add_library(avloop_media STATIC
     media/SourceNormalizer.h media/SourceNormalizer.cpp
     media/FrameCache.h media/FrameCache.cpp media/DiskCache.h media/DiskCache.cpp
     media/DecodeWorker.h media/DecodeWorker.cpp media/ThumbnailWorker.h media/ThumbnailWorker.cpp
-    media/Interpolator.h media/Interpolator.cpp
+    media/Interpolator.h media/Interpolator.cpp media/FrameIndex.h media/FrameIndex.cpp media/WorkerThread.h
     media/SystemMemory.h media/SystemMemory.cpp)
 target_link_libraries(avloop_media
     PUBLIC avloop_core Qt6::Core
     PRIVATE FFmpeg::avformat FFmpeg::avcodec FFmpeg::avutil FFmpeg::swscale FFmpeg::avfilter dxgi psapi avloop_warnings)
 
 add_library(avloop_render STATIC
-    render/Shaders.h render/Shaders.cpp render/MaskBuilder.h render/MaskBuilder.cpp)
-target_link_libraries(avloop_render PUBLIC avloop_core avloop_media Qt6::Gui Qt6::OpenGL PRIVATE avloop_warnings)
+    render/Shaders.h render/Shaders.cpp render/MaskBuilder.h render/MaskBuilder.cpp
+    render/RenderJob.h render/RenderJob.cpp render/CpuRenderer.h render/CpuRenderer.cpp
+    render/GlRenderer.h render/GlRenderer.cpp render/FrameRenderer.h render/FrameRenderer.cpp)
+target_link_libraries(avloop_render PUBLIC avloop_core avloop_media Qt6::Gui Qt6::OpenGL
+    PRIVATE Qt6::Concurrent avloop_warnings)
 
 add_library(avloop_ui STATIC
     ui/MainWindow.h ui/MainWindow.cpp ui/MainMenu.cpp ui/MainWindowActions.cpp ui/MainWindowCanvas.cpp
@@ -61,8 +64,8 @@ add_executable(avloop WIN32 app/main.cpp ${CMAKE_SOURCE_DIR}/resources/resources
 target_link_libraries(avloop PRIVATE avloop_ui avloop_warnings)
 avloop_copy_ffmpeg_dlls(avloop)
 
-add_executable(avloop-cli cli/main.cpp cli/CliMedia.cpp)
-target_link_libraries(avloop-cli PRIVATE avloop_core avloop_media Qt6::Gui
+add_executable(avloop-cli cli/main.cpp cli/CliMedia.cpp cli/CliRender.cpp)
+target_link_libraries(avloop-cli PRIVATE avloop_core avloop_media avloop_render Qt6::Gui
     FFmpeg::avcodec FFmpeg::avformat FFmpeg::avutil avloop_warnings)
 avloop_copy_ffmpeg_dlls(avloop-cli)
 

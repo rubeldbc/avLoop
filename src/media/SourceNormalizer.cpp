@@ -39,8 +39,13 @@ void SourceNormalizer::setOutputSize(const QSize& size) {
     graph_.reset();
 }
 
-QString SourceNormalizer::chain(int inWidth, int inHeight) const {
+QString SourceNormalizer::chain(int inFormat) const {
     QStringList f;
+    // A hardware decoder's frames come down as NV12 / P010: made planar first, they take the very path a software
+    // decoder's frames take (without accurate_rnd swscale converts NV12 by a coarser chroma path — 180 apart at
+    // colour edges).
+    if (inFormat == AV_PIX_FMT_NV12) f << QStringLiteral("format=yuv420p");
+    if (inFormat == AV_PIX_FMT_P010LE) f << QStringLiteral("format=yuv420p10le");
     if (info_.interlaced) f << QStringLiteral("bwdif=mode=send_frame:parity=auto:deint=interlaced");
     if (info_.hdr) {
         f << QStringLiteral("zscale=t=linear:npl=100") << QStringLiteral("format=gbrpf32le")
@@ -50,8 +55,6 @@ QString SourceNormalizer::chain(int inWidth, int inHeight) const {
     int w = size_.width();
     int h = size_.height();
     if (info_.rotation == 90 || info_.rotation == 270) std::swap(w, h);
-    Q_UNUSED(inWidth);
-    Q_UNUSED(inHeight);
     // No accurate_rnd: it turns off swscale's SIMD paths — 10 ms a 1080p frame against 0.7 ms, too slow for 60 fps
     // playback — for rounding within 1/255; full_chroma_int stays (sharp chroma, and cheap).
     f << QStringLiteral("scale=%1:%2:flags=bicubic+full_chroma_int:in_color_matrix=auto:"
@@ -72,6 +75,9 @@ bool SourceNormalizer::build(const AVFrame* sample, QString* error) {
     src_ = nullptr;
     sink_ = nullptr;
     if (!graph_) return false;
+    // One thread: the conversions take a millisecond, and every thread a graph starts costs memory for good in a
+    // process the GPU driver watches (its arena grows with each; spec §3.7.5).
+    graph_->nb_threads = 1;
     const QByteArray args = QStringLiteral("video_size=%1x%2:pix_fmt=%3:time_base=%4/%5:pixel_aspect=1/1")
                                 .arg(sample->width)
                                 .arg(sample->height)
@@ -107,7 +113,7 @@ bool SourceNormalizer::build(const AVFrame* sample, QString* error) {
         outputs->filter_ctx = src_;
         inputs->name = av_strdup("out");
         inputs->filter_ctx = sink_;
-        const QByteArray spec = chain(sample->width, sample->height).toLatin1();
+        const QByteArray spec = chain(sample->format).toLatin1();
         r = avfilter_graph_parse_ptr(graph_.get(), spec.constData(), &inputs, &outputs, nullptr);
         if (r >= 0) r = avfilter_graph_config(graph_.get(), nullptr);
     } else if (r >= 0) {

@@ -60,10 +60,13 @@ Invoke-Native 'cmake' @('-S', $root, '-B', $BuildDir, '-G', 'Ninja', "-DCMAKE_BU
 Invoke-Native 'cmake' @('--build', $BuildDir)
 
 $bin = Join-Path $BuildDir 'bin'
-$exe = Join-Path $bin 'avloop.exe'
-# Every build: a new Qt module (OpenGL at AV-003) needs its DLL beside the exe; windeployqt copies only what changed.
-if (Test-Path $exe) {
-    Invoke-Native (Join-Path $qt 'bin\windeployqt.exe') @('--no-translations', '--no-system-d3d-compiler', '--no-opengl-sw', '--no-compiler-runtime', $exe) | Out-Null
+# Every build, for each program: a new Qt module (OpenGL at AV-003, Concurrent in the CLI at AV-007) needs its DLL
+# beside the exe; windeployqt copies only what changed.
+foreach ($name in @('avloop.exe', 'avloop-cli.exe')) {
+    $exe = Join-Path $bin $name
+    if (Test-Path $exe) {
+        Invoke-Native (Join-Path $qt 'bin\windeployqt.exe') @('--no-translations', '--no-system-d3d-compiler', '--no-opengl-sw', '--no-compiler-runtime', $exe) | Out-Null
+    }
 }
 if ($Sanitize) {
     $asanDll = Get-Command clang_rt.asan_dynamic-x86_64.dll -ErrorAction SilentlyContinue

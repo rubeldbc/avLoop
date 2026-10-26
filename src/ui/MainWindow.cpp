@@ -5,6 +5,7 @@
 #include "media/DecodeWorker.h"
 #include "media/DiskCache.h"
 #include "media/FrameCache.h"
+#include "media/WorkerThread.h"
 #include "ui/WalkRunner.h"
 #include "ui/canvas/Canvas.h"
 #include "ui/canvas/DropZone.h"

@@ -8,10 +8,26 @@ extern "C" {
 }
 
 #include <QDebug>
+#include <QMutex>
 
 namespace avloop::media {
 
 namespace {
+
+// One D3D11 device for every decoder of the process: a device made and dropped with each decoder left ~3 MB behind
+// each time in the driver. FFmpeg's D3D11VA device locks itself, so decoders on other threads may share it.
+AVBufferRef* sharedDevice(int* error) {
+    static QMutex mutex;
+    static BufferRefPtr device;
+    QMutexLocker lock(&mutex);
+    if (!device) {
+        AVBufferRef* made = nullptr;
+        *error = av_hwdevice_ctx_create(&made, AV_HWDEVICE_TYPE_D3D11VA, nullptr, nullptr, 0);
+        if (*error < 0) return nullptr;
+        device.reset(made);
+    }
+    return av_buffer_ref(device.get());
+}
 
 AVPixelFormat pickD3D11(AVCodecContext*, const AVPixelFormat* formats) {
     for (const AVPixelFormat* p = formats; *p != AV_PIX_FMT_NONE; ++p)
@@ -39,9 +55,9 @@ bool Decoder::Impl::setupHardware(AVCodecContext* c, const AVCodec* codec) {
         return false;
     }
     if (!hwDevice) {
-        AVBufferRef* device = nullptr;
-        const int r = av_hwdevice_ctx_create(&device, AV_HWDEVICE_TYPE_D3D11VA, nullptr, nullptr, 0);
-        if (r < 0) {
+        int r = 0;
+        AVBufferRef* device = sharedDevice(&r);
+        if (!device) {
             hwNote = QStringLiteral("HW decode off: no D3D11 device (%1)").arg(avError(r));
             return false;
         }

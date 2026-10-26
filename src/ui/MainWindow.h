@@ -24,6 +24,7 @@ namespace avloop {
 
 namespace media {
 class DecodeWorker;
+class WorkerThread;
 class DiskCache;
 class FrameCache;
 } // namespace media
@@ -139,6 +140,7 @@ private:
 
     std::unique_ptr<media::DiskCache> disk_;
     std::unique_ptr<media::FrameCache> cache_;
+    std::unique_ptr<media::WorkerThread> decodeThread_; // outlives every worker: declared first, gone last
     std::unique_ptr<media::DecodeWorker> worker_;
     std::optional<media::MediaInfo> video_;
     QString videoState_ = QStringLiteral("none"); // none, opening, ready, error
