@@ -1,0 +1,18 @@
+startup: 459 ms
+walk ten-seconds.json: 24 steps
+-- 1080p30: Space, 10 s, Space
+     open samples/counter-1080p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect video.hardware: true
+PASS expect playback.dropped: 0
+PASS expect playback.shown: 304
+PASS expect status.dropped: Dropped: 0
+-- 1080p60: Space, 10 s, Space
+     open samples/counter-1080p60.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect video.hardware: true
+PASS expect playback.dropped: 0
+PASS expect playback.shown: 607
+PASS expect status.dropped: Dropped: 0
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

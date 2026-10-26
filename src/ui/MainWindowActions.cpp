@@ -11,6 +11,8 @@
 #include "ui/WalkRunner.h"
 #include "ui/canvas/Canvas.h"
 #include "ui/canvas/DropZone.h"
+#include "ui/timeline/PlaybackClock.h"
+#include "ui/timeline/Timeline.h"
 #include "ui/widgets/Toast.h"
 
 #include <QDir>
@@ -145,12 +147,17 @@ void MainWindow::probed(const QString& path, const std::optional<media::MediaInf
             [this, w = worker_.get()](double, const media::Frame& frame) {
                 if (worker_.get() == w) showFrame(frame);
             });
+    timeline_->setSource(&*video_);
+    clock_->setWorker(worker_.get());
     worker_->start();
+    refreshTransport();
     lastError_.clear();
     updateStatus();
 }
 
 void MainWindow::closeVideo() {
+    clock_->setWorker(nullptr);
+    timeline_->setSource(nullptr);
     if (worker_ && cache_) cache_->removeSource(worker_->sourceId());
     worker_.reset();
     video_.reset();
@@ -169,6 +176,7 @@ void MainWindow::showFrame(const media::Frame& frame) {
     }
     canvasStack_->setCurrentWidget(canvas_);
     canvas_->setFrame(frame);
+    shownSeconds_ = frame.seconds;
     shownFrame_ = QSize(frame.width, frame.height);
     videoState_ = QStringLiteral("ready");
     updateStatus();
@@ -180,9 +188,11 @@ void MainWindow::updateStatus() {
         const bool hw = worker_ && worker_->hardware();
         gpuLabel_->setText(
             tr("GPU: %1 · HW decode %2").arg(media::SystemMemory::adapterName(), hw ? tr("on") : tr("off")));
+        droppedLabel_->setText(tr("Dropped: %1").arg(clock_->dropped()));
     } else if (videoState_ != QLatin1String("opening")) {
         sourceLabel_->setText(tr("No video open"));
     }
+    droppedLabel_->setVisible(bool(video_));
     const media::MemorySnapshot m = media::SystemMemory::read();
     memoryLabel_->setText(tr("RAM %1 MB · VRAM %2 MB · Cache %3/%4 GB")
                               .arg(megabytes(m.privateBytes), megabytes(m.vramUsed), gigabytes(cache_->used()),

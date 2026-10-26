@@ -126,6 +126,13 @@ public:
         return true;
     }
 
+    bool wantsKey(const QKeyEvent* e) const override {
+        if (e->key() == Qt::Key_Escape) return mode_ == Mode::Draw;
+        const bool arrow =
+            e->key() == Qt::Key_Left || e->key() == Qt::Key_Right || e->key() == Qt::Key_Up || e->key() == Qt::Key_Down;
+        return (arrow || e->key() == Qt::Key_Delete) && !project_->crop().isEmpty();
+    }
+
     const CropShape* previewCrop() const override { return preview_ ? &*preview_ : nullptr; }
 
     Qt::CursorShape cursor(const ToolEvent& e) const override {

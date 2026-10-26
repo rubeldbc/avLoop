@@ -108,6 +108,15 @@ void Canvas::wheelEvent(QWheelEvent* e) {
     e->accept();
 }
 
+bool Canvas::event(QEvent* e) {
+    // The active tool's keys come before the window's shortcuts: the crop's arrows, not the timeline's frame steps.
+    if (e->type() == QEvent::ShortcutOverride && tool_ && tool_->wantsKey(static_cast<QKeyEvent*>(e))) {
+        e->accept();
+        return true;
+    }
+    return QOpenGLWidget::event(e);
+}
+
 void Canvas::keyPressEvent(QKeyEvent* e) {
     if (tool_ && tool_->keyPress(e)) {
         update();

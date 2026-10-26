@@ -17,7 +17,13 @@
     { "do": "type", "on": "options.rounded.radius", "text": "96" },
     { "do": "type", "on": "options.rounded.feather", "text": "24" },
     { "do": "click", "on": "canvas", "space": "canvas", "at": [960, 540] },
+    { "do": "type", "on": "transport.time", "text": "2" },
+    { "do": "key", "keys": "I", "on": "MainWindow" },
+    { "do": "type", "on": "transport.time", "text": "7.5" },
+    { "do": "key", "keys": "O", "on": "MainWindow" },
+    { "do": "type", "on": "transport.time", "text": "4.2" },
+    { "do": "waitFor", "probe": "timeline.thumbs", "min": 300, "timeout": 15000 },
     { "do": "wait", "ms": 300 },
-    { "do": "shot", "file": "main-window.png", "maxWidth": 1440 }
+    { "do": "shot", "file": "main-window.png", "maxWidth": 1360 }
   ]
 }

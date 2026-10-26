@@ -52,6 +52,7 @@ struct Decoder::Impl {
     void seekTo(std::int64_t pts);
     Frame locate(std::int64_t target);
     Frame frameAtPts(std::int64_t target);
+    Frame keyframeAtPts(std::int64_t target);
     // DecoderHw.cpp
     bool setupHardware(AVCodecContext* c, const AVCodec* codec);
     bool toSoftware(const AVFrame* in, FramePtr& out);

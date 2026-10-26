@@ -40,6 +40,8 @@ public:
     virtual void mouseRelease(const ToolEvent&) {}
     virtual void mouseDoubleClick(const ToolEvent&) {}
     virtual bool keyPress(QKeyEvent*) { return false; }
+    // A key the tool takes before the window's shortcuts (the crop's arrows over the timeline's frame steps).
+    virtual bool wantsKey(const QKeyEvent*) const { return false; }
     virtual void paintOverlay(QPainter&) {}
     virtual Qt::CursorShape cursor(const ToolEvent&) const { return Qt::ArrowCursor; }
     // A crop being drawn, shown instead of the project's until it is committed (the crop tools).
@@ -62,5 +64,7 @@ Tool* createZoomTool(Canvas* canvas, Project* project);
 Tool* createHandTool(Canvas* canvas, Project* project);
 // CropTool.cpp: one tool a kind — M Rect, U Rounded, E Ellipse.
 Tool* createCropTool(int kind, Canvas* canvas, Project* project);
+// InOutTool.cpp: "in" or "out" — a click on the timeline sets it there (spec §6.4).
+Tool* createInOutTool(bool out, Canvas* canvas, Project* project);
 
 } // namespace avloop

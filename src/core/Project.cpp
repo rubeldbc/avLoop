@@ -2,6 +2,7 @@
 
 #include "core/Commands.h"
 #include "core/ProjectJson.h"
+#include "core/Timecode.h"
 
 namespace avloop {
 
@@ -11,10 +12,12 @@ Project::Project(QObject* parent) : QObject(parent) {
 
 void Project::setSource(const SourceInfo& source) {
     source_ = source;
+    range_ = timerange::whole(source.duration, outputFps());
     transform_ = VideoTransform::initial(source.size());
     crop_ = CropShape{};
     undo_.clear();
     emit changed(Aspect::Source);
+    emit changed(Aspect::Range);
     emit changed(Aspect::Transform);
     emit changed(Aspect::Crop);
 }
@@ -22,6 +25,7 @@ void Project::setSource(const SourceInfo& source) {
 ProjectData Project::snapshot() const {
     ProjectData d;
     d.source = source_;
+    d.range = range_;
     d.transform = transform_;
     d.crop = crop_;
     d.view = view_;
@@ -31,12 +35,14 @@ ProjectData Project::snapshot() const {
 
 void Project::restore(const ProjectData& data) {
     source_ = data.source;
+    range_ = timerange::valid(data.range, source_.duration, outputFps());
     transform_ = data.transform;
     crop_ = data.crop.clamped();
     view_ = data.view;
     extra_ = data.original;
     undo_.clear();
     emit changed(Aspect::Source);
+    emit changed(Aspect::Range);
     emit changed(Aspect::Transform);
     emit changed(Aspect::Crop);
     emit changed(Aspect::View);
@@ -64,6 +70,21 @@ void Project::changeCrop(const CropShape& after, const QString& mergeKey) {
     if (target == crop_) return;
     undo_.push(new SetCropCommand(
         SetCropId, tr("Change the crop"), crop_, target, [this](const CropShape& c) { applyCrop(c); }, mergeKey));
+}
+
+Rational Project::outputFps() const {
+    return timecode::defaultFps(source_.fps);
+}
+
+void Project::changeRange(const TimeRange& after, const QString& mergeKey) {
+    if (after == range_) return;
+    undo_.push(new SetRangeCommand(
+        SetRangeId, tr("Change In and Out"), range_, after, [this](const TimeRange& r) { applyRange(r); }, mergeKey));
+}
+
+void Project::applyRange(const TimeRange& r) {
+    range_ = r;
+    emit changed(Aspect::Range);
 }
 
 void Project::applyCrop(const CropShape& c) {

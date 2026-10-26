@@ -52,7 +52,9 @@ QString SourceNormalizer::chain(int inWidth, int inHeight) const {
     if (info_.rotation == 90 || info_.rotation == 270) std::swap(w, h);
     Q_UNUSED(inWidth);
     Q_UNUSED(inHeight);
-    f << QStringLiteral("scale=%1:%2:flags=bicubic+accurate_rnd+full_chroma_int:in_color_matrix=auto:"
+    // No accurate_rnd: it turns off swscale's SIMD paths — 10 ms a 1080p frame against 0.7 ms, too slow for 60 fps
+    // playback — for rounding within 1/255; full_chroma_int stays (sharp chroma, and cheap).
+    f << QStringLiteral("scale=%1:%2:flags=bicubic+full_chroma_int:in_color_matrix=auto:"
                         "in_range=auto:out_range=full")
              .arg(w)
              .arg(h);

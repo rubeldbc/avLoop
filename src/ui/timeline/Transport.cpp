@@ -1,6 +1,7 @@
 #include "ui/timeline/Transport.h"
 
 #include "ui/theme/IconFactory.h"
+#include "ui/widgets/TimeEdit.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -25,9 +26,8 @@ Transport::Transport(QWidget* parent) : QWidget(parent) {
     for (QToolButton* b : {goIn_, prev_, play_, next_, goOut_, loop_})
         row->addWidget(b);
 
-    now_ = new QLabel(QStringLiteral("00:00:00.00"), this);
-    now_->setObjectName(QStringLiteral("TimeNow"));
-    now_->setProperty("mono", true);
+    now_ = new TimeEdit(QStringLiteral("transport.time"), this);
+    now_->setProperty("timeNow", true);
     total_ = new QLabel(QStringLiteral("/ 00:00:00.00"), this);
     total_->setObjectName(QStringLiteral("TimeTotal"));
     total_->setProperty("mono", true);
@@ -56,8 +56,7 @@ QToolButton* Transport::button(const QString& name, const QString& icon, const Q
     return b;
 }
 
-void Transport::setTimes(const QString& now, const QString& total) {
-    now_->setText(now);
+void Transport::setTotal(const QString& total) {
     total_->setText(QStringLiteral("/ %1").arg(total));
 }
 

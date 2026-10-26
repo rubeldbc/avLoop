@@ -1,0 +1,10 @@
+startup: 478 ms
+walk minute.json: 14 steps
+-- a minute of loop playback, In 2 s – Out 5 s
+     open samples/counter-1080p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect range.out: 5
+PASS expect playback.dropped: 0
+PASS expect playback.shown: 1804
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

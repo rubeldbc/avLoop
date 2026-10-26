@@ -2,6 +2,7 @@
 
 #include "core/CropShape.h"
 #include "core/Rational.h"
+#include "core/TimeRange.h"
 #include "core/VideoTransform.h"
 
 #include <QDateTime>
@@ -52,8 +53,11 @@ public:
     explicit Project(QObject* parent = nullptr);
 
     const SourceInfo& source() const { return source_; }
+    const TimeRange& range() const { return range_; }
     const VideoTransform& transform() const { return transform_; }
     const CropShape& crop() const { return crop_; }
+    // The output frame grid In, Out and the playhead snap to (spec §6.4); AV-006 adds the setting.
+    Rational outputFps() const;
     const ViewState& view() const { return view_; }
     const QJsonObject& extra() const { return extra_; }
     QUndoStack* undoStack() { return &undo_; }
@@ -70,16 +74,19 @@ public:
     // Pushes the change as one Undo step; changes under the same merge key within 500 ms (or one drag) merge.
     void changeTransform(const VideoTransform& after, const QString& mergeKey = {});
     void changeCrop(const CropShape& after, const QString& mergeKey = {});
+    void changeRange(const TimeRange& after, const QString& mergeKey = {});
 
     // Only commands call these.
     void applyTransform(const VideoTransform& t);
     void applyCrop(const CropShape& c);
+    void applyRange(const TimeRange& r);
 
 signals:
     void changed(avloop::Project::Aspect aspect);
 
 private:
     SourceInfo source_;
+    TimeRange range_;
     VideoTransform transform_;
     CropShape crop_;
     ViewState view_;

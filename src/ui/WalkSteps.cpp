@@ -67,11 +67,13 @@ QString text(const QVariant& v) {
 
 void WalkRunner::placeQuietly(QWidget* window, const QSize& client) {
     const HWND hwnd = HWND(window->winId());
-    constexpr UINT kQuiet = SWP_NOACTIVATE | SWP_NOZORDER | SWP_NOOWNERZORDER;
+    // Behind the owner's windows, and never made the foreground one — not even by the owner's click on it.
+    SetWindowLongPtrW(hwnd, GWL_EXSTYLE, GetWindowLongPtrW(hwnd, GWL_EXSTYLE) | WS_EX_NOACTIVATE);
+    constexpr UINT kQuiet = SWP_NOACTIVATE | SWP_NOOWNERZORDER;
     if (client.isEmpty()) {
         RECT area{};
         SystemParametersInfoW(SPI_GETWORKAREA, 0, &area, 0);
-        SetWindowPos(hwnd, nullptr, area.left, area.top, area.right - area.left, area.bottom - area.top, kQuiet);
+        SetWindowPos(hwnd, HWND_BOTTOM, area.left, area.top, area.right - area.left, area.bottom - area.top, kQuiet);
         return;
     }
     RECT outer{};
@@ -81,7 +83,7 @@ void WalkRunner::placeQuietly(QWidget* window, const QSize& client) {
     const int frameW = (outer.right - outer.left) - (inner.right - inner.left);
     const int frameH = (outer.bottom - outer.top) - (inner.bottom - inner.top);
     const qreal dpr = window->devicePixelRatioF();
-    SetWindowPos(hwnd, nullptr, 0, 0, int(std::lround(client.width() * dpr)) + frameW,
+    SetWindowPos(hwnd, HWND_BOTTOM, 0, 0, int(std::lround(client.width() * dpr)) + frameW,
                  int(std::lround(client.height() * dpr)) + frameH, kQuiet | SWP_NOMOVE);
 }
 
@@ -189,6 +191,8 @@ int WalkRunner::stepKey(const QJsonObject& step) {
     }
     QWidget* w = step.contains(QStringLiteral("on")) ? target(step) : QApplication::focusWidget();
     if (!w) w = window_;
+    // Keys aimed at a widget go to it as typed there: it has the focus, so its shortcut overrides count.
+    if (w != window_ && w->focusPolicy() != Qt::NoFocus) w->setFocus(Qt::OtherFocusReason);
     const QKeyCombination combo = seq[0];
     QTest::keyClick(w, combo.key(), combo.keyboardModifiers());
     return delay_;
@@ -241,16 +245,13 @@ int WalkRunner::stepShot(const QJsonObject& step) {
     return delay_;
 }
 
-int WalkRunner::stepExpect(const QJsonObject& step) {
-    const QString probe = step.value(QStringLiteral("probe")).toString();
-    if (!WalkProbes::has(probe)) {
-        check(false, QStringLiteral("expect %1").arg(probe), QStringLiteral("no such probe"));
-        return delay_;
-    }
-    const QVariant value = WalkProbes::read(probe);
+namespace {
+
+// An expect's or a waitFor's test of a probe's value: eq, near [v, ±], min, max, contains — all that are given.
+bool matches(const QJsonObject& step, const QVariant& value, QString* wanted) {
     const QString observed = text(value);
     bool ok = true;
-    QString wanted;
+    QString want;
     if (step.contains(QStringLiteral("eq"))) {
         const QJsonValue eq = step.value(QStringLiteral("eq"));
         if (eq.isDouble())
@@ -259,12 +260,12 @@ int WalkRunner::stepExpect(const QJsonObject& step) {
             ok = value.toBool() == eq.toBool();
         else
             ok = observed == eq.toString();
-        wanted = QStringLiteral("= %1").arg(eq.isString() ? eq.toString() : text(eq.toVariant()));
+        want = QStringLiteral("= %1").arg(eq.isString() ? eq.toString() : text(eq.toVariant()));
     }
     if (step.contains(QStringLiteral("near"))) {
         const QJsonArray within = step.value(QStringLiteral("near")).toArray();
         ok = ok && std::abs(value.toDouble() - within.at(0).toDouble()) <= within.at(1).toDouble();
-        wanted = QStringLiteral("≈ %1 ± %2").arg(within.at(0).toDouble()).arg(within.at(1).toDouble());
+        want = QStringLiteral("≈ %1 ± %2").arg(within.at(0).toDouble()).arg(within.at(1).toDouble());
     }
     if (step.contains(QStringLiteral("min")))
         ok = ok && value.toDouble() >= step.value(QStringLiteral("min")).toDouble();
@@ -272,6 +273,22 @@ int WalkRunner::stepExpect(const QJsonObject& step) {
         ok = ok && value.toDouble() <= step.value(QStringLiteral("max")).toDouble();
     if (step.contains(QStringLiteral("contains")))
         ok = ok && observed.contains(step.value(QStringLiteral("contains")).toString());
+    if (wanted) *wanted = want;
+    return ok;
+}
+
+} // namespace
+
+int WalkRunner::stepExpect(const QJsonObject& step) {
+    const QString probe = step.value(QStringLiteral("probe")).toString();
+    if (!WalkProbes::has(probe)) {
+        check(false, QStringLiteral("expect %1").arg(probe), QStringLiteral("no such probe"));
+        return delay_;
+    }
+    const QVariant value = WalkProbes::read(probe);
+    const QString observed = text(value);
+    QString wanted;
+    const bool ok = matches(step, value, &wanted);
     check(ok, QStringLiteral("expect %1").arg(probe),
           ok || wanted.isEmpty() ? observed : observed + QStringLiteral(" (wanted ") + wanted + QLatin1Char(')'));
     return delay_;
@@ -284,8 +301,9 @@ int WalkRunner::stepWaitFor(const QJsonObject& step) {
     auto* timer = new QTimer(this);
     timer->setInterval(50);
     connect(timer, &QTimer::timeout, this, [this, timer, step, probe, timeout] {
-        const QString observed = text(WalkProbes::read(probe));
-        const bool done = observed == step.value(QStringLiteral("eq")).toVariant().toString();
+        const QVariant value = WalkProbes::read(probe);
+        const QString observed = text(value);
+        const bool done = matches(step, value, nullptr);
         if (done || ++waitTicks_ * 50 >= timeout) {
             timer->deleteLater();
             check(done, QStringLiteral("waitFor %1").arg(probe),

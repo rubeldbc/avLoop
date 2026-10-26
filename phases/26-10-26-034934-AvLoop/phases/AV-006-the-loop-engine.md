@@ -1,7 +1,7 @@
 ---
 phase: AV-006
 title: "The loop engine"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 6
 track: A
 checkpoint_id: CP-A1

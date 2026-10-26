@@ -46,7 +46,8 @@ public:
     // visible one is drawn in again from its own framebuffer.
     static QPixmap grabWidget(QWidget* widget);
     // Sizes a window without ever activating it — the owner works on this desktop while walks run: the client size
-    // in logical px, or the whole work area when empty (the look of a maximized window).
+    // in logical px, or the whole work area when empty (the look of a maximized window). The window goes behind the
+    // owner's windows and cannot be activated by a click (WS_EX_NOACTIVATE).
     static void placeQuietly(QWidget* window, const QSize& client);
 
     void start();

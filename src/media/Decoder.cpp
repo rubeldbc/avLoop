@@ -56,6 +56,10 @@ Frame Decoder::frameAt(double seconds) {
     return d->frameAtPts(d->ptsOf(seconds));
 }
 
+Frame Decoder::keyframeAt(double seconds) {
+    return d->keyframeAtPts(d->ptsOf(seconds));
+}
+
 Frame Decoder::frameAtIndex(std::int64_t index) {
     const double fps = d->info.fps() > 0 ? d->info.fps() : 25.0;
     return frameAt((double(index) + 0.5) / fps);

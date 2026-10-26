@@ -4,6 +4,7 @@ add_library(avloop_core STATIC
     core/AppInfo.h core/AppInfo.cpp core/Rational.h
     core/Geometry.h core/Geometry.cpp core/VideoTransform.h core/VideoTransform.cpp
     core/CropShape.h core/CropShape.cpp core/AspectRatio.h core/AspectRatio.cpp
+    core/Timecode.h core/Timecode.cpp core/TimeRange.h core/TimeRange.cpp
     core/Project.h core/Project.cpp core/Commands.h core/ProjectJson.h core/ProjectJson.cpp)
 target_include_directories(avloop_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/generated)
 # Qt Gui only for QUndoStack/QUndoCommand, which Qt 6 moved there from Widgets (spec §11.2).
@@ -14,7 +15,7 @@ add_library(avloop_media STATIC
     media/Decoder.h media/DecoderImpl.h media/Decoder.cpp media/DecoderSeek.cpp media/DecoderHw.cpp
     media/SourceNormalizer.h media/SourceNormalizer.cpp
     media/FrameCache.h media/FrameCache.cpp media/DiskCache.h media/DiskCache.cpp
-    media/DecodeWorker.h media/DecodeWorker.cpp
+    media/DecodeWorker.h media/DecodeWorker.cpp media/ThumbnailWorker.h media/ThumbnailWorker.cpp
     media/SystemMemory.h media/SystemMemory.cpp)
 target_link_libraries(avloop_media
     PUBLIC avloop_core Qt6::Core
@@ -26,6 +27,7 @@ target_link_libraries(avloop_render PUBLIC avloop_core avloop_media Qt6::Gui Qt6
 
 add_library(avloop_ui STATIC
     ui/MainWindow.h ui/MainWindow.cpp ui/MainMenu.cpp ui/MainWindowActions.cpp ui/MainWindowCanvas.cpp
+    ui/MainWindowTimeline.cpp
     ui/WalkRunner.h ui/WalkRunner.cpp ui/WalkSteps.cpp
     ui/theme/Theme.h ui/theme/Theme.cpp
     ui/theme/IconFactory.h ui/theme/IconFactory.cpp
@@ -36,11 +38,14 @@ add_library(avloop_ui STATIC
     ui/canvas/Canvas.h ui/canvas/Canvas.cpp ui/canvas/CanvasView.cpp ui/canvas/CanvasGl.cpp ui/canvas/CanvasGlState.h ui/canvas/CanvasOverlay.cpp
     ui/tools/Tool.h ui/tools/ToolManager.h ui/tools/ToolManager.cpp
     ui/tools/SelectionTool.cpp ui/tools/ZoomTool.cpp ui/tools/HandTool.cpp
-    ui/tools/CropTool.cpp ui/tools/CropHandles.h ui/tools/CropHandles.cpp
+    ui/tools/CropTool.cpp ui/tools/CropHandles.h ui/tools/CropHandles.cpp ui/tools/InOutTool.cpp
     ui/options/OptionsBar.h ui/options/OptionsBar.cpp ui/options/SelectionOptions.cpp ui/options/ZoomOptions.cpp
     ui/options/CropOptions.cpp
-    ui/widgets/StepSpinBox.h ui/widgets/StepSpinBox.cpp
-    ui/timeline/Transport.h ui/timeline/Transport.cpp)
+    ui/widgets/StepSpinBox.h ui/widgets/StepSpinBox.cpp ui/widgets/TimeEdit.h ui/widgets/TimeEdit.cpp
+    ui/timeline/Transport.h ui/timeline/Transport.cpp
+    ui/timeline/Timeline.h ui/timeline/Timeline.cpp ui/timeline/TimelinePaint.cpp ui/timeline/TimelineInput.cpp
+    ui/timeline/TimelineScale.h ui/timeline/TimelineScale.cpp
+    ui/timeline/PlaybackClock.h ui/timeline/PlaybackClock.cpp)
 target_link_libraries(avloop_ui
     PUBLIC avloop_core avloop_media avloop_render Qt6::Widgets Qt6::Svg Qt6::OpenGLWidgets Qt6::Test Qt6::Concurrent
     PRIVATE avloop_warnings)

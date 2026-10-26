@@ -50,3 +50,7 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-21 | Custom… takes the crop's proportions in lowest terms; typed W/H keep the top-left | §6.1 names no anchor | `README.md` §3; AV-004 |
 | R-22 | The canvas shows the crop's outline; Feather is seen in Preview and export | §6.1's overlay list | `README.md` §3; AV-004 |
 | R-23 | Snapping: corners, edges or centre lines to the video's edges and centre | §6.1 | `README.md` §3; AV-004 |
+| R-24 | The range is In up to Out: I the first frame, O the last | §8.1's D | `README.md` §3; AV-005 |
+| R-25 | Dropped = never shown; frames shown in order, dropped only beyond two frames late | §7.3 | `README.md` §3; AV-005 |
+| R-26 | Timeline repaints at most 30 a second while playing | GL composition cost | `README.md` §3; AV-005 |
+| R-27 | Scrub: keyframe while moving, exact at rest (150 ms) or release | §7.2 | `README.md` §3; AV-005 |

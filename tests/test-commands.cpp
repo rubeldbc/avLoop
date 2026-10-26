@@ -15,6 +15,8 @@ SourceInfo source() {
     s.path = QStringLiteral("x.mp4");
     s.width = 640;
     s.height = 360;
+    s.fps = {30, 1};
+    s.duration = 10;
     return s;
 }
 
@@ -100,6 +102,26 @@ private slots:
         connect(&p, &Project::changed, this, [&](Project::Aspect a) { seen << a; });
         p.changeTransform(at(5));
         QCOMPARE(seen, QList<Project::Aspect>{Project::Aspect::Transform});
+    }
+    void rangeIsUndone() {
+        // SetRange (spec §6.4): a new source's range is the whole file; a change is a step; a handle's drag one.
+        Project p;
+        p.setSource(source());
+        QCOMPARE(p.range(), (TimeRange{0, 10}));
+        QCOMPARE(p.outputFps(), (Rational{30, 1}));
+        p.changeRange(timerange::withIn(p.range(), 2, 10, p.outputFps()));
+        p.changeRange(timerange::withOut(p.range(), 4, 10, p.outputFps()));
+        QCOMPARE(p.range(), (TimeRange{2, 4}));
+        QCOMPARE(p.undoStack()->count(), 2);
+        for (double t : {3.0, 3.5, 3.9})
+            p.changeRange(timerange::dragOut(p.range(), t + 1, 10, p.outputFps()), QStringLiteral("drag:range:1"));
+        QCOMPARE(p.undoStack()->count(), 3);
+        QCOMPARE(p.range().out, 4.9);
+        p.undoStack()->undo();
+        QCOMPARE(p.range(), (TimeRange{2, 4}));
+        p.undoStack()->undo();
+        p.undoStack()->undo();
+        QCOMPARE(p.range(), (TimeRange{0, 10}));
     }
 };
 

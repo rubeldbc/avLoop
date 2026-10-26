@@ -85,4 +85,19 @@ Frame Decoder::Impl::frameAtPts(std::int64_t target) {
     return {};
 }
 
+Frame Decoder::Impl::keyframeAtPts(std::int64_t target) {
+    // Already decoding in this neighbourhood: the frame on screen is as quick as any.
+    if (lastRaw && lastRaw->pts <= target && target - lastRaw->pts <= ptsOf(2.0) - ptsOf(0.0) && !needReseek)
+        return current();
+    needReseek = false;
+    seekTo(target);
+    FramePtr first = decodeRaw();
+    // A container whose seek lands after the target, or a codec that failed: the exact way finds it.
+    if (needReseek || !first || first->pts > target) return frameAtPts(target);
+    pendingRaw.reset();
+    lastRaw = std::move(first);
+    lastFrame = {};
+    return current();
+}
+
 } // namespace avloop::media

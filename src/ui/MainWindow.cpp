@@ -11,6 +11,7 @@
 #include "ui/panels/SidePanel.h"
 #include "ui/theme/IconFactory.h"
 #include "ui/theme/Theme.h"
+#include "ui/timeline/Timeline.h"
 #include "ui/timeline/Transport.h"
 #include "ui/tools/ToolManager.h"
 
@@ -117,6 +118,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     buildStatusBar();
     buildMenu();
     buildCanvasTools();
+    buildTimeline();
     registerProbes();
     registerMediaProbes();
     restoreLayout();
@@ -213,6 +215,11 @@ QWidget* MainWindow::buildRail() {
         b->setProperty("toolId", tool.id);
         toolGroup_->addButton(b);
         connect(b, &QToolButton::clicked, this, [this, id = tool.id] { selectTool(id); });
+        // I and O set In and Out at the playhead, not the tool (spec §6.4; MainWindowTimeline.cpp).
+        if (tool.id == QLatin1String("in") || tool.id == QLatin1String("out")) {
+            column->addWidget(b, 0, Qt::AlignHCenter);
+            continue;
+        }
         // The key switches at once (a button's own shortcut would animate a click for 100 ms first).
         auto* key = new QAction(b);
         key->setShortcut(tool.key);
@@ -236,9 +243,8 @@ QWidget* MainWindow::buildTimelineArea() {
     column->setSpacing(0);
     transport_ = new Transport(area);
     column->addWidget(transport_);
-    auto* rows = new QWidget(area);
-    rows->setObjectName(QStringLiteral("TimelineRows"));
-    column->addWidget(rows, 1);
+    timeline_ = new Timeline(project_, area);
+    column->addWidget(timeline_, 1);
     return area;
 }
 

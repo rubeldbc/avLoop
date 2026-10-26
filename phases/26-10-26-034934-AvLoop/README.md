@@ -109,6 +109,14 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     Preview and the export, which apply the mask (§6.1's overlay list names no soft edge on the canvas).
 23. **R-23** What snaps (§6.1 says "to the video's edges and centre"): a drawing's corners, a moved crop's edges or
     centre lines, a resized crop's moving edges — to the transformed video's edges and centre lines.
+24. **R-24** The range covers the frames from In up to Out (§8.1's D = (Out − In) × fps): I takes the frame under the
+    playhead as the first, O as the last (Out = the playhead + one frame); Go to Out shows the range's last frame.
+25. **R-25** "Dropped" counts frames never shown: the clock shows frames in order, so a late screen refresh is caught
+    up rather than skipped, and drops a frame only when it is more than two frames late with a newer one due.
+26. **R-26** During playback the timeline and the time field follow at most 30 times a second; the canvas shows every
+    frame (a raster repaint beside the GL canvas costs a whole-window composition).
+27. **R-27** The scrub's two speeds (§7.2): while the pointer moves, the keyframe at or before it (the frame on screen
+    when already near); after 150 ms at rest or on release, the exact frame.
 
 ## 4. What is not built
 

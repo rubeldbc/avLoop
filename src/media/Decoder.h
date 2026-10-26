@@ -33,6 +33,9 @@ public:
     // The frame on screen at `seconds` of source time (its PTS ≤ t < the next frame's PTS); the first frame before
     // it, the last after it. Null only when nothing decodes.
     Frame frameAt(double seconds);
+    // The scrub's fast frame (spec §7.2): the keyframe at or before `seconds` — or, already near it, the frame on
+    // screen — without decoding up to it.
+    Frame keyframeAt(double seconds);
     // Frame N in display order for a constant-rate source (t = (N + ½) / fps).
     Frame frameAtIndex(std::int64_t index);
     // The next frame in display order after the last one returned (sequential playback); null at the end.

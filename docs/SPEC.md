@@ -6,6 +6,33 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-005 — The timeline (AV-005, 2026-10-26)
+
+- Time is kept on the output frame grid (frame n at n / fps from the source's start); until AV-006's setting the
+  output rate is the source's, at most 60 (reading R-6). `HH:MM:SS.FF` shows the whole seconds of a frame's time and
+  its frame within that second; a time field takes `12.4` (seconds), `00:00:12.12` or `372f`.
+- The range covers the frames from In up to Out (§8.1: D = (Out − In) × fps): I takes the frame under the playhead as
+  the first, O as the last; In at or after Out moves Out to the file's end, Out at or before In moves In to the start;
+  at least two output frames; Alt+I / Alt+O clear (reading R-24). The In and Out tools set them where the timeline is
+  clicked; their options show the time (typed and Enter sets it) and, for Out, the length. `.avloop` keeps
+  `range`: in, out (none read = the whole file). Every change is one Undo step; a handle's drag is one.
+- The timeline: the ruler (timecode or frame numbers, double-click to switch; the step between labels from 1 frame up
+  to 10 minutes and more, always wide enough for its label), the thumbnail strip (a software decoder of its own,
+  keyframe seeks, at most 400 samples of 160 × 90, the visible ones first; `panel2` until made), the In–Out overlay
+  (`accentSoft` inside, 50% black outside, the 3 px orange bar to drag the range, bracket handles), the empty
+  crossfade band and keyframe row, the playhead over all. A click or drag on the ruler or the strip scrubs: the
+  keyframe preview while moving, the exact frame after 150 ms at rest or on release (reading R-27); the playhead snaps
+  to In and Out within 8 px; Ctrl+wheel zooms about the pointer from the whole file to 12 px a frame; the wheel and
+  Shift+wheel scroll;  fits the file, Shift+ the range.
+- The transport row: Go to In, Prev, Play/Pause, Next, Go to Out, Loop; the time (type to jump), the total; the In,
+  Out and length readout. Keys: Space, ←/→ (1 frame), Shift+←/→ (10), Home/End (In / the range's last frame),
+  Ctrl+Home/End, L, I, O, Alt+I, Alt+O. With a crop tool and a crop, the arrows on the canvas move the crop.
+- Playback shows the source: decoding runs ahead into a ring of six frames; a 4 ms clock takes them in order and
+  never waits; loop on cycles In → Out; a frame more than two frames late with a newer one due is dropped and counted
+  in the status bar's "Dropped: N" (reading R-25). During playback the timeline and the time field follow at most 30
+  times a second (reading R-26). 1080p H.264 plays at 30 and 60 fps with none dropped; memory stays flat over a
+  minute of loop playback.
+
 ### D-004 — The crop tools (AV-004, 2026-10-26)
 
 - One crop at a time (reading R-8): a Rect (M), Rounded (U) or Ellipse (E) in scene px with its ratio, Radius and

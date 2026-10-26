@@ -95,3 +95,29 @@ end of its section.
   run it with `-o <file>,txt` and read the file. (AV-004)
 - **A custom ratio taken from a crop's size can be large** (180 × 320): fields capped at 100 clipped it. Rule: Custom…
   reduces the crop's size to lowest terms (9:16), and the W:H fields take up to 9999. (AV-004)
+
+## The timeline and playback
+
+- **Ninja can keep a stale object**: after a virtual was added to `Tool`, three tool objects were not recompiled (the
+  deps log held an out-of-date record) and a call to `previewCrop()` landed on `createOptions()` of the old vtable —
+  a QWidget made with a garbage parent, a crash in the canvas's paint. Rule: a crash that makes no sense after a
+  header change → delete `build\**\*.obj` and build again; CI always builds clean. (AV-005)
+- **swscale's `accurate_rnd` turns its SIMD off**: 10 ms a 1080p frame against 0.7 ms — 60 fps playback dropped
+  frames on it. Rule: `bicubic+full_chroma_int` without `accurate_rnd` (rounding within 1/255). (AV-005)
+- **Next to a QOpenGLWidget every raster repaint costs a whole-window composition** (Qt copies the backing store and
+  composes it with the GL texture, 4–6 ms a flush, whatever the dirty area): a timeline repainted at every frame of a
+  60 fps video put the UI thread over 16.7 ms. Rule: during playback the timeline and the time field follow at most
+  30 times a second; widgets that fill themselves set `WA_OpaquePaintEvent`; the clock shows frames in order and
+  drops only a frame more than two frames late. (AV-005)
+- **A GUI build's `qInfo` does not reach the console**: diagnostics for a walk go to `stdout` with `fprintf` and are
+  taken out again. (AV-005)
+- **A click on a frame boundary lands a pixel early half the time**: the walk's points are view pixels. Rule: timeline
+  clicks in walks aim at the middle of a frame. (AV-005)
+- **Keys sent to a widget must have it focused**: the window's shortcuts ask the focus widget first (ShortcutOverride).
+  Rule: the walk's `key` step focuses its target; a tool that wants a key the window also binds (the crop's arrows)
+  says so through `Tool::wantsKey`. A time field gives the focus back after Enter, so I and O work again. (AV-005)
+- **`--mem-log`'s first column is milliseconds**, not seconds. (AV-005)
+- **A full-screen lab window catches the owner's clicks**: in a minute-long walk the owner's click anywhere on the
+  screen landed on it and made it the foreground window. Rule: lab windows are placed behind the owner's windows
+  (`HWND_BOTTOM`) with `WS_EX_NOACTIVATE`, so no click can activate them; pictures come from the widgets' own
+  rendering, not the screen. (AV-005)

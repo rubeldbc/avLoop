@@ -43,6 +43,9 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
     };
     root.insert(QStringLiteral("source"), merged(d.original, QStringLiteral("source"), source));
 
+    const QJsonObject range{{QStringLiteral("in"), d.range.in}, {QStringLiteral("out"), d.range.out}};
+    root.insert(QStringLiteral("range"), merged(d.original, QStringLiteral("range"), range));
+
     QJsonObject transform{
         {QStringLiteral("x"), d.transform.x},         {QStringLiteral("y"), d.transform.y},
         {QStringLiteral("scale"), d.transform.scale}, {QStringLiteral("flipH"), d.transform.flipH},
@@ -99,6 +102,11 @@ bool fromJson(const QJsonObject& json, ProjectData& d, QString* error, const QSt
         const QString beside = QFileInfo(projectPath).absoluteDir().absoluteFilePath(d.relativePath);
         if (QFileInfo::exists(beside)) d.source.path = QDir::toNativeSeparators(QDir::cleanPath(beside));
     }
+
+    // Out 0 (or none) is the whole file; the project fits the range to the source's grid when it is restored.
+    const QJsonObject r = json.value(QStringLiteral("range")).toObject();
+    d.range.in = r.value(QStringLiteral("in")).toDouble();
+    d.range.out = r.value(QStringLiteral("out")).toDouble();
 
     const QJsonObject t = json.value(QStringLiteral("transform")).toObject();
     d.transform.x = t.value(QStringLiteral("x")).toDouble();

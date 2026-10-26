@@ -249,8 +249,9 @@ QLabel[quiet="true"] {
 *[mono="true"] {
     font-family: Consolas;
 }
-#TimeNow {
+QLineEdit[timeNow="true"] {
     color: @accent;
+    padding: 1px 4px;
 }
 
 /* Toasts */

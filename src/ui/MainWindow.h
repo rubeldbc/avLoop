@@ -3,6 +3,7 @@
 #include "core/ProjectJson.h"
 #include "media/MediaInfo.h"
 
+#include <QElapsedTimer>
 #include <QMainWindow>
 #include <QStringList>
 
@@ -29,6 +30,8 @@ class FrameCache;
 
 class Canvas;
 class DropZone;
+class PlaybackClock;
+class Timeline;
 class Project;
 class ToolManager;
 class SidePanel;
@@ -93,6 +96,15 @@ private:
     void registerMediaProbes();
     // MainWindowCanvas.cpp
     void buildCanvasTools();
+    // MainWindowTimeline.cpp — the playhead, what the canvas shows, playback.
+    void buildTimeline();
+    void seek(double t, bool fast = false);
+    void stepFrames(int n);
+    void togglePlay();
+    void startPlayback(double from);
+    void toggleLoop();
+    void refreshTransport();
+    double fileEnd() const;
 
     QToolButton* menuButton_ = nullptr;
     QMenu* menu_ = nullptr;
@@ -106,6 +118,13 @@ private:
     DropZone* dropZone_ = nullptr;
     SidePanel* side_ = nullptr;
     Transport* transport_ = nullptr;
+    Timeline* timeline_ = nullptr;
+    PlaybackClock* clock_ = nullptr;
+    QLabel* droppedLabel_ = nullptr;
+    bool loopOn_ = true;
+    double shownSeconds_ = 0;
+    QElapsedTimer rasterClock_; // playback's timeline repaints, at most 30 a second
+    QString rangeText_;
     QSplitter* mainSplit_ = nullptr;
     QSplitter* centreSplit_ = nullptr;
     QLabel* sourceLabel_ = nullptr;
