@@ -63,7 +63,8 @@ SidePanel::SidePanel(QWidget* parent) : QWidget(parent) {
     loop_ = new Section(QStringLiteral("loop"), tr("Loop"), body);
     output_ = new Section(QStringLiteral("output"), tr("Output"), body);
     quality_ = new Section(QStringLiteral("quality"), tr("Quality"), body);
-    for (Section* s : {crop_, loop_, output_, quality_})
+    effects_ = new Section(QStringLiteral("effects"), tr("Clip effects"), body);
+    for (Section* s : {crop_, loop_, output_, quality_, effects_})
         sections->addWidget(s);
     sections->addStretch(1);
     scroll->setWidget(body);

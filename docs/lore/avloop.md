@@ -325,3 +325,22 @@ end of its section.
 - **The owner's own AvLoop may be open while a walk runs**: the build's avloop.exe is locked (link fails LNK1104), and
   the walk's "no AvLoop left" check saw it. Rule: never close the owner's app — rename the locked exe aside (Windows
   allows renaming a running image) and relink; the check counts only processes that were not running before. (AV-018)
+
+## The clip effects (late)
+
+- **Two back ends agree for free when they are given the same frame**: an effect written twice (GLSL and C++) needs a
+  parity budget and a test for each; made once on the CPU before either back end draws, the GPU and the CPU cannot
+  differ. Rule: what changes the source's pixels is made in `EffectsPass`; the back ends only place and blend. (AV-019)
+- **A texture pool keyed by pts serves the old look**: one shared GPU context, two jobs, the same source frame — the
+  second job's frame came back from the pool with the first job's effects. Rule: a pooled texture's key is everything
+  that made its pixels (`Composite::look`, the effects' key) — a test renders two looks through one context. (AV-019)
+- **Two sampler types on one texture unit fail the draw** (OpenGL's rule, kept before it bit): a `sampler3D` left at
+  unit 0 beside the video's `sampler2D` is GL_INVALID_OPERATION even when the shader never reads it. Rule: give
+  every sampler its own unit, set on every draw — the canvas sets `uLut` to 1 whether effects are on or not. (AV-019)
+- **A member destroyed before QWidget's children**: `renderService_` (a unique_ptr) went with the members, and the
+  Preview — a child window — was deleted afterwards by `~QWidget`, calling the service on its way out; quitting with
+  the Preview open left a minidump. Rule: a child that uses a member is deleted in the destructor's body, first; a lab
+  folder left behind is the sign of a crash at exit — read its `logs\*.dmp`. (AV-019)
+- **A narrow value column cuts a suffix**: "0.6 EV" and "0.0 px" lost their last letters in the side panel's 58 px
+  fields. Rule: a field's longest text, suffix included, fits in six characters — the unit goes in the tooltip, or
+  the decimals go. (AV-019)

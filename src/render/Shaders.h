@@ -6,7 +6,7 @@ namespace avloop::render::shaders {
 
 // Scene-space quad → clip space: `uMatrix`; passes the texture coordinate on.
 const char* transformVertex();
-// A premultiplied RGBA texture, times `uOpacity`.
+// A premultiplied RGBA texture, times `uOpacity` — with `uEffects`, the clip effects on it (the canvas, D-017).
 const char* textureFragment();
 // A checkerboard of `uCell` device pixels in `uDark` and `uLight`: where nothing is drawn (transparency).
 const char* checkerFragment();

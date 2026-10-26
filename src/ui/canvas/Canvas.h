@@ -1,6 +1,7 @@
 #pragma once
 
 #include "media/MediaInfo.h"
+#include "render/EffectsPass.h"
 
 #include <QOpenGLWidget>
 #include <QPointF>
@@ -66,10 +67,11 @@ protected:
 
 private:
     struct Gl;
-    void paintScene();    // CanvasGl.cpp
-    void paintFallback(); // CanvasGl.cpp: QPainter only, when OpenGL 3.3 is missing
-    void paintOverlay();  // CanvasOverlay.cpp
-    void releaseGl();     // CanvasGl.cpp
+    void paintScene();        // CanvasGl.cpp
+    void paintFallback();     // CanvasGl.cpp: QPainter only, when OpenGL 3.3 is missing
+    void setEffectUniforms(); // CanvasGl.cpp: the clip effects on the video
+    void paintOverlay();      // CanvasOverlay.cpp
+    void releaseGl();         // CanvasGl.cpp
     void viewChangedNow();
 
     Project* project_;
@@ -77,6 +79,10 @@ private:
     media::Frame frame_;
     bool frameDirty_ = false;
     std::unique_ptr<Gl> gl_;
+    render::EffectsPass fallbackPass_; // without OpenGL 3.3, the clip effects on the CPU …
+    media::Frame fallbackFrame_;       // … made once a frame and a look
+    media::Frame fallbackFrom_;        // held, so its buffer is never another frame's
+    std::uint64_t fallbackKey_ = 0;
     double zoom_ = 1.0;
     QPointF pan_; // the scene point at the canvas's centre
     bool panning_ = false;

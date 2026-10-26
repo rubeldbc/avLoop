@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/ClipEffects.h"
 #include "core/CropShape.h"
 #include "core/Keyframes.h"
 #include "core/LoopSettings.h"
@@ -52,7 +53,7 @@ class Project : public QObject {
     Q_OBJECT
 public:
     // Time: the playhead moved and, with keyframes, the transform shown with it (nothing to export changed).
-    enum class Aspect { Source, Range, Transform, Crop, Loop, Output, Quality, Keyframes, View, Time };
+    enum class Aspect { Source, Range, Transform, Crop, Loop, Output, Quality, Keyframes, View, Time, Effects };
     Q_ENUM(Aspect)
     static constexpr int kUndoLimit = 200;
 
@@ -75,6 +76,7 @@ public:
     const LoopSettings& loop() const { return loop_; }
     const OutputSettings& output() const { return output_; }
     const QualitySettings& quality() const { return quality_; }
+    const ClipEffects& effects() const { return effects_; }
     // The output frame grid In, Out and the playhead snap to (spec §6.4, §8.3): the Output section's FPS.
     Rational outputFps() const;
     // The export's frame as the Output section makes it (spec §10.2): the scene rectangle, its size, its alpha.
@@ -104,6 +106,7 @@ public:
     // A new frame rate keeps In and Out in seconds, on the new grid (one Undo step with the range — reading R-29).
     void changeOutput(const OutputSettings& after, const QString& mergeKey = {});
     void changeQuality(const QualitySettings& after, const QString& mergeKey = {});
+    void changeEffects(const ClipEffects& after, const QString& mergeKey = {});
     // A preset (spec §11.3): its Loop, Output and Quality as one Undo step.
     void changeSettings(const LoopSettings& loop, const OutputSettings& output, const QualitySettings& quality,
                         const QString& name);
@@ -123,6 +126,7 @@ public:
     void applyOutput(const OutputSettings& o);
     void applyQuality(const QualitySettings& q);
     void applyKeyframes(const Keyframes& k);
+    void applyEffects(const ClipEffects& e);
 
 signals:
     void changed(avloop::Project::Aspect aspect);
@@ -141,6 +145,7 @@ private:
     LoopSettings loop_;
     OutputSettings output_;
     QualitySettings quality_;
+    ClipEffects effects_;
     ViewState view_;
     QJsonObject extra_;
     QString exportPath_;

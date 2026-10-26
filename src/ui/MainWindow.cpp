@@ -147,6 +147,9 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
 }
 
 MainWindow::~MainWindow() {
+    // A Preview still open goes first: it works on the render service, which the members' end takes away before
+    // QWidget's would delete it (quitting with the Preview open crashed on the way out — AV-019).
+    delete previewWindow_.data();
     removeAutosave(); // a clean exit leaves no autosave; a crash does (spec §11.1)
     // The size estimate hands frames between the render thread and the export thread. With the batch, the export and
     // the estimate gone, what each thread still holds runs out — render, export, render — before the export thread

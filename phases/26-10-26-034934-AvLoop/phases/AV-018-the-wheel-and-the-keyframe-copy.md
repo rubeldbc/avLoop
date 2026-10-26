@@ -11,7 +11,7 @@ risk: Low
 permission_class: VERIFY_ENVIRONMENT_FIRST
 code_budget: 120
 depends_on: [AV-017]
-unlocks: []
+unlocks: [AV-019]
 requirements: [REQ-AV-023]
 read_scope:
   - phases/26-10-26-034934-AvLoop/control/19_SHAPES_THE_WHEEL_AND_KEY_COPY.md

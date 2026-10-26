@@ -27,6 +27,7 @@ struct Composite {
     const QImage* mask = nullptr; // Grayscale8 of `size`, or none
     bool alpha = true;
     QColor background = Qt::black;
+    std::uint64_t look = 0; // the clip effects' key (ClipEffects::key): a cached texture of another look is not it
 };
 
 // The CPU back end (AVADR-0001): for each output pixel the layers sampled bilinearly (texel centres at +½,

@@ -24,7 +24,8 @@ constexpr std::size_t kPoolFrames = 8;
 
 struct Texture {
     GLuint id = 0;
-    std::int64_t key = 0; // the frame's pts
+    std::int64_t key = 0;   // the frame's pts
+    std::uint64_t look = 0; // and the clip effects it was made with
     QSize size;
 };
 
@@ -68,10 +69,10 @@ struct GlRenderer::State {
     }
 
     // The frame's texture: from the pool when it was uploaded before, else uploaded (the oldest dropped over budget).
-    GLuint texture(const media::Frame& f) {
+    GLuint texture(const media::Frame& f, std::uint64_t look) {
         const QSize sz(f.width, f.height);
         for (auto it = pool.begin(); it != pool.end(); ++it)
-            if (it->key == f.pts && it->size == sz) {
+            if (it->key == f.pts && it->look == look && it->size == sz) {
                 pool.splice(pool.begin(), pool, it);
                 return pool.front().id;
             }
@@ -81,7 +82,7 @@ struct GlRenderer::State {
             poolBytes -= std::int64_t(pool.back().size.width()) * pool.back().size.height() * 4;
             pool.pop_back();
         }
-        Texture t{0, f.pts, sz};
+        Texture t{0, f.pts, look, sz};
         gl->glGenTextures(1, &t.id);
         gl->glBindTexture(GL_TEXTURE_2D, t.id);
         gl->glPixelStorei(GL_UNPACK_ROW_LENGTH, f.stride / 4);
@@ -197,7 +198,7 @@ bool GlRenderer::submit(const Composite& c) {
     for (int i = 0; i < int(c.layers.size()); ++i) {
         const Layer& l = c.layers[i];
         gl->glActiveTexture(GL_TEXTURE0 + i);
-        gl->glBindTexture(GL_TEXTURE_2D, s.texture(l.frame));
+        gl->glBindTexture(GL_TEXTURE_2D, s.texture(l.frame, c.look));
         s.program->setUniformValue(QStringLiteral("uTex%1").arg(i).toLatin1().constData(), i);
         s.program->setUniformValue(
             QStringLiteral("uPlace[%1]").arg(i).toLatin1().constData(),

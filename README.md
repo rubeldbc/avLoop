@@ -71,6 +71,14 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   keyframes, moving or scaling the video writes into the keyframe at the playhead, as in After Effects. Diamonds on the
   timeline's keyframe row — drag one to move it in time, Alt+drag to copy it, Delete removes it, **[** / **]** jump
   between them — and Linear or Ease per keyframe. The Preview and the export follow them frame by frame.
+- **Clip effects** to correct or restyle the clip before export, in their own section of the side panel: Exposure,
+  Contrast, Highlights, Shadows, Whites and Blacks; Temperature, Tint, Saturation, Vibrance and Hue; Sepia, Invert,
+  Posterize, a Vignette and Opacity; Sharpen and Blur. The canvas shows them as you type, the Preview and every export
+  exactly (made once, before the GPU or the CPU draws); **On** compares with the clip as it is, **Reset** clears
+  them, each change is one Undo step.
+
+  <img src="docs/screenshots/clip-effects.png" alt="A warmer, livelier look with a vignette on the canvas" width="74%"> <img src="docs/screenshots/clip-effects-panel.png" alt="The Clip effects section" width="20%">
+
 - **The Loop Finder** (Ctrl+L) looks for the In and Out where the video joins itself best: every frame of the search
   range (In–Out ± 5 s, or the whole file) reduced to a small fingerprint of what will be exported, every pair of the
   allowed lengths (2–10 s by default) compared — the pictures and their motion —, the best five shown with a 0–100
@@ -138,8 +146,8 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
 
 ## What is not in this version
 
-Audio, output above 1080p, a rotation tool, colour correction, text or stickers, several layers or crop areas, keyframes
-of the crop, macOS or Linux, an auto-updater, licence keys, telemetry and code signing are outside this version's specification
+Audio, output above 1080p, a rotation tool, text or stickers, several layers or crop areas, keyframes of the crop,
+macOS or Linux, an auto-updater, licence keys, telemetry and code signing are outside this version's specification
 (`docs/SPEC.md` §1.3).
 
 ## Using a loop in OBS

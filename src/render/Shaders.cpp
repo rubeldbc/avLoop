@@ -16,13 +16,67 @@ void main() {
 }
 
 const char* textureFragment() {
+    // The canvas's video with the clip effects (D-017) as EffectsPass makes them: blur and sharpen as Gaussians of
+    // 7 × 7 taps (sharpen's soft picture the blur's σ and its own together), the colour by a 3D table of
+    // ClipEffects::colour, then posterize, the vignette and the opacity. A close look; the Preview shows the exact one.
     return R"(#version 330 core
 in vec2 vUv;
 uniform sampler2D uTex;
+uniform sampler3D uLut;
 uniform float uOpacity;
+uniform bool uEffects;
+uniform bool uColour;
+uniform float uLutSize;
+uniform int uLevels;
+uniform float uVignette;
+uniform float uVignetteInner;
+uniform vec2 uTexel;
+uniform float uBlur;
+uniform float uSoft;
+uniform float uSharpen;
 out vec4 fragColor;
+vec4 gauss(vec2 uv, float sigma) {
+    if (sigma < 0.35) return texture(uTex, uv);
+    float spacing = sigma * 0.75;
+    float bias = max(0.0, log2(spacing));
+    vec4 sum = vec4(0.0);
+    float total = 0.0;
+    for (int j = -3; j <= 3; ++j)
+        for (int i = -3; i <= 3; ++i) {
+            vec2 d = vec2(i, j) * spacing;
+            float w = exp(-dot(d, d) / (2.0 * sigma * sigma));
+            sum += w * texture(uTex, uv + d * uTexel, bias);
+            total += w;
+        }
+    return sum / total;
+}
 void main() {
-    fragColor = texture(uTex, vUv) * uOpacity;
+    if (!uEffects) {
+        fragColor = texture(uTex, vUv) * uOpacity;
+        return;
+    }
+    vec4 c = gauss(vUv, uBlur);
+    if (uSharpen > 0.0) {
+        vec4 soft = gauss(vUv, uSoft);
+        c.rgb = clamp(c.rgb + uSharpen * (c.rgb - soft.rgb), vec3(0.0), vec3(c.a));
+    }
+    if (c.a <= 0.0) {
+        fragColor = vec4(0.0);
+        return;
+    }
+    vec3 rgb = min(c.rgb / c.a, vec3(1.0));
+    if (uColour) rgb = texture(uLut, rgb * ((uLutSize - 1.0) / uLutSize) + 0.5 / uLutSize).rgb;
+    if (uLevels >= 2) {
+        float n = float(uLevels - 1);
+        rgb = floor(clamp(rgb, 0.0, 1.0) * n + 0.5) / n;
+    }
+    if (uVignette != 0.0) {
+        vec2 d = (vUv - 0.5) * 2.0;
+        float w = smoothstep(uVignetteInner, uVignetteInner + 0.65, sqrt(dot(d, d) / 2.0));
+        rgb = uVignette > 0.0 ? rgb * (1.0 - uVignette * w) : rgb + (-uVignette) * w * (1.0 - rgb);
+    }
+    float a = c.a * uOpacity;
+    fragColor = vec4(rgb * a, a);
 }
 )";
 }

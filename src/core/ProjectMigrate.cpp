@@ -11,6 +11,11 @@ void toVersion1(QJsonObject& json) {
     json.insert(QStringLiteral("version"), 1);
 }
 
+// Version 1 → 2: the clip's effects; a file without them has none.
+void toVersion2(QJsonObject& json) {
+    json.insert(QStringLiteral("version"), 2);
+}
+
 } // namespace
 
 bool upgrade(QJsonObject& json, int current, QString* error) {
@@ -27,7 +32,11 @@ bool upgrade(QJsonObject& json, int current, QString* error) {
         toVersion1(json);
         version = 1;
     }
-    // Later versions add their steps here: if (version < 2) { toVersion2(json); version = 2; } …
+    if (version < 2) {
+        toVersion2(json);
+        version = 2;
+    }
+    // Later versions add their steps here: if (version < 3) { toVersion3(json); version = 3; } …
     return version == current;
 }
 

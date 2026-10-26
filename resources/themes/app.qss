@@ -246,6 +246,12 @@ QStatusBar::item {
 QLabel[quiet="true"] {
     color: @text2;
 }
+/* A group's name inside a section (Clip effects: Light, Colour, Creative, Detail) */
+QLabel[subhead="true"] {
+    color: @text2;
+    font-weight: 600;
+    padding-top: 4px;
+}
 *[mono="true"] {
     font-family: Consolas;
 }

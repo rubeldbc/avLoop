@@ -21,7 +21,8 @@ struct RenderJob {
     LoopSettings loop;
     OutputSettings output;
     QualitySettings quality;
-    bool alpha = true; // Alpha: Auto (needed → kept), On, Off (composited over `background`)
+    ClipEffects effects; // applied to each source frame before it is placed (EffectsPass)
+    bool alpha = true;   // Alpha: Auto (needed → kept), On, Off (composited over `background`)
     QColor background = Qt::black;
     bool sizeLimited = false; // the long-side limit of 1920 took the asked size down (spec §10.2's note)
 

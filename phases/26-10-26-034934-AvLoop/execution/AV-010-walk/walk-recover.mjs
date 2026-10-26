@@ -82,7 +82,7 @@ const recovered = app('recover', [
   { do: 'expect', probe: 'crop.kind', eq: 'ellipse' },
   { do: 'expect', probe: 'crop.feather', eq: 25 },
   { do: 'expect', probe: 'project.dirty', eq: true },
-  { do: 'expect', probe: 'window.title', eq: 'AvLoop — counter-640p30.mp4*' },
+  { do: 'expect', probe: 'window.title', eq: 'AvLoop by Rubel — counter-640p30.mp4*' },
   { do: 'expect', probe: 'autosave.exists', eq: false },
 ]);
 w.check(recovered.passed, 'Recover: the project back, unsaved', recovered.fails || 'Feather 25, the title with *');

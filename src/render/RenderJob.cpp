@@ -18,6 +18,7 @@ RenderJob RenderJob::of(const ProjectData& p, const media::MediaInfo& source) {
     job.loop = p.loop.clamped();
     job.output = p.output;
     job.quality = p.quality;
+    job.effects = p.effects.clamped();
     const QSizeF video(source.width, source.height);
     job.fps = p.output.effectiveFps(source.avgFps.isValid() ? source.avgFps : source.realFps, source.vfr);
     // Without a crop the frame is the video where it stands at In; the crop is never keyframed (spec §1.3).
@@ -27,9 +28,11 @@ RenderJob RenderJob::of(const ProjectData& p, const media::MediaInfo& source) {
     using A = OutputSettings::Alpha;
     // Auto: alpha when the video leaves the output partly clear at any keyframe (between them it never goes further).
     // A format without alpha (MP4) takes the Background under (spec §10.4).
-    const bool needed = std::any_of(extremes.begin(), extremes.end(), [&](const VideoTransform& t) {
-        return geometry::needsAlpha(p.crop, t, video, source.hasAlpha);
-    });
+    // The clip's Opacity below 100 % leaves every pixel partly clear.
+    const bool see = job.effects.on && job.effects.opacity < 100;
+    const bool needed = see || std::any_of(extremes.begin(), extremes.end(), [&](const VideoTransform& t) {
+                            return geometry::needsAlpha(p.crop, t, video, source.hasAlpha);
+                        });
     job.alpha = formatHasAlpha(p.output.format) && (p.output.alpha == A::On || (p.output.alpha == A::Auto && needed));
     job.background = QColor(p.output.background);
     job.plan = LoopPlan::of(job.loop, job.range.in, job.range.out, job.fps);

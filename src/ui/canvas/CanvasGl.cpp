@@ -1,6 +1,7 @@
 // The canvas's OpenGL 3.3 drawing (spec §3.6; AVADR-0001): the scene's background, a checkerboard under the video
-// where it is transparent, the video as a mipmapped premultiplied texture through the shared transform shader. Without
-// OpenGL 3.3 the same picture is drawn by QPainter.
+// where it is transparent, the video as a mipmapped premultiplied texture through the shared transform shader, the
+// clip effects on it (D-017: the colour by a 3D table of ClipEffects::colour). Without OpenGL 3.3 the same picture is
+// drawn by QPainter, the effects made on the CPU.
 #include "core/Project.h"
 #include "render/Shaders.h"
 #include "ui/canvas/Canvas.h"
@@ -19,7 +20,12 @@
 #include <QOpenGLVertexArrayObject>
 #include <QPainter>
 
+#include <QVector2D>
+
+#include <algorithm>
 #include <array>
+#include <cmath>
+#include <vector>
 
 namespace avloop {
 
@@ -31,6 +37,37 @@ const QColor kCheckLight(0x3A, 0x3A, 0x3A);
 
 QVector4D rgba(const QColor& c) {
     return QVector4D(c.redF(), c.greenF(), c.blueF(), c.alphaF());
+}
+
+constexpr int kLut = 64; // the colour table's points along each axis
+
+// ClipEffects::colour on a kLut³ grid: red along x, green along y, blue along z.
+std::vector<float> colourTable(const ClipEffects& e) {
+    const effects::Colour colour(e);
+    std::vector<float> t(std::size_t(kLut) * kLut * kLut * 4);
+    std::size_t i = 0;
+    for (int b = 0; b < kLut; ++b)
+        for (int g = 0; g < kLut; ++g)
+            for (int r = 0; r < kLut; ++r) {
+                float rgb[3] = {float(r) / (kLut - 1), float(g) / (kLut - 1), float(b) / (kLut - 1)};
+                colour(rgb);
+                t[i++] = rgb[0];
+                t[i++] = rgb[1];
+                t[i++] = rgb[2];
+                t[i++] = 1;
+            }
+    return t;
+}
+
+// What of the effects the table holds: a change to the others leaves it as it is.
+std::uint64_t colourKey(const ClipEffects& e) {
+    ClipEffects c = e;
+    c.posterize = 0;
+    c.vignette = 0;
+    c.opacity = 100;
+    c.sharpen = 0;
+    c.blur = 0;
+    return c.key();
 }
 
 } // namespace
@@ -153,10 +190,11 @@ void Canvas::paintScene() {
         gl_->texture.bind();
         gl_->texture.setUniformValue("uMatrix", m);
         gl_->texture.setUniformValue("uTex", 0);
-        gl_->texture.setUniformValue("uOpacity", 1.0f);
+        setEffectUniforms();
         gl_->tex->bind(0);
         f->glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
         gl_->tex->release(0);
+        if (gl_->lut) gl_->lut->release(1);
         gl_->texture.release();
         f->glDisable(GL_BLEND);
     }
@@ -164,13 +202,60 @@ void Canvas::paintScene() {
     gl_->vao.release();
 }
 
+void Canvas::setEffectUniforms() {
+    QOpenGLShaderProgram& p = gl_->texture;
+    const ClipEffects& e = project_->effects();
+    const bool on = !e.isNeutral();
+    p.setUniformValue("uLut", 1); // a unit of its own even when unused: two sampler types never share one
+    p.setUniformValue("uEffects", GLint(on));
+    p.setUniformValue("uOpacity", on ? float(e.opacity / 100) : 1.0f);
+    if (!on) return;
+    const bool colour = e.changesColour();
+    if (colour && (!gl_->lut || gl_->lutKey != colourKey(e))) {
+        if (!gl_->lut) {
+            gl_->lut = std::make_unique<QOpenGLTexture>(QOpenGLTexture::Target3D);
+            gl_->lut->setFormat(QOpenGLTexture::RGBA16F);
+            gl_->lut->setSize(kLut, kLut, kLut);
+            gl_->lut->setMipLevels(1);
+            gl_->lut->allocateStorage(QOpenGLTexture::RGBA, QOpenGLTexture::Float32);
+            gl_->lut->setWrapMode(QOpenGLTexture::ClampToEdge);
+            gl_->lut->setMinMagFilters(QOpenGLTexture::Linear, QOpenGLTexture::Linear);
+        }
+        const std::vector<float> table = colourTable(e);
+        gl_->lut->setData(QOpenGLTexture::RGBA, QOpenGLTexture::Float32, table.data());
+        gl_->lutKey = colourKey(e);
+    }
+    if (colour) gl_->lut->bind(1);
+    p.setUniformValue("uColour", GLint(colour));
+    p.setUniformValue("uLutSize", float(kLut));
+    p.setUniformValue("uLevels", GLint(e.posterize));
+    p.setUniformValue("uVignette", float(e.vignette / 100));
+    p.setUniformValue("uVignetteInner", float(0.7 * e.vignetteSize / 100));
+    p.setUniformValue("uTexel", QVector2D(1.f / float(frame_.width), 1.f / float(frame_.height)));
+    // Blur and sharpen in the texture's pixels; sharpen's soft picture is of the blurred one: the two σ together.
+    const double px = project_->source().width > 0 ? double(frame_.width) / project_->source().width : 1.0;
+    const double blur = e.blurSigma() * px;
+    const double sharp = std::max(0.5, ClipEffects::kSharpenSigma * px);
+    p.setUniformValue("uBlur", float(blur));
+    p.setUniformValue("uSoft", float(std::sqrt(blur * blur + sharp * sharp)));
+    p.setUniformValue("uSharpen", float(e.sharpen / 100 * 2));
+}
+
 void Canvas::paintFallback() {
     if (!project_->source().isValid() || frame_.isNull()) return;
+    const ClipEffects& e = project_->effects();
+    if (fallbackFrom_.data != frame_.data || fallbackKey_ != e.key()) {
+        const double px = double(frame_.width) / std::max(1, project_->source().width);
+        fallbackFrame_ = fallbackPass_.apply(e, frame_, px);
+        fallbackFrom_ = frame_;
+        fallbackKey_ = e.key();
+    }
+    const media::Frame& shown = fallbackFrame_;
     QPainter p(this);
     p.setRenderHint(QPainter::SmoothPixmapTransform);
     const VideoTransform& t = project_->transform();
     const QRectF target = sceneToView(videoRect());
-    const QImage image(frame_.data.get(), frame_.width, frame_.height, frame_.stride,
+    const QImage image(shown.data.get(), shown.width, shown.height, shown.stride,
                        QImage::Format_RGBA8888_Premultiplied);
     p.translate(target.center());
     p.scale(t.flipH ? -1 : 1, t.flipV ? -1 : 1);

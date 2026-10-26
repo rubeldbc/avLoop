@@ -2,13 +2,13 @@
   "programId": "AVLOOP",
   "programmeVersion": "1.0.0",
   "generatedBy": "control/phase-tools/sync-progress.mjs",
-  "generatedAt": "2026-10-26T19:36:56.772Z",
+  "generatedAt": "2026-10-26T20:14:16.935Z",
   "state": "COMPLETE",
   "activePhase": null,
   "nextEligiblePhase": null,
-  "lastCompletedPhase": "AV-018",
-  "completed": 18,
-  "total": 18,
+  "lastCompletedPhase": "AV-019",
+  "completed": 19,
+  "total": 19,
   "blocked": [],
   "deferred": [],
   "branch": "main",
@@ -467,7 +467,9 @@
       "dependsOn": [
         "AV-017"
       ],
-      "unlocks": [],
+      "unlocks": [
+        "AV-019"
+      ],
       "requirements": [
         "REQ-AV-023"
       ],
@@ -476,6 +478,27 @@
       "ownerItem": 16,
       "file": "phases/AV-018-the-wheel-and-the-keyframe-copy.md",
       "record": "execution/AV-018-EXECUTION.md"
+    },
+    {
+      "id": "AV-019",
+      "title": "The clip effects",
+      "status": "DONE",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-018"
+      ],
+      "unlocks": [],
+      "requirements": [
+        "REQ-AV-024"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 900,
+      "ownerItem": 17,
+      "file": "phases/AV-019-the-clip-effects.md",
+      "record": "execution/AV-019-EXECUTION.md"
     }
   ]
 }

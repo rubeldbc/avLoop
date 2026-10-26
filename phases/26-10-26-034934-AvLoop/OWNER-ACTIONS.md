@@ -43,3 +43,5 @@ read and open for a veto later; an answer that differs changes the reading in it
 | 34 | **R-59 … R-62** What keeps "AvLoop"; About's details; the gate's one address; 1.0.1 and its Release. | `README.md` §3 59 … 62; AV-017. | Decided by the agent (AV-017); open for a veto — the Release `v1.0.1` goes by `gh release delete v1.0.1` |
 | 35 | **Item 16**: the canvas's wheel zooms about the pointer; Alt+drag copies a keyframe. | AV-018 (late). | **Given 2026-10-27** — the owner's words (`README.md` §1) |
 | 36 | **R-63 … R-65** Ctrl+wheel kept, up/down panning by the wheel gone, the timeline's wheel unchanged; the copy one Undo step; no Release. | `README.md` §3 63 … 65; AV-018. | Decided by the agent (AV-018); open for a veto |
+| 37 | **Item 17**: the Clip effects section — colour correction and looks before export. | AV-019 (late). | **Given 2026-10-27** — the owner's words (`README.md` §1) |
+| 38 | **R-66 … R-70** Which effects; made on the CPU for the output, a close look on the canvas; the file's version 2; Opacity and Alpha; the section's place. | `README.md` §3 66 … 70; AV-019. | Decided by the agent (AV-019); open for a veto |

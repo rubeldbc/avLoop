@@ -20,11 +20,13 @@ void Project::setSource(const SourceInfo& source) {
     keyframes_.clear();
     current_ = transform_;
     crop_ = CropShape{};
+    effects_ = ClipEffects{};
     undo_.clear();
     emit changed(Aspect::Source);
     emit changed(Aspect::Range);
     emit changed(Aspect::Transform);
     emit changed(Aspect::Crop);
+    emit changed(Aspect::Effects);
 }
 
 ProjectData Project::snapshot() const {
@@ -37,6 +39,7 @@ ProjectData Project::snapshot() const {
     d.transform = transform_;
     d.keyframes = keyframes_;
     d.crop = crop_;
+    d.effects = effects_;
     d.view = view_;
     d.exportPath = exportPath_;
     d.original = extra_;
@@ -53,6 +56,7 @@ void Project::restore(const ProjectData& data) {
     keyframes_ = data.keyframes;
     current_ = transformAt(time_);
     crop_ = data.crop.clamped();
+    effects_ = data.effects.clamped();
     view_ = data.view;
     exportPath_ = data.exportPath;
     extra_ = data.original;
@@ -65,6 +69,7 @@ void Project::restore(const ProjectData& data) {
     emit changed(Aspect::Loop);
     emit changed(Aspect::Output);
     emit changed(Aspect::Quality);
+    emit changed(Aspect::Effects);
     emit changed(Aspect::View);
 }
 
@@ -81,6 +86,7 @@ bool Project::outputAlpha() const {
     using A = OutputSettings::Alpha;
     if (!formatHasAlpha(output_.format)) return false; // MP4: the Background under
     if (output_.alpha != A::Auto) return output_.alpha == A::On;
+    if (effects_.on && effects_.opacity < 100) return true; // the clip made see-through
     // Auto: alpha when the video leaves the output partly clear at any keyframe (between them it never goes further).
     for (const VideoTransform& t : keyframes::extremes(keyframes_, transform_))
         if (geometry::needsAlpha(crop_, t, source_.size(), source_.hasAlpha)) return true;
@@ -258,6 +264,19 @@ void Project::changeQuality(const QualitySettings& after, const QString& mergeKe
     undo_.push(new SetQualityCommand(
         SetQualityId, tr("Change the quality"), quality_, after, [this](const QualitySettings& q) { applyQuality(q); },
         mergeKey));
+}
+
+void Project::changeEffects(const ClipEffects& after, const QString& mergeKey) {
+    const ClipEffects target = after.clamped();
+    if (target == effects_) return;
+    undo_.push(new SetEffectsCommand(
+        SetEffectsId, tr("Change the clip effects"), effects_, target,
+        [this](const ClipEffects& e) { applyEffects(e); }, mergeKey));
+}
+
+void Project::applyEffects(const ClipEffects& e) {
+    effects_ = e;
+    emit changed(Aspect::Effects);
 }
 
 void Project::applyQuality(const QualitySettings& q) {

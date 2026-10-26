@@ -2,7 +2,7 @@
 
 Reserved numbers, newest first in `docs/SPEC.md` §0 when taken — delivered behaviour only. AvLoop's series starts at
 D-001: **D-001 … D-014 are this programme's, reserved 2026-10-26 as the fourteen items were planned**, one an item; D-015
-the late fifteenth (AV-017); D-016 the late sixteenth (AV-018). Two
+the late fifteenth (AV-017); D-016 the late sixteenth (AV-018); D-017 the late seventeenth (AV-019). Two
 ADRs are owed: **AVADR-0001** (one renderer, GPU/CPU parity), accepted by AV-007 before the code it governs, and
 **AVADR-0002** (memory budgets and caches), accepted by AV-002. The readings (`README.md` §3) are listed after the
 D-numbers; each is the agent's decision under autonomous mode, open for the owner's veto.
@@ -25,6 +25,7 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | D-014 | **The installer**: Inno Setup 6, `.avloop` association, no signing. | "No code signing. Windows only." | AV-014 |
 | D-015 | **The name and the About box** (late): "AvLoop by Rubel" shown in the app, its executable and its installer; the About box with the developer and the ways to reach them; version 1.0.1. | "The applicaiton name will be AvLoop by Rubel. There will be a about section where my information will be available." | AV-017 |
 | D-016 | **The wheel and the keyframe copy** (late): the wheel zooms the canvas about the pointer; Alt+drag on the timeline copies a keyframe. | "mouse wheen move will zoom in out targeted to the mous pointer area in canvas"; "alt drag will copy a keyframe in time line" | AV-018 |
+| D-017 | **The clip effects** (late): a Clip effects section — light, colour, creative and detail effects on the clip, the same on the canvas, in the Preview and in every export; the project file's version 2. | "add a righ side group, Clip effects. where a lots of clip effect could be applied to the clip to change or color correction the clip before export" | AV-019 |
 
 ## The readings (the agent's decisions)
 
@@ -95,3 +96,8 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-63 | The canvas's wheel zooms about the pointer, Ctrl or not, a step a notch; Shift/sideways pans across; the timeline's wheel unchanged | the owner's words name the canvas | `README.md` §3; AV-018 |
 | R-64 | Alt+drag copies a keyframe, one Undo step; a refused drag keeps its own keyframe | After Effects' and Premiere's Alt+drag | `README.md` §3; AV-018 |
 | R-65 | No new version, no Release for item 16 | a Release is published only when asked or at a checkpoint | `README.md` §3; AV-018 |
+| R-66 | Eighteen effects in four groups, On and Reset; not keyframed; not in presets | an editor's basic correction and looks | `README.md` §3; AV-019 |
+| R-67 | The output's effects on the CPU before both back ends; the canvas a close GPU look | AVADR-0001's parity kept; a live canvas | `README.md` §3; AV-019 |
+| R-68 | The file's version 2; 1.0.1 refuses it with its message | never drop the effects silently | `README.md` §3; AV-019 |
+| R-69 | Opacity < 100 % turns Alpha Auto on; thumbnails and the Finder read the source | see-through needs alpha; they find frames | `README.md` §3; AV-019 |
+| R-70 | The fifth section, after Quality, open; British words; no Release | the four before keep their places | `README.md` §3; AV-019 |

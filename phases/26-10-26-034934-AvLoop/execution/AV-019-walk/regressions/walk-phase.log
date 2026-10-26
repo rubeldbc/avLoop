@@ -1,0 +1,18 @@
+PASSED walk-shell.json (8 s)
+PASSED walk-selection.json (11 s)
+PASSED walk-preview.json (17 s)
+PASSED walk-settings.json (10 s)
+PASSED walk-batch.json (37 s)
+PHASE WALKS PASSED
+PASSED walk-render.mjs (23 s)
+PHASE WALKS PASSED
+PASSED walk-project.mjs (16 s)
+FAILED walk-recover.mjs (12 s)
+   FAIL Recover: the project back, unsaved: FAIL expect window.title: AvLoop by Rubel — counter-640p30.mp4* (wanted = AvLoop — counter-640p30.mp4*)
+PHASE WALKS FAILED: 1
+PASSED walk-keyframes.mjs (5 s)
+PHASE WALKS PASSED
+PASSED walk-formats.mjs (12 s)
+PHASE WALKS PASSED
+PASSED walk-recover.mjs (12 s)
+PHASE WALKS PASSED

@@ -1,5 +1,6 @@
-// GPU/CPU parity (AVADR-0001, spec §3.6): every unit case within 2/255 per channel; three projects — a Rect crop, an
-// Ellipse with Feather, a Crossfade — frame by frame within a mean of 1.0 and a maximum of 4. Without an OpenGL 3.3
+// GPU/CPU parity (AVADR-0001, spec §3.6): every unit case within 2/255 per channel; four projects — a Rect crop, an
+// Ellipse with Feather, a Crossfade, clip effects (D-017) — frame by frame within a mean of 1.0 and a maximum of 4; one
+// shared GPU context draws a second look of the same frames, never the first one's textures. Without an OpenGL 3.3
 // context the test says so and is skipped (CI; Remote Desktop).
 #include "RenderCases.h"
 #include "Samples.h"
@@ -71,6 +72,7 @@ private slots:
         QTest::newRow("Rect crop") << 0;
         QTest::newRow("Ellipse + Feather") << 1;
         QTest::newRow("Crossfade") << 2;
+        QTest::newRow("Clip effects") << 3;
     }
     void projects() {
         AVLOOP_NEED_SAMPLE(QStringLiteral("counter-640p30.mp4"));
@@ -89,6 +91,14 @@ private slots:
             p.loop.fade = 0.5;
             p.transform.flipH = true;
         }
+        if (which == 3) {
+            p.effects.exposure = 0.7;
+            p.effects.hue = 40;
+            p.effects.vignette = 60;
+            p.effects.blur = 3;
+            p.effects.sharpen = 40;
+            p.effects.opacity = 80;
+        }
         const auto probed = media::MediaProbe::probe(p.source.path);
         QVERIFY(probed.info);
         const render::RenderJob job = render::RenderJob::of(p, *probed.info);
@@ -106,6 +116,28 @@ private slots:
             QVERIFY2(d.mean <= 1.0 && d.max <= 4,
                      qPrintable(QStringLiteral("frame %1: mean %2 max %3").arg(k).arg(d.mean).arg(d.max)));
         }
+    }
+    void sharedContextLooks() {
+        AVLOOP_NEED_SAMPLE(QStringLiteral("counter-640p30.mp4"));
+        ProjectData p = project(QStringLiteral("counter-640p30.mp4"));
+        const auto probed = media::MediaProbe::probe(p.source.path);
+        QVERIFY(probed.info);
+        render::GlRenderer shared;
+        QVERIFY(shared.init());
+        const render::RenderJob plain = render::RenderJob::of(p, *probed.info);
+        p.effects.invert = true;
+        const render::RenderJob inverted = render::RenderJob::of(p, *probed.info);
+        render::FrameRenderer first(plain, nullptr, true, &shared);
+        render::FrameRenderer second(inverted, nullptr, true, &shared);
+        render::FrameRenderer cpu(inverted, nullptr, false);
+        QVERIFY(first.open() && second.open() && cpu.open());
+        QImage a, b, c;
+        QVERIFY(first.render(0, a));
+        QVERIFY(second.render(0, b)); // the same source frame, another look: not the pooled texture
+        QVERIFY(cpu.render(0, c));
+        QVERIFY(diff(a, b).mean > 20);
+        const Diff d = diff(b, c);
+        QVERIFY2(d.max <= 4, qPrintable(QStringLiteral("max %1").arg(d.max)));
     }
 };
 

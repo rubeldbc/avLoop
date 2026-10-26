@@ -83,6 +83,7 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
         {QStringLiteral("feather"), d.crop.feather},
     };
     root.insert(QStringLiteral("crop"), merged(d.original, QStringLiteral("crop"), crop));
+    root.insert(QStringLiteral("effects"), merged(d.original, QStringLiteral("effects"), d.effects.toJson()));
 
     QJsonObject view{
         {QStringLiteral("zoom"), d.view.zoom},
@@ -149,6 +150,7 @@ bool fromJson(const QJsonObject& read, ProjectData& d, QString* error, const QSt
     d.crop.radius = c.value(QStringLiteral("radius")).toDouble();
     d.crop.feather = c.value(QStringLiteral("feather")).toDouble();
     d.crop = d.crop.clamped();
+    d.effects = ClipEffects::fromJson(json.value(QStringLiteral("effects")).toObject());
 
     const QJsonObject v = json.value(QStringLiteral("view")).toObject();
     d.view.zoom = v.value(QStringLiteral("zoom")).toDouble(1.0);

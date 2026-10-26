@@ -6,6 +6,29 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-017 — The clip effects (AV-019, late, 2026-10-27)
+
+- The side panel's fifth section, "Clip effects" (after Quality, open by default): On and Reset; Light — Exposure
+  (−4 … 4 EV), Contrast, Highlights, Shadows, Whites, Blacks (−100 … 100); Colour — Temperature, Tint, Vibrance
+  (−100 … 100), Saturation (0 … 200 %), Hue (−180 … 180°); Creative — Sepia (0 … 100 %), Invert, Posterize (Off,
+  2 … 32 levels), Vignette (−100 … 100) and Vignette size (0 … 100), Opacity (0 … 100 %); Detail — Sharpen (0 … 100),
+  Blur (0 … 100 px). The maths: `control/20_SHAPES_THE_CLIP_EFFECTS.md` §1 (R-66). §1.3's "colour correction" is
+  built by this.
+- Order: blur, sharpen (premultiplied), then each pixel straight — exposure and white balance in linear light,
+  contrast, the tones, hue, saturation and vibrance, sepia, invert, posterize, the vignette (at the clip's own
+  coordinates), the opacity. Not keyframed; On off keeps the values and applies none; neutral leaves every byte.
+- The Preview (Live and Encoded), every export, the batch and avloop-cli: `EffectsPass` on each source frame at the
+  working size before the GPU or the CPU back end — they agree by construction; the GPU's texture pool is keyed by the
+  look too (R-67). The canvas: the same effects by its shader (a 64³ colour table, Gaussian taps), a close look; the
+  QPainter fallback draws the pass's frame. The thumbnails and the Loop Finder read the source as it is (R-69).
+- The project: `"effects"` (every value's key, `on`), version 2; a version-1 file opens without effects; 1.0.1
+  refuses a version-2 file with its message (R-68). One Undo step a field ("Change the clip effects"), typing or the
+  wheel in one field merging; a new video starts with none; presets do not carry them. Alpha Auto is on when Opacity
+  is under 100 % (R-69).
+- Mended on the way: quitting with the Preview open crashed on the way out (the Preview outlived the render service
+  it used; the main window now closes it first); AV-010's recovery walk read the window title of before AV-017.
+- Probes `effects.summary`, `effects.on`. No new version (R-70).
+
 ### D-016 — The wheel and the keyframe copy (AV-018, late, 2026-10-27)
 
 - The canvas's wheel, with Ctrl or without, zooms about the pointer: the scene point under it stays under it. One

@@ -3,6 +3,7 @@
 #include "core/TimeMap.h"
 #include "media/Interpolator.h"
 #include "render/CpuRenderer.h"
+#include "render/EffectsPass.h"
 #include "render/MaskBuilder.h"
 #include "render/RenderJob.h"
 
@@ -65,6 +66,8 @@ private:
     GlRenderer* gl_ = nullptr; // ownGl_, or a shared one
     CpuRenderer cpu_;
     MaskBuilder masks_;
+    EffectsPass effects_;
+    double effectsScale_ = 1; // working px a source px
     QImage mask_;
     std::unique_ptr<media::Decoder> decoders_[2];
     FrameTimes times_;
@@ -75,7 +78,7 @@ private:
         double seconds = -1;
         media::Frame frame;
     };
-    Cached recent_[8]; // the last frames decoded: a blend's frames come up more than once
+    Cached recent_[8]; // the last frames decoded (the clip effects applied): a blend's frames come up more than once
     int recentNext_ = 0;
 };
 

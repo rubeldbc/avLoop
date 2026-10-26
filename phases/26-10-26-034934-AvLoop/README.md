@@ -51,10 +51,13 @@ Added by the owner on 2026-10-27, item 16, verbatim: *"mouse wheen move will zoo
 area in canvas"*; then, while it was being built, *"alt drag will copy a keyframe in time line"*. Two wishes of one
 sitting: one item, one late phase.
 
+Added by the owner on 2026-10-27, item 17, verbatim: *"add a righ side group, Clip effects. where a lots of clip effect
+could be applied to the clip to change or color correction the clip before export"*.
+
 ## 2. The items
 
-Sixteen, in two tracks; a checkpoint closes each track. The fifteenth and the sixteenth came after both had closed:
-late phases.
+Seventeen, in two tracks; a checkpoint closes each track. The fifteenth to the seventeenth came after both had
+closed: late phases.
 
 | # | Item | What it gives |
 | --- | --- | --- |
@@ -74,6 +77,7 @@ late phases.
 | 14 | **The installer** (AV-014) | an Inno Setup installer with the `.avloop` association |
 | 15 | **The name and the About box** (AV-017, late) | "AvLoop by Rubel" in the app, its executable and its installer; the About box with the developer and the ways to reach them |
 | 16 | **The wheel and the keyframe copy** (AV-018, late) | the wheel zooms the canvas about the pointer; Alt+drag on the timeline copies a keyframe |
+| 17 | **The clip effects** (AV-019, late) | a Clip effects section: light, colour, creative and detail effects on the clip, on the canvas, in the Preview and in every export |
 
 Checkpoints: CP-A1 (AV-015) walks track A on one fresh build; CP-B1 (AV-016) walks the whole, installed, and makes
 the GitHub Release `v1.0.0`.
@@ -221,12 +225,28 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
     where another keyframe is; one Undo step, "Copy a keyframe"; Alt+click alone copies nothing. A drag refused over
     another keyframe now keeps its own (AV-011's drag picked the other one up).
 65. **R-65** No new version and no Release for item 16: main runs ahead of `v1.0.1` until the next Release carries it.
+66. **R-66** "Lots of clip effects" read as eighteen values in four groups, as an editor's basic correction and looks:
+    Light (Exposure, Contrast, Highlights, Shadows, Whites, Blacks), Colour (Temperature, Tint, Saturation, Vibrance,
+    Hue), Creative (Sepia, Invert, Posterize, Vignette and its size, Opacity), Detail (Sharpen, Blur); with On (off
+    keeps the values, shows the clip as it is) and Reset. Constant over the clip, not keyframed; a new video starts
+    with none; presets keep Loop, Output and Quality only.
+67. **R-67** The output's effects are made on the CPU on each source frame before either back end draws it, so the
+    GPU and the CPU agree by construction (AVADR-0001 kept): Blur is three box passes each way (σ = radius / 2, the
+    edges held, so an opaque clip stays opaque), Sharpen an unsharp mask of σ 1 source px. The canvas draws a close
+    look on the GPU (a 64³ colour table, 7 × 7-tap Gaussians) so editing stays live at any size; the Preview is exact.
+68. **R-68** The project file's version 2 carries `"effects"`; a version-1 file opens without effects; AvLoop 1.0.1
+    refuses a version-2 file with its "saved by a newer AvLoop" message rather than drop the effects silently.
+69. **R-69** Opacity under 100 % turns Alpha Auto on (the clip is see-through). The timeline's thumbnails and the Loop
+    Finder read the source as it is: they find frames, not looks.
+70. **R-70** The section is the fifth, "Clip effects", after Quality and open by default — it is long, and the four
+    before it keep their places; its words in the app's British English ("Colour"). No new version and no Release
+    (as R-65).
 
 ## 4. What is not built
 
 - Audio: no audio is decoded, played or exported. Output above 1080p.
-- A video rotation tool (rotation metadata is only corrected), colour correction, text or stickers, multiple video
-  layers. Multiple crop areas at once; keyframes of the crop frame.
+- A video rotation tool (rotation metadata is only corrected), text or stickers, multiple video layers. (Colour
+  correction came with item 17.) Multiple crop areas at once; keyframes of the crop frame.
 - macOS or Linux builds, an auto-updater, licence keys, telemetry. Code signing.
 - Anything the specification does not name.
 

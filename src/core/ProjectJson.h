@@ -18,16 +18,18 @@ struct ProjectData {
     VideoTransform transform;
     Keyframes keyframes; // "transform": {"keyframes": […]} (spec §11.1)
     CropShape crop;
+    ClipEffects effects; // "effects" (version 2)
     ViewState view;
     QString exportPath;   // "export": {"lastPath"} — the last file this project was exported to
     QJsonObject original; // the JSON as read: unknown keys are written back unchanged (spec §11.1)
 };
 
-// The `.avloop` file (spec §11.1): UTF-8 JSON, "format": "avloop", "version": 1; times in seconds, geometry in scene
-// px. Keys are never renamed (spec §2.7); a format change bumps the version with a migration (AV-010).
+// The `.avloop` file (spec §11.1): UTF-8 JSON, "format": "avloop", "version": 2 (2 added the clip's effects); times in
+// seconds, geometry in scene px. Keys are never renamed (spec §2.7); a format change bumps the version with a
+// migration (AV-010).
 namespace projectjson {
 
-constexpr int kVersion = 1;
+constexpr int kVersion = 2;
 
 QJsonObject toJson(const ProjectData& data, const QString& projectPath = {});
 // Fails on another format or a newer version, with a message that says so; an older one is brought up to date

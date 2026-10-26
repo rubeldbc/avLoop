@@ -3,9 +3,9 @@
 
 Canonical current execution state: `../AUTONOMOUS_STATE.md`
 
-Phases: **18** · done: **18** · state: **COMPLETE** · generated: 2026-10-26T19:36:56.772Z
+Phases: **19** · done: **19** · state: **COMPLETE** · generated: 2026-10-26T20:14:16.935Z
 
-Tracks: A The loop maker — the ground, the media, the canvas and the Selection, the crop tools, the timeline, the loop engine, the renderer, the preview window, the export, the project and the settings · B The extras — the keyframes, the loop finder, the batch and the other formats, the installer, the name and the About box, the wheel and the keyframe copy
+Tracks: A The loop maker — the ground, the media, the canvas and the Selection, the crop tools, the timeline, the loop engine, the renderer, the preview window, the export, the project and the settings · B The extras — the keyframes, the loop finder, the batch and the other formats, the installer, the name and the About box, the wheel and the keyframe copy, the clip effects
 
 "Item" is the owner's numbered item the phase implements (`../README.md` §1).
 
@@ -29,3 +29,4 @@ Tracks: A The loop maker — the ground, the media, the canvas and the Selection
 | AV-016 | 0 | B | CP-B1 | DONE | High | verify-env | **CP-B1 the whole walked** | AV-011, AV-012, AV-013, AV-014, AV-015 |
 | AV-017 | 15 | B | CP-B1 | DONE | Low | verify-env | The name and the About box | AV-016 |
 | AV-018 | 16 | B | CP-B1 | DONE | Low | verify-env | The wheel and the keyframe copy | AV-017 |
+| AV-019 | 17 | B | CP-B1 | DONE | Medium | verify-env | The clip effects | AV-018 |

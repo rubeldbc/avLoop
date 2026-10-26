@@ -43,7 +43,7 @@ private slots:
         QCOMPARE(back.source.modified, d.source.modified);
         const QJsonObject json = projectjson::toJson(d);
         QCOMPARE(json.value(QStringLiteral("format")).toString(), QStringLiteral("avloop"));
-        QCOMPARE(json.value(QStringLiteral("version")).toInt(), 1);
+        QCOMPARE(json.value(QStringLiteral("version")).toInt(), 2);
         QCOMPARE(json.value(QStringLiteral("source")).toObject().value(QStringLiteral("mtime")).toString(),
                  QStringLiteral("2026-10-26T10:12:00Z"));
     }
@@ -76,8 +76,8 @@ private slots:
         QCOMPARE(plain.output.background, QStringLiteral("#000000"));
         QVERIFY(plain.output.lockRatio);
     }
-    // Spec §11.1: ProjectMigrate — a file without a version (version 0) reads as the first format and is written as
-    // version 1; a newer one is refused with the message that says so.
+    // Spec §11.1: ProjectMigrate — a file without a version (version 0) or of version 1 reads as written, without clip
+    // effects, and is written as version 2; a newer one is refused with the message that says so.
     void migration() {
         QJsonObject old = projectjson::toJson(sample(QStringLiteral("D:/a.mp4")));
         old.remove(QStringLiteral("version"));
@@ -85,7 +85,13 @@ private slots:
         QString error;
         QVERIFY2(projectjson::fromJson(old, back, &error), qPrintable(error));
         QCOMPARE(back.transform.scale, 1.25);
-        QCOMPARE(projectjson::toJson(back).value(QStringLiteral("version")).toInt(), 1);
+        QCOMPARE(projectjson::toJson(back).value(QStringLiteral("version")).toInt(), 2);
+        QVERIFY(back.effects.isNeutral());
+        QJsonObject one = old;
+        one.insert(QStringLiteral("version"), 1);
+        one.remove(QStringLiteral("effects"));
+        QVERIFY2(projectjson::fromJson(one, back, &error), qPrintable(error));
+        QCOMPARE(back.effects, ClipEffects{});
         QJsonObject newer = old;
         newer.insert(QStringLiteral("version"), 7);
         QVERIFY(!projectjson::fromJson(newer, back, &error));

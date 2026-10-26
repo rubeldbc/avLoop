@@ -51,6 +51,7 @@ bool FrameRenderer::open(QString* error) {
         times_ = FrameTimes::constant(rate, std::max<std::int64_t>(1, frames));
     }
     if (!job_.crop.isEmpty()) mask_ = masks_.mask(job_.crop, job_.outputSize);
+    effectsScale_ = job_.source.width > 0 ? double(job_.workingSize.width()) / job_.source.width : 1.0;
     backend_ = Backend::Cpu;
     if (gl_) {
         if (gl_->ready() || gl_->init(&gpuNote_))
@@ -88,7 +89,7 @@ media::Frame FrameRenderer::sourceFrame(double seconds, int lane) {
     }
     media::Decoder* d = decoders_[lane] ? decoders_[lane].get() : decoders_[0].get();
     // The frame starting at `seconds` (a hair later, so rounding to the stream's time base cannot fall short).
-    const media::Frame f = d->frameAt(seconds + kSameFrame);
+    const media::Frame f = effects_.apply(job_.effects, d->frameAt(seconds + kSameFrame), effectsScale_);
     recent_[recentNext_] = {seconds, f};
     recentNext_ = (recentNext_ + 1) % 8;
     return f;
@@ -110,12 +111,14 @@ bool FrameRenderer::compose(int k, Composite& c, QString* error) {
     c.mask = mask_.isNull() ? nullptr : &mask_;
     c.alpha = job_.alpha;
     c.background = job_.background;
+    c.look = job_.effects.key();
     // One segment frame's source frames, at its share of the blend; the loop's partner frame on the second lane.
     auto add = [&](int i, double weight, int lane) -> bool {
         if (weight <= 0) return true;
         if (job_.loop.method == LoopSettings::Method::Motion) {
             media::Frame f = motion_ ? motion_->frame(motionJob_, i) : media::Frame{};
             if (f.isNull()) return false;
+            f = effects_.apply(job_.effects, f, effectsScale_);
             f.pts = -1 - i; // its own key in the GPU's texture pool
             c.layers.append({f, weight, placeAt(job_.tau(i))});
             return true;

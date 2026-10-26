@@ -69,6 +69,16 @@
     { "do": "key", "keys": "Ctrl+,", "on": "MainWindow" },
     { "do": "key", "keys": "Ctrl+Tab", "on": "settings.tabs" },
     { "do": "shot", "on": "SettingsDialog", "file": "settings.png" },
-    { "do": "click", "on": "settings.close" }
+    { "do": "click", "on": "settings.close" },
+
+    { "label": "Clip effects: a warmer, livelier look with a vignette — the canvas and the section" },
+    { "do": "type", "on": "panel.effects.exposure", "text": "0.3" },
+    { "do": "type", "on": "panel.effects.contrast", "text": "15" },
+    { "do": "type", "on": "panel.effects.temperature", "text": "35" },
+    { "do": "type", "on": "panel.effects.vibrance", "text": "40" },
+    { "do": "type", "on": "panel.effects.vignette", "text": "45" },
+    { "do": "wait", "ms": 300 },
+    { "do": "shot", "on": "CanvasArea", "file": "clip-effects.png", "maxWidth": 1100 },
+    { "do": "shot", "on": "Section.effects", "file": "clip-effects-panel.png" }
   ]
 }

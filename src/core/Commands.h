@@ -61,6 +61,7 @@ enum CommandId {
     AddKeyframeId,
     MoveKeyframeId,
     DeleteKeyframeId,
+    SetEffectsId,
 };
 
 using SetTransformCommand = ValueCommand<VideoTransform>;
@@ -70,5 +71,6 @@ using SetLoopCommand = ValueCommand<LoopSettings>;
 using SetOutputCommand = ValueCommand<OutputSettings>;
 using SetQualityCommand = ValueCommand<QualitySettings>;
 using SetKeyframesCommand = ValueCommand<Keyframes>; // AddKeyframe, MoveKeyframe, DeleteKeyframe by their ids
+using SetEffectsCommand = ValueCommand<ClipEffects>;
 
 } // namespace avloop
