@@ -19,10 +19,10 @@ crop — a rectangle, a rounded rectangle or an ellipse) of any video, and AvLoo
 WebM with transparency**, sized for OBS's Media Source — up to 1080p, with crossfade or ping-pong loops, adjustable
 frame rate and quality, and a preview that shows exactly what will be exported. GIF, APNG, MP4 and ProRes 4444 too.
 
-> **v1.0.1** — every item of the specification is built and walked
-> ([the plan](phases/26-10-26-034934-AvLoop/README.md) and its execution records); the app is shown as *AvLoop by
-> Rubel*, with an About box that names its developer.
-> **[Download the installer](https://github.com/rubeldbc/avLoop/releases/tag/v1.0.1)** for Windows 10/11 x64.
+> **v1.1.0** — every item of the specification is built and walked
+> ([the plan](phases/26-10-26-034934-AvLoop/README.md) and its execution records); new since 1.0.1: clip effects and
+> colour-theme effects (an orange clip made red), the wheel zooming about the pointer, and Alt+drag keyframe copies.
+> **[Download the installer](https://github.com/rubeldbc/avLoop/releases/tag/v1.1.0)** for Windows 10/11 x64.
 
 ## Features
 
@@ -164,9 +164,10 @@ WebM is the format for OBS. MOV ProRes 4444 keeps the alpha too, at many times t
 
 ## Download and install
 
-Download `AvLoop-1.0.1-setup.exe` (about 45 MB) from the
-[v1.0.1 release](https://github.com/rubeldbc/avLoop/releases/tag/v1.0.1) — its SHA-256 is beside it — and run it.
-It installs as *AvLoop by Rubel*; installed over 1.0.0, it keeps your settings and replaces the old shortcuts.
+Download `AvLoop-1.1.0-setup.exe` (about 45 MB) from the
+[v1.1.0 release](https://github.com/rubeldbc/avLoop/releases/tag/v1.1.0) — its SHA-256 is beside it — and run it.
+It installs as *AvLoop by Rubel*; installed over 1.0.x, it keeps your settings, presets and batch queue. A project
+saved with clip effects (file version 2) does not open in 1.0.x.
 
 - It installs for you alone (no administrator needed) or, if you choose, for everyone on the PC; it adds a Start menu
   entry, optionally a desktop icon, and opens `.avloop` projects with a double-click.

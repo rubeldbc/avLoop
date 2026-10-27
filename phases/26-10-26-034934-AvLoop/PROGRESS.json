@@ -2,13 +2,13 @@
   "programId": "AVLOOP",
   "programmeVersion": "1.0.0",
   "generatedBy": "control/phase-tools/sync-progress.mjs",
-  "generatedAt": "2026-10-26T21:25:15.643Z",
+  "generatedAt": "2026-10-27T16:08:54.911Z",
   "state": "COMPLETE",
   "activePhase": null,
   "nextEligiblePhase": null,
-  "lastCompletedPhase": "AV-020",
-  "completed": 20,
-  "total": 20,
+  "lastCompletedPhase": "AV-021",
+  "completed": 21,
+  "total": 21,
   "blocked": [],
   "deferred": [],
   "branch": "main",
@@ -513,7 +513,9 @@
       "dependsOn": [
         "AV-019"
       ],
-      "unlocks": [],
+      "unlocks": [
+        "AV-021"
+      ],
       "requirements": [
         "REQ-AV-025"
       ],
@@ -522,6 +524,27 @@
       "ownerItem": 18,
       "file": "phases/AV-020-the-colour-theme.md",
       "record": "execution/AV-020-EXECUTION.md"
+    },
+    {
+      "id": "AV-021",
+      "title": "The release 1.1.0",
+      "status": "DONE",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Low",
+      "dependsOn": [
+        "AV-020"
+      ],
+      "unlocks": [],
+      "requirements": [
+        "REQ-AV-026"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 150,
+      "ownerItem": 19,
+      "file": "phases/AV-021-the-release-1-1-0.md",
+      "record": "execution/AV-021-EXECUTION.md"
     }
   ]
 }

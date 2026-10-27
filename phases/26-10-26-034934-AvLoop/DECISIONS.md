@@ -2,7 +2,7 @@
 
 Reserved numbers, newest first in `docs/SPEC.md` §0 when taken — delivered behaviour only. AvLoop's series starts at
 D-001: **D-001 … D-014 are this programme's, reserved 2026-10-26 as the fourteen items were planned**, one an item; D-015
-the late fifteenth (AV-017); D-016 the late sixteenth (AV-018); D-017 the late seventeenth (AV-019); D-018 the late eighteenth (AV-020). Two
+the late fifteenth (AV-017); D-016 the late sixteenth (AV-018); D-017 the late seventeenth (AV-019); D-018 the late eighteenth (AV-020); D-019 the late nineteenth (AV-021). Two
 ADRs are owed: **AVADR-0001** (one renderer, GPU/CPU parity), accepted by AV-007 before the code it governs, and
 **AVADR-0002** (memory budgets and caches), accepted by AV-002. The readings (`README.md` §3) are listed after the
 D-numbers; each is the agent's decision under autonomous mode, open for the owner's veto.
@@ -27,6 +27,7 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | D-016 | **The wheel and the keyframe copy** (late): the wheel zooms the canvas about the pointer; Alt+drag on the timeline copies a keyframe. | "mouse wheen move will zoom in out targeted to the mous pointer area in canvas"; "alt drag will copy a keyframe in time line" | AV-018 |
 | D-017 | **The clip effects** (late): a Clip effects section — light, colour, creative and detail effects on the clip, the same on the canvas, in the Preview and in every export; the project file's version 2. | "add a righ side group, Clip effects. where a lots of clip effect could be applied to the clip to change or color correction the clip before export" | AV-019 |
 | D-018 | **The colour theme** (late): Replace colour with an eyedropper, Colourise, Split toning, Duotone. | "say a clip is orange color but i want to change it to red color theme. this kind of effect needed" | AV-020 |
+| D-019 | **The release 1.1.0** (late): version 1.1.0; the GitHub Release `v1.1.0` with its installer and SHA-256. | "bump to 1.1.0 and publish a release" | AV-021 |
 
 ## The readings (the agent's decisions)
 
@@ -105,3 +106,6 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-71 | Four colour-theme effects; Replace first, on the clip's own colours | "orange … to red color theme" | `README.md` §3; AV-020 |
 | R-72 | The eyedropper picks the clip as it is; a colour at 0 % sets 100 % | a picked colour must be found | `README.md` §3; AV-020 |
 | R-73 | Version 2 kept; 44 icons; no Release; the shutdown after green CI | AV-019's version unreleased | `README.md` §3; AV-020 |
+| R-74 | 1.1.0, a minor step; the Release `v1.1.0` as R-5 and R-62, latest | features and file version 2 since 1.0.1 | `README.md` §3; AV-021 |
+| R-75 | No silent install here; the build, deployment and installer checked by their details | the owner's own install shares the AppId | `README.md` §3; AV-021 |
+| R-76 | AV-017's walks read the version from `CMakeLists.txt` | the next version changes no walk | `README.md` §3; AV-021 |

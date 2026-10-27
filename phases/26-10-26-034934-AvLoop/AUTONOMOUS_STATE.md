@@ -2,7 +2,9 @@
 
 Program: AVLOOP
 Programme version: 1.0.0
-State: **COMPLETE 2026-10-27** — every phase DONE (AV-020, the owner's late item 18; no Release, R-73).
+State: **COMPLETE 2026-10-27** — every phase DONE (AV-021, the owner's late item 19; `v1.1.0` released, R-74).
+Was: **ACTIVE 2026-10-27** — the owner's late wish (item 19): AV-021, the release 1.1.0.
+Was: **COMPLETE 2026-10-27** — every phase DONE (AV-020, the owner's late item 18; no Release, R-73).
 Was: **ACTIVE 2026-10-27** — the owner's late wish (item 18): AV-020, the colour theme.
 Was: **COMPLETE 2026-10-27** — every phase DONE (AV-019, the owner's late item 17; no Release, R-70).
 Was: **ACTIVE 2026-10-27** — the owner's late wish (item 17): AV-019, the clip effects.
@@ -19,7 +21,7 @@ feels like a loop."* — with the ten decisions and the five later words of `REA
 a checkpoint after each.
 Active phase: none
 Next eligible: none — every phase is closed
-Completed: 20 of 20
+Completed: 21 of 21
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -45,7 +47,7 @@ is walked `control/04`.
 - Install the environment on this PC (CMake, Ninja, Qt, FFmpeg, Inno Setup, Node, `gh`): **given** — spec §2.8 item 5.
 - Use the machine's existing git credentials for `git push` and `gh` (`GH_TOKEN` per command, never stored): **given**
   — spec §2.9 ("the machine's existing git credentials or `gh auth`"); R-12.
-- Create the GitHub Release `v1.0.0` at CP-B1: **decided by the agent** (R-5); `v1.0.1` at AV-017 likewise (R-62).
+- Create the GitHub Release `v1.0.0` at CP-B1: **decided by the agent** (R-5); `v1.0.1` at AV-017 likewise (R-62); `v1.1.0` at AV-021 on the owner's word (R-74).
 - Item 15 (2026-10-26, after the close): the owner's words; the owner's contact made public in the About box — the
   owner told so before the push, the next word "continue" (`OWNER-ACTIONS.md` 33).
 - **Not given, and never taken**: code signing; a force-push; a secret, personal path, email or token in the
@@ -58,7 +60,7 @@ What a walk leaves for a hand, an eye or the owner's deed. Written by the phases
 
 | Leg | What to do | What to see | Why it waits |
 | --- | --- | --- | --- |
-| (none yet) | | | |
+| AV-021: 1.1.0 over the owner's own 1.0.1 | Run `AvLoop-1.1.0-setup.exe` (the Release) with AvLoop closed | Apps & features 1.1.0; About "Version 1.1.0"; settings, presets and projects kept | the owner's own install; a walk's install would take over its entry (R-75) |
 
 ## The lab here
 
@@ -97,12 +99,16 @@ file's version 2. Mended on the way: a crash at quit with the Preview open.
 the eyedropper — turned into another, an orange made red), Colourise, Split toning and Duotone, in the Clip effects
 section; the file still version 2.
 
-Readings taken: R-1 … R-73 (`README.md` §3; `DECISIONS.md`; `OWNER-ACTIONS.md`) — every one open for the owner's
+**Item 19, late (AV-021, 2026-10-27).** Version 1.1.0 — main since `v1.0.1`, items 16 … 18 — and the GitHub Release
+`v1.1.0` with `AvLoop-1.1.0-setup.exe` and its SHA-256; the README's Download link goes to it.
+
+Readings taken: R-1 … R-76 (`README.md` §3; `DECISIONS.md`; `OWNER-ACTIONS.md`) — every one open for the owner's
 veto. Dropped: nothing the specification names. Not done, and why: OBS itself was never driven (S11's second half needs
 obs-websocket, not on this PC; the libvpx half passes); no code signing (§1.3, the owner's word). `BLOCKED_EXTERNAL`:
-none. Waiting legs: none.
+none. Waiting legs: one — the owner's own 1.0.1 upgraded to 1.1.0 (AV-021, R-75).
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-021** DONE 2026-10-27 — The release 1.1.0 (late, item 19): version 1.1.0 from CMakeLists.txt alone; the Release v1.1.0 with AvLoop-1.1.0-setup.exe and its SHA-256; walk release PASSED, AV-017's About again; no install over the owner's own AvLoop Record: `execution/AV-021-EXECUTION.md`.
 - **AV-020** DONE 2026-10-27 — The colour theme (late, item 18): Replace colour with an eyedropper (orange → red), Colourise, Split toning, Duotone; walks theme and render PASSED, five earlier walks again Record: `execution/AV-020-EXECUTION.md`.
 - **AV-019** DONE 2026-10-27 — The clip effects (late, item 17): a Clip effects section — light, colour, creative, detail — on the canvas, in the Preview and every export, GPU = CPU; the file's version 2; walks effects and render PASSED, eleven earlier walks again Record: `execution/AV-019-EXECUTION.md`.
 - **AV-018** DONE 2026-10-27 — The wheel and the keyframe copy (late, item 16): the wheel zooms the canvas about the pointer; Alt+drag copies a keyframe, one Undo step; walks wheel and key-copy PASSED, AV-003 and AV-011 again Record: `execution/AV-018-EXECUTION.md`.

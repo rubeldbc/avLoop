@@ -1,6 +1,6 @@
 # AvLoop — the seamless loop maker for OBS. Root of the build (spec §4).
 cmake_minimum_required(VERSION 3.28)
-project(AvLoop VERSION 1.0.1 DESCRIPTION "Seamless looping WebM maker for OBS" LANGUAGES CXX)
+project(AvLoop VERSION 1.1.0 DESCRIPTION "Seamless looping WebM maker for OBS" LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

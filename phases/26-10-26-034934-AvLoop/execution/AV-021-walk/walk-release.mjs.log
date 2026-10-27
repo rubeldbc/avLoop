@@ -1,0 +1,11 @@
+PASS the root CMakeLists.txt: project(AvLoop VERSION 1.1.0)
+     the owner's own AvLoop installed here: 1.0.1 (left as it is)
+PASS build\bin\avloop-cli version: AvLoop 1.1.0
+PASS scripts\deploy.ps1 -NoBuild: AvLoop 1.1.0, 37 files, 141.4 MB
+PASS deploy\avloop.exe's details: AvLoop by Rubel | Md. Kamrul Islam Rubel | 1.1.0 | 1.1.0
+PASS deploy\avloop-cli.exe version: AvLoop 1.1.0
+PASS ISCC installer\AvLoop.iss: AvLoop-1.1.0-setup.exe, 44.8 MB
+PASS the installer's details: AvLoop by Rubel | Md. Kamrul Islam Rubel | 1.1.0 | 1.1.0
+PASS its SHA-256, written beside it: 220a3a236ccb5633a7d004bb1f271e2785d8c3a24e76b87e85483dc7896ef252 (AvLoop-1.1.0-setup.exe.sha256)
+PASS the owner's own install untouched: Apps & features: 1.0.1
+WALK PASSED

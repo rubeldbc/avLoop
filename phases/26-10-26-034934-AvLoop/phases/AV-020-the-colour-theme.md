@@ -11,7 +11,7 @@ risk: Low
 permission_class: VERIFY_ENVIRONMENT_FIRST
 code_budget: 500
 depends_on: [AV-019]
-unlocks: []
+unlocks: [AV-021]
 requirements: [REQ-AV-025]
 read_scope:
   - phases/26-10-26-034934-AvLoop/control/21_SHAPES_THE_COLOUR_THEME.md

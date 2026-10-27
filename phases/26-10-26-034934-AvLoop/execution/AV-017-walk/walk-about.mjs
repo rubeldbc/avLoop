@@ -12,6 +12,8 @@ const lab = await import(pathToFileURL(path.resolve(HERE, '..', '..', 'control',
 const w = lab.walkLog();
 const NAME = 'AvLoop by Rubel';
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'avloop-about-'));
+// The version as the root CMakeLists.txt gives it (1.0.1 at AV-017, 1.1.0 from AV-021).
+const VERSION = /project\(AvLoop VERSION (\S+)/.exec(fs.readFileSync(path.join(lab.REPO, 'CMakeLists.txt'), 'utf8'))?.[1];
 
 const source = fs.readFileSync(path.join(lab.REPO, 'src', 'ui', 'dialogs', 'AboutDialog.cpp'), 'utf8');
 const constant = (name) => new RegExp(`constexpr auto ${name} = "([^"]+)";`).exec(source)?.[1] ?? '';
@@ -26,7 +28,7 @@ const link = (href, text) => `<a href="${href}">${text}</a>`;
 // What the About box must show, by its row: a label's text, or a link with its target.
 const rows = [
   ['the name', `<h2>${NAME}</h2>`],
-  ['the version', '<p>Version 1.0.1</p>'],
+  ['the version', `<p>Version ${VERSION}</p>`],
   ['the repository, a link', link(`https://${c.repository}`, c.repository)],
   ['the developer', `|${c.developer}|`],
   ['the country', '|Bangladesh|'],

@@ -1,8 +1,8 @@
 // AV-017's name walk (item 15, R-59, R-62): scripts\deploy.ps1 and ISCC make the installer; avloop.exe's and the
 // installer's own details read; a stand-in of 1.0.0's "AvLoop.lnk" in the Start menu; a silent per-user install into a
-// temporary folder replaces it by "AvLoop by Rubel.lnk"; Apps & features names the app, its publisher and 1.0.1; the
-// installed app's title (a picture); the silent uninstall leaves no shortcut and no entry. The owner's AvLoop folders
-// (which uninstalling clears) are kept aside and put back.
+// temporary folder replaces it by "AvLoop by Rubel.lnk"; Apps & features names the app, its publisher and its
+// version; the installed app's title (a picture); the silent uninstall leaves no shortcut and no entry. The owner's
+// AvLoop folders (which uninstalling clears) are kept aside and put back.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -13,7 +13,8 @@ const lab = await import(pathToFileURL(path.resolve(HERE, '..', '..', 'control',
 const w = lab.walkLog();
 const NAME = 'AvLoop by Rubel';
 const AUTHOR = 'Md. Kamrul Islam Rubel';
-const VERSION = '1.0.1';
+// The version as the root CMakeLists.txt gives it (1.0.1 at AV-017, 1.1.0 from AV-021).
+const VERSION = /project\(AvLoop VERSION (\S+)/.exec(fs.readFileSync(path.join(lab.REPO, 'CMakeLists.txt'), 'utf8'))?.[1];
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'avloop-name-'));
 const hide = (t) => t.split(TMP).join('…').split(os.homedir()).join('~');
 const ISCC = [path.join(process.env['ProgramFiles(x86)'] ?? 'C:/Program Files (x86)', 'Inno Setup 6', 'ISCC.exe'),

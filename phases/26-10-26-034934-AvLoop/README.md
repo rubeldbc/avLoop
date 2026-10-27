@@ -58,9 +58,12 @@ Added by the owner on 2026-10-27, item 18, verbatim: *"need more effect like i w
 say a clip is orange color but i want to change it to red color theme. this kind of effect needed"*; then *"after
 completing everything push to main then forcly shutdown my pc"*.
 
+Added by the owner on 2026-10-27, item 19, verbatim: *"pull everyhitng from main and create a installer"* (an installer
+built from main, still 1.0.1); then *"bump to 1.1.0 and publish a release"*.
+
 ## 2. The items
 
-Eighteen, in two tracks; a checkpoint closes each track. The fifteenth to the eighteenth came after both had
+Nineteen, in two tracks; a checkpoint closes each track. The fifteenth to the nineteenth came after both had
 closed: late phases.
 
 | # | Item | What it gives |
@@ -83,6 +86,7 @@ closed: late phases.
 | 16 | **The wheel and the keyframe copy** (AV-018, late) | the wheel zooms the canvas about the pointer; Alt+drag on the timeline copies a keyframe |
 | 17 | **The clip effects** (AV-019, late) | a Clip effects section: light, colour, creative and detail effects on the clip, on the canvas, in the Preview and in every export |
 | 18 | **The colour theme** (AV-020, late) | Replace colour (an orange made red; the colour picked from the clip), Colourise, Split toning, Duotone |
+| 19 | **The release 1.1.0** (AV-021, late) | version 1.1.0 and the GitHub Release `v1.1.0`: main since `v1.0.1` as an installer |
 
 Checkpoints: CP-A1 (AV-015) walks track A on one fresh build; CP-B1 (AV-016) walks the whole, installed, and makes
 the GitHub Release `v1.0.0`.
@@ -257,6 +261,17 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md` rows 11 
 73. **R-73** The file stays at version 2 (AV-019's version 2 was never released); an effect at 0 % keeps its colours
     without counting (the frame untouched). The eyedropper is the app's 44th icon. No Release (as R-65). The owner's
     "forcly shutdown my pc" after the push: `shutdown /s /f` once CI is green, the open AvLoop's autosave kept.
+74. **R-74** 1.1.0, a minor step: since 1.0.1 main added features (items 16 … 18) and the project file's version 2,
+    which 1.0.x refuses; nothing 1.0.x has is taken away. The Release `v1.1.0` ("AvLoop by Rubel 1.1.0") on the
+    phase's commit once CI is green, marked latest, with `AvLoop-1.1.0-setup.exe` and its SHA-256, as R-5 and R-62;
+    its notes say what changed since 1.0.1; the README's Download link goes to it. `v1.0.1` and `v1.0.0` stay.
+75. **R-75** No silent install on this PC: the owner's own AvLoop (1.0.1, per user, open) shares the AppId, and a walk
+    installing and uninstalling under it would take over its Apps & features entry, shortcuts and association. The
+    release walk checks the build, the deployment and the installer by their own details and its SHA-256; the
+    installer's script is unchanged since AV-017's install walk. Installing 1.1.0 over it is the owner's (a waiting leg).
+76. **R-76** AV-017's About and name walks read the version from the root `CMakeLists.txt` instead of a written
+    `1.0.1`, so the next version needs no walk changed. The earlier installer of this sitting
+    (`AvLoop-1.0.1-81e425c-setup.exe`, local) is not released.
 
 ## 4. What is not built
 

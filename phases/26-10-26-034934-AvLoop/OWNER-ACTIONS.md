@@ -47,3 +47,5 @@ read and open for a veto later; an answer that differs changes the reading in it
 | 38 | **R-66 … R-70** Which effects; made on the CPU for the output, a close look on the canvas; the file's version 2; Opacity and Alpha; the section's place. | `README.md` §3 66 … 70; AV-019. | Decided by the agent (AV-019); open for a veto |
 | 39 | **Item 18**: the colour theme — an orange clip made red, and the like. | AV-020 (late). | **Given 2026-10-27** — the owner's words (`README.md` §1) |
 | 40 | **R-71 … R-73** The four theme effects and their order; the eyedropper; version 2 kept; the PC shut down after the push. | `README.md` §3 71 … 73; AV-020. | Decided by the agent (AV-020); the shutdown the owner's own word |
+| 41 | **Item 19**: version 1.1.0 and its Release. | AV-021 (late). | **Given 2026-10-27** — the owner's words (`README.md` §1) |
+| 42 | **R-74 … R-76** A minor step and the Release `v1.1.0`; no silent install over the owner's own AvLoop; the walks read the version. | `README.md` §3 74 … 76; AV-021. | Decided by the agent (AV-021); open for a veto — the Release goes by `gh release delete v1.1.0` |

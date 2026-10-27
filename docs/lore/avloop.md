@@ -345,6 +345,19 @@ end of its section.
   fields. Rule: a field's longest text, suffix included, fits in six characters — the unit goes in the tooltip, or
   the decimals go. (AV-019)
 
+## The release 1.1.0 (late)
+
+- **A walk that installs takes over the owner's own install**: the install walks (AV-014, AV-017) install and uninstall
+  under the real AppId; on a PC where the owner has AvLoop installed and open, the uninstall would remove its Apps &
+  features entry, its shortcuts and its association. Rule: read the AppId's uninstall key before an install walk; if
+  it is there, check the installer by its own details and SHA-256 and leave the install to the owner. (AV-021)
+- **A version written into a walk goes stale**: AV-017's About walk expected "Version 1.0.1" and would fail the day
+  the version moved. Rule: a walk reads the version from the root `CMakeLists.txt`. (AV-021)
+- **A build from main is not the release it shares a version with**: main ran three phases ahead of `v1.0.1` still
+  calling itself 1.0.1; a setup built from it would overwrite the released `AvLoop-1.0.1-setup.exe` in
+  `installer\Output`. Rule: an unreleased build's installer is named apart (`ISCC /F…-<commit>-setup`), never over a
+  released one. (AV-021)
+
 ## The colour theme (late)
 
 - **A picked colour must meet itself**: an eyedropper samples the clip as decoded; an effect matching that colour

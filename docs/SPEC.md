@@ -6,6 +6,16 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-019 — The release 1.1.0 (AV-021, late, 2026-10-27)
+
+- Version 1.1.0, from the root `CMakeLists.txt` alone: avloop.exe's VERSIONINFO (1.1.0.0), the About box's "Version
+  1.1.0", `avloop-cli version`, the installer `AvLoop-1.1.0-setup.exe` and Apps & features. A minor step: items
+  16 … 18 since 1.0.1 and the project file's version 2, which 1.0.x refuses with its message (R-74).
+- The GitHub Release `v1.1.0` ("AvLoop by Rubel 1.1.0", latest) with `AvLoop-1.1.0-setup.exe` and
+  `AvLoop-1.1.0-setup.exe.sha256`; its notes say what changed since 1.0.1; the README's Download link goes to it.
+  `v1.0.1` and `v1.0.0` stay. The AppId, folder, association and settings keys are unchanged: 1.1.0 installs over
+  1.0.x and keeps its settings, presets and queue.
+
 ### D-018 — The colour theme (AV-020, late, 2026-10-27)
 
 - Four effects join the Clip effects section, after Colour (R-71): **Replace colour** — From (typed, chosen, or picked
