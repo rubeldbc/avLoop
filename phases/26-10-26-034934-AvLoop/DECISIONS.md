@@ -132,3 +132,5 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-89 | One Path of several outlines, lines within ½ px; icons 51 … 53 | Qt's booleans give lines | `READINGS.md`; AV-026 |
 | R-90 | Feather and Strength a shape; a weak Cut is the "transparency" | "custom feathering or transparency … any part of the selection" | `READINGS.md`; AV-027 |
 | R-91 | An exact distance transform for custom outlines; the canvas a hint | an exact feather; memory bounded by the output | `READINGS.md`; AV-027 |
+| R-92 | A label's click resets its control through its own edit; positions and read-only rows have none | "Clicking on the text label next to any control should reset its value" | `READINGS.md`; AV-028 |
+| R-93 | Defaults are a fresh project's; group resets one step; the bars reset their tool's fields | "a 'Reset' option, which will reset the settings for that group" | `READINGS.md`; AV-028 |

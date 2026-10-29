@@ -2,10 +2,13 @@
 
 #include "ui/theme/IconFactory.h"
 #include "ui/theme/Theme.h"
+#include "ui/widgets/ResetLabel.h"
 
 #include <QComboBox>
+#include <QContextMenuEvent>
 #include <QGridLayout>
 #include <QLabel>
+#include <QMenu>
 #include <QSettings>
 #include <QToolButton>
 #include <QTransform>
@@ -68,7 +71,7 @@ Section::Section(const QString& key, const QString& title, QWidget* parent) : QW
 
 void Section::addRow(const QString& label, QWidget* value) {
     const int row = grid_->rowCount();
-    auto* name = new QLabel(label, body_);
+    auto* name = new ResetLabel(label, value, body_); // a click resets the value (D-025)
     name->setProperty("quiet", true);
     grid_->addWidget(name, row, 0);
     grid_->addWidget(value, row, 1);
@@ -89,6 +92,22 @@ QList<QWidget*> Section::row(QWidget* value) const {
         if (auto* item = grid_->itemAtPosition(r, 1); item && item->widget() == value)
             if (auto* label = grid_->itemAtPosition(r, 0)) both << label->widget();
     return both;
+}
+
+void Section::addResetAction(const QString& text, const QString& key, std::function<void()> reset) {
+    resets_.append({text, key, std::move(reset)});
+}
+
+void Section::contextMenuEvent(QContextMenuEvent* event) {
+    if (resets_.isEmpty()) return QWidget::contextMenuEvent(event);
+    QMenu menu(this);
+    for (const ResetAction& r : resets_) {
+        QAction* a = menu.addAction(r.text);
+        a->setObjectName(QStringLiteral("menu.reset.%1").arg(r.key));
+        connect(a, &QAction::triggered, this, [fn = r.reset] { fn(); });
+    }
+    menu.exec(event->globalPos());
+    event->accept();
 }
 
 bool Section::isOpen() const {

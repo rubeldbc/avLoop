@@ -23,6 +23,8 @@ public:
     void setColourQuietly(const QColor& colour); // a change that came from the model
     QColor colour() const { return colour_; }
     void setPicker(Picker pick);
+    // A colour taken as if chosen (colourChosen emitted): its label's reset (D-025).
+    void choose(const QColor& colour) { take(colour); }
 
 signals:
     void colourChosen(const QColor& colour);

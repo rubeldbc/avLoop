@@ -70,6 +70,7 @@ private:
     // WalkSteps.cpp
     int stepClick(const QJsonObject& step, bool twice);
     int stepDrag(const QJsonObject& step);
+    int stepContext(const QJsonObject& step);
     int stepWheel(const QJsonObject& step);
     int stepKey(const QJsonObject& step);
     int stepType(const QJsonObject& step);

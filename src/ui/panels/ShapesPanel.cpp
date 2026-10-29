@@ -9,6 +9,7 @@
 #include "ui/panels/SidePanel.h"
 #include "ui/theme/IconFactory.h"
 #include "ui/tools/ShapeEdit.h"
+#include "ui/widgets/ResetLabel.h"
 #include "ui/widgets/StepSpinBox.h"
 
 #include <QComboBox>
@@ -179,6 +180,17 @@ void SidePanel::bindShapes(Project* project) {
         for (int r = 0; r < list->count(); ++r)
             rows << list->item(r)->text();
         return rows.join(QLatin1Char('|'));
+    });
+    reset::setDefault(role, int(MaskShape::Role::Add));
+    reset::setDefault(feather, 0.0);
+    reset::setDefault(strength, 100.0);
+    reset::setDefault(op, int(shapecombine::Op::Unite));
+    s->addResetAction(tr("Reset shapes"), QStringLiteral("shapes"), [project] {
+        CropShape c = project->crop();
+        if (c.shapes.isEmpty()) return;
+        c.shapes.clear();
+        project->setSelectedShapes({});
+        project->changeCrop(c);
     });
     refresh();
 }

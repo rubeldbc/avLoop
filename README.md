@@ -65,6 +65,9 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
 - **Soft parts**: every shape has its own **Feather** (0–200 px, softening its edge inward) and **Strength** (0–100 %).
   A Cut at 40 % leaves 60 % of what it covers — any part of a selection made partly or wholly transparent, its edge as
   soft as you like; type one value for several shapes at once.
+- **Quick resets**: click the label beside a control to put it back to its default (Crossfade's 0.5 s, Speed 1×, an
+  effect's none …); right-click a section of the side panel — or a tool's options bar — for **Reset <section>**. Each
+  is one Undo step.
 
   ![An ellipse crop on the canvas](docs/screenshots/crop-ellipse.png)
 

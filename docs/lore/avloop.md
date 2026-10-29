@@ -429,3 +429,12 @@ end of its section.
   with C2109. Rule: a sized container is made from a plain variable or with braces. (AV-027)
 - **A shape's edge on the frame's edge has no outside to measure**: a feathered triangle along the top of the output
   ramped from its far side only. Rule: a feather test (and a walk) puts the edge inside the frame. (AV-027)
+
+## The resets (late)
+
+- **A reset with nothing to reset makes no Undo step**: a walk that undid "Reset Loop" after the label clicks had put
+  every loop value back undid the Output's reset instead. Rule: a walk changes a group's value right before resetting
+  the group, and checks the Undo by that value. (AV-028)
+- **A field's name is the bar's, not the tool's**: `OptionsRow::addNumber("scale")` is `options.scale`, while a crop
+  bar's are `options.<kind>.<field>` because their names carry the kind. Rule: a walk takes a bar field's name from its
+  `addNumber` call. (AV-028)

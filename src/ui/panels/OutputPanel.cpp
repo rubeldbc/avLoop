@@ -12,6 +12,7 @@
 #include "ui/panels/Section.h"
 #include "ui/panels/SidePanel.h"
 #include "ui/theme/IconFactory.h"
+#include "ui/widgets/ResetLabel.h"
 #include "ui/widgets/StepSpinBox.h"
 
 #include <QColorDialog>
@@ -261,6 +262,17 @@ void SidePanel::bindOutput(Project* project) {
     WalkProbes::add(QStringLiteral("output.format"), [project] { return formatId(project->output().format); });
     WalkProbes::add(QStringLiteral("output.background"), [project] { return project->output().background; });
     WalkProbes::add(QStringLiteral("output.note"), [note] { return note->text(); });
+    // The labels' resets (D-025): R-6's output.
+    const OutputSettings fresh;
+    reset::setDefault(format, formatId(fresh.format));
+    reset::setDefault(size, fresh.sizeId());
+    reset::setDefault(customW, double(fresh.custom.width()));
+    reset::setDefault(customH, double(fresh.custom.height()));
+    reset::setDefault(alpha, OutputSettings::alphaId(fresh.alpha));
+    reset::setDefault(fps, fresh.fpsId());
+    reset::setDefault(fpsCustom, fresh.fps.value());
+    s->addResetAction(tr("Reset Output"), QStringLiteral("output"),
+                      [project] { project->changeOutput(OutputSettings{}); });
     refresh();
 }
 

@@ -45,7 +45,7 @@ allowing any part of the selection to be made transparent."*
 | `node control/phase-tools/check-loc.mjs` | PASS: 303 code files, none over 600 lines (the largest: src/core/ClipEffects.cpp, 425 lines) |
 | `node control/phase-tools/validate-phase-system.mjs` | PASS: 31 phases, 34 requirement ids |
 | README pictures | not retaken: the default window unchanged |
-| AV-026's CI run | CI_RESULT |
+| AV-026's CI run | green, 7 m 53 s (run 40925466663) |
 
 ## The walk
 

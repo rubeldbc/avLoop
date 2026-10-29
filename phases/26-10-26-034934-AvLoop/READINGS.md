@@ -226,3 +226,9 @@ from `README.md` §3 on 2026-10-29, when the README passed the 300-line ceiling 
 91. **R-91** A custom outline's feather comes from an exact Euclidean distance transform of its raster (two float
     grids of the output size while it runs — AVADR-0002's bound is the output size), the standard kinds' from their
     analytic distance; the canvas hints a weak Cut by its strength, the Preview is exact.
+92. **R-92** "Clicking on the text label next to any control should reset its value": every label beside a control of
+    the side panel and the options bars; the reset is the control's own edit (one Undo step); a control without a
+    natural default — a position, a read-only value, a free hex colour — has none and its label stays plain. The
+    Settings window (saved at once, no Undo) and the Preview's two lists are not "the right-hand side" and keep theirs.
+93. **R-93** A default is a fresh project's value (the structs' own), the groups' resets the same values as one step:
+    Crop also removes its shapes and inverse; Loop keeps the range; a bar's reset touches the tool's fields only.

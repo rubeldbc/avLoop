@@ -9,6 +9,7 @@
 #include "ui/options/OptionsBar.h"
 #include "ui/theme/IconFactory.h"
 #include "ui/tools/ShapeEdit.h"
+#include "ui/widgets/ResetLabel.h"
 #include "ui/widgets/StepSpinBox.h"
 
 #include <QComboBox>
@@ -200,6 +201,23 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
                              {"feather", feather},
                              {"strength", strength}})
         probeValue(QStringLiteral("options.shape.%1").arg(QLatin1String(name)), box);
+    // The labels' resets and the bar's (D-025): what is drawn next, and the selected shapes' role, feather, strength.
+    reset::setDefault(kind, int(ShapeDraft::Kind::Rect));
+    reset::setDefault(role, int(MaskShape::Role::Add));
+    reset::setDefault(feather, 0.0);
+    reset::setDefault(strength, 100.0);
+    row->setReset(QObject::tr("Reset Shape"), [=] {
+        draft->kind = ShapeDraft::Kind::Rect;
+        draft->role = MaskShape::Role::Add;
+        CropShape c = project->crop();
+        for (int i : project->selectedShapes()) {
+            c.shapes[i].role = MaskShape::Role::Add;
+            c.shapes[i].feather = 0;
+            c.shapes[i].strength = 100;
+        }
+        if (!(c == project->crop())) project->changeCrop(c);
+        refresh();
+    });
     refresh();
     return row;
 }
@@ -225,6 +243,7 @@ QWidget* createPenOptions(Project* project, ShapeDraft* draft, QWidget* parent) 
         draft->role = MaskShape::Role(role->currentData().toInt());
         setShapesRole(project, int(draft->role));
     });
+    reset::setDefault(role, int(MaskShape::Role::Add));
     refresh();
     return row;
 }

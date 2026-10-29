@@ -9,6 +9,7 @@
 #include "ui/WalkRunner.h"
 #include "ui/panels/Section.h"
 #include "ui/panels/SidePanel.h"
+#include "ui/widgets/ResetLabel.h"
 #include "ui/widgets/StepSpinBox.h"
 
 #include <QComboBox>
@@ -59,6 +60,7 @@ void SidePanel::bindLoop(Project* project) {
     mode->addItem(tr("Ping-pong + Smooth turn"), int(Mode::PingPongSmooth));
     s->addRow(tr("Mode"), mode);
     auto* fadeRow = new QWidget(body);
+    fadeRow->setObjectName(QStringLiteral("panel.loop.fadeRow"));
     auto* fadeLayout = new QHBoxLayout(fadeRow);
     fadeLayout->setContentsMargins(0, 0, 0, 0);
     fadeLayout->setSpacing(4);
@@ -187,6 +189,15 @@ void SidePanel::bindLoop(Project* project) {
     WalkProbes::add(QStringLiteral("panel.loop.fadeFlash"), [fade, fadeFrames] {
         return fade->property("flash").toBool() || fadeFrames->property("flash").toBool();
     });
+    // The labels' resets (D-025): a fresh project's loop (R-28); the group's keeps the range.
+    const LoopSettings fresh;
+    reset::setDefault(mode, int(fresh.mode));
+    reset::setDefault(fade, fresh.fade);
+    reset::setDefault(curve, int(fresh.curve));
+    reset::setDefault(turn, fresh.turn);
+    reset::setDefault(speed, fresh.speed);
+    reset::setDefault(method, int(fresh.method));
+    s->addResetAction(tr("Reset Loop"), QStringLiteral("loop"), [project] { project->changeLoop(LoopSettings{}); });
     refresh();
 }
 

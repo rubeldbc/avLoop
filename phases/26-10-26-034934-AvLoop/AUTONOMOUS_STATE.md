@@ -22,9 +22,9 @@ words: *"I want to build a piece of software called AvLoop. Its main job is to t
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: AV-028
-Next eligible: AV-028 (in progress)
-Completed: 27 of 31
+Active phase: AV-029
+Next eligible: AV-029 (in progress)
+Completed: 28 of 31
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -111,6 +111,7 @@ obs-websocket, not on this PC; the libvpx half passes); no code signing (§1.3, 
 none. Waiting legs: one — the owner's own 1.0.1 upgraded to 1.1.0 (AV-021, R-75).
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-028** DONE 2026-10-30 — The resets (late, item 25): a label's click resets its control, a section's right-click Reset its group, one Undo step each; walk resets PASSED, five earlier walks again Record: `execution/AV-028-EXECUTION.md`.
 - **AV-027** DONE 2026-10-29 — The soft parts (late, item 24): Feather and Strength a shape — a Cut at 40 % leaves 60 %, its edge softened by an exact distance transform; walks soft and soft-render PASSED, six earlier walks again Record: `execution/AV-027-EXECUTION.md`.
 - **AV-026** DONE 2026-10-29 — The shape combinations (late, item 23): Pathfinder live — Select, Cut, Keep only, Exclude — and Combine into one path; Ctrl+A, the marquee; walks combine and combine-render PASSED, five earlier walks again Record: `execution/AV-026-EXECUTION.md`.
 - **AV-025** DONE 2026-10-29 — The pen tool (late, item 22): Illustrator's Pen — corner and smooth anchors, handles, Alt to convert and break, add on a segment, Delete, Ctrl to select; walks pen and pen-render PASSED, three earlier walks again Record: `execution/AV-025-EXECUTION.md`.

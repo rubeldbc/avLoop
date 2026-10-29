@@ -6,6 +6,27 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-025 — The resets (AV-028, late, 2026-10-29)
+
+- **A label's click** resets the control beside it to its default (R-92): every row of the side panel's sections
+  (`Section::addRow` makes its label a `ResetLabel`) and every labelled field of the options bars (`OptionsRow`) — the
+  hand cursor and "Click to reset" where there is a default. A default is kept on the control where it is made
+  (`reset::setDefault`) and the reset goes through the control's own change path — a number's `valueChanged`, a list's
+  `activated`, a box's click, a colour's `colourChosen` — so it is one Undo step, as if typed. A pair of fields under
+  one label resets those that have defaults. No default, no reset: a position (Crop X/Y/W/H, the Selection's X/Y/W/H,
+  a shape's place), a read-only row (Output, the summary), the Output's background colour (a hex field).
+- The defaults are a fresh project's (R-93): Crop — Shape Rectangle, Inverse off, Ratio Free, Radius 0, Feather 0;
+  Shapes — Role Select, Feather 0, Strength 100 %, Combine Unite; Loop — R-28's (Crossfade, 0.5 s, Smooth, 0.3 s, 1×,
+  Nearest); Output — R-6's; Quality — Medium's (CRF 31, Speed 2, no max bitrate, one pass, no target); Clip effects —
+  none, On; the bars — the crop's Ratio, Radius, Feather; the Selection's Scale 100 %; the Shape bar's Draw Rectangle,
+  Role Select, Feather 0, Strength 100 %.
+- **A right click on a section** (its header or a free part of its body) offers "Reset Crop" (no crop, no shapes, not
+  inverted), "Reset shapes" (inside Crop: the shapes removed, the frame kept), "Reset Loop" (the range stays), "Reset
+  Output", "Reset Quality", "Reset Clip effects" — one Undo step each; an options bar offers "Reset <tool>" (a crop
+  bar: its ratio, radius, feather and inverse; the Selection: its Reset button's; the Shape bar: the next shape's kind
+  and role and the selected shapes' role, feather, strength). Menu items named `menu.reset.<key>`; the walk's
+  `"context"` step opens a right-click menu and picks an item by its text. Labels named `<control>.label`.
+
 ### D-024 — The soft parts (AV-027, late, 2026-10-29)
 
 - Every shape's **Feather** (0 … 200 output px, `"feather"`) and **Strength** (0 … 100 %, `"strength"`): its coverage

@@ -159,6 +159,7 @@ int WalkRunner::run(const QJsonObject& step) {
     if (what == QLatin1String("expect")) return stepExpect(step);
     if (what == QLatin1String("waitFor")) return stepWaitFor(step);
     if (what == QLatin1String("menu")) return stepMenu(step);
+    if (what == QLatin1String("context")) return stepContext(step);
     if (what == QLatin1String("theme")) {
         Theme::instance().apply(Theme::idFromName(step.value(QStringLiteral("name")).toString()));
         return delay_ + 200;

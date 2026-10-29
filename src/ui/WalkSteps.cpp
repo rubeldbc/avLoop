@@ -4,6 +4,7 @@
 
 #include <QApplication>
 #include <QComboBox>
+#include <QContextMenuEvent>
 #include <QDir>
 #include <QJsonArray>
 #include <QMenu>
@@ -352,6 +353,26 @@ int WalkRunner::stepMenu(const QJsonObject& step) {
     QTimer::singleShot(250, this, &WalkRunner::menuNext);
     const QPoint c = button->rect().center();
     sendMouse(button, QEvent::MouseButtonPress, c, Qt::LeftButton, Qt::LeftButton, {});
+    return INT_MAX;
+}
+
+// {"do": "context", "on": "Section.loop", "path": ["Reset Loop"]}: a right click on a widget, its menu's item chosen by
+// its text (D-025) — the press armed before the menu's own event loop opens, as the ☰ menu's.
+int WalkRunner::stepContext(const QJsonObject& step) {
+    QWidget* w = target(step);
+    menuPath_.clear();
+    menuTries_ = 0;
+    for (const QJsonValue& v : step.value(QStringLiteral("path")).toArray())
+        menuPath_ << v.toString();
+    if (!w || menuPath_.isEmpty()) {
+        check(false, QStringLiteral("context"),
+              QStringLiteral("no widget \"%1\" or empty path").arg(step.value("on").toString()));
+        return -1;
+    }
+    ensureActive();
+    QTimer::singleShot(250, this, &WalkRunner::menuNext);
+    const QPoint at = point(w, step, QStringLiteral("at"));
+    QCoreApplication::postEvent(w, new QContextMenuEvent(QContextMenuEvent::Mouse, at, w->mapToGlobal(at)));
     return INT_MAX;
 }
 

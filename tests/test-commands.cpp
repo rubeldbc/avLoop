@@ -43,6 +43,41 @@ private slots:
         p.undoStack()->redo();
         QCOMPARE(p.transform().x, 500.0);
     }
+    // A group's Reset (D-025): one Undo step to the fresh values, its Undo restoring every value; the range stays.
+    void groupResetIsOneStep() {
+        Project p;
+        p.setSource(source());
+        LoopSettings l;
+        l.mode = LoopSettings::Mode::PingPong;
+        l.fade = 1.2;
+        l.speed = 2;
+        p.changeLoop(l);
+        ClipEffects e;
+        e.exposure = 2;
+        e.sepia = 40;
+        p.changeEffects(e);
+        const TimeRange range = p.range();
+        const int steps = p.undoStack()->count();
+        p.changeLoop(LoopSettings{});
+        p.changeEffects(ClipEffects{});
+        QCOMPARE(p.undoStack()->count(), steps + 2);
+        QCOMPARE(p.loop(), LoopSettings{});
+        QCOMPARE(p.effects(), ClipEffects{});
+        QCOMPARE(p.range(), range);
+        p.undoStack()->undo();
+        QCOMPARE(p.effects(), e);
+        p.undoStack()->undo();
+        QCOMPARE(p.loop(), l.clamped());
+        CropShape c;
+        c.rect = QRectF(10, 10, 100, 100);
+        c.invert = true;
+        c.shapes = {MaskShape{}};
+        p.changeCrop(c);
+        p.changeCrop(CropShape{});
+        QVERIFY(p.crop().isEmpty() && !p.crop().invert && p.crop().shapes.isEmpty());
+        p.undoStack()->undo();
+        QCOMPARE(p.crop().shapes.size(), 1);
+    }
     void aDragIsOneStep() {
         Project p;
         p.setSource(source());

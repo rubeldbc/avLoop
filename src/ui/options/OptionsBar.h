@@ -3,6 +3,8 @@
 #include <QString>
 #include <QWidget>
 
+#include <functional>
+
 class QComboBox;
 class QHBoxLayout;
 class QLabel;
@@ -31,9 +33,16 @@ public:
     // Any other widget (a ratio list), with a quiet label before it.
     void add(QWidget* widget, const QString& label = {});
     void addSeparator();
+    // The right-click menu's reset of the tool's fields (D-025), named "menu.reset.<tool>".
+    void setReset(const QString& text, std::function<void()> reset);
+
+protected:
+    void contextMenuEvent(QContextMenuEvent* event) override;
 
 private:
     QString tool_;
+    QString resetText_;
+    std::function<void()> reset_;
     QHBoxLayout* row_ = nullptr;
 };
 

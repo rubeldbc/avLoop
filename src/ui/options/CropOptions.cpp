@@ -6,6 +6,7 @@
 #include "core/Project.h"
 #include "ui/WalkRunner.h"
 #include "ui/options/OptionsBar.h"
+#include "ui/widgets/ResetLabel.h"
 #include "ui/widgets/StepSpinBox.h"
 
 #include <QComboBox>
@@ -193,6 +194,18 @@ QWidget* createCropOptions(Project* project, Canvas* canvas, int kindValue, QWid
         if (box) probeValue(QStringLiteral("options.%1.%2").arg(k, QLatin1String(name)), box);
     WalkProbes::add(QStringLiteral("options.%1.ratio").arg(k),
                     [p = QPointer<QComboBox>(ratio)] { return p ? p->currentData() : QVariant(); });
+    // The labels' resets and the bar's (D-025): the crop's ratio, radius, feather and inverse; its place stays.
+    reset::setDefault(ratio, QStringLiteral("free"));
+    if (radius) reset::setDefault(radius, 0.0);
+    if (feather) reset::setDefault(feather, 0.0);
+    row->setReset(QObject::tr("Reset %1").arg(title), [project] {
+        CropShape c = project->crop();
+        c.ratio = QStringLiteral("free");
+        c.radius = 0;
+        c.feather = 0;
+        c.invert = false;
+        if (!(c == project->crop())) project->changeCrop(c);
+    });
     refresh();
     return row;
 }

@@ -7,6 +7,7 @@
 #include "ui/canvas/Canvas.h"
 #include "ui/options/OptionsBar.h"
 #include "ui/theme/IconFactory.h"
+#include "ui/widgets/ResetLabel.h"
 #include "ui/widgets/StepSpinBox.h"
 
 #include <QBoxLayout>
@@ -122,6 +123,9 @@ QWidget* createSelectionOptions(Project* project, Canvas* canvas, QWidget* paren
     WalkProbes::add(QStringLiteral("options.upscaleWarning"),
                     [p = QPointer<QLabel>(warning)] { return p ? QVariant(!p->isHidden()) : QVariant(); });
     Q_UNUSED(canvas);
+    // Scale's label resets it to 100 %; the bar's right-click menu resets as its Reset button does (D-025).
+    reset::setDefault(scale, 100.0);
+    row->setReset(QObject::tr("Reset Selection"), [reset] { reset->click(); });
     refresh();
     return row;
 }

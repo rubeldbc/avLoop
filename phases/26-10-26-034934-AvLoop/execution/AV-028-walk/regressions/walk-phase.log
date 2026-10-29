@@ -1,0 +1,6 @@
+PASSED walk-shell.json (7 s)
+PASSED walk-selection.json (11 s)
+PASSED walk-crop.json (24 s)
+PASSED walk-loop.json (11 s)
+PASSED walk-effects.json (8 s)
+PHASE WALKS PASSED

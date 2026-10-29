@@ -10,6 +10,7 @@
 #include "ui/panels/Section.h"
 #include "ui/panels/SidePanel.h"
 #include "ui/widgets/ColourField.h"
+#include "ui/widgets/ResetLabel.h"
 #include "ui/widgets/StepSpinBox.h"
 
 #include <QCheckBox>
@@ -77,6 +78,7 @@ void SidePanel::bindEffects(Project* project, const ColourField::Picker& pick) {
             new StepSpinBox(QStringLiteral("panel.effects.%1").arg(QLatin1String(key)), min, max, step, decimals, body);
         box->setSuffix(suffix);
         s->addRow(name, box);
+        reset::setDefault(box, ClipEffects{}.*value); // its label resets it (D-025)
         numbers.append({box, value});
         fields << box;
         connect(box, &StepSpinBox::valueChanged, this, [project, key, value](double v) {
@@ -115,6 +117,7 @@ void SidePanel::bindEffects(Project* project, const ColourField::Picker& pick) {
                       double ClipEffects::* amount) {
         auto* field = new ColourField(QStringLiteral("panel.effects.%1").arg(QLatin1String(key)), name, body);
         s->addRow(name, field);
+        reset::setDefault(field, QColor::fromRgb(QRgb(ClipEffects{}.*value)));
         colours.append({field, value});
         fields << field;
         connect(field, &ColourField::colourChosen, this, [project, value, amount](const QColor& c) {
@@ -208,6 +211,11 @@ void SidePanel::bindEffects(Project* project, const ColourField::Picker& pick) {
 
     WalkProbes::add(QStringLiteral("effects.summary"), [project] { return summary(project->effects()); });
     WalkProbes::add(QStringLiteral("effects.on"), [project] { return project->effects().on; });
+    reset::setDefault(posterize, 0.0);
+    reset::setDefault(invert, false);
+    reset::setDefault(on, true);
+    s->addResetAction(tr("Reset Clip effects"), QStringLiteral("effects"),
+                      [project] { project->changeEffects(ClipEffects{}); });
     refresh();
 }
 

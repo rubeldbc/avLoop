@@ -4,6 +4,8 @@
 #include <QString>
 #include <QWidget>
 
+#include <functional>
+
 class QGridLayout;
 class QToolButton;
 
@@ -24,6 +26,8 @@ public:
     void addWide(QWidget* widget);
     // A row's value and its label: what a setting that does not apply hides together.
     QList<QWidget*> row(QWidget* value) const;
+    // The right-click menu's resets (D-025): "Reset <title>" and any others, each named "menu.reset.<key>" for walks.
+    void addResetAction(const QString& text, const QString& key, std::function<void()> reset);
 
     bool isOpen() const;
     void setOpen(bool open);
@@ -31,10 +35,19 @@ public:
 signals:
     void toggled(bool open);
 
+protected:
+    void contextMenuEvent(QContextMenuEvent* event) override;
+
 private:
     void updateHeader();
 
     QString key_;
+    struct ResetAction {
+        QString text;
+        QString key;
+        std::function<void()> reset;
+    };
+    QList<ResetAction> resets_;
     QToolButton* header_ = nullptr;
     QWidget* body_ = nullptr;
     QGridLayout* grid_ = nullptr;

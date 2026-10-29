@@ -7,6 +7,7 @@
 #include "ui/options/OptionsBar.h"
 #include "ui/panels/Section.h"
 #include "ui/panels/SidePanel.h"
+#include "ui/widgets/ResetLabel.h"
 #include "ui/widgets/StepSpinBox.h"
 
 #include <QCheckBox>
@@ -145,6 +146,13 @@ void SidePanel::bindCrop(Project* project) {
     WalkProbes::add(QStringLiteral("panel.crop.output"), [output] { return output->text(); });
     WalkProbes::add(QStringLiteral("panel.crop.hint"), [hint] { return !hint->isHidden(); });
     WalkProbes::add(QStringLiteral("panel.crop.w"), [w] { return w->value(); });
+    // The labels' resets and the group's (D-025): a position has no default.
+    reset::setDefault(shape, int(CropShape::Kind::Rect));
+    reset::setDefault(invert, false);
+    reset::setDefault(ratio, QStringLiteral("free"));
+    reset::setDefault(radius, 0.0);
+    reset::setDefault(feather, 0.0);
+    s->addResetAction(tr("Reset Crop"), QStringLiteral("crop"), [project] { project->changeCrop(CropShape{}); });
     refresh();
 }
 

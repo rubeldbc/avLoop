@@ -7,6 +7,7 @@
 #include "ui/WalkRunner.h"
 #include "ui/panels/Section.h"
 #include "ui/panels/SidePanel.h"
+#include "ui/widgets/ResetLabel.h"
 #include "ui/widgets/StepSpinBox.h"
 
 #include <QCheckBox>
@@ -133,6 +134,16 @@ void SidePanel::bindQuality(Project* project) {
         return project->quality().resolved(project->output().format == OutputFormat::WebmVp8).crf;
     });
     WalkProbes::add(QStringLiteral("quality.estimate"), [this] { return estimate_->text(); });
+    // The labels' resets (D-025): Medium's.
+    const QualitySettings fresh;
+    reset::setDefault(preset, QualitySettings::presetId(fresh.preset));
+    reset::setDefault(crf, double(fresh.crf));
+    reset::setDefault(speed, double(fresh.speed));
+    reset::setDefault(maxRate, double(fresh.maxBitrate));
+    reset::setDefault(twoPass, fresh.twoPass);
+    reset::setDefault(target, fresh.targetMB);
+    s->addResetAction(tr("Reset Quality"), QStringLiteral("quality"),
+                      [project] { project->changeQuality(QualitySettings{}); });
     refresh();
 }
 

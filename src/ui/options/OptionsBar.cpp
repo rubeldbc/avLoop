@@ -3,11 +3,14 @@
 #include "ui/WalkRunner.h"
 
 #include "ui/theme/IconFactory.h"
+#include "ui/widgets/ResetLabel.h"
 #include "ui/widgets/StepSpinBox.h"
 
+#include <QContextMenuEvent>
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMenu>
 #include <QPointer>
 #include <QPushButton>
 #include <QToolButton>
@@ -31,12 +34,12 @@ OptionsRow::OptionsRow(const QString& tool, const QString& title, QWidget* paren
 
 StepSpinBox* OptionsRow::addNumber(const QString& name, const QString& label, double min, double max, double step,
                                    int decimals, const QString& suffix) {
+    auto* spin = new StepSpinBox(QStringLiteral("options.%1").arg(name), min, max, step, decimals, this);
     if (!label.isEmpty()) {
-        auto* l = new QLabel(label, this);
+        auto* l = new ResetLabel(label, spin, this); // a click resets the number (D-025)
         l->setProperty("quiet", true);
         row_->insertWidget(row_->count() - 1, l);
     }
-    auto* spin = new StepSpinBox(QStringLiteral("options.%1").arg(name), min, max, step, decimals, this);
     spin->setSuffix(suffix);
     spin->setFixedWidth(70);
     row_->insertWidget(row_->count() - 1, spin);
@@ -71,7 +74,11 @@ QLabel* OptionsRow::addLabel(const QString& text) {
 }
 
 void OptionsRow::add(QWidget* widget, const QString& label) {
-    if (!label.isEmpty()) addLabel(label);
+    if (!label.isEmpty()) {
+        auto* l = new ResetLabel(label, widget, this);
+        l->setProperty("quiet", true);
+        row_->insertWidget(row_->count() - 1, l);
+    }
     widget->setParent(this);
     row_->insertWidget(row_->count() - 1, widget);
 }
@@ -82,6 +89,21 @@ void OptionsRow::addSeparator() {
     line->setAttribute(Qt::WA_StyledBackground);
     line->setFixedSize(1, 18);
     row_->insertWidget(row_->count() - 1, line);
+}
+
+void OptionsRow::setReset(const QString& text, std::function<void()> reset) {
+    resetText_ = text;
+    reset_ = std::move(reset);
+}
+
+void OptionsRow::contextMenuEvent(QContextMenuEvent* event) {
+    if (!reset_) return QWidget::contextMenuEvent(event);
+    QMenu menu(this);
+    QAction* a = menu.addAction(resetText_);
+    a->setObjectName(QStringLiteral("menu.reset.%1").arg(tool_));
+    connect(a, &QAction::triggered, this, [this] { reset_(); });
+    menu.exec(event->globalPos());
+    event->accept();
 }
 
 void probeValue(const QString& name, StepSpinBox* box) {

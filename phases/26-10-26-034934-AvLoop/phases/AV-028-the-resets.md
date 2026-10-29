@@ -1,7 +1,7 @@
 ---
 phase: AV-028
 title: "The resets"
-status: IN_PROGRESS
+status: DONE
 owner_item: 25
 track: B
 checkpoint_id: CP-B1
