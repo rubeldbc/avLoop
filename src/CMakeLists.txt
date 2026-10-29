@@ -3,11 +3,11 @@
 add_library(avloop_core STATIC
     core/AppInfo.h core/AppInfo.cpp core/Rational.h
     core/Geometry.h core/Geometry.cpp core/VideoTransform.h core/VideoTransform.cpp
-    core/CropShape.h core/CropShape.cpp core/MaskShape.h core/MaskShape.cpp core/ShapeCombine.h core/ShapeCombine.cpp core/ShapeAlign.h core/ShapeAlign.cpp core/VideoLayer.h core/VideoLayer.cpp core/Sequence.h core/Sequence.cpp core/SequenceEdit.h core/SequenceEdit.cpp core/AspectRatio.h core/AspectRatio.cpp core/Keyframes.h core/Keyframes.cpp
+    core/CropShape.h core/CropShape.cpp core/MaskShape.h core/MaskShape.cpp core/ShapeCombine.h core/ShapeCombine.cpp core/ShapeAlign.h core/ShapeAlign.cpp core/VideoLayer.h core/VideoLayer.cpp core/Sequence.h core/Sequence.cpp core/SequenceEdit.h core/SequenceEdit.cpp core/SequenceView.h core/SequenceView.cpp core/AspectRatio.h core/AspectRatio.cpp core/Keyframes.h core/Keyframes.cpp
     core/Timecode.h core/Timecode.cpp core/TimeRange.h core/TimeRange.cpp
     core/LoopSettings.h core/LoopSettings.cpp core/LoopMap.h core/LoopMap.cpp core/TimeMap.h core/TimeMap.cpp
     core/QualitySettings.h core/QualitySettings.cpp core/ClipEffects.h core/ClipEffects.cpp
-    core/Project.h core/Project.cpp core/Commands.h core/ProjectJson.h core/ProjectJson.cpp core/ProjectSections.cpp
+    core/Project.h core/Project.cpp core/ProjectEdit.cpp core/Commands.h core/ProjectJson.h core/ProjectJson.cpp core/ProjectSections.cpp
     core/ProjectMigrate.h core/ProjectMigrate.cpp core/Presets.h core/Presets.cpp core/AppSettings.h core/AppSettings.cpp)
 target_include_directories(avloop_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_BINARY_DIR}/generated)
 # Qt Gui only for QUndoStack/QUndoCommand, which Qt 6 moved there from Widgets (spec §11.2).
@@ -48,7 +48,7 @@ add_library(avloop_ui STATIC
     ui/dialogs/SettingsDialog.h ui/dialogs/SettingsDialog.cpp ui/dialogs/AboutDialog.h ui/dialogs/AboutDialog.cpp
     ui/dialogs/ShortcutOverlay.h ui/dialogs/ShortcutOverlay.cpp
     ui/export/ExportBar.h ui/export/ExportBar.cpp ui/export/LoopFinderWindow.h ui/export/LoopFinderWindow.cpp
-    ui/MainWindowFinder.cpp ui/MainWindowLayers.cpp ui/MainWindowBatch.cpp ui/export/BatchWindow.h ui/export/BatchWindow.cpp
+    ui/MainWindowFinder.cpp ui/MainWindowLayers.cpp ui/MainWindowMonitor.cpp ui/MonitorComposite.h ui/panels/ProjectPanel.h ui/panels/ProjectPanel.cpp ui/MainWindowBatch.cpp ui/export/BatchWindow.h ui/export/BatchWindow.cpp
     ui/preview/PreviewWindow.h ui/preview/PreviewWindow.cpp ui/preview/PreviewWidgets.h ui/preview/PreviewWidgets.cpp
     ui/preview/PreviewPlayer.h ui/preview/PreviewPlayer.cpp ui/preview/PreviewEncode.cpp
     ui/WalkRunner.h ui/WalkRunner.cpp ui/WalkSteps.cpp

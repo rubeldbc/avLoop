@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/Project.h"
+#include "core/Sequence.h"
 
 #include <QJsonObject>
 #include <QString>
@@ -20,6 +21,8 @@ struct ProjectData {
     CropShape crop;
     ClipEffects effects;      // "effects" (version 2)
     QList<VideoLayer> layers; // "layers" (version 3): the videos on the tracks above (D-027)
+    Sequence sequence;        // "sequence" (version 5, D-033): the truth the sections above show; none: made from them
+    QList<SourceInfo> media;  // "media" (version 5): the media bin
     ViewState view;
     QString exportPath;   // "export": {"lastPath"} — the last file this project was exported to
     QJsonObject original; // the JSON as read: unknown keys are written back unchanged (spec §11.1)
@@ -30,7 +33,7 @@ struct ProjectData {
 // migration (AV-010).
 namespace projectjson {
 
-constexpr int kVersion = 4;
+constexpr int kVersion = 5;
 
 QJsonObject toJson(const ProjectData& data, const QString& projectPath = {});
 // Fails on another format or a newer version, with a message that says so; an older one is brought up to date

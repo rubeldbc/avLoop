@@ -1,8 +1,9 @@
 // AS-002's render walk (D-032): the composite by the built avloop-cli on the counter sample (640×360, 30 fps, its
 // frame number in 16 stripes along its foot). AvLoop's one video under an ellipse crop with keyframes: the composite
 // within 1/255 of AvLoop's own path; a project with a layer: the composite, GPU = CPU byte for byte; a hand-made
-// version-4 sequence — the Razor's two halves on V1 showing their own media times, a Cut ellipse in V2 showing V1
-// through it, an inverted matte's hole clear, V2 keyed to half opacity; 1,200 frames of a layers project: memory flat.
+// sequence (version 5, the scene's px since AS-003's D-033) — the Razor's two halves on V1 showing their own media
+// times, a Cut ellipse in V2 showing V1 through it, an inverted matte's hole clear, V2 keyed to half opacity; 1,200
+// frames of a layers project: memory flat.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -72,9 +73,9 @@ w.check(g && counter(g) === 30 && counter(q, 8) === 120, 'its counters: the main
 const clip = (id, extra) => ({ id, name: 'counter', path: sample, w: 640, h: 360, duration: 10, start: 0, in: 0, out: 10,
   x: 320, y: 180, scale: 1, flipH: false, flipV: false, keys: [], opacity: 100, effects: {}, masks: [], enabled: true,
   ...extra });
-const seq = (v1, v2, matte = {}) => file(`seq${Math.random().toString(36).slice(2, 7)}`, { sequence: { w: 640, h: 360,
+const seq = (v1, v2, matte = {}) => file(`seq${Math.random().toString(36).slice(2, 7)}`, { sequence: { x: 0, y: 0, w: 640, h: 360,
   fps: '30/1', in: 0, out: 10, nextId: 9, matte, tracks: [{ name: 'V1', visible: true, locked: false, clips: v1 },
-    { name: 'V2', visible: true, locked: false, clips: v2 }] } }, 4);
+    { name: 'V2', visible: true, locked: false, clips: v2 }] } }, 5);
 const halves = seq([clip(1, { out: 2 }), clip(2, { start: 2, in: 3 })], []);
 const h1 = seqAt(halves, 1.5), h2 = seqAt(halves, 2.5, 'razor-2.5s.png');
 w.check(h1 && h2 && counter(h1) === 45 && counter(h2) === 105,

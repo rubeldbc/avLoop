@@ -2,7 +2,7 @@
   "delay": 120,
   "settle": 700,
   "steps": [
-    { "label": "D-026: three rectangles drawn with S at 100 % (a canvas point lands ½ px in)" },
+    { "label": "D-026: three rectangles drawn with S at 100 % (a canvas point lands ½ px in) (x read anew with AS-003's Project panel beside the canvas: the ½-px landing)" },
     { "do": "open", "file": "samples/counter-640p30.mp4" },
     { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 10000 },
     { "do": "wait", "ms": 300 },
@@ -19,12 +19,12 @@
     { "label": "Ctrl+A; Align left: all at A's left, none resized; Undo" },
     { "do": "key", "keys": "Ctrl+A", "on": "canvas" },
     { "do": "click", "on": "options.shape.align.left" },
-    { "do": "expect", "probe": "shapes.summary", "eq": "rect:add:21,20,60,60;rect:add:21,100,60,80;rect:add:21,40,80,80" },
+    { "do": "expect", "probe": "shapes.summary", "eq": "rect:add:20,20,60,60;rect:add:20,100,60,80;rect:add:20,40,80,80" },
     { "do": "key", "keys": "Ctrl+Z", "on": "MainWindow" },
 
     { "label": "Distribute horizontally: the middle one's gaps equal (B at 220.5); Undo" },
     { "do": "click", "on": "options.shape.spreadH" },
-    { "do": "expect", "probe": "shapes.summary", "contains": ";rect:add:221,100,60,80;" },
+    { "do": "expect", "probe": "shapes.summary", "contains": ";rect:add:220,100,60,80;" },
     { "do": "shot", "on": "canvas", "file": "canvas-distributed.png", "maxWidth": 1200 },
     { "do": "key", "keys": "Ctrl+Z", "on": "MainWindow" },
 

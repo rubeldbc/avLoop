@@ -5,6 +5,7 @@
 #include "core/Keyframes.h"
 #include "core/LoopSettings.h"
 #include "core/Rational.h"
+#include "core/Sequence.h"
 #include "core/TimeRange.h"
 #include "core/VideoLayer.h"
 #include "core/VideoTransform.h"
@@ -21,7 +22,6 @@
 namespace avloop {
 
 struct ProjectData;
-struct Sequence;
 
 // The source as the project knows it (spec §11.1 "source"): enough to find it again and to lay it in scene space.
 struct SourceInfo {
@@ -50,13 +50,16 @@ struct ViewState {
 };
 
 // The project model (spec §3.2): it changes only through Undo commands, and says what changed by `changed(Aspect)`.
-// Undo keeps 200 steps of values only, never images (spec §3.7, §11.2).
+// Undo keeps 200 steps of values only, never images (spec §3.7, §11.2). Its truth is the sequence (D-033): AvLoop's
+// source, transform, keyframes, crop, effects and layers are views of it (sequenceview) — each edit through them is a
+// step over the whole sequence.
 class Project : public QObject {
     Q_OBJECT
 public:
     // Time: the playhead moved and, with keyframes, the transform shown with it (nothing to export changed).
     // Shapes: which shapes are selected (D-022; not in Undo, not in the file).
     // Layers: the video layers above the main video (D-027); LayerSelection: which one is selected (not in Undo).
+    // Sequence: any clip or track (D-033); Media: the media bin (not in Undo).
     enum class Aspect {
         Source,
         Range,
@@ -71,7 +74,9 @@ public:
         Effects,
         Shapes,
         Layers,
-        LayerSelection
+        LayerSelection,
+        Sequence,
+        Media
     };
     Q_ENUM(Aspect)
     static constexpr int kUndoLimit = 200;
@@ -125,9 +130,15 @@ public:
     // Everything as a value (to save, to snapshot for an export) and back (a project read: Undo cleared).
     ProjectData snapshot() const;
     void restore(const ProjectData& data);
-    // The project as AvLoop Studio's sequence of tracks and clips (D-031): made from the fields above until the editor
-    // edits the sequence itself (AS-003, RS-9).
-    Sequence sequence() const;
+    // The sequence (D-031, D-033): the truth the views above show; changed as one Undo step a gesture.
+    const avloop::Sequence& sequence() const { return seq_; }
+    void changeSequence(const avloop::Sequence& after, const QString& text, const QString& mergeKey = {});
+    // AvLoop's one video: V1 holds the main clip alone from its media's start, no clip has masks — the canvas and
+    // the timeline show it as AvLoop did; else the monitor shows the composite (D-033).
+    bool avloopShaped() const;
+    // The media bin (the Project panel; not in Undo): every file imported, the source first.
+    const QList<SourceInfo>& media() const { return media_; }
+    void addMedia(const SourceInfo& info);
     // The view and the unknown keys are kept outside Undo.
     void setView(const ViewState& view);
     void setExtra(const QJsonObject& extra);
@@ -155,26 +166,30 @@ public:
     void setKeyframeEase(int index, bool ease);
 
     // Only commands call these.
-    void applyTransform(const VideoTransform& t);
-    void applyCrop(const CropShape& c);
-    void applyRange(const TimeRange& r);
+    void applySequence(const avloop::Sequence& s);
     void applyLoop(const LoopSettings& l);
     void applyOutput(const OutputSettings& o);
     void applyQuality(const QualitySettings& q);
-    void applyKeyframes(const Keyframes& k);
-    void applyEffects(const ClipEffects& e);
 
 signals:
     void changed(avloop::Project::Aspect aspect);
 
 private:
+    // The views made again from the sequence; what changed said (all of them on a new document).
+    void sync(bool all);
+    // `after` (settled) pushed as one step over the sequence; nothing when it is the same.
+    void pushSequence(int id, const QString& text, avloop::Sequence after, const QString& mergeKey = {});
+    void pushKeyframes(int id, const QString& text, const Keyframes& after, const QString& mergeKey = {});
+    SourceInfo mediaOf(const QString& path) const;
+
+    avloop::Sequence seq_;    // the truth (D-033)
+    QList<SourceInfo> media_; // the bin
+    // The views (sequenceview): the main clip's media, In/Out, its transform — at the playhead with its keys —, its
+    // keys over sequence time, the matte, its effects, the clips on V2 ….
     SourceInfo source_;
     TimeRange range_;
-    void refreshCurrent(Aspect aspect);
-    void pushKeyframes(int id, const QString& text, const Keyframes& after, const QString& mergeKey = {});
-
     VideoTransform transform_;
-    VideoTransform current_; // transform_ with the keyframes at time_
+    VideoTransform current_;
     Keyframes keyframes_;
     double time_ = 0;
     CropShape crop_;

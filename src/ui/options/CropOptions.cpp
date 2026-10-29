@@ -92,6 +92,31 @@ QWidget* createCropOptions(Project* project, Canvas* canvas, int kindValue, QWid
         clear =
             row->addIcon(k + QStringLiteral(".clear"), QStringLiteral("close"), QObject::tr("Clear the crop (Delete)"));
     }
+    if (kind == CropShape::Kind::Rect) {
+        // The Frame tool (D-033): a size for the output, the crop centred where it is (else on the video), not
+        // inverted.
+        auto* frame = new QComboBox(row);
+        frame->setObjectName(QStringLiteral("options.rect.frame"));
+        frame->addItem(QObject::tr("Frame size…"), QSize());
+        for (const QSize& s : {QSize(1920, 1080), QSize(1080, 1920), QSize(1080, 1080), QSize(1280, 720),
+                               QSize(720, 1280), QSize(1080, 1350)})
+            frame->addItem(QStringLiteral("%1 × %2").arg(s.width()).arg(s.height()), s);
+        frame->setToolTip(QObject::tr("The frame: a size for the output, centred where the crop is"));
+        row->add(frame);
+        QObject::connect(frame, &QComboBox::activated, row, [project, frame](int index) {
+            const QSize size = frame->itemData(index).toSize();
+            frame->setCurrentIndex(0);
+            if (size.isEmpty()) return;
+            CropShape c = project->crop();
+            const QPointF centre =
+                c.isEmpty() ? project->transform().rect(project->source().size()).center() : c.rect.center();
+            c.kind = CropShape::Kind::Rect;
+            c.invert = false;
+            c.ratio = QStringLiteral("free");
+            c.rect = QRectF(centre - QPointF(size.width() / 2.0, size.height() / 2.0), QSizeF(size));
+            project->changeCrop(c);
+        });
+    }
     if (kind == CropShape::Kind::Rounded)
         radius = row->addNumber(k + QStringLiteral(".radius"), QObject::tr("Radius"), 0, 100000, 1, 1);
     if (kind != CropShape::Kind::Rect)

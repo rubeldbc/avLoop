@@ -49,7 +49,9 @@ class RenderService;
 }
 class PlaybackClock;
 class Timeline;
+class MonitorComposite;
 class Project;
+class ProjectPanel;
 class ToolManager;
 class SidePanel;
 class Transport;
@@ -170,6 +172,8 @@ private:
     void buildFinder();
     // MainWindowLayers.cpp — the video layers (D-027): Add as layer…, the canvas's look of them.
     void buildLayers();
+    // MainWindowMonitor.cpp — the Program monitor's composite and the Project panel's walk steps (D-033).
+    void buildMonitor();
     void addLayer(const QString& path);
     void openFinder();
     QObject* exportContext(); // made at first use, as the estimator
@@ -186,6 +190,8 @@ private:
     QStackedWidget* canvasStack_ = nullptr;
     DropZone* dropZone_ = nullptr;
     SidePanel* side_ = nullptr;
+    ProjectPanel* projectPanel_ = nullptr;
+    MonitorComposite* monitor_ = nullptr;
     Transport* transport_ = nullptr;
     Timeline* timeline_ = nullptr;
     PlaybackClock* clock_ = nullptr;
@@ -197,6 +203,7 @@ private:
     QTimer* previewDue_ = nullptr;
     QString rangeText_;
     QSplitter* mainSplit_ = nullptr;
+    QSplitter* leftSplit_ = nullptr; // the Project panel | the canvas and the timeline
     QSplitter* centreSplit_ = nullptr;
     QLabel* sourceLabel_ = nullptr;
     QLabel* gpuLabel_ = nullptr;

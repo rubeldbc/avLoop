@@ -56,7 +56,7 @@ hole a video and export as transparent."*
 | `node tools/check-secrets.mjs` | PASS (on its own, exit code 0) |
 | `check-loc.mjs` | PASS: 339 code files, the largest `src/core/ClipEffects.cpp` 425 |
 | `validate-phase-system.mjs` | PASS: 9 phases, 9 requirement ids |
-| `git push origin main`; CI | see the commit `[AS-002]` and its run |
+| `git push origin main`; CI | pushed `3b2edd7`; CI **red** (run 40949767710): AvLoop's validator — AV-033's read scope named the removed `LayerPass.cpp`; mended in `[AS-003]` |
 
 ## The walk
 

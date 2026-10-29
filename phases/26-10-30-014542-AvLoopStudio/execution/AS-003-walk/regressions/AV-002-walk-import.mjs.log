@@ -1,0 +1,54 @@
+PASS opens alpha-vp9.webm: 640×360 · 30.00 fps · VP9 · alpha · vp9 in matroska,webm · frames 0/44/89 → 640×360
+PASS refused audio-only.m4a: ERROR This file has no video AvLoop can decode (container: QuickTime / MOV).
+PASS refused broken.mp4: ERROR Cannot open broken.mp4: Invalid data found when processing input. It is not a video file AvLoop can read.
+PASS opens counter-1080p30.mp4: 1920×1080 · 30.00 fps · H.264 · h264 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/149/299 → 1920×1080
+PASS opens counter-1080p60.mp4: 1920×1080 · 60.00 fps · H.264 · h264 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/299/599 → 1920×1080
+PASS opens counter-640p30.mp4: 640×360 · 30.00 fps · H.264 · h264 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/149/299 → 640×360
+PASS opens family-anim.apng: 320×240 · 25.00 fps · APNG · apng in apng · frames 0/0/0 → 320×240
+PASS opens family-anim.gif: 320×240 · 25.00 fps · GIF · alpha · gif in gif · frames 0/24/49 → 320×240
+PASS refused family-anim.webp: ERROR This animated WebP cannot be decoded: FFmpeg reads still WebP images only. Convert it to GIF, APNG or a video first.
+PASS opens family-av1.mp4: 320×240 · 25.00 fps · AV1 · av1 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/24/49 → 320×240
+PASS opens family-cineform.mov: 320×240 · 25.00 fps · CineForm · cfhd in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/24/49 → 320×240
+PASS opens family-dnxhr.mxf: 1280×720 · 25.00 fps · DNxHD · dnxhd in mxf · frames 0/12/24 → 1280×720
+PASS opens family-ffv1.mkv: 320×240 · 25.00 fps · FFV1 · ffv1 in matroska,webm · frames 0/24/49 → 320×240
+PASS opens family-flv1.flv: 320×240 · 25.00 fps · Sorenson H.263 · flv1 in flv · frames 0/24/49 → 320×240
+PASS opens family-h263.3gp: 176×144 · 25.00 fps · H263 · h263 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/24/49 → 176×144
+PASS opens family-h264.m2ts: 320×240 · 25.00 fps · H.264 · h264 in mpegts · frames 0/24/49 → 320×240
+PASS opens family-h264.mkv: 320×240 · 25.00 fps · H.264 · h264 in matroska,webm · frames 0/24/49 → 320×240
+PASS opens family-h264.ts: 320×240 · 25.00 fps · H.264 · h264 in mpegts · frames 0/24/49 → 320×240
+PASS opens family-hap.mov: 320×240 · 25.00 fps · HAP · hap in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/24/49 → 320×240
+PASS opens family-hevc.mp4: 320×240 · 25.00 fps · HEVC · hevc in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/24/49 → 320×240
+PASS opens family-mjpeg.avi: 320×240 · 25.00 fps · MJPEG · mjpeg in avi · frames 0/24/49 → 320×240
+PASS opens family-mpeg1.mpg: 320×240 · 25.00 fps · MPEG-1 · VFR → CFR · mpeg1video in mpeg · frames 0/24/49 → 320×240
+PASS opens family-mpeg2.mpg: 320×240 · 25.00 fps · MPEG-2 · mpeg2video in mpeg · frames 0/24/49 → 320×240
+PASS opens family-mpeg2.vob: 720×576 · 25.00 fps · MPEG-2 · mpeg2video in mpeg · frames 0/24/49 → 720×576
+PASS opens family-mpeg4.avi: 320×240 · 25.00 fps · MPEG-4 · mpeg4 in avi · frames 0/24/49 → 320×240
+PASS opens family-png.mov: 320×240 · 25.00 fps · PNG · png in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/24/49 → 320×240
+PASS opens family-prores.mov: 320×240 · 25.00 fps · ProRes · prores in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/24/49 → 320×240
+PASS opens family-qtrle.mov: 320×240 · 25.00 fps · QuickTime Animation · alpha · qtrle in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/24/49 → 320×240
+PASS opens family-raw.avi: 320×240 · 25.00 fps · Uncompressed · rawvideo in avi · frames 0/12/24 → 320×240
+PASS opens family-raw.y4m: 320×240 · 25.00 fps · Uncompressed · rawvideo in yuv4mpegpipe · frames 0/12/24 → 320×240
+PASS opens family-theora.ogv: 320×240 · 25.00 fps · Theora · theora in ogg · frames 0/24/49 → 320×240
+PASS opens family-vp8.webm: 320×240 · 25.00 fps · VP8 · vp8 in matroska,webm · frames 0/24/49 → 320×240
+PASS opens family-vp9.webm: 320×240 · 25.00 fps · VP9 · vp9 in matroska,webm · frames 0/24/49 → 320×240
+PASS opens family-wmv2.wmv: 320×240 · 25.00 fps · WMV 8 · wmv2 in asf · frames 0/24/49 → 320×240
+PASS opens hdr-pq.mkv: 640×360 · 25.00 fps · HEVC · HDR → SDR · hevc in matroska,webm · frames 0/37/74 → 640×360
+PASS opens interlaced.mpg: 720×576 · 25.00 fps · MPEG-2 · interlaced · mpeg2video in mpeg · frames 0/24/49 → 720×576
+PASS opens loop4s.mp4: 640×360 · 30.00 fps · H.264 · h264 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/299/599 → 640×360
+PASS opens prores4444.mov: 640×360 · 25.00 fps · ProRes · alpha · prores in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/24/49 → 640×360
+PASS opens readme-demo.mp4: 1920×1080 · 30.00 fps · H.264 · h264 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/149/299 → 1920×1080
+PASS opens rotate90.mp4: 360×640 · 30.00 fps · H.264 · h264 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/149/299 → 360×640
+PASS opens sar43.mp4: 854×480 · 25.00 fps · H.264 · h264 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/24/49 → 854×480
+PASS opens uhd-4k.mp4: 3840×2160 · 30.00 fps · H.264 · h264 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/29/59 → 1920×1080
+PASS opens vfr.mp4: 640×360 · 24.13 fps · H.264 · VFR → CFR · h264 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/71/143 → 640×360
+PASS opens বাংলা নমুনা/ভিডিও.mp4: 640×360 · 30.00 fps · H.264 · h264 in mov,mp4,m4a,3gp,3g2,mj2 · frames 0/149/299 → 640×360
+     41 files opened, their first, middle and last frames decoded
+PASS rotation upright (vs ffmpeg autorotate): 360×640, mean difference 0.000
+PASS SAR 4:3 to square pixels: 854×480
+PASS deinterlaced (bwdif): frame 24 against ffmpeg's bwdif: mean 0.02; against the woven fields: 1.42; combing 0.267
+PASS HDR tone-mapped to SDR (zscale + hable): against ffmpeg's tone-mapped frame: mean 0.02; against the untone-mapped decode: 3.46
+PASS alpha kept: alpha-vp9.webm: corner alpha 0, centre alpha 255
+PASS alpha kept: prores4444.mov: corner alpha 0, centre alpha 255
+PASS 4K scaled to the working size: 1920×1080
+PASS HW decode on and off give the same frame: D3D11VA used; mean 0.000, max 0
+WALK PASSED

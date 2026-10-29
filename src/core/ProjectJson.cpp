@@ -98,11 +98,23 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
     for (const VideoLayer& l : d.layers)
         layers.append(l.toJson());
     root.insert(QStringLiteral("layers"), layers);
-    // The sequence (version 4, D-031): AvLoop's model as tracks and clips — derived from it until the editor edits the
-    // sequence itself (RS-7). Only a probed source gives it (its size and length are not in the file); else the one
-    // read stays (the root starts as the file read).
-    if (d.source.width > 0 && d.source.height > 0)
+    // The sequence (version 5, D-033): the project's truth, the sections above its views. A project without one (an
+    // AvLoop file read alone, as avloop-cli does) has it made from them when its source was probed (its size and
+    // length are not in the file); else the one read stays (the root starts as the file read).
+    if (!d.sequence.tracks.isEmpty())
+        root.insert(QStringLiteral("sequence"), d.sequence.toJson());
+    else if (d.source.width > 0 && d.source.height > 0)
         root.insert(QStringLiteral("sequence"), Sequence::fromAvLoop(d).toJson());
+    QJsonArray media;
+    for (const SourceInfo& m : d.media)
+        media.append(QJsonObject{{QStringLiteral("path"), QDir::fromNativeSeparators(m.path)},
+                                 {QStringLiteral("w"), m.width},
+                                 {QStringLiteral("h"), m.height},
+                                 {QStringLiteral("duration"), m.duration},
+                                 {QStringLiteral("fps"), QStringLiteral("%1/%2").arg(m.fps.num).arg(m.fps.den)},
+                                 {QStringLiteral("vfr"), m.vfr},
+                                 {QStringLiteral("alpha"), m.hasAlpha}});
+    if (!d.media.isEmpty() || root.contains(QStringLiteral("media"))) root.insert(QStringLiteral("media"), media);
 
     QJsonObject view{
         {QStringLiteral("zoom"), d.view.zoom},
@@ -177,6 +189,21 @@ bool fromJson(const QJsonObject& read, ProjectData& d, QString* error, const QSt
     d.layers.clear();
     for (const QJsonValue& v : json.value(QStringLiteral("layers")).toArray())
         if (d.layers.size() < VideoLayer::kMaxLayers) d.layers.append(VideoLayer::fromJson(v.toObject()));
+    if (const QJsonValue s = json.value(QStringLiteral("sequence")); s.isObject())
+        d.sequence = Sequence::fromJson(s.toObject());
+    for (const QJsonValue& v : json.value(QStringLiteral("media")).toArray()) {
+        const QJsonObject o = v.toObject();
+        SourceInfo m;
+        m.path = QDir::toNativeSeparators(o.value(QStringLiteral("path")).toString());
+        m.width = o.value(QStringLiteral("w")).toInt();
+        m.height = o.value(QStringLiteral("h")).toInt();
+        m.duration = o.value(QStringLiteral("duration")).toDouble();
+        const QStringList fps = o.value(QStringLiteral("fps")).toString().split(QLatin1Char('/'));
+        m.fps = {fps.value(0).toInt(), std::max(1, fps.value(1).toInt())};
+        m.vfr = o.value(QStringLiteral("vfr")).toBool();
+        m.hasAlpha = o.value(QStringLiteral("alpha")).toBool();
+        if (!m.path.isEmpty()) d.media.append(m);
+    }
 
     const QJsonObject v = json.value(QStringLiteral("view")).toObject();
     d.view.zoom = v.value(QStringLiteral("zoom")).toDouble(1.0);

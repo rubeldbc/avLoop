@@ -33,7 +33,7 @@ Clip counter(double scale = 1) {
 
 Sequence tracks(int n) {
     Sequence s;
-    s.frame = {640, 360};
+    s.frame = QRectF(0, 0, 640, 360);
     s.inOut = {0, 10};
     for (int i = 0; i < n; ++i)
         s.tracks.append({QStringLiteral("V%1").arg(i + 1), true, false, {}});
@@ -109,8 +109,8 @@ private slots:
         QVERIFY(!job.composite);
         render::FrameRenderer avloop(job, nullptr, false);
         QVERIFY(avloop.open());
-        render::SequenceRenderer composite(job.sequence, QRectF(QPointF(0, 0), job.frame.size()), job.outputSize,
-                                           job.loop.method, job.alpha, job.background);
+        render::SequenceRenderer composite(job.sequence, job.frame, job.outputSize, job.loop.method, job.alpha,
+                                           job.background);
         const LoopPlan& plan = job.plan;
         for (int k : {0, plan.length / 2, plan.length - 1}) {
             const Pick pick = loopmap::pick(job.loop.mode, plan.segment, plan.fade, plan.turn, job.loop.curve, k);

@@ -1,0 +1,2 @@
+PASS 40 cold seeks through avloop-cli (1080p H.264, D3D11VA): 40/40 exact; frames 147, 216, 136, 16, 228, 208, 36, 248, 264, 36, 192, 28 …; mean decode 119 ms a seek
+WALK PASSED

@@ -33,17 +33,6 @@ QList<LayerKey> keysFrom(const QJsonArray& list) {
     return keys;
 }
 
-// A shape moved by `by` (the old scene → the frame's px).
-MaskShape moved(MaskShape s, const QPointF& by) {
-    s.rect.translate(by);
-    for (PathPoint& pt : s.points) {
-        pt.p += by;
-        pt.in += by;
-        pt.out += by;
-    }
-    return s;
-}
-
 QJsonObject matteJson(const CropShape& m) {
     QJsonArray shapes;
     for (const MaskShape& s : m.shapes)
@@ -106,7 +95,8 @@ QJsonObject Clip::toJson() const {
             {QStringLiteral("opacity"), opacity},
             {QStringLiteral("effects"), effects.toJson()},
             {QStringLiteral("masks"), maskList},
-            {QStringLiteral("enabled"), enabled}};
+            {QStringLiteral("enabled"), enabled},
+            {QStringLiteral("locked"), locked}};
 }
 
 Clip Clip::fromJson(const QJsonObject& json) {
@@ -129,6 +119,7 @@ Clip Clip::fromJson(const QJsonObject& json) {
     for (const QJsonValue& v : json.value(QStringLiteral("masks")).toArray())
         if (c.masks.size() < MaskShape::kMaxShapes) c.masks.append(MaskShape::fromJson(v.toObject()));
     c.enabled = json.value(QStringLiteral("enabled")).toBool(true);
+    c.locked = json.value(QStringLiteral("locked")).toBool(false);
     return c;
 }
 
@@ -158,11 +149,14 @@ QJsonObject Sequence::toJson() const {
                                      {QStringLiteral("locked"), t.locked},
                                      {QStringLiteral("clips"), clips}});
     }
-    return {{QStringLiteral("w"), frame.width()},
+    return {{QStringLiteral("x"), frame.x()},
+            {QStringLiteral("y"), frame.y()},
+            {QStringLiteral("w"), frame.width()},
             {QStringLiteral("h"), frame.height()},
             {QStringLiteral("fps"), QStringLiteral("%1/%2").arg(fps.num).arg(fps.den)},
             {QStringLiteral("in"), inOut.in},
             {QStringLiteral("out"), inOut.out},
+            {QStringLiteral("main"), main},
             {QStringLiteral("nextId"), nextId},
             {QStringLiteral("tracks"), trackList},
             {QStringLiteral("matte"), matteJson(matte)}};
@@ -170,12 +164,14 @@ QJsonObject Sequence::toJson() const {
 
 Sequence Sequence::fromJson(const QJsonObject& json) {
     Sequence s;
-    s.frame = QSize(json.value(QStringLiteral("w")).toInt(1920), json.value(QStringLiteral("h")).toInt(1080));
+    s.frame = QRectF(json.value(QStringLiteral("x")).toDouble(), json.value(QStringLiteral("y")).toDouble(),
+                     json.value(QStringLiteral("w")).toDouble(1920), json.value(QStringLiteral("h")).toDouble(1080));
     const QStringList fps = json.value(QStringLiteral("fps")).toString(QStringLiteral("30/1")).split(QLatin1Char('/'));
     s.fps = {fps.value(0).toInt(), std::max(1, fps.value(1).toInt())};
     if (!s.fps.isValid()) s.fps = {30, 1};
     s.inOut = {json.value(QStringLiteral("in")).toDouble(), json.value(QStringLiteral("out")).toDouble()};
     s.nextId = std::max(1, json.value(QStringLiteral("nextId")).toInt(1));
+    s.main = json.value(QStringLiteral("main")).toInt();
     s.matte = matteFrom(json.value(QStringLiteral("matte")).toObject());
     for (const QJsonValue& v : json.value(QStringLiteral("tracks")).toArray()) {
         if (s.tracks.size() >= kMaxTracks) break;
@@ -198,14 +194,13 @@ Sequence Sequence::fromAvLoop(const ProjectData& d) {
     Sequence s;
     const QSizeF video(d.source.width, d.source.height);
     // The export's frame: the crop, else the video where it stands at In (RenderJob's).
-    const QRectF frame = geometry::exportFrame(d.crop, keyframes::valueAt(d.keyframes, d.transform, d.range.in), video);
-    const QPointF origin = frame.topLeft();
-    s.frame = QSize(std::max(16, int(std::lround(frame.width()))), std::max(16, int(std::lround(frame.height()))));
+    s.frame = geometry::exportFrame(d.crop, keyframes::valueAt(d.keyframes, d.transform, d.range.in), video);
     s.fps = d.output.sourceFps && d.source.fps.isValid() ? d.source.fps : d.output.fps;
     if (!s.fps.isValid()) s.fps = {30, 1};
     s.inOut = d.range;
     s.tracks.append({QStringLiteral("V1"), true, false, {}});
-    if (!d.source.path.isEmpty()) {
+    {
+        // The main video — a placeholder without a path when the project has none (D-033: V1 always holds it).
         Clip main;
         main.id = s.nextId++;
         main.name = QFileInfo(d.source.path).completeBaseName();
@@ -214,19 +209,15 @@ Sequence Sequence::fromAvLoop(const ProjectData& d) {
         main.duration = d.source.duration;
         main.range = {0, d.source.duration};
         main.transform = d.transform;
-        main.transform.x -= origin.x();
-        main.transform.y -= origin.y();
         for (const Keyframe& k : d.keyframes)
-            main.keys.append({k.t, k.x - origin.x(), k.y - origin.y(), k.scale, 100, k.ease});
+            main.keys.append({k.t, k.x, k.y, k.scale, 100, k.ease});
         main.effects = d.effects;
+        s.main = main.id;
         s.tracks[0].clips.append(main);
     }
     // The crop over everything, as AvLoop drew it over the main video and the layers (RS-10).
     s.matte = d.crop;
     s.matte.ratio = CropShape().ratio;
-    if (!s.matte.isEmpty()) s.matte.rect.translate(-origin);
-    for (MaskShape& m : s.matte.shapes)
-        m = moved(m, -origin);
     for (const VideoLayer& l : d.layers) {
         const int index = std::clamp(l.track, 2, kMaxTracks) - 1;
         while (s.tracks.size() <= index)
@@ -240,16 +231,11 @@ Sequence Sequence::fromAvLoop(const ProjectData& d) {
         c.start = l.start;
         c.range = l.range;
         c.transform = l.transform;
-        c.transform.x -= origin.x();
-        c.transform.y -= origin.y();
-        for (LayerKey k : l.keys) {
-            k.x -= origin.x();
-            k.y -= origin.y();
-            c.keys.append(k);
-        }
+        c.keys = l.keys;
         c.opacity = l.opacity;
         c.effects = l.effects;
         c.enabled = l.visible;
+        c.locked = l.locked;
         s.tracks[index].clips.append(c);
         std::sort(s.tracks[index].clips.begin(), s.tracks[index].clips.end(),
                   [](const Clip& a, const Clip& b) { return a.start < b.start; });

@@ -50,7 +50,14 @@ bool upgrade(QJsonObject& json, int current, QString* error) {
         json.insert(QStringLiteral("version"), 4);
         version = 4;
     }
-    // Later versions add their steps here: if (version < 5) { toVersion5(json); version = 5; } …
+    if (version < 5) {
+        // Version 4 → 5: the sequence becomes the truth, in the scene's px (D-033). Version 4's was always made from
+        // the rest (RS-9), in the frame's px: it goes, and is made again from the rest on reading.
+        json.remove(QStringLiteral("sequence"));
+        json.insert(QStringLiteral("version"), 5);
+        version = 5;
+    }
+    // Later versions add their steps here: if (version < 6) { toVersion6(json); version = 6; } …
     return version == current;
 }
 

@@ -1,13 +1,15 @@
 // The sequence (D-031): a clip's own time and keyed look; the edits — the Razor, trims, moves, removes, ripple, insert,
 // overwrite, tracks — and their refusals; the file's form; an AvLoop project (a crop, an inverse, shapes, keyframes,
-// layers) migrated.
+// layers) migrated; the project over it (D-033): AvLoop's views and their way back, Undo, a clip's masks kept.
 #include "core/ProjectJson.h"
 #include "core/SequenceEdit.h"
+#include "core/SequenceView.h"
 
 #include <QTest>
 
 using namespace avloop;
 namespace se = avloop::sequenceedit;
+namespace sv = avloop::sequenceview;
 
 namespace {
 
@@ -124,7 +126,7 @@ private slots:
         c.effects.sepia = 30;
         QVERIFY(se::insert(s, 1, 1.5, c));
         s.inOut = {1, 3};
-        s.frame = {1080, 1920};
+        s.frame = QRectF(10, 20, 1080, 1920);
         s.matte.kind = CropShape::Kind::Ellipse;
         s.matte.rect = QRectF(10, 20, 300, 200);
         s.matte.invert = true;
@@ -161,34 +163,112 @@ private slots:
         l.transform.y = 100;
         d.layers = {l};
         const Sequence s = Sequence::fromAvLoop(d);
-        QCOMPARE(s.frame, QSize(200, 100));
+        QCOMPARE(s.frame, QRectF(100, 50, 200, 100)); // the crop, in the scene's px (D-033)
         QCOMPARE(s.inOut.in, 1.0);
         QCOMPARE(s.tracks.size(), 3);
         const Clip& main = s.tracks[0].clips.first();
-        QCOMPARE(main.transform.x, 220.0); // 320 − the frame's left 100
-        QCOMPARE(main.keys.first().x, 300.0);
+        QCOMPARE(s.main, main.id);
+        QCOMPARE(main.transform.x, 320.0); // nothing moved
+        QCOMPARE(main.keys.first().x, 400.0);
         QVERIFY(main.masks.isEmpty());
-        QCOMPARE(s.matte.rect, QRectF(0, 0, 200, 100)); // the crop at the frame's place: over everything (RS-10)
+        QCOMPARE(s.matte.rect, QRectF(100, 50, 200, 100)); // the crop over everything (RS-10)
         QCOMPARE(s.matte.kind, CropShape::Kind::Ellipse);
         QCOMPARE(s.matte.feather, 10.0);
-        QCOMPARE(s.matte.shapes.first().rect, QRectF(20, 10, 20, 20));
-        QCOMPARE(s.tracks[2].clips.first().transform.x, 100.0);
+        QCOMPARE(s.matte.shapes.first().rect, QRectF(120, 60, 20, 20));
+        QCOMPARE(s.tracks[2].clips.first().transform.x, 200.0);
         d.crop.invert = true;
         const Sequence hole = Sequence::fromAvLoop(d);
-        // An inverse: the whole video where it stands at In — held at the first key (400, 200, ×1.5): 960×540 from
-        // (−80, −70).
-        QCOMPARE(hole.frame, QSize(960, 540));
+        // An inverse: the whole video where it stands at In — held at the first key (400, 200, ×1.5).
+        QCOMPARE(hole.frame, QRectF(-80, -70, 960, 540));
         QVERIFY(hole.matte.invert);
-        QCOMPARE(hole.matte.rect, QRectF(180, 120, 200, 100));
-        QCOMPARE(hole.tracks[0].clips.first().keys.first().x, 480.0);
+        QCOMPARE(hole.matte.rect, QRectF(100, 50, 200, 100));
         // The file carries it, and reads it back.
         const QJsonObject json = projectjson::toJson(d);
-        QCOMPARE(json.value(QStringLiteral("version")).toInt(), 4);
+        QCOMPARE(json.value(QStringLiteral("version")).toInt(), 5);
         QCOMPARE(Sequence::fromJson(json.value(QStringLiteral("sequence")).toObject()), hole);
-        // The project's own (RS-9: made from its fields until AS-003).
+        // The project over it: AvLoop's views show it.
         Project p;
         p.restore(d);
         QCOMPARE(p.sequence(), hole);
+        QCOMPARE(p.keyframes(), d.keyframes);
+        QCOMPARE(p.crop(), d.crop);
+        QCOMPARE(p.layers().size(), 1);
+        QCOMPARE(p.layers().first().transform.x, 200.0);
+        QVERIFY(p.layers().first().id > 0);
+        QCOMPARE(p.exportFrame(), hole.frame);
+    }
+    // AvLoop's views and their way back (D-033): each edit one step over the sequence.
+    void viewsAndBack() {
+        ProjectData d;
+        d.source.path = QStringLiteral("D:/clips/fire.mp4");
+        d.source.width = 640;
+        d.source.height = 360;
+        d.source.duration = 10;
+        d.source.fps = {30, 1};
+        d.range = {0, 10};
+        d.transform = VideoTransform::initial({640, 360});
+        Project p;
+        p.restore(d);
+        QVERIFY(p.avloopShaped());
+        VideoTransform t = p.transform();
+        t.x = 100;
+        p.changeTransform(t);
+        QCOMPARE(sv::mainClip(p.sequence())->transform.x, 100.0);
+        p.undoStack()->undo();
+        QCOMPARE(sv::mainClip(p.sequence())->transform.x, 320.0);
+        // A layer through AvLoop's view: a clip on its track; its masks stay through a later edit of the layer.
+        VideoLayer l;
+        l.name = QStringLiteral("b");
+        l.path = QStringLiteral("D:/clips/b.mp4");
+        l.size = QSizeF(320, 180);
+        l.duration = 5;
+        l.range = {0, 5};
+        l.track = 2;
+        p.changeLayers({l});
+        QCOMPARE(p.sequence().tracks[1].clips.size(), 1);
+        Sequence masked = p.sequence();
+        masked.tracks[1].clips[0].masks = {MaskShape{}};
+        p.changeSequence(masked, QStringLiteral("Add a mask"));
+        QVERIFY(!p.avloopShaped());
+        QList<VideoLayer> after = p.layers();
+        after[0].opacity = 50;
+        p.changeLayers(after);
+        QCOMPARE(p.sequence().tracks[1].clips[0].masks.size(), 1);
+        QCOMPARE(p.sequence().tracks[1].clips[0].opacity, 50.0);
+        // A copy (the same id twice): a clip of its own.
+        QList<VideoLayer> two = p.layers();
+        two.append(two[0]);
+        two[1].start = 6;
+        p.changeLayers(two);
+        QCOMPARE(p.sequence().tracks[1].clips.size(), 2);
+        QVERIFY(p.sequence().tracks[1].clips[0].id != p.sequence().tracks[1].clips[1].id);
+        // Insert on V1 at 2 s: the main clip cut there and stays the source; the new clip between its halves.
+        Sequence ins = p.sequence();
+        Clip c;
+        c.path = QStringLiteral("D:/clips/c.mp4");
+        c.size = QSizeF(640, 360);
+        c.duration = 3;
+        c.range = {0, 3};
+        QVERIFY(se::insert(ins, 0, 2, c));
+        p.changeSequence(ins, QStringLiteral("Insert"));
+        QCOMPARE(p.sequence().tracks[0].clips.size(), 3);
+        QCOMPARE(p.source().path, d.source.path);
+        QCOMPARE(sv::mainClip(p.sequence())->end(), 2.0);
+        p.undoStack()->undo();
+        QCOMPARE(p.sequence().tracks[0].clips.size(), 1);
+    }
+    // Keys over sequence time on a clip that starts later: own = In + (t − start).
+    void keysOverSequenceTime() {
+        Clip c = media(10);
+        c.start = 2;
+        c.range = {1, 5};
+        c.keys = {{3, 10, 20, 1, 40, false}};
+        QCOMPARE(sv::keyframesOf(c).first().t, 4.0);
+        sv::setKeyframes(c, {{4, 10, 20, 1, false}, {5, 30, 40, 2, true}});
+        QCOMPARE(c.keys.size(), 2);
+        QCOMPARE(c.keys[0].t, 3.0);
+        QCOMPARE(c.keys[0].opacity, 40.0); // a key that stays keeps its opacity
+        QCOMPARE(c.keys[1].t, 4.0);
     }
 };
 

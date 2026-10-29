@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/Project.h"
+#include "core/Sequence.h"
 
 #include <QElapsedTimer>
 #include <QUndoCommand>
@@ -63,16 +64,14 @@ enum CommandId {
     DeleteKeyframeId,
     SetEffectsId,
     SetLayersId,
+    SetSequenceId,
 };
 
-using SetTransformCommand = ValueCommand<VideoTransform>;
-using SetCropCommand = ValueCommand<CropShape>;
-using SetRangeCommand = ValueCommand<TimeRange>;
 using SetLoopCommand = ValueCommand<LoopSettings>;
 using SetOutputCommand = ValueCommand<OutputSettings>;
 using SetQualityCommand = ValueCommand<QualitySettings>;
-using SetKeyframesCommand = ValueCommand<Keyframes>; // AddKeyframe, MoveKeyframe, DeleteKeyframe by their ids
-using SetEffectsCommand = ValueCommand<ClipEffects>;
-using SetLayersCommand = ValueCommand<QList<VideoLayer>>; // the video layers on the tracks above (D-027)
+// The transform, the crop, In/Out, the keyframes, the effects, the layers and the sequence's own edits: each a step
+// over the whole sequence (D-033, RS-4), its id the aspect's (so a drag in one field still merges).
+using SetSequenceCommand = ValueCommand<Sequence>;
 
 } // namespace avloop

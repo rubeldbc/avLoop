@@ -14,6 +14,8 @@
 #include <QJsonDocument>
 #include <QStringList>
 
+#include <algorithm>
+#include <cmath>
 #include <cstdio>
 
 namespace avloop::cli {
@@ -32,8 +34,8 @@ QString option(const QStringList& args, const QString& name) {
 
 // The sequence at `t` into a PNG (and its premultiplied RGBA8 bytes as they are).
 int draw(const Sequence& s, double t, const QString& png, const QString& raw) {
-    render::SequenceRenderer r(s, QRectF(QPointF(0, 0), QSizeF(s.frame)), s.frame, LoopSettings::Method::Nearest, true,
-                               Qt::black);
+    const QSize size(std::max(16, int(std::lround(s.frame.width()))), std::max(16, int(std::lround(s.frame.height()))));
+    render::SequenceRenderer r(s, s.frame, size, LoopSettings::Method::Nearest, true, Qt::black);
     QImage img;
     QString error;
     if (!r.render({{t, 1, 0, 0}}, img, &error)) {

@@ -17,7 +17,7 @@ read_scope:
   - phases/26-10-26-034934-AvLoop/control/30_SHAPES_THE_TIMELINE_LAYERS.md
   - docs/SPEC.md
   - src/core/VideoLayer.h
-  - src/render/LayerPass.cpp
+  - src/render/SequenceRenderer.cpp
   - src/ui/panels/LayersPanel.cpp
   - src/ui/panels/EffectsPanel.cpp
   - src/ui/timeline/TrackLanes.cpp

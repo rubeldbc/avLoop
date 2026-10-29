@@ -479,3 +479,14 @@ end of its section.
 - **A pixel check where both answers look alike proves nothing**: the hole's centre was blue in V1 and in V2 alike, so
   "V1 through the hole" passed with no hole drawn; the picture showed it. Rule: a walk that tells two sources apart
   makes them differ where it reads (a mirrored V1) and checks the other source is not there. (AS-002)
+- **A const_cast into a QList copy writes into the original**: `mainClip(Sequence&)` returned a pointer found through
+  const access and cast it; the copy had not detached, so the "after" sequence and the live one changed together, the
+  step was "no change" and nothing reached Undo. Rule: a mutable lookup into a Qt container goes through its own
+  non-const access (it detaches), never a const_cast. (AS-003)
+- **A walk value that rests on the canvas's ½-px landing moves with any panel beside it**: the Project panel narrowed
+  the canvas and AV-024's and AV-029's shapes landed at x 100, not 101. Rule: such values are read anew when the
+  layout changes (and the record says why); a new walk reads positions with `near`. (AS-003)
+- **A phase's regressions miss what they do not run**: AS-002's composite made AV-031's memory walk fail (+55.5 MB),
+  found only in AS-003's sweep. Rule: a renderer change runs every memory and render walk of before. (AS-003)
+- **CI validates every programme's phases**: removing `LayerPass.cpp` broke AvLoop's validator (AV-033 read it), and only
+  CI said so. Rule: both programmes' `validate-phase-system.mjs` run before a commit that removes or renames a file. (AS-003)

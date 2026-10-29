@@ -1,0 +1,28 @@
+startup: 627 ms
+walk walk-key-copy.json: 34 steps
+-- two keyframes: K at 2 s, the Selection's X typed at 4 s @1327 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect keyframes.count: 2
+PASS expect keyframes.list: 2.000:320.0,180.0,1.000|4.000:520.0,180.0,1.000
+PASS expect undo.index: 2
+-- Alt+drag the 2 s diamond to 3 s: a copy there, the original kept, one Undo step @2876 ms
+PASS expect keyframes.count: 3
+PASS expect keyframes.list: 2.000:320.0,180.0,1.000|3.000:320.0,180.0,1.000|4.000:520.0,180.0,1.000
+PASS expect playhead: 3
+PASS expect undo.index: 3
+PASS shot key-copied.png: 1400x117 px
+PASS expect keyframes.count: 2
+PASS expect keyframes.list: 2.000:320.0,180.0,1.000|4.000:520.0,180.0,1.000
+PASS expect keyframes.count: 3
+-- Alt+click without a drag copies nothing @4327 ms
+PASS expect keyframes.count: 3
+PASS expect undo.index: 3
+-- a plain drag still moves; over another keyframe it keeps its own (3 s → 4.5 s across 4 s) @4706 ms
+PASS expect keyframes.count: 3
+PASS expect keyframes.list: 2.000:320.0,180.0,1.000|4.000:520.0,180.0,1.000|4.500:320.0,180.0,1.000
+PASS expect keyframes.list: 2.000:320.0,180.0,1.000|4.000:520.0,180.0,1.000|4.500:320.0,180.0,1.000
+PASS expect playhead: 4.5
+PASS shot key-moved-across.png: 1400x117 px
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

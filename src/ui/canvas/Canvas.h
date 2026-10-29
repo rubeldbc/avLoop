@@ -59,6 +59,11 @@ public:
     QRectF fitTarget() const;
     QRectF videoRect() const;
     bool glReady() const;
+    // The main video not drawn: the Program monitor paints the composite over the underlay instead (D-033).
+    void setVideoHidden(bool hidden) {
+        videoHidden_ = hidden;
+        update();
+    }
     // The eyedropper (D-018): the next click on the video gives its colour there, as the clip is (before effects);
     // Esc or a click beside the video gives none. Overrides the tool for that one click.
     void pickColour(std::function<void(const QColor&)> done);
@@ -86,6 +91,7 @@ private:
     void setEffectUniforms(); // CanvasGl.cpp: the clip effects on the video
     void paintOverlay();      // CanvasOverlay.cpp
     std::function<void(QPainter&)> underlay_;
+    bool videoHidden_ = false;
     void paintShapes(QPainter& p, const CropShape& crop); // the dim and outlines with shapes (D-022)
     void releaseGl();                                     // CanvasGl.cpp
     void viewChangedNow();

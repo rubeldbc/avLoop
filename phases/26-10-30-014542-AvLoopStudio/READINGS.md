@@ -34,3 +34,14 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md`; `DECISI
 13. **RS-13** (AS-002) Each clip is decoded at its own working size (R-16's rule; AvLoop's layers were decoded whole);
     V1's clips may use the hardware decoder, the tracks above the software one; a clip whose media is offline or past
     its end is not drawn (as AvLoop's layers), never an error.
+14. **RS-14** (AS-003) The sequence is the project's truth and AvLoop's model its view (D-033): the main clip — one of
+    V1's, `Sequence::main` — is AvLoop's main video, the clips on V2 … its layers (ordered by id; a clip's masks stay
+    through a layer edit; an id seen twice is a copy), the matte its crop. RS-2 replaced: the scene stays AvLoop's and
+    the frame is a rectangle of it (no translation); the file's version 5 (4 → 5 drops the derived sequence).
+15. **RS-15** (AS-003) The Project panel places a clip centred in the frame at 100 % (Premiere's default); dragging from
+    it to a track comes with the timeline editor (AS-004). The monitor paints the composite only beyond AvLoop's one
+    video — its own path stays for that (its GPU look, its walks). The Frame tool is the Rectangle crop (M) with frame
+    sizes; F stays free (Premiere's F is Match Frame).
+16. **RS-16** (AS-003) The composite's decoders above V1 use two threads (each thread holds frames; a crossfade doubles
+    the decoders): AV-031's memory walk +34.2 MB, under its 50. The cost: 32.9 fps for a 640p crossfade with three
+    layers on the CPU (AvLoop's GPU path made 138) — for CP-S1 (AS-009) to weigh.

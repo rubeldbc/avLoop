@@ -43,6 +43,7 @@ struct VideoLayer {
     bool locked = false;
     QList<LayerKey> keys; // sorted by t; none: the transform and opacity above hold (D-029)
     ClipEffects effects;  // its own clip effects, applied to each of its frames (D-029)
+    int id = 0;           // the sequence's clip it shows (D-033; not in its JSON); 0: a new one
 
     // Its place, scale and opacity at its own time `own`: keyed (between two keys linear, or eased when the first
     // eases), else the transform and opacity.

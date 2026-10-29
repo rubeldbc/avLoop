@@ -142,7 +142,7 @@ void Canvas::paintGL() {
 }
 
 void Canvas::paintScene() {
-    if (!project_->source().isValid()) return;
+    if (!project_->source().isValid() || videoHidden_) return;
     QOpenGLFunctions* f = context()->functions();
     if (frameDirty_ && !frame_.isNull()) {
         if (!gl_->tex || gl_->tex->width() != frame_.width || gl_->tex->height() != frame_.height) {
@@ -242,7 +242,7 @@ void Canvas::setEffectUniforms() {
 }
 
 void Canvas::paintFallback() {
-    if (!project_->source().isValid() || frame_.isNull()) return;
+    if (!project_->source().isValid() || frame_.isNull() || videoHidden_) return;
     const ClipEffects& e = project_->effects();
     if (fallbackFrom_.data != frame_.data || fallbackKey_ != e.key()) {
         const double px = double(frame_.width) / std::max(1, project_->source().width);

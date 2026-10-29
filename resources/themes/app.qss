@@ -22,6 +22,23 @@ QMainWindow, QDialog, #CanvasArea, #PreviewWindow {
 #SidePanel {
     border-left: 1px solid @border;
 }
+#ProjectPanel {
+    background: @panel;
+    border-right: 1px solid @border;
+}
+#PanelTitle {
+    font-weight: 700;
+}
+#ProjectPanel QListWidget {
+    background: @bg;
+    border: 1px solid @border;
+    color: @text;
+    outline: none;
+}
+#ProjectPanel QListWidget::item:selected {
+    background: @accentSoft;
+    color: @text;
+}
 #TimelineArea {
     background: @panel;
     border-top: 1px solid @border;

@@ -54,8 +54,8 @@ bool FrameRenderer::open(QString* error) {
         mask_ = masks_.mask(job_.crop, job_.frame, job_.outputSize);
     effectsScale_ = job_.source.width > 0 ? double(job_.workingSize.width()) / job_.source.width : 1.0;
     if (job_.composite) {
-        sequence_ = std::make_unique<SequenceRenderer>(job_.sequence, QRectF(QPointF(0, 0), job_.frame.size()),
-                                                       job_.outputSize, job_.loop.method, job_.alpha, job_.background);
+        sequence_ = std::make_unique<SequenceRenderer>(job_.sequence, job_.frame, job_.outputSize, job_.loop.method,
+                                                       job_.alpha, job_.background);
         // Motion's pre-pass is the main video's: V1's clip from the source's start (AvLoop's own), by segment frame.
         const QList<Clip>& v1 = job_.sequence.tracks.isEmpty() ? QList<Clip>{} : job_.sequence.tracks[0].clips;
         if (job_.loop.method == LoopSettings::Method::Motion && !v1.isEmpty() && v1.first().start == 0)

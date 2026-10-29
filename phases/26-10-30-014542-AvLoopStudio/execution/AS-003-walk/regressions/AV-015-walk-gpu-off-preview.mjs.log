@@ -1,0 +1,3 @@
+PASS AV-008-walk/walk-preview.json with the GPU off: 41 checks passed
+PASS AV-008-walk/walk-preview-check.mjs with the GPU off: 6 checks passed
+WALK PASSED

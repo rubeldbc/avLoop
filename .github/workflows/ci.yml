@@ -69,4 +69,6 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           node phases/26-10-26-034934-AvLoop/control/phase-tools/validate-phase-system.mjs
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          node phases/26-10-30-014542-AvLoopStudio/control/phase-tools/validate-phase-system.mjs
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           scripts/format.ps1 -Check

@@ -1,0 +1,58 @@
+{
+  "delay": 120,
+  "settle": 700,
+  "steps": [
+    { "label": "D-033: the counter opened — the Project panel holds it, AvLoop's one video on V1, AvLoop's canvas" },
+    { "do": "resize", "w": 1440, "h": 860 },
+    { "do": "open", "file": "samples/counter-640p30.mp4" },
+    { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 10000 },
+    { "do": "expect", "probe": "project.media", "eq": 1 },
+    { "do": "expect", "probe": "sequence.clips", "eq": 1 },
+    { "do": "expect", "probe": "monitor.composite", "eq": false },
+    { "do": "shot", "on": "MainWindow", "file": "shell-open.png", "maxWidth": 1440 },
+
+    { "label": "Import… a second file: the bin lists both, the new one selected" },
+    { "do": "import", "files": ["samples/counter-1080p30.mp4"] },
+    { "do": "expect", "probe": "project.media", "eq": 2 },
+    { "do": "shot", "on": "ProjectPanel", "file": "project-panel.png" },
+
+    { "label": "Insert at 2 s on V1: the counter cut there, the 1080p clip between, the rest pushed right by its 10 s" },
+    { "do": "type", "on": "transport.time", "text": "2" },
+    { "do": "click", "on": "project.insert" },
+    { "do": "expect", "probe": "sequence.clips", "eq": 3 },
+    { "do": "expect", "probe": "sequence.v1", "eq": "counter-640p30@0.00+0.00 counter-1080p30@2.00+0.00 counter-640p30@12.00+2.00" },
+    { "do": "expect", "probe": "source.file", "contains": "counter-640p30.mp4" },
+    { "do": "expect", "probe": "undo.count", "eq": 1 },
+    { "do": "expect", "probe": "monitor.composite", "eq": true },
+
+    { "label": "the Program monitor: at 3 s the inserted clip's 1 s (frame 30), centred in the frame" },
+    { "do": "type", "on": "transport.time", "text": "3" },
+    { "do": "wait", "ms": 800 },
+    { "do": "shot", "on": "CanvasArea", "file": "monitor-composite-3s.png", "maxWidth": 1000 },
+    { "do": "type", "on": "transport.time", "text": "1" },
+    { "do": "wait", "ms": 800 },
+    { "do": "shot", "on": "CanvasArea", "file": "monitor-composite-1s.png", "maxWidth": 1000 },
+
+    { "label": "Undo: the insert gone, AvLoop's canvas back" },
+    { "do": "key", "keys": "Ctrl+Z", "on": "MainWindow" },
+    { "do": "expect", "probe": "sequence.clips", "eq": 1 },
+    { "do": "expect", "probe": "monitor.composite", "eq": false },
+
+    { "label": "Overwrite on V2 at 1 s: a clip on a new track — AvLoop's layer, its lane" },
+    { "do": "choose", "on": "project.track", "text": "V2" },
+    { "do": "click", "on": "project.overwrite" },
+    { "do": "expect", "probe": "sequence.tracks", "eq": 2 },
+    { "do": "expect", "probe": "layers.count", "eq": 1 },
+    { "do": "expect", "probe": "monitor.composite", "eq": false },
+
+    { "label": "the Frame tool: the Rectangle crop's Frame size 1080 × 1920 — the frame, the output" },
+    { "do": "key", "keys": "M", "on": "MainWindow" },
+    { "do": "choose", "on": "options.rect.frame", "text": "1080 × 1920" },
+    { "do": "expect", "probe": "crop.w", "near": [1080, 0.01] },
+    { "do": "expect", "probe": "crop.h", "near": [1920, 0.01] },
+    { "do": "expect", "probe": "crop.cx", "near": [320, 0.01] },
+    { "do": "expect", "probe": "output.size", "eq": "1080x1920" },
+    { "do": "key", "keys": "V", "on": "MainWindow" },
+    { "do": "shot", "on": "MainWindow", "file": "frame-1080x1920.png", "maxWidth": 1440 }
+  ]
+}

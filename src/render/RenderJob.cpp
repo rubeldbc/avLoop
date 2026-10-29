@@ -20,12 +20,16 @@ RenderJob RenderJob::of(const ProjectData& p, const media::MediaInfo& source) {
     job.output = p.output;
     job.quality = p.quality;
     job.effects = p.effects.clamped();
-    ProjectData probed = p; // the sequence needs the source's size, length and rate (not in the file)
-    probed.source.width = source.width;
-    probed.source.height = source.height;
-    probed.source.duration = source.duration;
-    probed.source.fps = source.avgFps.isValid() ? source.avgFps : source.realFps;
-    job.sequence = Sequence::fromAvLoop(probed);
+    if (!p.sequence.tracks.isEmpty()) {
+        job.sequence = p.sequence; // the project's own (D-033)
+    } else {
+        ProjectData probed = p; // made from AvLoop's sections: it needs the source's size, length and rate
+        probed.source.width = source.width;
+        probed.source.height = source.height;
+        probed.source.duration = source.duration;
+        probed.source.fps = source.avgFps.isValid() ? source.avgFps : source.realFps;
+        job.sequence = Sequence::fromAvLoop(probed);
+    }
     job.composite = !SequenceRenderer::plain(job.sequence);
     const QSizeF video(source.width, source.height);
     job.fps = p.output.effectiveFps(source.avgFps.isValid() ? source.avgFps : source.realFps, source.vfr);

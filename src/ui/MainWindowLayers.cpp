@@ -8,6 +8,7 @@
 #include "media/MediaProbe.h"
 #include "render/EffectsPass.h"
 #include "ui/MainWindow.h"
+#include "ui/MonitorComposite.h"
 #include "ui/WalkRunner.h"
 #include "ui/canvas/Canvas.h"
 #include "ui/panels/Section.h"
@@ -164,7 +165,10 @@ void MainWindow::buildLayers() {
             column->indexOf(timeline_),
             new TrackLanes(project_, timeline_, [this](double t) { seek(t); }, timeline_->parentWidget()));
     auto* preview = new LayerPreview(project_, this);
-    canvas_->setUnderlay([this, preview](QPainter& p) { preview->paint(p, canvas_, clock_ && clock_->running()); });
+    canvas_->setUnderlay([this, preview](QPainter& p) {
+        if (monitor_ && monitor_->active()) return monitor_->paint(p); // the composite holds the layers (D-033)
+        preview->paint(p, canvas_, clock_ && clock_->running());
+    });
     connect(project_, &Project::changed, canvas_, [this](Project::Aspect a) {
         if (a == Project::Aspect::Layers || a == Project::Aspect::LayerSelection || a == Project::Aspect::Time)
             canvas_->update();

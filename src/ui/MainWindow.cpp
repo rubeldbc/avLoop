@@ -15,6 +15,7 @@
 #include "ui/canvas/Canvas.h"
 #include "ui/canvas/DropZone.h"
 #include "ui/export/ExportBar.h"
+#include "ui/panels/ProjectPanel.h"
 #include "ui/panels/SidePanel.h"
 #include "ui/preview/PreviewWindow.h"
 #include "ui/theme/IconFactory.h"
@@ -121,7 +122,16 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     mainSplit_->setObjectName(QStringLiteral("split.main"));
     mainSplit_->setChildrenCollapsible(false);
     mainSplit_->setHandleWidth(1);
-    mainSplit_->addWidget(centreSplit_);
+    projectPanel_ = new ProjectPanel(project_, central);
+    projectPanel_->setMinimumWidth(170);
+    leftSplit_ = new QSplitter(Qt::Horizontal, central);
+    leftSplit_->setObjectName(QStringLiteral("split.left"));
+    leftSplit_->setChildrenCollapsible(false);
+    leftSplit_->setHandleWidth(1);
+    leftSplit_->addWidget(projectPanel_);
+    leftSplit_->addWidget(centreSplit_);
+    leftSplit_->setStretchFactor(1, 1);
+    mainSplit_->addWidget(leftSplit_);
     mainSplit_->addWidget(side_);
     mainSplit_->setStretchFactor(0, 1);
     column->addWidget(mainSplit_, 1);
@@ -136,6 +146,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     buildProject();
     buildFinder();
     buildLayers();
+    buildMonitor();
     buildBatch();
     registerProbes();
     registerMediaProbes();
@@ -383,6 +394,8 @@ void MainWindow::restoreLayout() {
         mainSplit_->setSizes({1000, 260});
     if (!centreSplit_->restoreState(s.value(QStringLiteral("ui/splitCentre")).toByteArray()))
         centreSplit_->setSizes({600, 150});
+    if (!leftSplit_->restoreState(s.value(QStringLiteral("ui/splitLeft")).toByteArray()))
+        leftSplit_->setSizes({200, 1000});
 }
 
 void MainWindow::saveLayout() const {
@@ -390,6 +403,7 @@ void MainWindow::saveLayout() const {
     s.setValue(QStringLiteral("ui/windowGeometry"), saveGeometry());
     s.setValue(QStringLiteral("ui/splitMain"), mainSplit_->saveState());
     s.setValue(QStringLiteral("ui/splitCentre"), centreSplit_->saveState());
+    s.setValue(QStringLiteral("ui/splitLeft"), leftSplit_->saveState());
 }
 
 } // namespace avloop

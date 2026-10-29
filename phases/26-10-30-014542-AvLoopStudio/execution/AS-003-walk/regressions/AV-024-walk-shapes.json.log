@@ -1,0 +1,61 @@
+startup: 672 ms
+walk walk-shapes.json: 79 steps
+-- D-022: the counter at 100 %, no crop; S, the Shape tool; no shapes (a canvas point lands ½ px in, as walk-crop's: x read anew with AS-003's Project panel beside the canvas) @1374 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect tool.active: shape
+PASS expect shapes.count: 0
+PASS expect panel.crop.output: 640 × 360
+-- a rectangle drawn (Select): one Undo step, selected; the output needs alpha @2859 ms
+PASS expect shapes.count: 1
+PASS expect shapes.summary: rect:add:100,60,200,140
+PASS expect shapes.selected: 0
+PASS expect undo.count: 1
+PASS expect options.shape.w: 200
+PASS expect panel.crop.output: 640 × 360 · alpha
+-- moved by a drag inside; resized by its bottom-right handle; each one step @3852 ms
+PASS expect shapes.summary: rect:add:140,80,200,140
+PASS expect shapes.summary: rect:add:140,80,240,160
+PASS expect undo.count: 3
+-- Esc deselects; an ellipse that cuts, drawn beside it @4653 ms
+PASS expect shapes.selected: 
+PASS expect shapes.summary: rect:add:140,80,240,160
+PASS expect shapes.summary: rect:add:140,80,240,160;ellipse:cut:400,160,160,160
+-- a polygon of five clicks, closed on its first anchor (Select) @5642 ms
+PASS expect shape.mode: polygon
+PASS expect shape.points: 5
+PASS expect shape.mode: none
+PASS expect shapes.count: 3
+PASS expect shapes.summary: rect:add:140,80,240,160;ellipse:cut:400,160,160,160;polygon:add:n5
+-- Esc cancels a polygon being drawn @7409 ms
+PASS expect shape.mode: none
+PASS expect shapes.count: 3
+-- a freehand outline dragged round, simplified, closed @8163 ms
+PASS expect shapes.count: 4
+PASS expect shapes.summary: rect:add:140,80,240,160;ellipse:cut:400,160,160,160;polygon:add:n5;polygon:add:n7
+PASS expect panel.shapes.rows: Polygon 2 · Select|Polygon 1 · Select|Ellipse 1 · Cut|Rectangle 1 · Select
+PASS shot canvas-shapes.png: 1200x671 px
+PASS shot panel-shapes.png: 281x684 px
+-- a click selects the rectangle; the Crop section's Role makes it cut; Delete removes it; Undo @9374 ms
+PASS expect shapes.selected: 0
+PASS expect shapes.summary: rect:cut:140,80,240,160;ellipse:cut:400,160,160,160;polygon:add:n5;polygon:add:n7
+PASS expect shapes.summary: rect:add:140,80,240,160;ellipse:cut:400,160,160,160;polygon:add:n5;polygon:add:n7
+PASS expect shapes.count: 3
+PASS expect shapes.count: 4
+-- the Preview: the shapes' mask, exactly @10633 ms
+PASS expect preview.open: true
+PASS waitFor preview.frame: 640x360 after 0 ms
+PASS shot preview-shapes.png: 680x500 px
+     previewClose
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 000001feacd1f1c0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001feacd1f1c0] v1.16.0
+[libvpx-vp9 @ 000001feacd1f580] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001feacd1f580] v1.16.0
+[libvpx-vp9 @ 000001feacd20800] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001feacd20800] v1.16.0
+[libvpx-vp9 @ 000001feacd216c0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001feacd216c0] v1.16.0
+[libvpx-vp9 @ 000001feacd20800] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001feacd20800] v1.16.0

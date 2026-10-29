@@ -137,7 +137,8 @@ private slots:
         QList<Project::Aspect> seen;
         connect(&p, &Project::changed, this, [&](Project::Aspect a) { seen << a; });
         p.changeTransform(at(5));
-        QCOMPARE(seen, QList<Project::Aspect>{Project::Aspect::Transform});
+        // The transform, and the sequence it lives in (D-033).
+        QCOMPARE(seen, (QList<Project::Aspect>{Project::Aspect::Transform, Project::Aspect::Sequence}));
     }
     void rangeIsUndone() {
         // SetRange (spec §6.4): a new source's range is the whole file; a change is a step; a handle's drag one.

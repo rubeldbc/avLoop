@@ -27,6 +27,29 @@ its model, under the UI that is still AvLoop's (RS-7).
   the frame's corner; each layer on its own track; the crop with its shapes the sequence's matte (D-032). A migrated
   file renders byte for byte as before. `avloop-cli sequence <project> [--save x.avloop]` prints it.
 
+### D-033 — The editor's shell (AS-003, AvLoop Studio, 2026-10-30)
+
+- **The sequence is the project's truth.** AvLoop's model is a view of it: the main video is the **main clip** (one
+  of V1's; its media the project's source) — its transform, its keyframes (the clip's keys over sequence time), its
+  clip effects —; the layers are the clips on V2 …; the crop is the matte; In/Out are the sequence's. Every edit made
+  through them is one Undo step over the whole sequence (the aspect's own id, so a drag still merges); a project always
+  has a main clip on V1 (without media, a placeholder). The frame and every clip stand in the scene's px — AvLoop's —
+  and the frame is the matte's rectangle, else the main clip where it stands at In (RS-14).
+- **The file's version 5**: `"sequence"` (the truth, with its frame's x, y, its main clip, a clip's lock) and
+  `"media"` (the bin: path, size, length, rate). AvLoop's sections are still written, as views. Version 4's sequence —
+  always made from the rest — is dropped on reading (4 → 5) and made again.
+- **The Project panel**, left of the canvas (its splitter remembered, `ui/splitLeft`): Import… probes and adds files
+  (not in Undo); the list shows each one's name, size and length; **Insert** and **Overwrite** put the selected one at
+  the playhead on the chosen track (V1 … V8, a new track made), centred in the frame at 100 % — Insert cuts the clip
+  there and moves the rest of the track right, Overwrite cuts away what it covers. One step each.
+- **The Program monitor**: while the project is AvLoop's one video (V1 its main clip alone, from its media's start; no
+  masks) the canvas is AvLoop's. Beyond that it hides its own video and paints the **composite** at the playhead — the
+  frame and every clip present, their masks applied, the matte left to the dim —, made again when the playhead or the
+  sequence changes (RS-15).
+- **The Frame tool** is the Rectangle crop (M) with **Frame size** on its bar: 1920 × 1080, 1080 × 1920, 1080 × 1080,
+  1280 × 720, 720 × 1280, 1080 × 1350, centred where the crop is (else on the video), not inverted.
+- The composite's decoders above V1 run on two threads each (RS-16).
+
 ### D-032 — The composite (AS-002, AvLoop Studio, 2026-10-30)
 
 - **The composite** (`render/SequenceRenderer`): at a sequence time every shown track bottom to top, the clip present

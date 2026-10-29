@@ -52,6 +52,13 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   output size and whether it needs transparency, and the status bar warns when the crop leaves the video.
   **Inverse** (the Crop section, or the toggle on the crop's bar) turns the selection inside out: the whole video is
   exported and the chosen area becomes a transparent hole in it, its feather softening outward.
+  **Frame size** on the rectangle's bar sets the output to 1920 × 1080, 1080 × 1920, 1080 × 1080, 1280 × 720,
+  720 × 1280 or 1080 × 1350, centred where the crop is — past the video's edges the frame is transparent.
+- **The Project panel** (left of the canvas), as in Premiere Pro: **Import…** adds videos to the project's media;
+  **Insert** puts the selected one at the playhead on the chosen track (V1 … V8) — what is there is cut and the rest
+  of the track moves right — and **Overwrite** covers what is there; each one Undo step. A clip is placed centred in the
+  frame at 100 %. When the sequence is more than one video (cuts on V1, a clip from later in its file, masks), the
+  canvas shows the whole composite at the playhead — every track, as it will be exported.
 - **Shapes** (**S**) inside the crop — or the whole video — say what is kept: rectangles, rounded rectangles and
   ellipses by a drag, polygons by clicks, freehand outlines by dragging round. Each shape **selects** (keeps its inside)
   or **cuts** (makes it transparent); select, move, resize, nudge and delete them on the canvas, and see them listed in
@@ -147,7 +154,8 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
 
 - **One renderer** for what you will see and what you will export: output frame N of a loop is made on the GPU
   (OpenGL 3.3) or, without one, on the CPU with the same result (within 2/255) — the crop's mask and feather, the
-  loop's blends and Motion Interpolation applied.
+  loop's blends and Motion Interpolation applied. A project of several clips is made by the **composite** on the CPU:
+  each track's clip at its own time, its effects, motion, opacity and masks, over the tracks below, the crop over all.
 - **Export** (Ctrl+E) writes a **VP9 (or VP8) WebM with transparency** that OBS's Media Source loops seamlessly: in
   the background from a snapshot of the project (keep editing), with its progress and Cancel in the status bar
   (`Exporting 86/149 · 58% · 41 fps · ETA 0:02`), written to `name.part` and renamed only when complete, then

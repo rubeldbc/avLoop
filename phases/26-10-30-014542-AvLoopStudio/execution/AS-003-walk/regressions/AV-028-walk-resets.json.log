@@ -1,0 +1,45 @@
+startup: 648 ms
+walk walk-resets.json: 71 steps
+-- D-025: the counter; a value changed in every section @1349 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect crop.feather: 20
+PASS expect loop.speed: 2
+PASS expect effects.summary: exposure=2 sepia=40
+PASS expect undo.count: 8
+-- a click on a label resets its control — each one Undo step @4056 ms
+PASS expect crop.feather: 0
+PASS expect loop.speed: 1
+PASS expect loop.plan: D300 F15 T9 L285
+PASS expect effects.summary: sepia=40
+PASS expect undo.count: 12
+-- Undo gives each value back @5193 ms
+PASS expect effects.summary: exposure=2 sepia=40
+PASS expect loop.speed: 2
+-- a right click on a group: Reset <group> — one Undo step each @6201 ms
+PASS expect loop.mode: pingpong
+PASS shot panel-before-reset.png: 260x935 px
+     menu: Reset Clip effects
+PASS expect effects.summary: 
+     menu: Reset Quality
+PASS expect quality.crf: 31
+     menu: Reset Output
+PASS expect output.sizeMode: crop
+     menu: Reset Loop
+PASS expect loop.speed: 1
+PASS expect loop.mode: crossfade
+     menu: Reset Crop
+PASS expect crop.empty: true
+PASS shot panel-after-reset.png: 260x935 px
+-- Undo through the group resets @10159 ms
+PASS expect crop.empty: false
+PASS expect loop.mode: pingpong
+-- the options bars: E's Feather label and the bar's Reset; the Selection's Scale label @10663 ms
+PASS expect crop.feather: 33
+PASS expect crop.feather: 0
+     menu: Reset Crop: Ellipse
+PASS expect crop.feather: 0
+PASS expect transform.scale: 1.5
+PASS expect transform.scale: 1
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

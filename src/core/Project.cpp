@@ -3,35 +3,71 @@
 #include "core/Commands.h"
 #include "core/Geometry.h"
 #include "core/ProjectJson.h"
-#include "core/Sequence.h"
+#include "core/SequenceView.h"
 #include "core/Timecode.h"
+
+#include <QFileInfo>
 
 #include <algorithm>
 
 namespace avloop {
 
+namespace sv = sequenceview;
+
+namespace {
+
+bool sameSource(const SourceInfo& a, const SourceInfo& b) {
+    return a.path == b.path && a.width == b.width && a.height == b.height && a.duration == b.duration &&
+           a.fps == b.fps && a.vfr == b.vfr && a.hasAlpha == b.hasAlpha;
+}
+
+} // namespace
+
 Project::Project(QObject* parent) : QObject(parent) {
     undo_.setUndoLimit(kUndoLimit);
 }
 
+SourceInfo Project::mediaOf(const QString& path) const {
+    for (const SourceInfo& m : media_)
+        if (m.path == path) return m;
+    return {};
+}
+
+void Project::addMedia(const SourceInfo& info) {
+    for (SourceInfo& m : media_)
+        if (m.path == info.path) {
+            m = info;
+            emit changed(Aspect::Media);
+            return;
+        }
+    media_.append(info);
+    emit changed(Aspect::Media);
+}
+
 void Project::setSource(const SourceInfo& source) {
-    source_ = source;
-    range_ = timerange::whole(source.duration, outputFps());
-    transform_ = VideoTransform::initial(source.size());
-    keyframes_.clear();
-    current_ = transform_;
-    crop_ = CropShape{};
+    // A new document: the source the bin's first, one clip of it on V1 at its initial place.
+    media_ = {source};
+    Sequence s;
+    s.tracks.append({QStringLiteral("V1"), true, false, {}});
+    {
+        Clip c; // V1 always holds the main clip (without a path: a placeholder the views still edit)
+        c.id = s.nextId++;
+        c.name = QFileInfo(source.path).completeBaseName();
+        c.path = source.path;
+        c.size = source.size();
+        c.duration = source.duration;
+        c.range = {0, source.duration};
+        c.transform = VideoTransform::initial(source.size());
+        s.tracks[0].clips.append(c);
+        s.main = c.id;
+    }
+    s.inOut = timerange::whole(source.duration, output_.effectiveFps(source.fps, source.vfr));
+    sv::settle(s);
+    seq_ = s;
     selectedShapes_.clear();
-    layers_.clear();
     selectedLayer_ = -1;
-    effects_ = ClipEffects{};
     undo_.clear();
-    emit changed(Aspect::Source);
-    emit changed(Aspect::Range);
-    emit changed(Aspect::Transform);
-    emit changed(Aspect::Crop);
-    emit changed(Aspect::Effects);
-    emit changed(Aspect::Layers);
+    sync(true);
 }
 
 QList<int> Project::selectedShapes() const {
@@ -60,50 +96,106 @@ ProjectData Project::snapshot() const {
     d.crop = crop_;
     d.effects = effects_;
     d.layers = layers_;
+    d.sequence = seq_;
+    d.media = media_;
     d.view = view_;
     d.exportPath = exportPath_;
     d.original = extra_;
     return d;
 }
 
-Sequence Project::sequence() const {
-    return Sequence::fromAvLoop(snapshot());
-}
-
 void Project::restore(const ProjectData& data) {
-    source_ = data.source;
     loop_ = data.loop.clamped();
     output_ = data.output;
     quality_ = data.quality;
-    range_ = timerange::valid(data.range, source_.duration, outputFps());
-    transform_ = data.transform;
-    keyframes_ = data.keyframes;
-    current_ = transformAt(time_);
-    crop_ = data.crop.clamped();
+    media_ = data.media;
+    if (!data.source.path.isEmpty()) {
+        // The source probed: the bin's entry for it replaced, or the bin's first.
+        const auto it =
+            std::find_if(media_.begin(), media_.end(), [&](const SourceInfo& m) { return m.path == data.source.path; });
+        if (it != media_.end())
+            *it = data.source;
+        else
+            media_.prepend(data.source);
+    }
+    // A file of version 5 holds its sequence; an older one is made into one (RS-5).
+    Sequence s = data.sequence.tracks.isEmpty() ? Sequence::fromAvLoop(data) : data.sequence;
+    s.matte = s.matte.clamped();
+    if (Clip* m = sv::mainClip(s)) {
+        m->effects = m->effects.clamped();
+        s.inOut =
+            timerange::valid(s.inOut, m->start + m->length(), output_.effectiveFps(data.source.fps, data.source.vfr));
+    }
+    sv::settle(s);
+    seq_ = s;
     selectedShapes_.clear();
-    layers_ = data.layers;
     selectedLayer_ = -1;
-    effects_ = data.effects.clamped();
     view_ = data.view;
     exportPath_ = data.exportPath;
     extra_ = data.original;
     undo_.clear();
-    emit changed(Aspect::Source);
-    emit changed(Aspect::Range);
-    emit changed(Aspect::Transform);
-    emit changed(Aspect::Keyframes);
-    emit changed(Aspect::Crop);
+    sync(true);
     emit changed(Aspect::Loop);
     emit changed(Aspect::Output);
     emit changed(Aspect::Quality);
-    emit changed(Aspect::Effects);
-    emit changed(Aspect::Layers);
     emit changed(Aspect::View);
 }
 
+void Project::sync(bool all) {
+    const Clip* m = sv::mainClip(seq_);
+    SourceInfo source = m ? mediaOf(m->path) : SourceInfo{};
+    if (m && source.path.isEmpty()) {
+        // A clip whose media is not in the bin: what the clip knows of it.
+        source.path = m->path;
+        source.width = int(m->size.width());
+        source.height = int(m->size.height());
+        source.duration = m->duration;
+    }
+    const Keyframes keys = m ? sv::keyframesOf(*m) : Keyframes{};
+    const VideoTransform base = m ? m->transform : VideoTransform{};
+    const ClipEffects effects = m ? m->effects : ClipEffects{};
+    const QList<VideoLayer> layers = sv::layersOf(seq_);
+    const bool sourceChanged = !sameSource(source, source_);
+    const bool rangeChanged = !(seq_.inOut == range_);
+    const bool keysChanged = !(keys == keyframes_);
+    const bool baseChanged = !(base == transform_);
+    const bool cropChanged = !(seq_.matte == crop_);
+    const bool effectsChanged = !(effects == effects_);
+    const bool layersChanged = !(layers == layers_);
+    source_ = source;
+    range_ = seq_.inOut;
+    keyframes_ = keys;
+    transform_ = base;
+    crop_ = seq_.matte;
+    effects_ = effects;
+    layers_ = layers;
+    const VideoTransform now = transformAt(time_);
+    const bool currentChanged = !(now == current_);
+    current_ = now;
+    if (selectedLayer_ >= layers_.size()) selectedLayer_ = -1;
+    if (all || sourceChanged) emit changed(Aspect::Source);
+    if (all || rangeChanged) emit changed(Aspect::Range);
+    if (all || keysChanged) emit changed(Aspect::Keyframes);
+    if (all || baseChanged || currentChanged) emit changed(Aspect::Transform);
+    if (all || cropChanged) emit changed(Aspect::Crop);
+    if (all || effectsChanged) emit changed(Aspect::Effects);
+    if (all || layersChanged) emit changed(Aspect::Layers);
+    emit changed(Aspect::Sequence);
+}
+
+bool Project::avloopShaped() const {
+    if (seq_.tracks.isEmpty()) return true;
+    const QList<Clip>& v1 = seq_.tracks[0].clips;
+    if (v1.size() > 1 || (v1.size() == 1 && (v1[0].start != 0 || v1[0].range.in != 0))) return false;
+    for (const Track& t : seq_.tracks)
+        for (const Clip& c : t.clips)
+            if (!c.masks.isEmpty()) return false;
+    return true;
+}
+
 QRectF Project::exportFrame() const {
-    // Without a crop the video's own rectangle, where it stands at In (the crop itself is never keyframed, §1.3).
-    return geometry::exportFrame(crop_, transformAt(range_.in), source_.size());
+    // The matte's rectangle, else the main clip where it stands at In (sequenceview::frameOf, kept with every edit).
+    return seq_.frame;
 }
 
 QSize Project::outputSize(bool* limited) const {
@@ -130,39 +222,10 @@ void Project::setExtra(const QJsonObject& extra) {
     extra_ = extra;
 }
 
-void Project::changeTransform(const VideoTransform& after, const QString& mergeKey) {
-    const VideoTransform target = after.clamped();
-    if (keyframes_.isEmpty()) {
-        if (target == transform_) return;
-        undo_.push(new SetTransformCommand(
-            SetTransformId, tr("Move or scale the video"), transform_, target,
-            [this](const VideoTransform& t) { applyTransform(t); }, mergeKey));
-        return;
-    }
-    // With keyframes: the flips on the one transform (they hold), the position and scale into the keyframe at the
-    // playhead — made there if there is none (spec §6.2).
-    if (target == current_) return;
-    const bool flips = target.flipH != transform_.flipH || target.flipV != transform_.flipV;
-    const bool moved = target.x != current_.x || target.y != current_.y || target.scale != current_.scale;
-    if (flips && moved) undo_.beginMacro(tr("Move or scale the video"));
-    if (flips) {
-        VideoTransform base = transform_;
-        base.flipH = target.flipH;
-        base.flipV = target.flipV;
-        undo_.push(new SetTransformCommand(
-            SetTransformId, tr("Flip the video"), transform_, base,
-            [this](const VideoTransform& t) { applyTransform(t); }, mergeKey));
-    }
-    if (moved) {
-        const int at = keyframeAtTime();
-        const Keyframe k{time_, target.x, target.y, target.scale, at >= 0 && keyframes_[at].ease};
-        pushKeyframes(AddKeyframeId, tr("Set a keyframe"), keyframes::withKey(keyframes_, k, keyTolerance()), mergeKey);
-    }
-    if (flips && moved) undo_.endMacro();
-}
-
 VideoTransform Project::transformAt(double seconds) const {
-    return keyframes::valueAt(keyframes_, transform_, seconds);
+    const Clip* m = sv::mainClip(seq_);
+    if (!m) return transform_;
+    return m->look(m->range.in + (seconds - m->start)).transform;
 }
 
 void Project::setTime(double seconds) {
@@ -182,124 +245,8 @@ int Project::keyframeAtTime() const {
     return keyframes::indexAt(keyframes_, time_, keyTolerance());
 }
 
-void Project::addKeyframe() {
-    if (!source_.isValid()) return;
-    const int at = keyframeAtTime();
-    const double t = at >= 0 ? keyframes_[at].t : time_;
-    const Keyframe k{t, current_.x, current_.y, current_.scale, at >= 0 && keyframes_[at].ease};
-    pushKeyframes(AddKeyframeId, tr("Add a keyframe"), keyframes::withKey(keyframes_, k, keyTolerance()));
-}
-
-void Project::deleteKeyframe(int index) {
-    if (index < 0 || index >= keyframes_.size()) return;
-    Keyframes after = keyframes_;
-    after.removeAt(index);
-    if (!after.isEmpty()) {
-        pushKeyframes(DeleteKeyframeId, tr("Delete a keyframe"), after);
-        return;
-    }
-    // The last one: the video stays where it is shown (the one transform takes its value), as After Effects does.
-    undo_.beginMacro(tr("Delete a keyframe"));
-    undo_.push(new SetTransformCommand(
-        SetTransformId, tr("Delete a keyframe"), transform_, current_,
-        [this](const VideoTransform& t) { applyTransform(t); }, QString()));
-    pushKeyframes(DeleteKeyframeId, tr("Delete a keyframe"), after);
-    undo_.endMacro();
-}
-
-void Project::moveKeyframe(int index, double seconds, const QString& mergeKey) {
-    const Keyframes after = keyframes::moved(keyframes_, index, std::max(0.0, seconds), keyTolerance());
-    pushKeyframes(MoveKeyframeId, tr("Move a keyframe"), after, mergeKey);
-}
-
-void Project::copyKeyframe(int index, double seconds, const QString& mergeKey) {
-    // A move's id: the copy's moves later in the same drag merge into this step.
-    const Keyframes after = keyframes::copied(keyframes_, index, std::max(0.0, seconds), keyTolerance());
-    pushKeyframes(MoveKeyframeId, tr("Copy a keyframe"), after, mergeKey);
-}
-
-void Project::setKeyframeEase(int index, bool ease) {
-    if (index < 0 || index >= keyframes_.size() || keyframes_[index].ease == ease) return;
-    Keyframes after = keyframes_;
-    after[index].ease = ease;
-    pushKeyframes(AddKeyframeId, ease ? tr("Ease a keyframe") : tr("Make a keyframe linear"), after);
-}
-
-void Project::pushKeyframes(int id, const QString& text, const Keyframes& after, const QString& mergeKey) {
-    if (after == keyframes_) return;
-    undo_.push(new SetKeyframesCommand(
-        id, text, keyframes_, after, [this](const Keyframes& k) { applyKeyframes(k); }, mergeKey));
-}
-
-void Project::applyKeyframes(const Keyframes& k) {
-    keyframes_ = k;
-    emit changed(Aspect::Keyframes);
-    refreshCurrent(Aspect::Transform);
-}
-
-void Project::refreshCurrent(Aspect aspect) {
-    const VideoTransform now = transformAt(time_);
-    if (now == current_) return;
-    current_ = now;
-    emit changed(aspect);
-}
-
-void Project::changeCrop(const CropShape& after, const QString& mergeKey) {
-    const CropShape target = after.clamped();
-    if (target == crop_) return;
-    undo_.push(new SetCropCommand(
-        SetCropId, tr("Change the crop"), crop_, target, [this](const CropShape& c) { applyCrop(c); }, mergeKey));
-}
-
 Rational Project::outputFps() const {
     return output_.effectiveFps(source_.fps, source_.vfr);
-}
-
-void Project::changeSettings(const LoopSettings& loop, const OutputSettings& output, const QualitySettings& quality,
-                             const QString& name) {
-    if (loop.clamped() == loop_ && output == output_ && quality == quality_) return;
-    undo_.beginMacro(tr("Apply the preset %1").arg(name));
-    changeLoop(loop);
-    changeOutput(output);
-    changeQuality(quality);
-    undo_.endMacro();
-}
-
-void Project::changeLoop(const LoopSettings& after, const QString& mergeKey) {
-    const LoopSettings target = after.clamped();
-    if (target == loop_) return;
-    undo_.push(new SetLoopCommand(
-        SetLoopId, tr("Change the loop"), loop_, target, [this](const LoopSettings& l) { applyLoop(l); }, mergeKey));
-}
-
-void Project::changeOutput(const OutputSettings& after, const QString& mergeKey) {
-    if (after == output_) return;
-    const Rational before = outputFps();
-    const Rational next = after.effectiveFps(source_.fps, source_.vfr);
-    const bool regrid = source_.isValid() && !(before == next);
-    if (regrid) undo_.beginMacro(tr("Change the frame rate"));
-    undo_.push(new SetOutputCommand(
-        SetOutputId, tr("Change the output"), output_, after, [this](const OutputSettings& o) { applyOutput(o); },
-        regrid ? QString() : mergeKey));
-    if (regrid) {
-        changeRange(timerange::valid(range_, source_.duration, next));
-        undo_.endMacro();
-    }
-}
-
-void Project::changeQuality(const QualitySettings& after, const QString& mergeKey) {
-    if (after == quality_) return;
-    undo_.push(new SetQualityCommand(
-        SetQualityId, tr("Change the quality"), quality_, after, [this](const QualitySettings& q) { applyQuality(q); },
-        mergeKey));
-}
-
-void Project::changeEffects(const ClipEffects& after, const QString& mergeKey) {
-    const ClipEffects target = after.clamped();
-    if (target == effects_) return;
-    undo_.push(new SetEffectsCommand(
-        SetEffectsId, tr("Change the clip effects"), effects_, target,
-        [this](const ClipEffects& e) { applyEffects(e); }, mergeKey));
 }
 
 void Project::setSelectedLayer(int index) {
@@ -309,35 +256,14 @@ void Project::setSelectedLayer(int index) {
     emit changed(Aspect::LayerSelection);
 }
 
-void Project::changeLayers(const QList<VideoLayer>& after, const QString& mergeKey) {
-    if (after == layers_) return;
-    undo_.push(new SetLayersCommand(
-        SetLayersId, tr("Change the layers"), layers_, after.mid(0, VideoLayer::kMaxLayers),
-        [this](const QList<VideoLayer>& l) { applyLayers(l); }, mergeKey));
-}
-
 const ClipEffects& Project::panelEffects() const {
     const int i = selectedLayer();
     return i >= 0 ? layers_[i].effects : effects_;
 }
 
-void Project::changePanelEffects(const ClipEffects& after, const QString& mergeKey) {
-    const int i = selectedLayer();
-    if (i < 0) return changeEffects(after, mergeKey);
-    QList<VideoLayer> l = layers_;
-    l[i].effects = after.clamped();
-    changeLayers(l, mergeKey);
-}
-
-void Project::applyLayers(const QList<VideoLayer>& l) {
-    layers_ = l;
-    if (selectedLayer_ >= layers_.size()) selectedLayer_ = -1;
-    emit changed(Aspect::Layers);
-}
-
-void Project::applyEffects(const ClipEffects& e) {
-    effects_ = e;
-    emit changed(Aspect::Effects);
+void Project::applySequence(const Sequence& s) {
+    seq_ = s;
+    sync(false);
 }
 
 void Project::applyQuality(const QualitySettings& q) {
@@ -353,28 +279,6 @@ void Project::applyLoop(const LoopSettings& l) {
 void Project::applyOutput(const OutputSettings& o) {
     output_ = o;
     emit changed(Aspect::Output);
-}
-
-void Project::changeRange(const TimeRange& after, const QString& mergeKey) {
-    if (after == range_) return;
-    undo_.push(new SetRangeCommand(
-        SetRangeId, tr("Change In and Out"), range_, after, [this](const TimeRange& r) { applyRange(r); }, mergeKey));
-}
-
-void Project::applyRange(const TimeRange& r) {
-    range_ = r;
-    emit changed(Aspect::Range);
-}
-
-void Project::applyCrop(const CropShape& c) {
-    crop_ = c;
-    emit changed(Aspect::Crop);
-}
-
-void Project::applyTransform(const VideoTransform& t) {
-    transform_ = t;
-    current_ = transformAt(time_);
-    emit changed(Aspect::Transform);
 }
 
 } // namespace avloop

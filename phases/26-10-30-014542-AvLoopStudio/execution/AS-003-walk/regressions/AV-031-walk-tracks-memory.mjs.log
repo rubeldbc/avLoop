@@ -1,0 +1,4 @@
+PASS avloop-cli frames: 600 frames of a loop with three layers: 600 frames of a 105-frame loop · 640x360 · CPU · 18.3 s · 32.9 fps
+PASS the memory logged each second: 19 samples
+PASS Private Bytes after the first second: growth under 50 MB: 151.9 → peak 186.1, last 186.1 MB (+34.2)
+WALK PASSED

@@ -123,6 +123,8 @@ int SequenceRenderer::sourceFor(const Clip& clip, int lane, bool hardware) {
     media::Decoder::Options options;
     options.workingSize = working;
     options.hardware = hardware;
+    // The tracks above V1: software, two threads — each thread holds frames, and a crossfade doubles the decoders.
+    options.threads = hardware ? 0 : 2;
     s.path = clip.path;
     s.working = working;
     s.lane = lane;
