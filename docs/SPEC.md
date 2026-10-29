@@ -6,6 +6,25 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-027 — The timeline layers II: the tracks (AV-031, late, 2026-10-30)
+
+- **The tracks on the timeline**, as Premiere Pro's: lanes between the transport and the main video's timeline, on its
+  own time scale (its zoom and scroll), from one empty lane above the highest used track down to V2 — each labelled
+  "V<n>", each layer a bar with its name (faded when hidden, "(locked)" when locked; the selected outlined). A click
+  selects the layer (the Layers section follows); a drag moves it in time, snapping its start or end to In, Out, the
+  playhead and the other bars' ends within 8 px (Ctrl off), and up or down to another track — refused where it would
+  overlap another bar on that track; a press within 6 px of an end trims it (an In trim moves the start with it, as
+  Premiere's; Out within the file; at least 0.1 s); Alt+drag copies it ("<name> copy", the original stays; one Undo
+  step); Delete removes the selected; a double-click takes the playhead to its start. The lanes stand still under a
+  drag (a bar dragged into the empty lane does not climb on).
+- **The canvas**: the Selection tool's click picks the topmost shown, unlocked layer present at the playhead whose
+  rectangle holds the pointer, and its drag moves that layer (one Undo step); elsewhere it works on the main video as
+  before. The Layers section, the lanes and the canvas share the one selected layer.
+- Not done (R-104): thumbnails in the bars; the track header's eye and lock (they are the Layers section's check box
+  and Locked); a track menu (a track exists while a layer is on it). Probes `lanes.tracks`, `layers.start`,
+  `layers.in`, `layers.out`, `layers.track`; the lanes' walk mapper (seconds, track). The memory walk with three layers:
+  +5.7 MB over 600 frames.
+
 ### D-027 — The timeline layers I: the layers and their composite (AV-030, late, 2026-10-30)
 
 - **Video layers** (R-97 … R-103): the project's video stays the main one (track 1) with everything it had — its

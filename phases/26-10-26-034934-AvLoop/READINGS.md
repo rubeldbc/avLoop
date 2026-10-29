@@ -251,3 +251,7 @@ from `README.md` §3 on 2026-10-29, when the README passed the 300-line ceiling 
      layer adds no alpha decision of its own (Alpha Auto follows the main video).
 103. **R-103** The canvas shows the layers by their decoded frame at the playhead (paused) at ≤ 960 px; the thumbnails
      and the Loop Finder read the main video.
+104. **R-104** The lanes give Premiere's drags, trims, snapping, Alt-copy and Delete; a bar shows its name, not
+     thumbnails, and the eye and lock live in the Layers section (its check box and Locked) rather than on a track
+     header — one layer a track at a time is the common case and the section is beside it; a track exists while a
+     layer is on it (no track menu). Open for the owner's veto.

@@ -71,7 +71,10 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
 - **Video layers**: ☰ → **Add as layer…** (Ctrl+Shift+O) puts another video on a track above the main one, from the
   playhead; the **Layers** section places, scales, fades (Opacity), shifts in time (Start), restacks (Track), shows,
   hides, locks and deletes each. The canvas shows them; the Preview and every export lay them over the main video,
-  inside the crop and its shapes.
+  inside the crop and its shapes. On the **timeline**, as in Premiere Pro, each layer is a bar on its track (V2, V3 …)
+  above the main video: drag it in time (it snaps to In, Out, the playhead and other bars) or to another track, drag its
+  ends to trim it, Alt+drag to copy it, Delete to remove it; with the Selection tool, click a layer on the canvas to
+  pick it and drag to move it.
 - **Quick resets**: click the label beside a control to put it back to its default (Crossfade's 0.5 s, Speed 1×, an
   effect's none …); right-click a section of the side panel — or a tool's options bar — for **Reset <section>**. Each
   is one Undo step.

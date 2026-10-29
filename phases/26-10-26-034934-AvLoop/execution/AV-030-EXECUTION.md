@@ -46,7 +46,7 @@ from `build\bin`, untouched)
 | `node control/phase-tools/check-loc.mjs` | PASS: 316 code files, none over 600 lines (the largest: src/core/ClipEffects.cpp, 425 lines) |
 | `node control/phase-tools/validate-phase-system.mjs` | PASS: 31 phases, 34 requirement ids |
 | README pictures | not retaken: the default window's look unchanged but for the closed-by-default Layers header |
-| AV-029's CI run | CI_RESULT |
+| AV-029's CI run | green, 9 m 9 s (run 40930909417) |
 
 ## The walk
 

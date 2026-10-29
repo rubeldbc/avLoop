@@ -143,6 +143,19 @@ void SidePanel::bindLayers(Project* project) {
     });
     WalkProbes::add(QStringLiteral("layers.count"), [project] { return int(project->layers().size()); });
     WalkProbes::add(QStringLiteral("layers.selected"), [project] { return project->selectedLayer(); });
+    // The selected layer's timing and track (AV-031's walks read them with near).
+    auto selectedOf = [project](auto read) {
+        const int i = project->selectedLayer();
+        return i >= 0 ? QVariant(read(project->layers()[i])) : QVariant();
+    };
+    WalkProbes::add(QStringLiteral("layers.start"),
+                    [=] { return selectedOf([](const VideoLayer& l) { return l.start; }); });
+    WalkProbes::add(QStringLiteral("layers.in"),
+                    [=] { return selectedOf([](const VideoLayer& l) { return l.range.in; }); });
+    WalkProbes::add(QStringLiteral("layers.out"),
+                    [=] { return selectedOf([](const VideoLayer& l) { return l.range.out; }); });
+    WalkProbes::add(QStringLiteral("layers.track"),
+                    [=] { return selectedOf([](const VideoLayer& l) { return l.track; }); });
     // "name:V<track>:<start>:<x>,<y>,<scale %>:<opacity>" a layer, ";" between.
     WalkProbes::add(QStringLiteral("layers.summary"), [project] {
         QStringList parts;

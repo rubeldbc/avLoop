@@ -455,3 +455,6 @@ end of its section.
   from the base frame first and checks the change, rather than naming the bar by eye. (AV-030)
 - **A transform's x, y is the video's centre**: a layer at x 100 of 320 px spans −60 … 260. Rule: tests and walks place
   layers and shapes by their centre (the project file's `transform`). (AV-030)
+- **Lanes that grow under a drag move the rows under the pointer**: a bar dragged into the empty top lane added a lane,
+  the rows shifted by one and the next move took it a track higher, and so on. Rule: a widget whose layout follows
+  the model freezes its layout from the press to the release. (AV-031)

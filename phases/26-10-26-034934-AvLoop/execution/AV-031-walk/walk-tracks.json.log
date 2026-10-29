@@ -1,0 +1,39 @@
+startup: 790 ms
+walk walk-tracks.json: 52 steps
+-- D-027 (AV-031): the counter; a layer — one lane, V2, its bar 0 … 10 s @1491 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect lanes.tracks: 0
+     addLayer samples/counter-640p30.mp4
+PASS expect lanes.tracks: 1
+PASS expect layers.track: 2
+-- its right end trimmed to 6 s; its body moved 2 s later; its left end trimmed 1 s (the start goes with it) @3284 ms
+PASS expect layers.out: 6.017209588
+PASS expect layers.start: 2.003687769
+PASS expect layers.start: 3.005531653
+PASS expect layers.in: 1.001843884
+PASS expect undo.count: 4
+-- a second layer from the playhead overlaps on V2: it goes to V3; dragged down it is refused @4558 ms
+     addLayer samples/counter-640p30.mp4
+PASS expect layers.track: 3
+PASS expect lanes.tracks: 2
+PASS expect layers.track: 3
+-- Alt+drag copies the first up to V4; Delete removes the copy @5579 ms
+PASS expect layers.count: 3
+PASS expect layers.track: 4
+PASS shot timeline-tracks.png: 1400x128 px
+PASS expect layers.count: 2
+-- the canvas: the Selection picks the layer showing at the playhead and moves it @6496 ms
+PASS expect layers.selected: 1
+PASS expect layers.summary: counter-640p30:V2:3.01:320,180,100:100;counter-640p30:V3:0.00:370,200,100:100
+PASS expect transform.x: 320
+PASS shot canvas-tracks.png: 1200x587 px
+-- Undo: the move, the delete, the copy, the second layer, the trims @8080 ms
+PASS expect layers.summary: counter-640p30:V2:3.01:320,180,100:100;counter-640p30:V3:0.00:320,180,100:100
+PASS expect layers.count: 3
+PASS expect layers.count: 1
+PASS expect layers.summary: counter-640p30:V2:0.00:320,180,100:100
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 000001d1a7e9a240] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001d1a7e9a240] v1.16.0

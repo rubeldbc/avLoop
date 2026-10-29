@@ -32,6 +32,14 @@ public:
         start_ = e.scene;
         startT_ = project_->transform();
         mergeKey_ = QStringLiteral("drag:select:%1").arg(++drags_);
+        // A video layer under the pointer (D-027) is picked first: the drag moves it.
+        layer_ = videolayers::hitLayer(project_->layers(), e.scene, project_->time());
+        project_->setSelectedLayer(layer_);
+        if (layer_ >= 0) {
+            layersAtStart_ = project_->layers();
+            mode_ = Mode::Layer;
+            return;
+        }
         corner_ = cornerAt(e.view);
         mode_ = corner_                                                     ? Mode::Scale
                 : startT_.rect(project_->source().size()).contains(e.scene) ? Mode::Move
@@ -40,6 +48,13 @@ public:
 
     void mouseMove(const ToolEvent& e) override {
         if (mode_ == Mode::None) return;
+        if (mode_ == Mode::Layer) {
+            QList<VideoLayer> layers = layersAtStart_;
+            layers[layer_].transform.x += e.scene.x() - start_.x();
+            layers[layer_].transform.y += e.scene.y() - start_.y();
+            project_->changeLayers(layers, mergeKey_);
+            return;
+        }
         VideoTransform t = startT_;
         if (mode_ == Mode::Move) {
             t.x += e.scene.x() - start_.x();
@@ -78,7 +93,9 @@ public:
     QWidget* createOptions(QWidget* parent) override { return createSelectionOptions(project_, canvas_, parent); }
 
 private:
-    enum class Mode { None, Move, Scale };
+    enum class Mode { None, Move, Scale, Layer };
+    int layer_ = -1;
+    QList<VideoLayer> layersAtStart_;
 
     std::optional<Corner> cornerAt(const QPointF& view) const {
         if (!project_->source().isValid()) return std::nullopt;

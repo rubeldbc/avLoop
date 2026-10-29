@@ -1,0 +1,38 @@
+startup: 718 ms
+walk walk-layers.json: 40 steps
+-- D-027: the counter; Add as layer… the counter again — on V2 from the playhead, selected @1421 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect layers.count: 0
+     addLayer samples/counter-640p30.mp4
+PASS expect layers.count: 1
+PASS expect layers.selected: 0
+PASS expect layers.summary: counter-640p30:V2:0.00:320,180,100:100
+PASS expect undo.count: 1
+-- the Layers section: Scale 50, X 160, Y 90, Opacity 60 — one Undo step each @3451 ms
+PASS expect layers.summary: counter-640p30:V2:0.00:160,90,50:60
+PASS expect undo.count: 5
+PASS shot canvas-layer.png: 1200x587 px
+PASS shot panel-layers.png: 252x354 px
+-- the Preview: the layer over the main video, exactly @5095 ms
+PASS waitFor preview.frame: 640x360 after 0 ms
+PASS shot preview-layer.png: 680x500 px
+     previewClose
+-- a second layer at the same time goes to V3; Reset Layers removes both; Undo gives them back @6714 ms
+     addLayer samples/counter-640p30.mp4
+PASS expect layers.count: 2
+PASS expect layers.summary: counter-640p30:V2:0.00:160,90,50:60;counter-640p30:V3:0.00:320,180,100:100
+PASS expect layers.count: 1
+     menu: Reset Layers
+PASS expect layers.count: 0
+PASS expect layers.count: 1
+PASS expect layers.count: 2
+PASS expect layers.previewDecoders: 1
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 000001917212f380] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001917212f380] v1.16.0
+[libvpx-vp9 @ 00000191c2250300] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 00000191c2250300] v1.16.0
+[libvpx-vp9 @ 00000191c224de00] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 00000191c224de00] v1.16.0

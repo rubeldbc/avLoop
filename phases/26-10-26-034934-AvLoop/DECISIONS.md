@@ -144,3 +144,4 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-101 | "layers" at the top, version 3 | unreleased version 3 | `READINGS.md`; AV-030 |
 | R-102 | One CPU pass after either back end, inside the mask | AVADR-0001 parity | `READINGS.md`; AV-030 |
 | R-103 | The canvas's layer frames decoded at rest, ≤ 960 px | a live canvas | `READINGS.md`; AV-030 |
+| R-104 | The lanes: drags, trims, snapping, Alt-copy, Delete; names, no thumbnails; eye and lock in the Layers section | Premiere's tracks, the section beside them | `READINGS.md`; AV-031 |

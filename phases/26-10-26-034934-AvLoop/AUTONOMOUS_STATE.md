@@ -2,7 +2,9 @@
 
 Program: AVLOOP
 Programme version: 1.0.0
-State: **ACTIVE 2026-10-29** — the owner's late wishes (items 20 … 27): AV-022 … AV-031, confirmed by the owner's
+State: **COMPLETE 2026-10-30** — every phase DONE (AV-022 … AV-031, the owner's late items 20 … 27; no Release: the
+project file's version 3 waits for the owner's word, R-80).
+Was: **ACTIVE 2026-10-29** — the owner's late wishes (items 20 … 27): AV-022 … AV-031, confirmed by the owner's
 "commit, push and start and go till end of all phases".
 Was: **PLANNED 2026-10-29, awaiting the owner's confirmation** — items 20 … 27 shaped as AV-022 … AV-031.
 Was: **COMPLETE 2026-10-27** — every phase DONE (AV-021, the owner's late item 19; `v1.1.0` released, R-74).
@@ -22,9 +24,9 @@ words: *"I want to build a piece of software called AvLoop. Its main job is to t
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: AV-031
-Next eligible: AV-031 (in progress)
-Completed: 30 of 31
+Active phase: none
+Next eligible: none — every phase is closed
+Completed: 31 of 31
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -105,12 +107,22 @@ section; the file still version 2.
 **Item 19, late (AV-021, 2026-10-27).** Version 1.1.0 — main since `v1.0.1`, items 16 … 18 — and the GitHub Release
 `v1.1.0` with `AvLoop-1.1.0-setup.exe` and its SHA-256; the README's Download link goes to it.
 
-Readings taken: R-1 … R-76 (`README.md` §3; `DECISIONS.md`; `OWNER-ACTIONS.md`) — every one open for the owner's
+**Items 20 … 27, late (AV-022 … AV-031, 2026-10-29 … 30).** The owner's ten wishes of one sitting, written as phases
+first and started on the owner's word: Mode None — the clip as cut (AV-022); the crop's Inverse — the area a hole in the
+whole video, the file's version 3 (AV-023); shapes that select or cut — rectangles, ellipses, polygons, freehand (S)
+and Illustrator's Pen (P) (AV-024, AV-025); Pathfinder live and Combine (AV-026); Feather and Strength a shape by an
+exact distance transform (AV-027); a label's click and a group's right-click Reset (AV-028); Align, Distribute and a
+layers panel for the shapes (AV-029); video layers on tracks over the main video, composited by one CPU pass after
+either back end, Add as layer…, the Layers section (AV-030), and their tracks on the timeline with Premiere's drags,
+trims, snapping and Alt-copy (AV-031). Readings R-77 … R-104 (`READINGS.md`). No Release.
+
+Readings taken: R-1 … R-104 (`READINGS.md`, once `README.md` §3; `DECISIONS.md`; `OWNER-ACTIONS.md`) — every one open for the owner's
 veto. Dropped: nothing the specification names. Not done, and why: OBS itself was never driven (S11's second half needs
 obs-websocket, not on this PC; the libvpx half passes); no code signing (§1.3, the owner's word). `BLOCKED_EXTERNAL`:
 none. Waiting legs: one — the owner's own 1.0.1 upgraded to 1.1.0 (AV-021, R-75).
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-031** DONE 2026-10-30 — The timeline layers II (late, item 27): the tracks on the timeline as Premiere Pro's — bars dragged in time and across tracks with snapping, trimmed, Alt-copied, deleted; layers picked and moved on the canvas; walks tracks and tracks-memory PASSED, seven earlier walks again Record: `execution/AV-031-EXECUTION.md`.
 - **AV-030** DONE 2026-10-30 — The timeline layers I (late, item 27): up to 8 videos on tracks over the main one, laid over it inside the crop by one CPU pass after either back end; Add as layer…, the Layers section; walks layers and layers-render PASSED, nine earlier walks again Record: `execution/AV-030-EXECUTION.md`.
 - **AV-029** DONE 2026-10-30 — The align tools and the shape layers (late, item 26): Align and Distribute to the selection or the frame; a layers panel — eye, lock, name, order, duplicate; walks align and align-render PASSED, four earlier walks again Record: `execution/AV-029-EXECUTION.md`.
 - **AV-028** DONE 2026-10-30 — The resets (late, item 25): a label's click resets its control, a section's right-click Reset its group, one Undo step each; walk resets PASSED, five earlier walks again Record: `execution/AV-028-EXECUTION.md`.

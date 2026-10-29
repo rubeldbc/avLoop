@@ -11,6 +11,8 @@
 #include "ui/panels/SidePanel.h"
 #include "ui/theme/Theme.h"
 #include "ui/timeline/PlaybackClock.h"
+#include "ui/timeline/Timeline.h"
+#include "ui/timeline/TrackLanes.h"
 #include "ui/widgets/Toast.h"
 
 #include <QAction>
@@ -19,6 +21,7 @@
 #include <QFileInfo>
 #include <QHash>
 #include <QPainter>
+#include <QVBoxLayout>
 
 #include <cmath>
 #include <memory>
@@ -136,6 +139,11 @@ void MainWindow::addLayer(const QString& path) {
 
 void MainWindow::buildLayers() {
     side_->bindLayers(project_);
+    // The tracks (AV-031): lanes above the main video's timeline, on its time scale.
+    if (auto* column = qobject_cast<QVBoxLayout*>(timeline_->parentWidget()->layout()))
+        column->insertWidget(
+            column->indexOf(timeline_),
+            new TrackLanes(project_, timeline_, [this](double t) { seek(t); }, timeline_->parentWidget()));
     auto* preview = new LayerPreview(project_, this);
     canvas_->setUnderlay([this, preview](QPainter& p) { preview->paint(p, canvas_, clock_ && clock_->running()); });
     connect(project_, &Project::changed, canvas_, [this](Project::Aspect a) {
