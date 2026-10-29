@@ -1,0 +1,46 @@
+startup: 726 ms
+walk walk-cut.json: 46 steps
+-- D-020: the counter, In 1 s, Out 3 s (D = 60 at 30 fps); the default loop is Crossfade @1428 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect range.out: 3
+PASS expect loop.mode: crossfade
+PASS expect loop.plan: D60 F15 T9 L45
+PASS expect panel.loop.summary: Loop 1.50 s · 45 frames @ 30 fps
+PASS expect export.defaultName: counter-640p30_loop_640x360.webm
+PASS shot timeline-crossfade.png: 1442x150 px
+-- Mode None: the clip as cut — L = D, the summary says Clip, no band, the name says clip @3230 ms
+PASS expect loop.mode: none
+PASS expect loop.plan: D60 F15 T9 L60
+PASS expect panel.loop.summary: Clip 2.00 s · 60 frames @ 30 fps
+PASS expect timeline.fadeEdge: 3
+PASS expect export.defaultName: counter-640p30_clip_640x360.webm
+PASS shot timeline-none.png: 1442x150 px
+PASS shot loop-panel-none.png: 309x149 px
+-- the Preview: 60 frames, no seam mark, Around seam not offered @4256 ms
+PASS expect preview.open: true
+PASS expect preview.length: 60
+PASS waitFor preview.cached: 60 after 0 ms
+PASS expect preview.aroundSeamEnabled: false
+PASS expect preview.aroundSeam: false
+PASS shot preview-none.png: 680x500 px
+     previewClose
+PASS expect preview.open: false
+-- Undo: back to Crossfade, the loop's words again; Redo: None @5700 ms
+PASS expect loop.mode: crossfade
+PASS expect panel.loop.summary: Loop 1.50 s · 45 frames @ 30 fps
+PASS expect export.defaultName: counter-640p30_loop_640x360.webm
+PASS expect loop.mode: none
+-- the Preview of a loop again offers Around seam @6452 ms
+PASS expect loop.mode: simple
+PASS expect preview.open: true
+PASS expect preview.aroundSeamEnabled: true
+     previewClose
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 0000021555bdc900] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000021555bdc900] v1.16.0
+[libvpx-vp9 @ 0000021555bda080] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000021555bda080] v1.16.0
+[libvpx-vp9 @ 0000021555bdb6c0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000021555bdb6c0] v1.16.0

@@ -3,6 +3,7 @@
 // blue-white dashed line with four handles; the crop frame stays still.
 #include "core/Geometry.h"
 #include "core/Project.h"
+#include "core/SequenceEdit.h"
 #include "ui/canvas/Canvas.h"
 #include "ui/options/OptionsBar.h"
 #include "ui/tools/Tool.h"
@@ -40,6 +41,15 @@ public:
             mode_ = Mode::Layer;
             return;
         }
+        // Then another clip on V1 shown there (D-036): picked, the drag moves it (into its key when keyed).
+        const Sequence& s = project_->sequence();
+        if (const int id = sequenceedit::topClipAt(s, e.scene, project_->time());
+            id && id != s.main && sequenceedit::find(s, id).track == 0) {
+            project_->setSelectedClip(id);
+            clipAtStart_ = *sequenceedit::clip(s, id);
+            mode_ = Mode::Clip;
+            return;
+        }
         corner_ = cornerAt(e.view);
         mode_ = corner_                                                     ? Mode::Scale
                 : startT_.rect(project_->source().size()).contains(e.scene) ? Mode::Move
@@ -48,6 +58,16 @@ public:
 
     void mouseMove(const ToolEvent& e) override {
         if (mode_ == Mode::None) return;
+        if (mode_ == Mode::Clip) {
+            Clip c = clipAtStart_;
+            const double own = std::clamp(c.range.in + (project_->time() - c.start), c.range.in, c.range.out);
+            VideoLayer::Look look = c.look(own);
+            look.transform.x += e.scene.x() - start_.x();
+            look.transform.y += e.scene.y() - start_.y();
+            c.setLook(own, look, project_->keyTolerance());
+            project_->changeClip(c, QObject::tr("Move a clip"), mergeKey_);
+            return;
+        }
         if (mode_ == Mode::Layer) {
             QList<VideoLayer> layers = layersAtStart_;
             VideoLayer& l = layers[layer_];
@@ -98,7 +118,8 @@ public:
     QWidget* createOptions(QWidget* parent) override { return createSelectionOptions(project_, canvas_, parent); }
 
 private:
-    enum class Mode { None, Move, Scale, Layer };
+    enum class Mode { None, Move, Scale, Layer, Clip };
+    Clip clipAtStart_;
     int layer_ = -1;
     QList<VideoLayer> layersAtStart_;
 

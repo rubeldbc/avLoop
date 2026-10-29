@@ -1,7 +1,7 @@
 ---
 phase: AS-006
 title: "The masks on the monitor"
-status: IN_PROGRESS
+status: DONE
 owner_item: 6
 track: A
 checkpoint_id: CP-A1

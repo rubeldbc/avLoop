@@ -32,6 +32,11 @@ void setLayers(Sequence& s, const QList<VideoLayer>& layers);
 // The export frame (AvLoop's): the matte's rectangle, else the main clip where it stands at In, else the old frame.
 QRectF frameOf(const Sequence& s);
 
+// A clip's masks between its own px and the scene's, where it stands at its own time `own`: scene = its rectangle's
+// top-left + own px × its scale (flips aside; D-032, D-036).
+QList<MaskShape> masksToScene(const Clip& c, double own);
+QList<MaskShape> masksFromScene(const Clip& c, double own, const QList<MaskShape>& scene);
+
 } // namespace sequenceview
 
 } // namespace avloop

@@ -58,3 +58,7 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md`; `DECISI
     timeline (its diamonds), not a lane in the panel.
 21. **RS-21** (AS-005) A mask added is Select (Premiere's Add) over the clip's middle half; Cut makes it a hole. Its
     shape is drawn and edited on the monitor in AS-006; here its mode, feather and strength.
+22. **RS-22** (AS-006) A clip's masks are drawn in the scene where the clip stands at the playhead and stored in its
+    own px — Premiere's masks ride the clip's motion. With no clip selected the shape tools stay the crop's (AvLoop's
+    frame-wide shapes, the matte), so every AvLoop shape walk holds.
+23. **RS-23** (AS-006) A mask is mapped by the clip's place and scale, its flips aside (as the composite, D-032).

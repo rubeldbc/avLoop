@@ -47,7 +47,7 @@ application like mini adobe premiere pro … cutting like hole a video and expor
 | `node tools/check-secrets.mjs` | PASS (on its own, exit code 0) |
 | `check-loc.mjs` | PASS: the largest code file `src/core/ClipEffects.cpp`, 425 lines |
 | `validate-phase-system.mjs` (both programmes) | PASS: 33 phases; PASS: 9 phases |
-| `git push origin main`; CI | see the commit `[AS-005]` and its run |
+| `git push origin main`; CI | pushed `ffa1cd2`; CI green (run 40960668570, 8 m 58 s) |
 
 ## The walk
 

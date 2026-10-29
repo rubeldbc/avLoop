@@ -145,7 +145,7 @@ void SidePanel::bindShapes(Project* project) {
     // Rows top first: row r is shape (n − 1 − r).
     auto shapeOf = [list](int row) { return list->count() - 1 - row; };
     auto refresh = [=] {
-        const QList<MaskShape>& shapes = project->crop().shapes;
+        const QList<MaskShape>& shapes = project->shapeHost().shapes;
         const QList<int> selected = project->selectedShapes();
         const QSignalBlocker block(list);
         list->clear();
@@ -205,9 +205,9 @@ void SidePanel::bindShapes(Project* project) {
     auto editOne = [project](auto change) {
         const QList<int> sel = project->selectedShapes();
         if (sel.size() != 1) return;
-        CropShape c = project->crop();
+        CropShape c = project->shapeHost();
         change(c.shapes[sel.first()]);
-        if (!(c == project->crop())) project->changeCrop(c);
+        if (!(c == project->shapeHost())) project->changeShapeHost(c);
     };
     connect(name, &QLineEdit::editingFinished, this, [=] {
         const QString text = name->text().trimmed();
@@ -217,17 +217,17 @@ void SidePanel::bindShapes(Project* project) {
     connect(locked, &QCheckBox::clicked, this, [=](bool on) { editOne([on](MaskShape& m) { m.locked = on; }); });
     connect(list, &QListWidget::itemChanged, this, [=](QListWidgetItem* item) {
         const int i = item->data(Qt::UserRole).toInt();
-        CropShape c = project->crop();
+        CropShape c = project->shapeHost();
         if (i < 0 || i >= c.shapes.size()) return;
         c.shapes[i].visible = item->checkState() == Qt::Checked;
-        if (!(c == project->crop())) project->changeCrop(c);
+        if (!(c == project->shapeHost())) project->changeShapeHost(c);
     });
     auto move = [project](int from, int to) {
-        CropShape c = project->crop();
+        CropShape c = project->shapeHost();
         c.shapes = shapealign::moved(c.shapes, from, to);
-        if (c == project->crop()) return;
+        if (c == project->shapeHost()) return;
         project->setSelectedShapes({to});
-        project->changeCrop(c);
+        project->changeShapeHost(c);
     };
     connect(up, &QPushButton::clicked, this, [=] {
         if (const QList<int> sel = project->selectedShapes(); sel.size() == 1) move(sel.first(), sel.first() + 1);
@@ -238,15 +238,15 @@ void SidePanel::bindShapes(Project* project) {
     connect(duplicate, &QPushButton::clicked, this, [=] {
         const QList<int> sel = project->selectedShapes();
         if (sel.size() != 1) return;
-        CropShape c = project->crop();
+        CropShape c = project->shapeHost();
         c.shapes = shapealign::duplicated(c.shapes, sel.first());
-        if (c == project->crop()) return;
+        if (c == project->shapeHost()) return;
         project->setSelectedShapes({sel.first() + 1});
-        project->changeCrop(c);
+        project->changeShapeHost(c);
     });
     // A row dragged: the list's new order (top first) is the shapes' order reversed.
     connect(list->model(), &QAbstractItemModel::rowsMoved, this, [=] {
-        CropShape c = project->crop();
+        CropShape c = project->shapeHost();
         QList<MaskShape> next;
         for (int r = list->count() - 1; r >= 0; --r) {
             const int i = list->item(r)->data(Qt::UserRole).toInt();
@@ -255,7 +255,7 @@ void SidePanel::bindShapes(Project* project) {
         if (next.size() != c.shapes.size()) return;
         c.shapes = next;
         project->setSelectedShapes({});
-        if (!(c == project->crop())) project->changeCrop(c);
+        if (!(c == project->shapeHost())) project->changeShapeHost(c);
     });
     connect(feather, &StepSpinBox::valueChanged, this,
             [=](double v) { setShapesSoftness(project, v, -1, QStringLiteral("field:panel.shapes.feather")); });
@@ -263,31 +263,32 @@ void SidePanel::bindShapes(Project* project) {
             [=](double v) { setShapesSoftness(project, -1, v, QStringLiteral("field:panel.shapes.strength")); });
     connect(combine, &QPushButton::clicked, this, [=] { combineSelected(project, op->currentData().toInt()); });
     connect(remove, &QPushButton::clicked, this, [project] {
-        CropShape c = project->crop();
+        CropShape c = project->shapeHost();
         c.shapes = shapeedit::removed(c.shapes, project->selectedShapes());
         project->setSelectedShapes({});
-        project->changeCrop(c);
+        project->changeShapeHost(c);
     });
 
-    WalkProbes::add(QStringLiteral("shapes.count"), [project] { return int(project->crop().shapes.size()); });
+    WalkProbes::add(QStringLiteral("shapes.count"), [project] { return int(project->shapeHost().shapes.size()); });
     WalkProbes::add(QStringLiteral("shapes.selected"), [project] {
         QStringList ids;
         for (int i : project->selectedShapes())
             ids << QString::number(i);
         return ids.join(QLatin1Char(','));
     });
-    WalkProbes::add(QStringLiteral("shapes.summary"), [project] { return shapeedit::summary(project->crop().shapes); });
+    WalkProbes::add(QStringLiteral("shapes.summary"),
+                    [project] { return shapeedit::summary(project->shapeHost().shapes); });
     // Each shape's layer flags (D-026): "v" shown or "h" hidden, then "l" locked or "u", "," between.
     WalkProbes::add(QStringLiteral("shapes.flags"), [project] {
         QStringList parts;
-        for (const MaskShape& m : project->crop().shapes)
+        for (const MaskShape& m : project->shapeHost().shapes)
             parts << QStringLiteral("%1%2").arg(m.visible ? 'v' : 'h').arg(m.locked ? 'l' : 'u');
         return parts.join(QLatin1Char(','));
     });
     // Each shape's feather and strength, "f/s" a shape, ";" between (D-024).
     WalkProbes::add(QStringLiteral("shapes.soft"), [project] {
         QStringList parts;
-        for (const MaskShape& m : project->crop().shapes)
+        for (const MaskShape& m : project->shapeHost().shapes)
             parts << QStringLiteral("%1/%2").arg(m.feather).arg(m.strength);
         return parts.join(QLatin1Char(';'));
     });
@@ -302,11 +303,11 @@ void SidePanel::bindShapes(Project* project) {
     reset::setDefault(strength, 100.0);
     reset::setDefault(op, int(shapecombine::Op::Unite));
     s->addResetAction(tr("Reset shapes"), QStringLiteral("shapes"), [project] {
-        CropShape c = project->crop();
+        CropShape c = project->shapeHost();
         if (c.shapes.isEmpty()) return;
         c.shapes.clear();
         project->setSelectedShapes({});
-        project->changeCrop(c);
+        project->changeShapeHost(c);
     });
     refresh();
 }

@@ -34,7 +34,7 @@ public:
         WalkProbes::add(QStringLiteral("pen.anchor"), [this] { return anchor_; });
         WalkProbes::add(QStringLiteral("pen.anchors"), [this] {
             const int i = editable();
-            return i >= 0 ? pathedit::kinds(project_->crop().shapes[i]) : QString();
+            return i >= 0 ? pathedit::kinds(project_->shapeHost().shapes[i]) : QString();
         });
     }
 
@@ -58,7 +58,7 @@ public:
             return;
         }
         if (const int i = editable(); i >= 0) {
-            const MaskShape& s = project_->crop().shapes[i];
+            const MaskShape& s = project_->shapeHost().shapes[i];
             index_ = i;
             startShape_ = pathedit::asPath(s);
             bool out = false;
@@ -86,7 +86,7 @@ public:
         }
         anchor_ = -1;
         if (e.modifiers & Qt::ControlModifier) { // the direct selection
-            const int hit = shapeedit::hitShape(project_->crop().shapes, e.scene);
+            const int hit = shapeedit::hitShape(project_->shapeHost().shapes, e.scene);
             project_->setSelectedShapes(hit >= 0 ? QList<int>{hit} : QList<int>{});
             return;
         }
@@ -147,7 +147,7 @@ public:
         if (e->key() != Qt::Key_Delete && e->key() != Qt::Key_Backspace) return false;
         const int i = editable();
         if (i < 0) return false;
-        CropShape c = project_->crop();
+        CropShape c = project_->shapeHost();
         const MaskShape fewer = anchor_ >= 0 ? pathedit::removed(c.shapes[i], anchor_) : c.shapes[i];
         if (anchor_ >= 0 && fewer.points.size() < c.shapes[i].points.size()) {
             c.shapes[i] = fewer;
@@ -156,7 +156,7 @@ public:
             project_->setSelectedShapes({});
         }
         anchor_ = -1;
-        project_->changeCrop(c);
+        project_->changeShapeHost(c);
         return true;
     }
 
@@ -195,7 +195,7 @@ public:
             paintAnchors(p, toView, drawing_, int(drawing_.size()) - 1);
             return;
         }
-        if (const int i = editable(); i >= 0) paintAnchors(p, toView, project_->crop().shapes[i].points, anchor_);
+        if (const int i = editable(); i >= 0) paintAnchors(p, toView, project_->shapeHost().shapes[i].points, anchor_);
     }
 
     QWidget* createOptions(QWidget* parent) override { return createPenOptions(project_, &draft_, parent); }
@@ -207,21 +207,21 @@ private:
     int editable() const {
         const QList<int> s = project_->selectedShapes();
         if (s.size() != 1) return -1;
-        const MaskShape& m = project_->crop().shapes[s.first()];
+        const MaskShape& m = project_->shapeHost().shapes[s.first()];
         return !m.isStandard() && !m.locked ? s.first() : -1;
     }
 
     void commit(const MaskShape& s, const QString& mergeKey = {}) {
-        CropShape c = project_->crop();
+        CropShape c = project_->shapeHost();
         if (index_ < 0 || index_ >= c.shapes.size()) return;
         c.shapes[index_] = s;
-        project_->changeCrop(c, mergeKey);
+        project_->changeShapeHost(c, mergeKey);
     }
 
     void close() {
         const bool curved =
             std::any_of(drawing_.begin(), drawing_.end(), [](const PathPoint& pt) { return pt.hasHandles(); });
-        CropShape c = project_->crop();
+        CropShape c = project_->shapeHost();
         if ((drawing_.size() >= 3 || (drawing_.size() == 2 && curved)) && c.shapes.size() < MaskShape::kMaxShapes) {
             MaskShape s;
             s.kind = MaskShape::Kind::Path;
@@ -229,7 +229,7 @@ private:
             s.points = drawing_;
             s.name = maskshapes::nextName(c.shapes, s.kind);
             c.shapes.append(s);
-            project_->changeCrop(c);
+            project_->changeShapeHost(c);
             project_->setSelectedShapes({int(c.shapes.size() - 1)});
         }
         drawing_.clear();

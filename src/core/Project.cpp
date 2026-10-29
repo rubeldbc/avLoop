@@ -71,10 +71,18 @@ void Project::setSource(const SourceInfo& source) {
     sync(true);
 }
 
+CropShape Project::shapeHost() const {
+    CropShape host = crop_;
+    if (const Clip* c = selectedClip_ ? sequenceedit::clip(seq_, selectedClip_) : nullptr)
+        host.shapes = sv::masksToScene(*c, std::clamp(c->range.in + (time_ - c->start), c->range.in, c->range.out));
+    return host;
+}
+
 QList<int> Project::selectedShapes() const {
     QList<int> valid;
+    const qsizetype count = shapeHost().shapes.size();
     for (int i : selectedShapes_)
-        if (i >= 0 && i < crop_.shapes.size() && !valid.contains(i)) valid.append(i);
+        if (i >= 0 && i < count && !valid.contains(i)) valid.append(i);
     std::sort(valid.begin(), valid.end());
     return valid;
 }
@@ -275,6 +283,10 @@ void Project::setSelectedClip(int id) {
     if (valid == selectedClip_) return;
     selectedClip_ = valid;
     emit changed(Aspect::LayerSelection);
+    if (!selectedShapes_.isEmpty()) { // the shapes' indices were the other host's
+        selectedShapes_.clear();
+        emit changed(Aspect::Shapes);
+    }
 }
 
 const ClipEffects& Project::panelEffects() const {

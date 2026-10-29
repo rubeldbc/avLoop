@@ -4,6 +4,8 @@
 
 #include <QSet>
 
+#include <functional>
+
 #include <algorithm>
 
 namespace avloop::sequenceview {
@@ -128,6 +130,38 @@ void setLayers(Sequence& s, const QList<VideoLayer>& layers) {
     }
     for (qsizetype t = 1; t < s.tracks.size(); ++t)
         sortTrack(s.tracks[t]);
+}
+
+namespace {
+
+QList<MaskShape> mapped(const QList<MaskShape>& masks, const std::function<QPointF(const QPointF&)>& map, double k) {
+    QList<MaskShape> out;
+    for (MaskShape m : masks) {
+        const QPointF a = map(m.rect.topLeft());
+        m.rect = QRectF(a, m.rect.size() * k);
+        m.radius *= k;
+        for (PathPoint& pt : m.points) {
+            pt.p = map(pt.p);
+            pt.in = map(pt.in);
+            pt.out = map(pt.out);
+        }
+        out.append(m);
+    }
+    return out;
+}
+
+} // namespace
+
+QList<MaskShape> masksToScene(const Clip& c, double own) {
+    const QRectF r = c.rectAt(own);
+    const double k = c.size.width() > 0 ? r.width() / c.size.width() : 1.0;
+    return mapped(c.masks, [&](const QPointF& p) { return r.topLeft() + p * k; }, k);
+}
+
+QList<MaskShape> masksFromScene(const Clip& c, double own, const QList<MaskShape>& scene) {
+    const QRectF r = c.rectAt(own);
+    const double k = c.size.width() > 0 && r.width() > 0 ? r.width() / c.size.width() : 1.0;
+    return mapped(scene, [&](const QPointF& p) { return (p - r.topLeft()) / k; }, 1.0 / k);
 }
 
 } // namespace avloop::sequenceview

@@ -1,6 +1,7 @@
 #include "render/SequenceRenderer.h"
 
 #include "core/Geometry.h"
+#include "core/SequenceView.h"
 #include "media/Decoder.h"
 #include "media/FrameIndex.h"
 #include "media/MediaProbe.h"
@@ -22,24 +23,6 @@ constexpr size_t kMaxMasks = 4;
 
 inline std::uint8_t unorm(float v) {
     return std::uint8_t(std::lround(std::clamp(v, 0.f, 1.f) * 255.f));
-}
-
-// A clip's masks from its own px to the sequence's: its rectangle's top-left + p × its scale (flips aside).
-QList<MaskShape> placed(const QList<MaskShape>& masks, const QRectF& rect, const QSizeF& size) {
-    const double k = size.width() > 0 ? rect.width() / size.width() : 1.0;
-    const auto map = [&](const QPointF& p) { return rect.topLeft() + p * k; };
-    QList<MaskShape> out;
-    for (MaskShape m : masks) {
-        m.rect = QRectF(map(m.rect.topLeft()), m.rect.size() * k);
-        m.radius *= k;
-        for (PathPoint& pt : m.points) {
-            pt.p = map(pt.p);
-            pt.in = map(pt.in);
-            pt.out = map(pt.out);
-        }
-        out.append(m);
-    }
-    return out;
 }
 
 } // namespace
@@ -175,13 +158,13 @@ const FrameTimes& SequenceRenderer::timesOf(const Clip& clip) {
     return times_.insert(clip.id, times).value();
 }
 
-std::shared_ptr<const std::vector<float>> SequenceRenderer::maskOf(const Clip& clip, const QRectF& rect) {
+std::shared_ptr<const std::vector<float>> SequenceRenderer::maskOf(const Clip& clip, double own, const QRectF& rect) {
     if (!maskshapes::anyVisible(clip.masks)) return {};
     for (const MaskEntry& e : masks_)
         if (e.id == clip.id && e.rect == rect) return e.coverage;
     if (masks_.size() >= kMaxMasks) masks_.erase(masks_.begin());
     auto coverage = std::make_shared<const std::vector<float>>(
-        MaskBuilder::shapesCoverage(placed(clip.masks, rect, clip.size), area_, size_));
+        MaskBuilder::shapesCoverage(sequenceview::masksToScene(clip, own), area_, size_));
     masks_.push_back({clip.id, rect, coverage});
     return coverage;
 }
@@ -218,7 +201,7 @@ bool SequenceRenderer::gather(const Term& term, QVector<Drawn>& drawn, QString* 
                     d.pieces.append({f, float(mix.weight[m]), Placement::of(area_, size_, at, clip.size)});
                 }
             }
-            d.mask = maskOf(clip, look.transform.rect(clip.size));
+            d.mask = maskOf(clip, own, look.transform.rect(clip.size));
             if (!d.pieces.isEmpty()) drawn.append(d);
             break; // one clip a track at a time
         }

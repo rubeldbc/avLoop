@@ -298,6 +298,10 @@ void SidePanel::bindControls(Project* project, std::function<void(double)> seek)
             .arg(l.transform.scale * 100, 0, 'f', 1)
             .arg(l.opacity, 0, 'f', 1);
     });
+    WalkProbes::add(QStringLiteral("controls.posX"), [project] {
+        const Clip* c = clipOf(project);
+        return c ? c->look(ownAt(*c, project->time())).transform.x : 0.0;
+    });
     WalkProbes::add(QStringLiteral("controls.keyCount"), [project] {
         const Clip* c = clipOf(project);
         return c ? int(c->keys.size()) : 0;

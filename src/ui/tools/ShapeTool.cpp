@@ -40,7 +40,7 @@ public:
 
     void mousePress(const ToolEvent& e) override {
         if (e.button != Qt::LeftButton || !project_->source().isValid()) return;
-        const QList<MaskShape>& shapes = project_->crop().shapes;
+        const QList<MaskShape>& shapes = project_->shapeHost().shapes;
         start_ = e.scene;
         mergeKey_ = QStringLiteral("drag:shape:%1").arg(++drags_);
         if (mode_ == Mode::Polygon) {
@@ -92,7 +92,7 @@ public:
 
     void mouseMove(const ToolEvent& e) override {
         const QPointF d = e.scene - start_;
-        CropShape c = project_->crop();
+        CropShape c = project_->shapeHost();
         switch (mode_) {
         case Mode::Marquee:
             rect_ = QRectF(start_, e.scene).normalized();
@@ -109,7 +109,7 @@ public:
             break;
         case Mode::Move:
             c.shapes = shapeedit::moved(startShapes_, moving_, d);
-            project_->changeCrop(c, mergeKey_);
+            project_->changeShapeHost(c, mergeKey_);
             break;
         case Mode::Resize:
             if (index_ < c.shapes.size()) {
@@ -118,7 +118,7 @@ public:
                 MaskShape s = startShape_;
                 s.rect = crophandles::resized(r, handle_, d, ratio, e.modifiers & Qt::AltModifier);
                 c.shapes[index_] = s.clamped();
-                project_->changeCrop(c, mergeKey_);
+                project_->changeShapeHost(c, mergeKey_);
             }
             break;
         case Mode::Anchor:
@@ -129,7 +129,7 @@ public:
                 pt.in += d;
                 pt.out += d;
                 c.shapes[index_] = s;
-                project_->changeCrop(c, mergeKey_);
+                project_->changeShapeHost(c, mergeKey_);
             }
             break;
         case Mode::None:
@@ -140,7 +140,7 @@ public:
     void mouseRelease(const ToolEvent&) override {
         if (mode_ == Mode::Marquee) {
             QList<int> touched;
-            const QList<MaskShape>& shapes = project_->crop().shapes;
+            const QList<MaskShape>& shapes = project_->shapeHost().shapes;
             for (qsizetype i = 0; i < shapes.size(); ++i)
                 if (shapes[i].visible && !shapes[i].locked && shapes[i].bounds().intersects(rect_))
                     touched.append(int(i));
@@ -171,7 +171,7 @@ public:
     bool keyPress(QKeyEvent* e) override {
         if (e->matches(QKeySequence::SelectAll)) { // Ctrl+A: every visible, unlocked shape
             QList<int> all;
-            const QList<MaskShape>& shapes = project_->crop().shapes;
+            const QList<MaskShape>& shapes = project_->shapeHost().shapes;
             for (qsizetype i = 0; i < shapes.size(); ++i)
                 if (shapes[i].visible && !shapes[i].locked) all.append(int(i));
             project_->setSelectedShapes(all);
@@ -190,11 +190,11 @@ public:
             return true;
         }
         if (selected.isEmpty()) return false;
-        CropShape c = project_->crop();
+        CropShape c = project_->shapeHost();
         if (e->key() == Qt::Key_Delete || e->key() == Qt::Key_Backspace) {
             c.shapes = shapeedit::removed(c.shapes, selected);
             project_->setSelectedShapes({});
-            project_->changeCrop(c);
+            project_->changeShapeHost(c);
             return true;
         }
         const double step = (e->modifiers() & Qt::ShiftModifier) ? 10 : 1;
@@ -210,13 +210,13 @@ public:
         else
             return false;
         c.shapes = shapeedit::moved(c.shapes, selected, d);
-        project_->changeCrop(c, QStringLiteral("nudge:shapes"));
+        project_->changeShapeHost(c, QStringLiteral("nudge:shapes"));
         return true;
     }
 
     bool wantsKey(const QKeyEvent* e) const override {
         const bool selection = !project_->selectedShapes().isEmpty();
-        if (e->matches(QKeySequence::SelectAll)) return !project_->crop().shapes.isEmpty();
+        if (e->matches(QKeySequence::SelectAll)) return !project_->shapeHost().shapes.isEmpty();
         switch (e->key()) {
         case Qt::Key_Escape:
             return mode_ != Mode::None || selection;
@@ -237,7 +237,7 @@ public:
 
     Qt::CursorShape cursor(const ToolEvent& e) const override {
         hover_ = e.scene; // the canvas asks for the cursor on a move without a button: a polygon's next segment follows
-        const QList<MaskShape>& shapes = project_->crop().shapes;
+        const QList<MaskShape>& shapes = project_->shapeHost().shapes;
         const QList<int> selected = project_->selectedShapes();
         if (selected.size() == 1 && shapes[selected.first()].isStandard()) {
             const Handle h = crophandles::hit(canvas_->sceneToView(shapes[selected.first()].rect), e.view);
@@ -268,7 +268,7 @@ public:
             if (mode_ == Mode::Polygon) anchors(p, QPolygonF(line.mid(0, line.size() - 1)), 0);
         }
         // The selection: one standard shape's eight handles; a custom one's anchors; several, their boxes.
-        const QList<MaskShape>& shapes = project_->crop().shapes;
+        const QList<MaskShape>& shapes = project_->shapeHost().shapes;
         const QList<int> selected = project_->selectedShapes();
         for (int i : selected) {
             const MaskShape& s = shapes[i];
@@ -327,11 +327,11 @@ private:
     }
 
     void add(MaskShape s) {
-        CropShape c = project_->crop();
+        CropShape c = project_->shapeHost();
         if (c.shapes.size() >= MaskShape::kMaxShapes) return;
         s.name = maskshapes::nextName(c.shapes, s.kind);
         c.shapes.append(s);
-        project_->changeCrop(c);
+        project_->changeShapeHost(c);
         project_->setSelectedShapes({int(c.shapes.size() - 1)});
     }
 

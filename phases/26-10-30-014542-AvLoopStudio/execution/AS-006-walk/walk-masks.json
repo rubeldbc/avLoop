@@ -1,0 +1,42 @@
+{
+  "delay": 120,
+  "settle": 700,
+  "steps": [
+    { "label": "D-036: the counter; the 1080p counter on V2 at 25 %, centred — selected" },
+    { "do": "resize", "w": 1440, "h": 900 },
+    { "do": "open", "file": "samples/counter-640p30.mp4" },
+    { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 10000 },
+    { "do": "import", "files": ["samples/counter-1080p30.mp4"] },
+    { "do": "choose", "on": "project.track", "text": "V2" },
+    { "do": "click", "on": "project.overwrite" },
+    { "do": "click", "on": "lanes", "space": "lanes", "at": [5, 2] },
+    { "do": "type", "on": "controls.scale", "text": "25" },
+    { "do": "expect", "probe": "controls.look", "eq": "320.0,180.0,25.0,100.0" },
+    { "do": "key", "keys": "Ctrl+0", "on": "MainWindow" },
+
+    { "label": "S, Ellipse, Cut: a drag on the monitor draws a mask on V2's clip — a hole; the crop's shapes untouched" },
+    { "do": "key", "keys": "S", "on": "MainWindow" },
+    { "do": "choose", "on": "options.shape.kind", "data": 2 },
+    { "do": "choose", "on": "options.shape.role", "data": 1 },
+    { "do": "drag", "on": "canvas", "space": "canvas", "from": [260, 140], "to": [380, 220], "steps": 12 },
+    { "do": "expect", "probe": "controls.maskList", "eq": "ellipse:cut" },
+    { "do": "expect", "probe": "shapes.count", "eq": 1 },
+    { "do": "expect", "probe": "undo.count", "eq": 3 },
+    { "do": "wait", "ms": 600 },
+    { "do": "shot", "on": "CanvasArea", "file": "mask-drawn.png", "maxWidth": 1000 },
+
+    { "label": "the Selection drags V2 80 px right: its mask goes with it" },
+    { "do": "key", "keys": "V", "on": "MainWindow" },
+    { "do": "drag", "on": "canvas", "space": "canvas", "from": [150, 80], "to": [230, 80], "steps": 10 },
+    { "do": "expect", "probe": "controls.posX", "near": [400, 1] },
+    { "do": "expect", "probe": "controls.maskList", "eq": "ellipse:cut" },
+    { "do": "wait", "ms": 600 },
+    { "do": "shot", "on": "CanvasArea", "file": "mask-moved.png", "maxWidth": 1000 },
+
+    { "label": "nothing selected: the Shape tool's shapes are the crop's again (none)" },
+    { "do": "click", "on": "lanes", "space": "lanes", "at": [5, 3] },
+    { "do": "expect", "probe": "lanes.selected", "eq": "" },
+    { "do": "expect", "probe": "shapes.count", "eq": 0 },
+    { "do": "saveAs", "file": "masks.avloop" }
+  ]
+}

@@ -1,9 +1,9 @@
 PASS one video, an ellipse crop, keyframes: the composite within 1/255 of AvLoop's own path at 1 s: 280×280, max diff 0
-PASS a layer: the composite, GPU setting = CPU byte for byte: frame 30 of 60 · 640x360 · simple · CPU · 56 ms → layered.avloop-30.rgba.png
+PASS a layer: the composite, GPU setting = CPU byte for byte: frame 30 of 60 · 640x360 · simple · CPU · 54 ms → layered.avloop-30.rgba.png
 PASS its counters: the main video's frame 30, the layer's 120 (3 s on): 30 | 120
 PASS the Razor's halves: at 1.5 s the media's frame 45, at 2.5 s (the second half from 3 s) frame 105: 45 | 105
 PASS a Cut ellipse in V2: V1 through the hole, V2 around it (its foot: frame 150): centre 254,0,253,255 = V1's (V2 there: 0,254,0,255), corner 253,0,0,255 = V2's, foot 150
 PASS the matte inverted: its ellipse clear through every track, the rest opaque: alpha 0 | 255
 PASS V2 keyed 0 → 100 % over 2 s: half at 1 s: alpha 128
-PASS 1,200 frames with three layers: private bytes flat after the first second: 1200 frames of a 120-frame loop · 640x360 · CPU · 6.2 s · 194.4 fps · 148 → 155.5 → 156.2 → 156.4 → 156.8 → 156.8 → 156.8 MB (+1.3)
+PASS 1,200 frames with three layers: private bytes flat after the first second: 1200 frames of a 120-frame loop · 640x360 · CPU · 6.2 s · 193.4 fps · 146.3 → 151.6 → 152.2 → 152.2 → 152.6 → 154.6 → 154.9 MB (+3.3)
 WALK PASSED

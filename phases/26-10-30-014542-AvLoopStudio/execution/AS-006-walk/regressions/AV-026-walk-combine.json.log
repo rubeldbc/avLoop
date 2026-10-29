@@ -1,0 +1,45 @@
+startup: 737 ms
+walk walk-combine.json: 66 steps
+-- D-023: two overlapping ellipses drawn with S on the counter at 100 % @1440 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect shapes.count: 2
+PASS expect shapes.summary: ellipse:add:100,80,200,200;ellipse:add:240,80,200,200
+-- Ctrl+A selects both; Combine ▸ Unite bakes one path (one Undo step); Undo gives the two back @3484 ms
+PASS expect shapes.selected: 0,1
+PASS expect shapes.count: 1
+PASS expect shapes.summary: path:add:n66
+PASS expect panel.shapes.rows: Path 1 · Select
+PASS shot canvas-unite.png: 1200x671 px
+PASS expect shapes.count: 2
+-- Minus front, Intersect, Exclude — each one path, each undone @4773 ms
+PASS expect shapes.count: 1
+PASS shot canvas-minus.png: 1200x671 px
+PASS expect shapes.count: 1
+PASS shot canvas-intersect.png: 1200x671 px
+PASS expect shapes.count: 1
+PASS shot canvas-exclude.png: 1200x671 px
+PASS expect shapes.count: 2
+-- live roles: the top ellipse Keep only, then Exclude (the Crop section's Role) @7210 ms
+PASS expect shapes.selected: 1
+PASS expect shapes.summary: ellipse:add:100,80,200,200;ellipse:keep:240,80,200,200
+PASS shot canvas-keep.png: 1200x671 px
+PASS expect shapes.summary: ellipse:add:100,80,200,200;ellipse:exclude:240,80,200,200
+PASS shot canvas-exclude-live.png: 1200x671 px
+PASS shot panel-combine.png: 309x684 px
+-- a Ctrl+drag marquee selects what it touches @8404 ms
+PASS expect shapes.selected: 0
+PASS expect shapes.selected: 0,1
+PASS expect shapes.count: 2
+-- the Preview: Exclude live, exactly @9256 ms
+PASS waitFor preview.frame: 640x360 after 0 ms
+PASS shot preview-exclude.png: 680x500 px
+     previewClose
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 000001a3410c5c40] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001a3410c5c40] v1.16.0
+[libvpx-vp9 @ 000001a3410c7280] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001a3410c7280] v1.16.0
+[libvpx-vp9 @ 000001a3410c84c0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001a3410c84c0] v1.16.0

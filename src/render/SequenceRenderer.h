@@ -96,7 +96,7 @@ private:
     int sourceFor(const Clip& clip, int lane, bool hardware);
     media::Frame frameOf(const Clip& clip, double own, int lane, bool hardware);
     const FrameTimes& timesOf(const Clip& clip);
-    std::shared_ptr<const std::vector<float>> maskOf(const Clip& clip, const QRectF& rect);
+    std::shared_ptr<const std::vector<float>> maskOf(const Clip& clip, double own, const QRectF& rect);
     bool gather(const Term& term, QVector<Drawn>& drawn, QString* error);
 
     Sequence sequence_;

@@ -1,0 +1,21 @@
+walk walk-masks.json: 33 steps
+-- D-036: the counter; the 1080p counter on V2 at 25 %, centred — selected @1414 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+     import 1
+PASS expect controls.look: 320.0,180.0,25.0,100.0
+-- S, Ellipse, Cut: a drag on the monitor draws a mask on V2's clip — a hole; the crop's shapes untouched @3398 ms
+PASS expect controls.maskList: ellipse:cut
+PASS expect shapes.count: 1
+PASS expect undo.count: 3
+PASS shot mask-drawn.png: 938x691 px
+-- the Selection drags V2 80 px right: its mask goes with it @5207 ms
+PASS expect controls.posX: 399.8135198
+PASS expect controls.maskList: ellipse:cut
+PASS shot mask-moved.png: 938x691 px
+-- nothing selected: the Shape tool's shapes are the crop's again (none) @6866 ms
+PASS expect lanes.selected: 
+PASS expect shapes.count: 0
+     saveAs D:/Code5/avLoop/phases/26-10-30-014542-AvLoopStudio/execution/AS-006-walk/masks.avloop
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

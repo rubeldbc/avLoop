@@ -5,6 +5,8 @@
 #include "core/SequenceEdit.h"
 #include "core/SequenceView.h"
 
+#include <algorithm>
+
 namespace avloop {
 
 namespace sv = sequenceview;
@@ -143,6 +145,26 @@ void Project::changePanelEffects(const ClipEffects& after, const QString& mergeK
     const sequenceedit::Where w = sequenceedit::find(next, c.id);
     next.tracks[w.track].clips[w.index] = c;
     pushSequence(SetEffectsId, tr("Change the clip effects"), next, mergeKey);
+}
+
+void Project::changeShapeHost(const CropShape& after, const QString& mergeKey) {
+    const Clip* c = selectedClip_ ? sequenceedit::clip(seq_, selectedClip_) : nullptr;
+    if (!c) return changeCrop(after, mergeKey);
+    // The clip's masks from the scene back to its own px, where it stands at the playhead; the crop's own fields
+    // are left as they are.
+    Clip next = *c;
+    const double own = std::clamp(c->range.in + (time_ - c->start), c->range.in, c->range.out);
+    next.masks = sequenceview::masksFromScene(*c, own, after.clamped().shapes);
+    if (next.masks == c->masks) return;
+    pushSequence(
+        SetCropId, tr("Change the masks"),
+        [&] {
+            Sequence s = seq_;
+            const sequenceedit::Where w = sequenceedit::find(s, next.id);
+            s.tracks[w.track].clips[w.index] = next;
+            return s;
+        }(),
+        mergeKey);
 }
 
 void Project::changeClip(const Clip& after, const QString& text, const QString& mergeKey) {

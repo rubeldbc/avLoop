@@ -27,6 +27,18 @@ its model, under the UI that is still AvLoop's (RS-7).
   the frame's corner; each layer on its own track; the crop with its shapes the sequence's matte (D-032). A migrated
   file renders byte for byte as before. `avloop-cli sequence <project> [--save x.avloop]` prints it.
 
+### D-036 — The masks on the monitor (AS-006, AvLoop Studio, 2026-10-30)
+
+- **The Shape (S) and Pen (P) tools draw on the selected clip**: with a clip selected, every shape tool — drawing, the
+  handles and anchors, the shape bar (role, feather, strength, X, Y, W, H), Combine, Align, the Shapes list — acts on
+  that clip's **masks**, shown in their place on the monitor where the clip stands at the playhead and written back in
+  its own px (so they move, scale and key with it). With no clip selected they act on the crop's shapes, as AvLoop.
+  One Undo step a gesture; the selected shapes are let go when the selected clip changes.
+- A mask's role **Cut** makes the hole (Select keeps inside; Keep only, Exclude as D-026); the monitor's composite shows
+  the clip cut, every track below seen through it.
+- **The Selection on the monitor**: a layer under the pointer first (D-027), then another clip on V1 shown there —
+  picked (the Effect Controls follow) and dragged (into its key when keyed) —, else the main video as before.
+
 ### D-035 — The Effect Controls (AS-005, AvLoop Studio, 2026-10-30)
 
 - **The selected clip** (one clip selected on the timeline, or a layer in the Layers section) is the project's — not in

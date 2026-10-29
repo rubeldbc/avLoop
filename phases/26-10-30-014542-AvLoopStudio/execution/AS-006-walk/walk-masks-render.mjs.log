@@ -1,0 +1,6 @@
+PASS the project saved by the GUI walk: masks.avloop
+PASS V2's mask in its own px: an ellipse Cut, centred on its middle, 480 × 320: ellipse cut 721.3053613053612,380.3729603729604 477.3892773892776×319.2540792540792
+PASS the clip moved to x 400 (a drag: within 1 px); the crop: no shapes: x 399.8135198135198, crop shapes 0
+PASS the hole moved with it: (400, 180) V1 alone: 0,0,254,255 = 0,0,254,255
+PASS beside the hole (400, 60): V2, not V1: 15,15,244,255 ≠ 0,0,254,255
+WALK PASSED

@@ -39,18 +39,18 @@ QComboBox* createRoleBox(QWidget* parent) {
 
 void setShapesRole(Project* project, int roleValue) {
     const auto role = MaskShape::Role(roleValue);
-    CropShape c = project->crop();
+    CropShape c = project->shapeHost();
     bool changed = false;
     for (int i : project->selectedShapes())
         if (c.shapes[i].role != role) {
             c.shapes[i].role = role;
             changed = true;
         }
-    if (changed) project->changeCrop(c);
+    if (changed) project->changeShapeHost(c);
 }
 
 void setShapesSoftness(Project* project, double feather, double strength, const QString& mergeKey) {
-    CropShape c = project->crop();
+    CropShape c = project->shapeHost();
     bool changed = false;
     for (int i : project->selectedShapes()) {
         MaskShape& s = c.shapes[i];
@@ -63,16 +63,16 @@ void setShapesSoftness(Project* project, double feather, double strength, const 
             changed = true;
         }
     }
-    if (changed) project->changeCrop(c, mergeKey);
+    if (changed) project->changeShapeHost(c, mergeKey);
 }
 
 bool combineSelected(Project* project, int op) {
     int at = -1;
-    CropShape c = project->crop();
+    CropShape c = project->shapeHost();
     c.shapes = shapecombine::combined(c.shapes, project->selectedShapes(), shapecombine::Op(op), &at);
     if (at < 0) return false;
     project->setSelectedShapes({at});
-    project->changeCrop(c);
+    project->changeShapeHost(c);
     return true;
 }
 
@@ -130,7 +130,7 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
         const QSignalBlocker b1(kind), b2(role);
         kind->setCurrentIndex(kind->findData(int(draft->kind)));
         const QList<int> selected = project->selectedShapes();
-        const QList<MaskShape>& shapes = project->crop().shapes;
+        const QList<MaskShape>& shapes = project->shapeHost().shapes;
         const MaskShape::Role shown = selected.isEmpty() ? draft->role : shapes[selected.first()].role;
         role->setCurrentIndex(std::max(0, role->findData(int(shown))));
         const int i = single();
@@ -169,10 +169,10 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
     auto edit = [=](const QString& field, auto change) {
         const int i = single();
         if (i < 0) return;
-        CropShape c = project->crop();
+        CropShape c = project->shapeHost();
         change(c.shapes[i]);
         c.shapes[i] = c.shapes[i].clamped();
-        project->changeCrop(c, QStringLiteral("field:shape.%1").arg(field));
+        project->changeShapeHost(c, QStringLiteral("field:shape.%1").arg(field));
     };
     QObject::connect(x, &StepSpinBox::valueChanged, row,
                      [=](double v) { edit(QStringLiteral("x"), [v](MaskShape& s) { s.rect.moveLeft(v); }); });
@@ -185,10 +185,10 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
     QObject::connect(radius, &StepSpinBox::valueChanged, row,
                      [=](double v) { edit(QStringLiteral("radius"), [v](MaskShape& s) { s.radius = v; }); });
     QObject::connect(remove, &QToolButton::clicked, row, [project] {
-        CropShape c = project->crop();
+        CropShape c = project->shapeHost();
         c.shapes = shapeedit::removed(c.shapes, project->selectedShapes());
         project->setSelectedShapes({});
-        project->changeCrop(c);
+        project->changeShapeHost(c);
     });
     QObject::connect(feather, &StepSpinBox::valueChanged, row,
                      [=](double v) { setShapesSoftness(project, v, -1, QStringLiteral("field:shape.feather")); });
@@ -210,13 +210,13 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
     row->setReset(QObject::tr("Reset Shape"), [=] {
         draft->kind = ShapeDraft::Kind::Rect;
         draft->role = MaskShape::Role::Add;
-        CropShape c = project->crop();
+        CropShape c = project->shapeHost();
         for (int i : project->selectedShapes()) {
             c.shapes[i].role = MaskShape::Role::Add;
             c.shapes[i].feather = 0;
             c.shapes[i].strength = 100;
         }
-        if (!(c == project->crop())) project->changeCrop(c);
+        if (!(c == project->shapeHost())) project->changeShapeHost(c);
         refresh();
     });
     refresh();
@@ -233,7 +233,8 @@ QWidget* createPenOptions(Project* project, ShapeDraft* draft, QWidget* parent) 
     auto refresh = [=] {
         const QSignalBlocker block(role);
         const QList<int> selected = project->selectedShapes();
-        const MaskShape::Role shown = selected.isEmpty() ? draft->role : project->crop().shapes[selected.first()].role;
+        const MaskShape::Role shown =
+            selected.isEmpty() ? draft->role : project->shapeHost().shapes[selected.first()].role;
         role->setCurrentIndex(std::max(0, role->findData(int(shown))));
         row->setEnabled(project->source().isValid());
     };

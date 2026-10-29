@@ -100,6 +100,11 @@ public:
     double keyTolerance() const; // half an output frame: one keyframe a frame
     int keyframeAtTime() const;  // the keyframe at the playhead, else −1
     const CropShape& crop() const { return crop_; }
+    // What the Shape and Pen tools, the shape bar and the Shapes list act on (D-036): the crop with its shapes — or,
+    // with a clip selected, the crop with that clip's masks in their place in the scene at the playhead. Changed
+    // back as one step into wherever they came from.
+    CropShape shapeHost() const;
+    void changeShapeHost(const CropShape& after, const QString& mergeKey = {});
     // The shapes the Shape tool, its bar and the Crop section act on: valid indices, ascending.
     QList<int> selectedShapes() const;
     void setSelectedShapes(const QList<int>& indices);
