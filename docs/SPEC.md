@@ -6,6 +6,22 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-023 — The shape combinations (AV-026, late, 2026-10-29)
+
+- Live (R-88): a shape's Role is one of **Select** (`"add"`), **Cut** (`"cut"`), **Keep only** (`"keep"`: r·s — only
+  where it and the shapes below meet) and **Exclude** (`"exclude"`: r + s − 2rs — where one is, not both), joined
+  bottom to top; Select and Cut as AV-024 wrote them, byte for byte. The role lists (the S and P bars, the Crop section)
+  give the four with their icons (`role-add`, `shape-cut`, `role-keep`, `role-exclude`; the 51st … 53rd icons). The
+  canvas's dim follows the same four on the outlines.
+- Baked: **Combine** — Unite, Minus front (the lowest less the rest), Intersect, Exclude (pairwise united less
+  intersected) — by the S bar's Combine ▸ menu or the Crop section's Combine op and button, for two or more selected:
+  one Path shape at the lowest one's place with its role and a name "Path N", one Undo step, the others gone; its
+  anchors the Pen's to edit. Qt's path booleans return lines, not curves: each all-corner outline is simplified to
+  ½ scene px (R-89). A result of several outlines (two lunes, a ring) is one shape: an anchor's eighth value `1` begins
+  another outline; such a shape fills odd-even (holes clear), a single outline by winding.
+- The selection: Shift+click adds, Ctrl+A selects every visible, unlocked shape, a Ctrl+drag on the canvas beside them
+  a marquee selecting what it touches; the list's Shift/Ctrl rows.
+
 ### D-022 — The shapes (AV-024, late, 2026-10-29)
 
 - **Shapes** inside the crop's frame (`"shapes"` under `crop`, version 3; at most 64): a rectangle, a rounded

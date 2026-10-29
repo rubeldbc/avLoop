@@ -3,7 +3,8 @@
 // clicks (a click on its first anchor, Enter or a double-click closes it; Esc cancels), a freehand outline by a drag
 // (simplified to 1 scene px) — and the role a new shape takes. A click selects the topmost shape under it (Shift adds
 // to the selection), a drag moves the selected; a single standard shape has the crop's eight handles, a custom one its
-// anchors; Delete removes, arrows nudge (Shift 10 px), Esc deselects. Each edit is one Undo step of the crop.
+// anchors; Delete removes, arrows nudge (Shift 10 px), Esc deselects; Ctrl+A selects every shape and a Ctrl+drag on the
+// canvas beside them selects what its marquee touches (D-023). Each edit is one Undo step of the crop.
 #include "core/Project.h"
 #include "ui/WalkRunner.h"
 #include "ui/canvas/Canvas.h"
@@ -76,10 +77,14 @@ public:
             moving_ = project_->selectedShapes();
             return;
         }
-        project_->setSelectedShapes({});
         points_ = {e.scene};
         hover_ = e.scene;
         rect_ = QRectF();
+        if (e.modifiers & Qt::ControlModifier) { // a marquee: what it touches is selected (D-023)
+            mode_ = Mode::Marquee;
+            return;
+        }
+        project_->setSelectedShapes({});
         mode_ = draft_.kind == ShapeDraft::Kind::Polygon    ? Mode::Polygon
                 : draft_.kind == ShapeDraft::Kind::Freehand ? Mode::Freehand
                                                             : Mode::Draw;
@@ -89,6 +94,9 @@ public:
         const QPointF d = e.scene - start_;
         CropShape c = project_->crop();
         switch (mode_) {
+        case Mode::Marquee:
+            rect_ = QRectF(start_, e.scene).normalized();
+            break;
         case Mode::Draw:
             rect_ = crophandles::drawn(start_, e.scene, (e.modifiers & Qt::ShiftModifier) ? 1.0 : 0.0,
                                        e.modifiers & Qt::AltModifier);
@@ -130,7 +138,14 @@ public:
     }
 
     void mouseRelease(const ToolEvent&) override {
-        if (mode_ == Mode::Draw) {
+        if (mode_ == Mode::Marquee) {
+            QList<int> touched;
+            const QList<MaskShape>& shapes = project_->crop().shapes;
+            for (qsizetype i = 0; i < shapes.size(); ++i)
+                if (shapes[i].visible && !shapes[i].locked && shapes[i].bounds().intersects(rect_))
+                    touched.append(int(i));
+            project_->setSelectedShapes(touched);
+        } else if (mode_ == Mode::Draw) {
             if (rect_.width() >= shapeedit::kMinSide && rect_.height() >= shapeedit::kMinSide)
                 add(shapeedit::standard(draft_.kind, draft_.role, rect_));
         } else if (mode_ == Mode::Freehand) {
@@ -154,6 +169,14 @@ public:
     }
 
     bool keyPress(QKeyEvent* e) override {
+        if (e->matches(QKeySequence::SelectAll)) { // Ctrl+A: every visible, unlocked shape
+            QList<int> all;
+            const QList<MaskShape>& shapes = project_->crop().shapes;
+            for (qsizetype i = 0; i < shapes.size(); ++i)
+                if (shapes[i].visible && !shapes[i].locked) all.append(int(i));
+            project_->setSelectedShapes(all);
+            return true;
+        }
         const QList<int> selected = project_->selectedShapes();
         if (e->key() == Qt::Key_Escape) {
             if (mode_ != Mode::None)
@@ -193,6 +216,7 @@ public:
 
     bool wantsKey(const QKeyEvent* e) const override {
         const bool selection = !project_->selectedShapes().isEmpty();
+        if (e->matches(QKeySequence::SelectAll)) return !project_->crop().shapes.isEmpty();
         switch (e->key()) {
         case Qt::Key_Escape:
             return mode_ != Mode::None || selection;
@@ -228,7 +252,10 @@ public:
         QPen dashed(t.accentHover, 1.25, Qt::DashLine);
         p.setBrush(Qt::NoBrush);
         // What is being drawn.
-        if (mode_ == Mode::Draw && !rect_.isEmpty()) {
+        if (mode_ == Mode::Marquee && !rect_.isEmpty()) {
+            p.setPen(QPen(t.text, 1, Qt::DashLine));
+            p.drawRect(toView.mapRect(rect_));
+        } else if (mode_ == Mode::Draw && !rect_.isEmpty()) {
             p.setPen(dashed);
             p.drawPath(toView.map(shapeedit::standard(draft_.kind, draft_.role, rect_).path()));
         } else if (mode_ == Mode::Freehand || mode_ == Mode::Polygon) {
@@ -269,10 +296,10 @@ public:
     QWidget* createOptions(QWidget* parent) override { return createShapeOptions(project_, &draft_, parent); }
 
 private:
-    enum class Mode { None, Draw, Freehand, Polygon, Move, Resize, Anchor };
+    enum class Mode { None, Draw, Freehand, Polygon, Move, Resize, Anchor, Marquee };
 
     QString modeName() const {
-        static const char* names[] = {"none", "draw", "freehand", "polygon", "move", "resize", "anchor"};
+        static const char* names[] = {"none", "draw", "freehand", "polygon", "move", "resize", "anchor", "marquee"};
         return QString::fromLatin1(names[int(mode_)]);
     }
 

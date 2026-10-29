@@ -1,0 +1,8 @@
+PASS B Keep only: only where A and B meet: A, both, B, neither: 0, 255, 0, 0
+PASS B Exclude: where one is, not both: A, both, B, neither: 255, 0, 255, 0
+PASS the order matters: an Add above a Cut keeps its inside: alpha 255
+PASS the ring's band opaque: 255, 255
+PASS its hole clear (two outlines, odd-even): alpha 0
+PASS outside clear: alpha 0
+PASS the GPU and the CPU: the same picture: max diff 0
+WALK PASSED

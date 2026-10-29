@@ -59,6 +59,9 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
 - **The Pen** (**P**), as in Illustrator: click for corner anchors, click-and-drag for smooth ones with their handles,
   close on the first anchor (or Enter). Edit any path or polygon: drag anchors and handles (Alt breaks a handle pair),
   Alt+click converts smooth ↔ corner, click a segment to add an anchor, Delete removes one; Ctrl+click selects.
+- **Combine shapes as in Illustrator's Pathfinder**: a shape's role can also be **Keep only** (only where it meets the
+  shapes below) or **Exclude** (where one is, not both), live; or select several (Ctrl+A, Shift+click, a Ctrl+drag
+  marquee) and **Combine** them into one path — Unite, Minus front, Intersect, Exclude — to edit with the Pen.
 
   ![An ellipse crop on the canvas](docs/screenshots/crop-ellipse.png)
 

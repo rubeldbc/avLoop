@@ -128,3 +128,5 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-85 | S; its bar types one standard shape's place; no snapping for shapes | a snap would fight clicks and freehand | `READINGS.md`; AV-024 |
 | R-86 | The Pen as Illustrator's for closed paths; a polygon edited becomes a path | "full pen tool" | `READINGS.md`; AV-025 |
 | R-87 | Icons 46 … 49 | the app draws its own icons | `READINGS.md`; AV-024 |
+| R-88 | Live roles (four) and Combine (four) | "combining or permuting multiple existing shapes" as Illustrator | `READINGS.md`; AV-026 |
+| R-89 | One Path of several outlines, lines within ½ px; icons 51 … 53 | Qt's booleans give lines | `READINGS.md`; AV-026 |

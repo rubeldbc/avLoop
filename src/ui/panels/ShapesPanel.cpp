@@ -1,6 +1,8 @@
 // The Crop section's Shapes (D-022): the shapes inside the frame, top first, each "Rectangle 1 · Select"; a row clicked
-// selects the shape (Shift or Ctrl add), the same selection as the Shape tool's; the selected shapes' Role and Delete.
+// selects the shape (Shift or Ctrl add), the same selection as the Shape tool's; the selected shapes' Role and Delete;
+// Combine (D-023) with its op — Unite, Minus front, Intersect, Exclude — for two or more.
 #include "core/Project.h"
+#include "core/ShapeCombine.h"
 #include "ui/WalkRunner.h"
 #include "ui/options/OptionsBar.h"
 #include "ui/panels/Section.h"
@@ -72,6 +74,18 @@ void SidePanel::bindShapes(Project* project) {
     remove->setObjectName(QStringLiteral("panel.shapes.delete"));
     remove->setToolTip(tr("Delete the selected shapes"));
     s->addRow(QString(), remove);
+    // Combine (D-023): the op, then the button — the selected shapes baked into one path.
+    auto* op = new QComboBox(body);
+    op->setObjectName(QStringLiteral("panel.shapes.combineOp"));
+    op->addItem(tr("Unite"), int(shapecombine::Op::Unite));
+    op->addItem(tr("Minus front"), int(shapecombine::Op::MinusFront));
+    op->addItem(tr("Intersect"), int(shapecombine::Op::Intersect));
+    op->addItem(tr("Exclude"), int(shapecombine::Op::Exclude));
+    s->addRow(tr("Combine"), op);
+    auto* combine = new QPushButton(tr("Combine"), body);
+    combine->setObjectName(QStringLiteral("panel.shapes.combine"));
+    combine->setToolTip(tr("Two or more selected shapes into one path"));
+    s->addRow(QString(), combine);
 
     // Rows top first: row r is shape (n − 1 − r).
     auto shapeOf = [list](int row) { return list->count() - 1 - row; };
@@ -88,9 +102,11 @@ void SidePanel::bindShapes(Project* project) {
         }
         hint->setVisible(shapes.isEmpty());
         list->setVisible(!shapes.isEmpty());
-        for (QWidget* w : s->row(role) + s->row(remove))
+        for (QWidget* w : s->row(role) + s->row(remove) + s->row(op) + s->row(combine))
             w->setVisible(!shapes.isEmpty());
         role->setEnabled(!selected.isEmpty());
+        op->setEnabled(selected.size() >= 2);
+        combine->setEnabled(selected.size() >= 2);
         remove->setEnabled(!selected.isEmpty());
         if (!selected.isEmpty()) {
             const QSignalBlocker b(role);
@@ -107,6 +123,7 @@ void SidePanel::bindShapes(Project* project) {
         project->setSelectedShapes(chosen);
     });
     connect(role, &QComboBox::activated, this, [=] { setShapesRole(project, role->currentData().toInt()); });
+    connect(combine, &QPushButton::clicked, this, [=] { combineSelected(project, op->currentData().toInt()); });
     connect(remove, &QPushButton::clicked, this, [project] {
         CropShape c = project->crop();
         c.shapes = shapeedit::removed(c.shapes, project->selectedShapes());

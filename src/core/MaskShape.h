@@ -7,17 +7,21 @@
 #include <QRectF>
 #include <QString>
 
+#include <utility>
+
 namespace avloop {
 
 // One anchor of a custom shape (D-022): its point and the handles before and after it — the point itself for a
-// corner without handles (a polygon's, a freehand outline's); `smooth` keeps the two handles in line (the Pen, AV-025).
+// corner without handles (a polygon's, a freehand outline's); `smooth` keeps the two handles in line (the Pen, AV-025);
+// `start` begins another closed outline of the same shape (a combined shape's, D-023; the first anchor always does).
 struct PathPoint {
     QPointF p;
     QPointF in;
     QPointF out;
     bool smooth = false;
+    bool start = false;
 
-    static PathPoint corner(const QPointF& at) { return {at, at, at, false}; }
+    static PathPoint corner(const QPointF& at) { return {at, at, at, false, false}; }
     bool hasHandles() const { return in != p || out != p; }
     friend bool operator==(const PathPoint&, const PathPoint&) = default;
 };
@@ -45,7 +49,15 @@ struct MaskShape {
 
     bool isStandard() const { return kind == Kind::Rect || kind == Kind::Rounded || kind == Kind::Ellipse; }
     // The outline in scene px: a closed path (a custom shape's segments cubic where it has handles).
+    // A shape of one outline fills by the winding rule (a freehand loop crossing itself stays filled); one of several
+    // (a combined shape) by odd-even, its holes clear.
     QPainterPath path() const;
+    // A custom shape's outlines as [begin, end) anchor ranges, and an anchor's neighbours within its own outline.
+    QList<std::pair<int, int>> outlines() const;
+    int nextAnchor(int i) const;
+    int prevAnchor(int i) const;
+    // A path (QPainterPath) as a Path shape's anchors: its lines corners, its cubics handles, each subpath an outline.
+    static QList<PathPoint> anchorsOf(const QPainterPath& path);
     QRectF bounds() const;
     void translate(const QPointF& d);
     MaskShape clamped() const;

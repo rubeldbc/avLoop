@@ -25,22 +25,84 @@ QPainterPath MaskShape::path() const {
         break;
     case Kind::Polygon:
     case Kind::Path: {
-        if (points.size() < 2) break;
-        path.moveTo(points.first().p);
-        // Each segment a line, or a cubic where either end has a handle; the last joins the first (closed).
-        for (qsizetype i = 1; i <= points.size(); ++i) {
-            const PathPoint& a = points[i - 1];
-            const PathPoint& b = points[i % points.size()];
-            if (a.out == a.p && b.in == b.p)
-                path.lineTo(b.p);
-            else
-                path.cubicTo(a.out, b.in, b.p);
+        const auto parts = outlines();
+        if (parts.size() > 1) path.setFillRule(Qt::OddEvenFill);
+        for (const auto& [begin, end] : parts) {
+            if (end - begin < 2) continue;
+            path.moveTo(points[begin].p);
+            // Each segment a line, or a cubic where either end has a handle; the last joins its outline's first.
+            for (int i = begin; i < end; ++i) {
+                const PathPoint& a = points[i];
+                const PathPoint& b = points[nextAnchor(i)];
+                if (a.out == a.p && b.in == b.p)
+                    path.lineTo(b.p);
+                else
+                    path.cubicTo(a.out, b.in, b.p);
+            }
+            path.closeSubpath();
         }
-        path.closeSubpath();
         break;
     }
     }
     return path;
+}
+
+QList<std::pair<int, int>> MaskShape::outlines() const {
+    QList<std::pair<int, int>> parts;
+    int begin = 0;
+    for (int i = 1; i <= int(points.size()); ++i)
+        if (i == int(points.size()) || points[i].start) {
+            parts.append({begin, i});
+            begin = i;
+        }
+    return parts;
+}
+
+int MaskShape::nextAnchor(int i) const {
+    for (const auto& [begin, end] : outlines())
+        if (i >= begin && i < end) return i + 1 < end ? i + 1 : begin;
+    return 0;
+}
+
+int MaskShape::prevAnchor(int i) const {
+    for (const auto& [begin, end] : outlines())
+        if (i >= begin && i < end) return i > begin ? i - 1 : end - 1;
+    return 0;
+}
+
+QList<PathPoint> MaskShape::anchorsOf(const QPainterPath& path) {
+    QList<PathPoint> out;
+    qsizetype begin = 0;
+    // A closed subpath ends where it began: that last anchor is its first, which takes its in handle.
+    auto closeOutline = [&] {
+        if (out.size() - begin >= 2 && out.last().p == out[begin].p) {
+            out[begin].in = out.last().in;
+            out.removeLast();
+        }
+    };
+    for (int i = 0; i < path.elementCount(); ++i) {
+        const QPainterPath::Element e = path.elementAt(i);
+        if (e.type == QPainterPath::MoveToElement) {
+            closeOutline();
+            begin = out.size();
+            PathPoint pt = PathPoint::corner(QPointF(e.x, e.y));
+            pt.start = begin > 0;
+            out.append(pt);
+        } else if (e.type == QPainterPath::LineToElement) {
+            out.append(PathPoint::corner(QPointF(e.x, e.y)));
+        } else if (e.type == QPainterPath::CurveToElement && i + 2 < path.elementCount()) {
+            const QPointF c1(e.x, e.y);
+            const QPainterPath::Element e2 = path.elementAt(i + 1);
+            const QPainterPath::Element e3 = path.elementAt(i + 2);
+            if (!out.isEmpty()) out.last().out = c1;
+            PathPoint pt = PathPoint::corner(QPointF(e3.x, e3.y));
+            pt.in = QPointF(e2.x, e2.y);
+            out.append(pt);
+            i += 2;
+        }
+    }
+    closeOutline();
+    return out;
 }
 
 QRectF MaskShape::bounds() const {
@@ -82,10 +144,11 @@ QJsonObject MaskShape::toJson() const {
     QJsonArray list;
     for (const PathPoint& pt : points) {
         QJsonArray a{pt.p.x(), pt.p.y()};
-        if (pt.hasHandles() || pt.smooth)
+        if (pt.hasHandles() || pt.smooth || pt.start)
             for (QJsonValue v : {QJsonValue(pt.in.x()), QJsonValue(pt.in.y()), QJsonValue(pt.out.x()),
                                  QJsonValue(pt.out.y()), QJsonValue(pt.smooth ? 1 : 0)})
                 a.append(v);
+        if (pt.start) a.append(1); // another outline begins here (a combined shape)
         list.append(a);
     }
     json.insert(QStringLiteral("points"), list);
@@ -111,6 +174,7 @@ MaskShape MaskShape::fromJson(const QJsonObject& json) {
             pt.in = QPointF(a.at(2).toDouble(), a.at(3).toDouble());
             pt.out = QPointF(a.at(4).toDouble(), a.at(5).toDouble());
             pt.smooth = a.at(6).toInt() != 0;
+            pt.start = a.size() >= 8 && a.at(7).toInt() != 0 && !s.points.isEmpty();
         }
         s.points.append(pt);
     }

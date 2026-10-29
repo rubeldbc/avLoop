@@ -152,6 +152,32 @@ private slots:
         QCOMPARE(at(m, 20, 20), 255);
         QCOMPARE(at(m, 180, 180), 0);
     }
+    // Keep only and Exclude (D-023): over a Select square A (0, 0, 200, 200), a square B (100, 0, 200, 200) on top.
+    void keepAndExclude() {
+        CropShape c;
+        MaskShape a;
+        a.rect = QRectF(0, 0, 200, 200);
+        MaskShape b = a;
+        b.rect = QRectF(100, 0, 200, 200);
+        b.role = MaskShape::Role::KeepOnly;
+        c.shapes = {a, b};
+        const QRectF frame(0, 0, 400, 200);
+        QImage m = MaskBuilder::build(c, frame, {400, 200});
+        QCOMPARE(at(m, 50, 100), 0);    // A alone
+        QCOMPARE(at(m, 150, 100), 255); // both
+        QCOMPARE(at(m, 250, 100), 0);   // B alone
+        c.shapes[1].role = MaskShape::Role::Exclude;
+        m = MaskBuilder::build(c, frame, {400, 200});
+        QCOMPARE(at(m, 50, 100), 255);
+        QCOMPARE(at(m, 150, 100), 0);
+        QCOMPARE(at(m, 250, 100), 255);
+        QCOMPARE(at(m, 350, 100), 0); // neither
+        // The order matters: a Cut below an Add is undone by it.
+        MaskShape cut = a;
+        cut.role = MaskShape::Role::Cut;
+        c.shapes = {cut, a};
+        QCOMPARE(at(MaskBuilder::build(c, frame, {400, 200}), 50, 100), 255);
+    }
     // Inverted (D-021): the ellipse a hole in a 640 × 360 frame — its centre 0, the corners 255; not inverted, the
     // same crop's own mask byte for byte as before.
     void inverse() {

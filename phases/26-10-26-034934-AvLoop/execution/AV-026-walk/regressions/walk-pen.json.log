@@ -1,0 +1,56 @@
+startup: 390 ms
+walk walk-pen.json: 68 steps
+-- D-022 (AV-025): the counter at 100 %; P, the Pen @1091 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect tool.active: pen
+-- clicks make corners, a drag a smooth anchor; a click on the first closes the path (one Undo step) @2332 ms
+PASS expect pen.drawing: 1
+PASS expect pen.drawing: 4
+PASS expect shapes.count: 0
+PASS expect pen.drawing: 0
+PASS expect shapes.count: 1
+PASS expect shapes.summary: path:add:n4
+PASS expect pen.anchors: c,c,s,c
+PASS expect undo.count: 1
+PASS shot canvas-pen-drawn.png: 1200x587 px
+-- Alt+click converts the smooth anchor to a corner, and back (handles along its neighbours) @4160 ms
+PASS expect pen.anchors: c,c,c,c
+PASS expect pen.anchors: c,c,s,c
+PASS expect undo.count: 3
+-- a click on the top segment adds an anchor there; Delete removes it @4791 ms
+PASS expect shapes.summary: path:add:n5
+PASS expect pen.anchors: c,c,c,s,c
+PASS expect pen.anchor: 1
+PASS expect shapes.summary: path:add:n4
+PASS expect pen.anchors: c,c,s,c
+-- Alt+drag of the smooth anchor's out handle breaks the pair; a drag of an anchor moves it @5668 ms
+PASS expect pen.anchors: c,c,b,c
+PASS expect shapes.count: 1
+PASS shot canvas-pen-edited.png: 1200x587 px
+-- Ctrl+click beside it selects nothing; Esc drops a path begun; Enter closes another @6447 ms
+PASS expect shapes.selected: 
+PASS expect pen.drawing: 2
+PASS expect pen.drawing: 0
+PASS expect shapes.count: 1
+PASS expect shapes.count: 2
+PASS expect shapes.summary: path:add:n4;path:cut:n3
+PASS expect pen.anchors: c,c,s
+-- the Preview: the curves exactly; Undo takes the second path away @8500 ms
+PASS expect preview.open: true
+PASS waitFor preview.frame: 640x360 after 0 ms
+PASS shot preview-pen.png: 680x500 px
+     previewClose
+PASS expect shapes.count: 1
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 0000020b434ff640] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000020b434ff640] v1.16.0
+[libvpx-vp9 @ 0000020b434ff640] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000020b434ff640] v1.16.0
+[libvpx-vp9 @ 0000020be90ba940] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000020be90ba940] v1.16.0
+[libvpx-vp9 @ 0000020be90ba940] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000020be90ba940] v1.16.0
+[libvpx-vp9 @ 0000020beb4a8240] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000020beb4a8240] v1.16.0

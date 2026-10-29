@@ -20,9 +20,8 @@ double length(const QPointF& v) {
 } // namespace
 
 QPointF at(const MaskShape& shape, int segment, double t) {
-    const qsizetype n = shape.points.size();
     const PathPoint& a = shape.points[segment];
-    const PathPoint& b = shape.points[(segment + 1) % n];
+    const PathPoint& b = shape.points[shape.nextAnchor(segment)];
     const double u = 1 - t;
     return a.p * (u * u * u) + a.out * (3 * u * u * t) + b.in * (3 * u * t * t) + b.p * (t * t * t);
 }
@@ -64,9 +63,8 @@ int hitHandle(const MaskShape& shape, const QTransform& toView, const QPointF& v
 
 MaskShape inserted(const MaskShape& shape, int segment, double t, int* index) {
     MaskShape s = asPath(shape);
-    const qsizetype n = s.points.size();
     PathPoint& a = s.points[segment];
-    PathPoint& b = s.points[(segment + 1) % n];
+    PathPoint& b = s.points[s.nextAnchor(segment)];
     const bool straight = a.out == a.p && b.in == b.p;
     PathPoint mid;
     if (straight) {
@@ -86,7 +84,11 @@ MaskShape inserted(const MaskShape& shape, int segment, double t, int* index) {
 MaskShape removed(const MaskShape& shape, int anchor) {
     if (shape.points.size() <= 2 || anchor < 0 || anchor >= shape.points.size()) return shape;
     MaskShape s = asPath(shape);
+    const bool start = s.points[anchor].start;
     s.points.removeAt(anchor);
+    if (start && anchor < s.points.size() && !s.points[anchor].start)
+        s.points[anchor].start = true; // the outline goes on
+    if (!s.points.isEmpty()) s.points.first().start = false;
     return s;
 }
 
@@ -99,8 +101,8 @@ MaskShape converted(const MaskShape& shape, int anchor) {
         pt = PathPoint::corner(pt.p);
         return s;
     }
-    const QPointF prev = s.points[(anchor + n - 1) % n].p;
-    const QPointF next = s.points[(anchor + 1) % n].p;
+    const QPointF prev = s.points[s.prevAnchor(anchor)].p;
+    const QPointF next = s.points[s.nextAnchor(anchor)].p;
     const QPointF line = next - prev;
     const double len = length(line);
     if (len <= 0) return s;

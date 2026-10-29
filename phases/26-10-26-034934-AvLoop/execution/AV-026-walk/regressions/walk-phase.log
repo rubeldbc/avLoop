@@ -1,0 +1,6 @@
+PASSED walk-shell.json (7 s)
+PASSED walk-shapes.json (13 s)
+PASSED walk-pen.json (11 s)
+PHASE WALKS PASSED
+PASSED walk-shapes-render.mjs (4 s)
+PASSED walk-pen-render.mjs (1 s)

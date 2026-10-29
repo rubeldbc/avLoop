@@ -214,3 +214,9 @@ from `README.md` §3 on 2026-10-29, when the README passed the 300-line ceiling 
     convert, break a pair, the direct selection by Ctrl — not pressure, width profiles, open strokes or brushes (a mask
     shape is a closed area). A polygon or freehand outline edited by the Pen becomes a Path; the Pen's new path is
     committed when closed, one Undo step.
+88. **R-88** "Combining or permuting multiple shapes as in Illustrator" is both of the Pathfinder's ways: live roles
+    (Select, Cut, Keep only, Exclude — the shape modes) joined bottom to top, and Combine (Unite, Minus front, Intersect,
+    Exclude) baking the selected into one path. Divide, Trim, Merge, Crop and Outline are not built (not asked).
+89. **R-89** A combined shape is one Path of possibly several outlines (odd-even); its outlines are lines within ½ scene
+    px of the exact result — Qt's booleans give no curves back, and fitting curves was not asked; its role, place and
+    visibility the lowest shape's. The 51st … 53rd icons: `role-add`, `role-keep`, `role-exclude`.

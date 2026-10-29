@@ -1,6 +1,7 @@
 // The shapes' model and the Shape tool's geometry (D-022): outlines, the file's form, a freehand outline simplified,
 // names, hit-testing, the walks' summary.
 #include "core/MaskShape.h"
+#include "core/ShapeCombine.h"
 #include "ui/tools/PathEdit.h"
 #include "ui/tools/ShapeEdit.h"
 
@@ -111,6 +112,50 @@ private slots:
         QVERIFY(out);
         QCOMPARE(pathedit::asPath(shapeedit::polygon({{0, 0}, {1, 0}, {0, 1}}, MaskShape::Role::Add)).kind,
                  MaskShape::Kind::Path);
+    }
+    // Pathfinder (D-023) on two overlapping squares, A (0, 0, 100, 100) below B (50, 0, 100, 100): where the result is.
+    void combine() {
+        using shapecombine::Op;
+        const MaskShape a = shapeedit::standard(ShapeDraft::Kind::Rect, MaskShape::Role::Cut, QRectF(0, 0, 100, 100));
+        const MaskShape b = shapeedit::standard(ShapeDraft::Kind::Rect, MaskShape::Role::Add, QRectF(50, 0, 100, 100));
+        const QPointF left(25, 50), both(75, 50), right(125, 50);
+        auto inside = [](const MaskShape& s, QPointF p) { return s.path().contains(p); };
+        struct Case {
+            Op op;
+            bool l, m, r;
+        };
+        for (const Case& c : {Case{Op::Unite, true, true, true}, Case{Op::MinusFront, true, false, false},
+                              Case{Op::Intersect, false, true, false}, Case{Op::Exclude, true, false, true}}) {
+            int at = -1;
+            const QList<MaskShape> out = shapecombine::combined({a, b}, {0, 1}, c.op, &at);
+            QCOMPARE(out.size(), 1);
+            QCOMPARE(at, 0);
+            const MaskShape& s = out.first();
+            QCOMPARE(s.kind, MaskShape::Kind::Path);
+            QCOMPARE(s.role, MaskShape::Role::Cut); // the lowest shape's role
+            QCOMPARE(inside(s, left), c.l);
+            QCOMPARE(inside(s, both), c.m);
+            QCOMPARE(inside(s, right), c.r);
+            QCOMPARE(MaskShape::fromJson(s.toJson()).path().contains(both), c.m); // the file keeps it
+        }
+        // Exclude of two squares: two outlines; a ring (minus front of a small square in a big one) has a hole.
+        const MaskShape x = shapecombine::combined({a, b}, {0, 1}, Op::Exclude).first();
+        QCOMPARE(x.outlines().size(), 2);
+        const MaskShape inner =
+            shapeedit::standard(ShapeDraft::Kind::Rect, MaskShape::Role::Add, QRectF(25, 25, 50, 50));
+        const MaskShape ring = shapecombine::combined({a, inner}, {0, 1}, Op::MinusFront).first();
+        QVERIFY(ring.path().contains(QPointF(10, 10)));
+        QVERIFY(!ring.path().contains(QPointF(50, 50)));
+        QCOMPARE(MaskShape::fromJson(ring.toJson()), ring);
+        // Fewer than two: unchanged.
+        int at = 0;
+        QCOMPARE(shapecombine::combined({a, b}, {1}, Op::Unite, &at).size(), 2);
+        QCOMPARE(at, -1);
+        // A third shape between keeps its place; the result takes the lowest's.
+        const QList<MaskShape> three = shapecombine::combined({b, a, inner}, {0, 2}, Op::Unite, &at);
+        QCOMPARE(three.size(), 2);
+        QCOMPARE(at, 0);
+        QCOMPARE(three[1], a);
     }
     void joins() {
         using R = MaskShape::Role;

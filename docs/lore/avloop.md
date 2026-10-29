@@ -414,3 +414,14 @@ end of its section.
 - **A hit test that samples a curve finds the anchor's own end**: a click on an anchor also lies on its segment's t = 0.
   Rule: the Pen tests handles, then anchors, then segments, and a segment hit within 2 % of its ends is the anchor's.
   (AV-025)
+
+## The shape combinations (late)
+
+- **Qt's path booleans flatten curves**: `united`/`subtracted`/`intersected` return a circle as ~200 short lines; as
+  anchors they crowd the canvas. Rule: a combined outline of corners is simplified (Douglas–Peucker, ½ scene px) before
+  it becomes a shape. (AV-026)
+- **A custom shape's `rect` is not written**: a combined shape kept its bounding box in `rect` and failed its own
+  round trip. Rule: a custom shape's `rect` stays empty; `bounds()` comes from its outline. (AV-026)
+- **Several outlines in one shape need the odd-even rule**: united pieces never overlap, but a ring's hole lies inside
+  its outer outline; winding would fill it when both run the same way. Rule: a shape of several outlines fills
+  odd-even, a single one by winding (a freehand loop crossing itself stays filled). (AV-026)

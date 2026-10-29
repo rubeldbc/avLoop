@@ -1,7 +1,9 @@
 // The Shape tool's options (D-022): Draw — Rectangle, Rounded, Ellipse, Polygon, Freehand (what a drag or clicks make
-// next); Role — what a new shape does, and the selected shapes' role (one Undo step); X, Y, W, H and Radius of the one
-// selected standard shape; Delete. The same shapes as the Crop section's list.
+// next); Role — Select, Cut, Keep only, Exclude (D-023): what a new shape does, and the selected shapes' role (one Undo
+// step); X, Y, W, H and Radius of the one selected standard shape; Delete; Combine ▸ Unite, Minus front, Intersect,
+// Exclude for two or more selected. The same shapes as the Crop section's list.
 #include "core/Project.h"
+#include "core/ShapeCombine.h"
 #include "ui/WalkRunner.h"
 #include "ui/options/OptionsBar.h"
 #include "ui/theme/IconFactory.h"
@@ -10,6 +12,7 @@
 
 #include <QComboBox>
 #include <QLabel>
+#include <QMenu>
 #include <QPointer>
 #include <QToolButton>
 
@@ -22,6 +25,13 @@ QComboBox* createRoleBox(QWidget* parent) {
     box->addItem(QObject::tr("Cut"), int(MaskShape::Role::Cut));
     box->setItemData(1, QObject::tr("Make what it covers transparent"), Qt::ToolTipRole);
     box->setItemIcon(1, IconFactory::icon(QStringLiteral("shape-cut")));
+    box->addItem(IconFactory::icon(QStringLiteral("role-keep")), QObject::tr("Keep only"),
+                 int(MaskShape::Role::KeepOnly));
+    box->setItemData(2, QObject::tr("Keep only where it and the shapes below meet"), Qt::ToolTipRole);
+    box->addItem(IconFactory::icon(QStringLiteral("role-exclude")), QObject::tr("Exclude"),
+                 int(MaskShape::Role::Exclude));
+    box->setItemData(3, QObject::tr("Keep where it or the shapes below are, not both"), Qt::ToolTipRole);
+    box->setItemIcon(0, IconFactory::icon(QStringLiteral("role-add")));
     return box;
 }
 
@@ -35,6 +45,28 @@ void setShapesRole(Project* project, int roleValue) {
             changed = true;
         }
     if (changed) project->changeCrop(c);
+}
+
+bool combineSelected(Project* project, int op) {
+    int at = -1;
+    CropShape c = project->crop();
+    c.shapes = shapecombine::combined(c.shapes, project->selectedShapes(), shapecombine::Op(op), &at);
+    if (at < 0) return false;
+    project->setSelectedShapes({at});
+    project->changeCrop(c);
+    return true;
+}
+
+QMenu* createCombineMenu(Project* project, QWidget* parent) {
+    auto* menu = new QMenu(parent);
+    const QList<std::pair<QString, shapecombine::Op>> ops = {{QObject::tr("Unite"), shapecombine::Op::Unite},
+                                                             {QObject::tr("Minus front"), shapecombine::Op::MinusFront},
+                                                             {QObject::tr("Intersect"), shapecombine::Op::Intersect},
+                                                             {QObject::tr("Exclude"), shapecombine::Op::Exclude}};
+    for (const auto& [name, op] : ops)
+        QObject::connect(menu->addAction(name), &QAction::triggered, menu,
+                         [project, op] { combineSelected(project, int(op)); });
+    return menu;
 }
 
 QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent) {
@@ -58,6 +90,10 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
     StepSpinBox* radius = row->addNumber(QStringLiteral("shape.radius"), QObject::tr("Radius"), 0, 100000, 1, 1);
     QToolButton* remove =
         row->addIcon(QStringLiteral("shape.delete"), QStringLiteral("close"), QObject::tr("Delete the shape (Delete)"));
+    QToolButton* combine = row->addIcon(QStringLiteral("shape.combine"), QStringLiteral("role-add"),
+                                        QObject::tr("Combine the selected shapes into one"));
+    combine->setMenu(createCombineMenu(project, combine));
+    combine->setPopupMode(QToolButton::InstantPopup);
 
     // The one selected shape, standard: its rectangle and radius are typed here.
     auto single = [project]() -> int {
@@ -86,6 +122,7 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
         }
         radius->setEnabled(standard && shapes[i].kind == MaskShape::Kind::Rounded);
         remove->setEnabled(!selected.isEmpty());
+        combine->setEnabled(selected.size() >= 2);
         row->setEnabled(project->source().isValid());
     };
     QObject::connect(project, &Project::changed, row, [refresh](Project::Aspect a) {

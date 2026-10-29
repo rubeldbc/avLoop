@@ -203,6 +203,9 @@ const QStringList& IconFactory::allNames() {
         QStringLiteral("shape-freehand"),
         QStringLiteral("shape-cut"),
         QStringLiteral("tool-pen"),
+        QStringLiteral("role-add"),
+        QStringLiteral("role-keep"),
+        QStringLiteral("role-exclude"),
     };
     // icons:end
     return names;

@@ -51,6 +51,10 @@ QWidget* createPenOptions(Project* project, ShapeDraft* draft, QWidget* parent);
 // step, nothing when none changes).
 QComboBox* createRoleBox(QWidget* parent);
 void setShapesRole(Project* project, int role);
+// Combine (D-023): the selected shapes baked into one by `op` (shapecombine::Op), one Undo step; false with fewer
+// than two. The menu of the four, for a button.
+bool combineSelected(Project* project, int op);
+class QMenu* createCombineMenu(Project* project, QWidget* parent);
 // Applies the ratio chosen in a ratio box to the project's crop (one Undo step); Custom… takes the crop's own.
 void applyRatio(Project* project, const QString& id);
 // What walks read of a bar's field: its value while its row is shown, nothing once a tool switch has removed it.
