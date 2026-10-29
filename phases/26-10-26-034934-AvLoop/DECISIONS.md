@@ -130,3 +130,5 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-87 | Icons 46 … 49 | the app draws its own icons | `READINGS.md`; AV-024 |
 | R-88 | Live roles (four) and Combine (four) | "combining or permuting multiple existing shapes" as Illustrator | `READINGS.md`; AV-026 |
 | R-89 | One Path of several outlines, lines within ½ px; icons 51 … 53 | Qt's booleans give lines | `READINGS.md`; AV-026 |
+| R-90 | Feather and Strength a shape; a weak Cut is the "transparency" | "custom feathering or transparency … any part of the selection" | `READINGS.md`; AV-027 |
+| R-91 | An exact distance transform for custom outlines; the canvas a hint | an exact feather; memory bounded by the output | `READINGS.md`; AV-027 |

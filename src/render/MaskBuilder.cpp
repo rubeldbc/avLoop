@@ -1,5 +1,7 @@
 #include "render/MaskBuilder.h"
 
+#include "render/DistanceField.h"
+
 #include <QPainter>
 
 #include <vector>
@@ -68,6 +70,29 @@ QImage MaskBuilder::shapeCoverage(const MaskShape& shape, const QRectF& frame, c
         uchar* row = out.scanLine(y);
         for (int x = 0; x < size.width(); ++x)
             row[x] = uchar(qAlpha(in[x]));
+    }
+    if (shape.feather <= 0 || frame.isEmpty()) return out;
+    // Feathered (D-024): §6.1's ramp inward over `feather` output px from the signed distance — the standard kinds'
+    // analytic one at their own place, a custom outline's by the exact distance transform of its raster.
+    const double soft = std::max(shape.feather, 1.0);
+    std::vector<float> field;
+    if (!shape.isStandard()) field = signedDistance(out);
+    const double kx = size.width() / frame.width();
+    const double ky = size.height() / frame.height();
+    const double cx = (shape.rect.center().x() - frame.left()) * kx;
+    const double cy = (shape.rect.center().y() - frame.top()) * ky;
+    const CropShape::Kind kind = shape.kind == MaskShape::Kind::Ellipse   ? CropShape::Kind::Ellipse
+                                 : shape.kind == MaskShape::Kind::Rounded ? CropShape::Kind::Rounded
+                                                                          : CropShape::Kind::Rect;
+    for (int y = 0; y < size.height(); ++y) {
+        uchar* row = out.scanLine(y);
+        for (int x = 0; x < size.width(); ++x) {
+            const double d = shape.isStandard()
+                                 ? distance(kind, shape.rect.width() / 2 * kx, shape.rect.height() / 2 * ky,
+                                            shape.radius * std::min(kx, ky), x + 0.5 - cx, y + 0.5 - cy)
+                                 : double(field[size_t(y) * size.width() + x]);
+            row[x] = uchar(std::lround(std::clamp((0.5 - d) / soft, 0.0, 1.0) * 255.0));
+        }
     }
     return out;
 }

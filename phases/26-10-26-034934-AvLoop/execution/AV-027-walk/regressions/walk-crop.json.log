@@ -1,0 +1,147 @@
+startup: 392 ms
+walk walk-crop.json: 177 steps
+-- S5: the crop tools on a 640×360 video, the view at 100 % @1094 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect canvas.zoom: 1
+PASS expect crop.empty: true
+PASS expect panel.crop.hint: true
+PASS expect panel.crop.output: 640 × 360
+-- M: a drag draws a rectangle in one Undo step; the bar and the panel follow @2571 ms
+PASS expect tool.active: crop-rect
+PASS expect crop.kind: rect
+PASS expect crop.x: 100.5
+PASS expect crop.y: 60
+PASS expect crop.w: 200
+PASS expect crop.h: 140
+PASS expect undo.count: 1
+PASS expect options.rect.w: 200
+PASS expect panel.crop.w: 200
+PASS expect panel.crop.hint: false
+PASS expect panel.crop.output: 200 × 140
+PASS expect status.notice: 
+-- a drag inside moves it; the bottom-right handle resizes it @4516 ms
+PASS expect crop.x: 150.5
+PASS expect crop.y: 90
+PASS expect crop.w: 200
+PASS expect undo.count: 2
+PASS expect crop.w: 240
+PASS expect crop.h: 160
+PASS expect crop.x: 150.5
+PASS expect undo.count: 3
+PASS shot crop-rect.png: 1600x834 px
+-- snapping: a left edge 5 px from the video's edge lands on it; with Ctrl it does not @6268 ms
+PASS expect crop.x: 0
+PASS expect crop.x: 150.5
+PASS expect crop.x: 5.5
+PASS expect undo.count: 4
+-- arrows move it 1 px, Shift 10 px; presses in a row are one Undo step @7461 ms
+PASS expect crop.x: 7.5
+PASS expect crop.y: 100
+PASS expect undo.count: 5
+-- a drag outside draws a new crop in its place: Shift keeps 1:1, Alt draws from the centre @8213 ms
+PASS expect crop.x: 400.5
+PASS expect crop.w: 120
+PASS expect crop.h: 120
+PASS expect undo.count: 6
+PASS expect crop.cx: 200.5
+PASS expect crop.cy: 250
+PASS expect crop.w: 130
+PASS expect crop.h: 80
+PASS expect undo.count: 7
+-- a drawing under 16 px is cancelled @9910 ms
+PASS expect crop.w: 130
+PASS expect undo.count: 7
+-- Esc while drawing cancels the drawing @10349 ms
+PASS expect crop.w: 130
+PASS expect undo.count: 7
+-- Ctrl+0 fits the crop, not the video @10792 ms
+PASS expect canvas.zoom: 8
+PASS shot crop-fit.png: 1600x834 px
+PASS expect canvas.zoom: 1
+-- ratios: Custom… takes the crop's own in lowest terms, W:H typed, 16:9 keeps the centre, W sets H, Swap @11466 ms
+PASS expect crop.ratio: 13:8
+PASS expect crop.w: 130
+PASS expect crop.ratio: 2:1
+PASS expect crop.cx: 200.5
+PASS expect crop.w: 144.222051
+PASS expect crop.ratio: 16:9
+PASS expect options.rect.ratio: 16:9
+PASS expect crop.cy: 250
+PASS expect crop.w: 320
+PASS expect crop.h: 180
+PASS expect crop.w: 180
+PASS expect crop.h: 320
+PASS expect crop.ratio: 9:16
+PASS expect crop.cx: 292.5130732
+-- every ratio in the list in turn: the centre stays, the area stays, 9:16 last brings back 180 × 320 @13984 ms
+PASS expect crop.ratio: free
+PASS expect crop.cx: 292.5130732
+PASS expect crop.ratio: original
+PASS expect crop.cx: 292.5130732
+PASS expect crop.ratio: 1:1
+PASS expect crop.cx: 292.5130732
+PASS expect crop.ratio: 4:3
+PASS expect crop.cx: 292.5130732
+PASS expect crop.ratio: 3:4
+PASS expect crop.cx: 292.5130732
+PASS expect crop.ratio: 16:9
+PASS expect crop.cx: 292.5130732
+PASS expect crop.ratio: 21:9
+PASS expect crop.cx: 292.5130732
+PASS expect crop.ratio: 3:2
+PASS expect crop.cx: 292.5130732
+PASS expect crop.ratio: 2:3
+PASS expect crop.cx: 292.5130732
+PASS expect crop.ratio: 4:5
+PASS expect crop.cx: 292.5130732
+PASS expect crop.ratio: 9:16
+PASS expect crop.cx: 292.5130732
+PASS expect crop.w: 180
+PASS expect crop.h: 320
+-- U: the crop becomes a Rounded rect; Radius and Feather; the output gains alpha @18382 ms
+PASS expect tool.active: crop-round
+PASS expect crop.kind: rounded
+PASS expect crop.w: 180
+PASS expect crop.radius: 40
+PASS expect crop.feather: 12
+PASS expect panel.crop.output: 180 × 320 · alpha
+PASS shot crop-rounded.png: 1600x834 px
+-- E: an Ellipse; the panel's Feather is the same crop @19686 ms
+PASS expect tool.active: crop-ellipse
+PASS expect crop.kind: ellipse
+PASS expect options.ellipse.feather: 12
+PASS shot crop-ellipse.png: 1600x834 px
+PASS expect crop.feather: 0
+PASS expect options.ellipse.feather: 0
+PASS expect panel.crop.output: 180 × 320 · alpha
+-- a double-click makes it the whole video @20864 ms
+PASS expect crop.x: 0
+PASS expect crop.w: 640
+PASS expect crop.h: 360
+PASS expect crop.kind: ellipse
+-- a crop past the video's edge, then wholly outside it: the status bar says so @21494 ms
+PASS expect crop.x: 600
+PASS expect status.notice: Transparent area in output
+PASS expect status.notice: Output is fully transparent
+-- Delete removes the crop; Undo brings it back @22121 ms
+PASS expect crop.empty: true
+PASS expect status.notice: 
+PASS expect panel.crop.hint: true
+PASS expect crop.empty: false
+PASS expect crop.x: 2000
+PASS expect tool.active: select
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 0000018feb316f40] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000018feb316f40] v1.16.0
+[libvpx-vp9 @ 0000018feb318cc0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000018feb318cc0] v1.16.0
+[libvpx-vp9 @ 0000018feb318cc0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000018feb318cc0] v1.16.0
+[libvpx-vp9 @ 0000018feb318cc0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000018feb318cc0] v1.16.0
+[libvpx-vp9 @ 0000018feb316f40] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000018feb316f40] v1.16.0
+[libvpx-vp9 @ 0000018feb318900] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000018feb318900] v1.16.0

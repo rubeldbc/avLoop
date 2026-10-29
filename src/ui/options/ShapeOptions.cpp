@@ -1,7 +1,8 @@
 // The Shape tool's options (D-022): Draw — Rectangle, Rounded, Ellipse, Polygon, Freehand (what a drag or clicks make
 // next); Role — Select, Cut, Keep only, Exclude (D-023): what a new shape does, and the selected shapes' role (one Undo
-// step); X, Y, W, H and Radius of the one selected standard shape; Delete; Combine ▸ Unite, Minus front, Intersect,
-// Exclude for two or more selected. The same shapes as the Crop section's list.
+// step); X, Y, W, H and Radius of the one selected standard shape; Feather and Strength of every selected shape
+// (D-024); Delete; Combine ▸ Unite, Minus front, Intersect, Exclude for two or more selected. The same shapes as the
+// Crop section's list.
 #include "core/Project.h"
 #include "core/ShapeCombine.h"
 #include "ui/WalkRunner.h"
@@ -47,6 +48,23 @@ void setShapesRole(Project* project, int roleValue) {
     if (changed) project->changeCrop(c);
 }
 
+void setShapesSoftness(Project* project, double feather, double strength, const QString& mergeKey) {
+    CropShape c = project->crop();
+    bool changed = false;
+    for (int i : project->selectedShapes()) {
+        MaskShape& s = c.shapes[i];
+        const double f = feather >= 0 ? feather : s.feather;
+        const double p = strength >= 0 ? strength : s.strength;
+        if (f != s.feather || p != s.strength) {
+            s.feather = f;
+            s.strength = p;
+            s = s.clamped();
+            changed = true;
+        }
+    }
+    if (changed) project->changeCrop(c, mergeKey);
+}
+
 bool combineSelected(Project* project, int op) {
     int at = -1;
     CropShape c = project->crop();
@@ -88,6 +106,12 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
     StepSpinBox* w = row->addNumber(QStringLiteral("shape.w"), QStringLiteral("W"), 1, 100000, 1, 1);
     StepSpinBox* h = row->addNumber(QStringLiteral("shape.h"), QStringLiteral("H"), 1, 100000, 1, 1);
     StepSpinBox* radius = row->addNumber(QStringLiteral("shape.radius"), QObject::tr("Radius"), 0, 100000, 1, 1);
+    StepSpinBox* feather = row->addNumber(QStringLiteral("shape.feather"), QObject::tr("Feather"), 0,
+                                          MaskShape::kMaxFeather, 1, 0, QStringLiteral(" px"));
+    feather->setToolTip(QObject::tr("Soften the shape's edge inward, in output pixels"));
+    StepSpinBox* strength =
+        row->addNumber(QStringLiteral("shape.strength"), QObject::tr("Strength"), 0, 100, 1, 0, QStringLiteral(" %"));
+    strength->setToolTip(QObject::tr("How strongly the shape applies: a Cut at 40 % leaves 60 %"));
     QToolButton* remove =
         row->addIcon(QStringLiteral("shape.delete"), QStringLiteral("close"), QObject::tr("Delete the shape (Delete)"));
     QToolButton* combine = row->addIcon(QStringLiteral("shape.combine"), QStringLiteral("role-add"),
@@ -121,6 +145,12 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
             radius->setValueQuietly(s.radius);
         }
         radius->setEnabled(standard && shapes[i].kind == MaskShape::Kind::Rounded);
+        feather->setEnabled(!selected.isEmpty());
+        strength->setEnabled(!selected.isEmpty());
+        if (!selected.isEmpty()) {
+            feather->setValueQuietly(shapes[selected.first()].feather);
+            strength->setValueQuietly(shapes[selected.first()].strength);
+        }
         remove->setEnabled(!selected.isEmpty());
         combine->setEnabled(selected.size() >= 2);
         row->setEnabled(project->source().isValid());
@@ -158,7 +188,17 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
         project->setSelectedShapes({});
         project->changeCrop(c);
     });
-    for (auto [name, box] : {std::pair{"x", x}, {"y", y}, {"w", w}, {"h", h}, {"radius", radius}})
+    QObject::connect(feather, &StepSpinBox::valueChanged, row,
+                     [=](double v) { setShapesSoftness(project, v, -1, QStringLiteral("field:shape.feather")); });
+    QObject::connect(strength, &StepSpinBox::valueChanged, row,
+                     [=](double v) { setShapesSoftness(project, -1, v, QStringLiteral("field:shape.strength")); });
+    for (auto [name, box] : {std::pair{"x", x},
+                             {"y", y},
+                             {"w", w},
+                             {"h", h},
+                             {"radius", radius},
+                             {"feather", feather},
+                             {"strength", strength}})
         probeValue(QStringLiteral("options.shape.%1").arg(QLatin1String(name)), box);
     refresh();
     return row;

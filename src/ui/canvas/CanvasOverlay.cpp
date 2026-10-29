@@ -45,7 +45,7 @@ QPainterPath keptByShapes(const QList<MaskShape>& shapes, const QTransform& toVi
             kept = kept.united(p);
             break;
         case MaskShape::Role::Cut:
-            kept = kept.subtracted(p);
+            if (s.strength >= 100) kept = kept.subtracted(p); // a weaker cut is dimmed by its strength, after
             break;
         case MaskShape::Role::KeepOnly:
             kept = kept.intersected(p);
@@ -117,6 +117,11 @@ void Canvas::paintShapes(QPainter& p, const CropShape& crop) {
     QPainterPath dim;
     dim.addRect(QRectF(rect()).adjusted(-1, -1, 1, 1));
     p.fillPath(dim.subtracted(kept), QColor(0, 0, 0, 153)); // 60% black over what is not kept
+    // A Cut below full strength (D-024): its part of what is kept dimmed by its strength — a hint; the Preview is
+    // exact.
+    for (const MaskShape& s : crop.shapes)
+        if (s.visible && s.role == MaskShape::Role::Cut && s.strength < 100)
+            p.fillPath(kept.intersected(toView.map(s.path())), QColor(0, 0, 0, int(153 * s.strength / 100)));
     p.setBrush(Qt::NoBrush);
     if (!crop.isEmpty()) {
         p.setPen(QPen(t.accent, 1.5));

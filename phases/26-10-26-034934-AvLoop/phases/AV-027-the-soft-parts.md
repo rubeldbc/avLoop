@@ -1,7 +1,7 @@
 ---
 phase: AV-027
 title: "The soft parts"
-status: IN_PROGRESS
+status: DONE
 owner_item: 24
 track: B
 checkpoint_id: CP-B1

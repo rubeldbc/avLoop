@@ -6,6 +6,19 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-024 — The soft parts (AV-027, late, 2026-10-29)
+
+- Every shape's **Feather** (0 … 200 output px, `"feather"`) and **Strength** (0 … 100 %, `"strength"`): its coverage
+  is §6.1's ramp — clamp((½ − d) / max(f, 1)) of its signed distance d, softening inward — times the strength, then
+  joined by its role (R-90). A Cut at 40 % leaves 60 % of what it covers; Keep only and Exclude scale the same way.
+- The distance: the standard kinds' analytic one (the crop's, at the shape's own place); a polygon's, a freehand
+  outline's, a Pen path's and a combined shape's by an exact Euclidean distance transform (Felzenszwalb–Huttenlocher)
+  of its anti-aliased raster — two float grids of the output size while it runs (R-91). An edge on the frame's own edge
+  has nothing outside it to measure: no ramp there. Feather 0, Strength 100: AV-024's bytes.
+- The S bar and the Crop section: Feather and Strength of every selected shape (a value typed for several sets all; one
+  Undo step, typing merging); the list's row adds " · 30 px · 40 %". The canvas dims a Cut below full strength by it
+  (a hint — the feather is the Preview's, R-22). Probe `shapes.soft` ("f/s" a shape).
+
 ### D-023 — The shape combinations (AV-026, late, 2026-10-29)
 
 - Live (R-88): a shape's Role is one of **Select** (`"add"`), **Cut** (`"cut"`), **Keep only** (`"keep"`: r·s — only

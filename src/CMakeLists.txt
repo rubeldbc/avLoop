@@ -28,7 +28,7 @@ target_link_libraries(avloop_media
     PRIVATE FFmpeg::avformat FFmpeg::avcodec FFmpeg::avutil FFmpeg::swscale FFmpeg::avfilter dxgi psapi avloop_warnings)
 
 add_library(avloop_render STATIC
-    render/Shaders.h render/Shaders.cpp render/MaskBuilder.h render/MaskBuilder.cpp
+    render/Shaders.h render/Shaders.cpp render/MaskBuilder.h render/MaskBuilder.cpp render/DistanceField.h render/DistanceField.cpp
     render/RenderJob.h render/RenderJob.cpp render/CpuRenderer.h render/CpuRenderer.cpp
     render/GlRenderer.h render/GlRenderer.cpp render/FrameRenderer.h render/FrameRenderer.cpp
     render/RenderService.h render/RenderService.cpp render/EffectsPass.h render/EffectsPass.cpp)

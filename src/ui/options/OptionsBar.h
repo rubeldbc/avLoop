@@ -54,6 +54,8 @@ void setShapesRole(Project* project, int role);
 // Combine (D-023): the selected shapes baked into one by `op` (shapecombine::Op), one Undo step; false with fewer
 // than two. The menu of the four, for a button.
 bool combineSelected(Project* project, int op);
+// Feather and Strength (D-024) set on every selected shape (a value < 0 keeps each one's own), one Undo step.
+void setShapesSoftness(Project* project, double feather, double strength, const QString& mergeKey = {});
 class QMenu* createCombineMenu(Project* project, QWidget* parent);
 // Applies the ratio chosen in a ratio box to the project's crop (one Undo step); Custom… takes the crop's own.
 void applyRatio(Project* project, const QString& id);

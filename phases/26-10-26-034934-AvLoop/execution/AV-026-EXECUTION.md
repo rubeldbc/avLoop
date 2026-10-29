@@ -47,7 +47,7 @@ existing shapes; these new shapes can then be used for selection."*
 | `node control/phase-tools/check-loc.mjs` | PASS: 300 code files, none over 600 lines (the largest: src/core/ClipEffects.cpp, 425 lines) |
 | `node control/phase-tools/validate-phase-system.mjs` | PASS: 31 phases, 34 requirement ids |
 | README pictures | not retaken: the default window unchanged (the new rows show only with shapes) |
-| AV-025's CI run | CI_RESULT |
+| AV-025's CI run | green, 9 m 32 s (run 40923769770) |
 
 ## The walk
 

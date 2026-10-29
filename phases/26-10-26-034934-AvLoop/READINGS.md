@@ -220,3 +220,9 @@ from `README.md` §3 on 2026-10-29, when the README passed the 300-line ceiling 
 89. **R-89** A combined shape is one Path of possibly several outlines (odd-even); its outlines are lines within ½ scene
     px of the exact result — Qt's booleans give no curves back, and fitting curves was not asked; its role, place and
     visibility the lowest shape's. The 51st … 53rd icons: `role-add`, `role-keep`, `role-exclude`.
+90. **R-90** "Select specific areas within a shape and apply custom feathering or transparency" is a Feather and a
+    Strength on every shape: a part of a selection made transparent is a Cut shape over it at the strength wanted, its
+    edge softened by its feather (inward, as the crop's §6.1). Typed for several selected shapes at once.
+91. **R-91** A custom outline's feather comes from an exact Euclidean distance transform of its raster (two float
+    grids of the output size while it runs — AVADR-0002's bound is the output size), the standard kinds' from their
+    analytic distance; the canvas hints a weak Cut by its strength, the Preview is exact.

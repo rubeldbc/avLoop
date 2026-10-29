@@ -62,6 +62,9 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
 - **Combine shapes as in Illustrator's Pathfinder**: a shape's role can also be **Keep only** (only where it meets the
   shapes below) or **Exclude** (where one is, not both), live; or select several (Ctrl+A, Shift+click, a Ctrl+drag
   marquee) and **Combine** them into one path — Unite, Minus front, Intersect, Exclude — to edit with the Pen.
+- **Soft parts**: every shape has its own **Feather** (0–200 px, softening its edge inward) and **Strength** (0–100 %).
+  A Cut at 40 % leaves 60 % of what it covers — any part of a selection made partly or wholly transparent, its edge as
+  soft as you like; type one value for several shapes at once.
 
   ![An ellipse crop on the canvas](docs/screenshots/crop-ellipse.png)
 

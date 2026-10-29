@@ -1,0 +1,33 @@
+startup: 407 ms
+walk walk-soft.json: 43 steps
+-- D-024: a rectangle that selects and an ellipse that cuts inside it, with S at 100 % @1108 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect shapes.count: 1
+PASS expect shapes.selected: 
+PASS expect shapes.soft: 0/100
+-- the cut ellipse is drawn outside the rectangle's start point, then moved in by its bar @3190 ms
+PASS expect shapes.count: 2
+PASS expect shapes.summary: rect:add:61,40,520,280;ellipse:cut:220,100,200,160
+-- Strength 40 and Feather 30 on the bar: the list says so; one Undo step each @4118 ms
+PASS expect shapes.soft: 0/100;0/40
+PASS expect shapes.soft: 0/100;30/40
+PASS expect panel.shapes.rows: Ellipse 1 · Cut · 30 px · 40 %|Rectangle 1 · Select
+PASS shot canvas-soft.png: 1200x587 px
+PASS shot panel-soft.png: 252x604 px
+PASS waitFor preview.frame: 640x360 after 0 ms
+PASS shot preview-soft.png: 680x500 px
+     previewClose
+PASS expect shapes.soft: 0/100;0/40
+-- the Crop section's Strength 100; then both shapes selected, one Feather typed sets both @6921 ms
+PASS expect shapes.soft: 0/100;0/100
+PASS expect shapes.selected: 0,1
+PASS expect shapes.soft: 12/100;12/100
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 00000271e9ac8ac0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 00000271e9ac8ac0] v1.16.0
+[libvpx-vp9 @ 00000271e9ac8ac0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 00000271e9ac8ac0] v1.16.0
+[libvpx-vp9 @ 00000271e91afc00] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 00000271e91afc00] v1.16.0

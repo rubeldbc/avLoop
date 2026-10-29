@@ -2,10 +2,13 @@
 // one-pixel anti-aliased edge at feather 0, a feather that steps down gradually over its width, the Rounded rect's
 // radius, the cache. With AVLOOP_TEST_OUT set, the masks are written there as PNGs.
 #include "core/CropShape.h"
+#include "render/DistanceField.h"
 #include "render/MaskBuilder.h"
 
 #include <QDir>
 #include <QTest>
+
+#include <limits>
 
 #include <cmath>
 
@@ -177,6 +180,74 @@ private slots:
         cut.role = MaskShape::Role::Cut;
         c.shapes = {cut, a};
         QCOMPARE(at(MaskBuilder::build(c, frame, {400, 200}), 50, 100), 255);
+    }
+    // The distance transform against brute force on a 64 × 64 grid of scattered seeds: exact (D-024).
+    void distanceTransform() {
+        const int w = 64, h = 64;
+        std::vector<bool> seed(size_t(w) * h, false);
+        for (int i = 0; i < 40; ++i)
+            seed[size_t((i * 37) % h) * w + (i * 53 + 7) % w] = true;
+        const std::vector<float> fast = render::squaredDistance(seed, w, h);
+        float worst = 0;
+        for (int y = 0; y < h; ++y)
+            for (int x = 0; x < w; ++x) {
+                float best = std::numeric_limits<float>::infinity();
+                for (int sy = 0; sy < h; ++sy)
+                    for (int sx = 0; sx < w; ++sx)
+                        if (seed[size_t(sy) * w + sx])
+                            best = std::min(best, float((x - sx) * (x - sx) + (y - sy) * (y - sy)));
+                worst = std::max(worst, std::abs(std::sqrt(best) - std::sqrt(fast[size_t(y) * w + x])));
+            }
+        QVERIFY2(worst < 1e-3f, qPrintable(QString::number(worst)));
+        QVERIFY(std::isinf(render::squaredDistance(std::vector<bool>(16, false), 4, 4)[5]));
+    }
+    // Feather and Strength (D-024): a Cut ellipse at Strength 50 in a Select rectangle leaves half at its centre; a
+    // feathered polygon ramps up inward monotonically over ~20 px; the defaults are AV-024's bytes.
+    void softShapes() {
+        CropShape c;
+        MaskShape r;
+        r.rect = QRectF(0, 0, 400, 200);
+        MaskShape e;
+        e.kind = MaskShape::Kind::Ellipse;
+        e.role = MaskShape::Role::Cut;
+        e.rect = QRectF(100, 20, 200, 160);
+        const QRectF frame(0, 0, 400, 200);
+        c.shapes = {r, e};
+        const QImage hard = MaskBuilder::build(c, frame, {400, 200});
+        c.shapes[1].strength = 50;
+        QImage m = MaskBuilder::build(c, frame, {400, 200});
+        QVERIFY(std::abs(at(m, 200, 100) - 128) <= 1);
+        QCOMPARE(at(m, 20, 100), 255);
+        c.shapes[1].strength = 100;
+        c.shapes[1].feather = 20;
+        m = MaskBuilder::build(c, frame, {400, 200});
+        QCOMPARE(at(m, 200, 100), 0);  // deep inside the cut
+        QCOMPARE(at(m, 99, 100), 255); // outside it
+        int last = 256;
+        for (int x = 100; x <= 125; ++x) { // inward from the cut's left edge the kept part falls away
+            QVERIFY(at(m, x, 100) <= last);
+            last = at(m, x, 100);
+        }
+        QVERIFY(at(m, 105, 100) > 100 && at(m, 105, 100) < 255);
+        c.shapes[1].feather = 0;
+        QCOMPARE(MaskBuilder::build(c, frame, {400, 200}), hard);
+        // A feathered triangle inside the frame (a custom outline, by the distance transform): 0 outside, rising inward
+        // over ~20 px. (An edge on the frame's own edge has nothing outside it to measure: no ramp there.)
+        MaskShape t;
+        t.kind = MaskShape::Kind::Polygon;
+        t.points = {PathPoint::corner({20, 20}), PathPoint::corner({380, 20}), PathPoint::corner({20, 180})};
+        t.feather = 20;
+        CropShape tri;
+        tri.shapes = {t};
+        m = MaskBuilder::build(tri, frame, {400, 200});
+        QCOMPARE(at(m, 300, 150), 0);
+        last = -1;
+        for (int y = 20; y <= 50; ++y) { // down from the top edge (y 20) at x 100: rising, full by ~20 px
+            QVERIFY(at(m, 100, y) >= last);
+            last = at(m, 100, y);
+        }
+        QVERIFY(at(m, 100, 25) < 255);
+        QCOMPARE(at(m, 100, 45), 255);
     }
     // Inverted (D-021): the ellipse a hole in a 640 × 360 frame — its centre 0, the corners 255; not inverted, the
     // same crop's own mask byte for byte as before.

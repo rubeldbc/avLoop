@@ -25,7 +25,8 @@ public:
     // The mask of a crop whose export frame is `frame` (scene px) at an output of `size`: the crop's own shape filling
     // the output, or, inverted, the shape a hole at its place in the frame.
     static QImage build(const CropShape& crop, const QRectF& frame, const QSize& size);
-    // A shape's own coverage at the output size (QImage::Format_Grayscale8): its outline anti-aliased.
+    // A shape's own coverage at the output size (QImage::Format_Grayscale8): its outline anti-aliased; with a feather
+    // (D-024) softened inward over it from the shape's signed distance (strength is applied where shapes join).
     static QImage shapeCoverage(const MaskShape& shape, const QRectF& frame, const QSize& size);
 
     // The mask from the cache when nothing changed.

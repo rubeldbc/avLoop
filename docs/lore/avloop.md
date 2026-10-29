@@ -425,3 +425,7 @@ end of its section.
 - **Several outlines in one shape need the odd-even rule**: united pieces never overlap, but a ring's hole lies inside
   its outer outline; winding would fill it when both run the same way. Rule: a shape of several outlines fills
   odd-even, a single one by winding (a freehand loop crossing itself stays filled). (AV-026)
+- **The most vexing parse**: `std::vector<float> f(size_t(n))` declares a function, and the next line's `f[y]` fails
+  with C2109. Rule: a sized container is made from a plain variable or with braces. (AV-027)
+- **A shape's edge on the frame's edge has no outside to measure**: a feathered triangle along the top of the output
+  ramped from its far side only. Rule: a feather test (and a walk) puts the edge inside the frame. (AV-027)
