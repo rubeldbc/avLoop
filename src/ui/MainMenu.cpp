@@ -37,6 +37,8 @@ void MainWindow::buildMenu() {
     entry(menu_, QStringLiteral("action.openProject"), tr("Open Project…"));
     entry(menu_, QStringLiteral("action.save"), tr("Save"), QKeySequence(Qt::CTRL | Qt::Key_S));
     entry(menu_, QStringLiteral("action.saveAs"), tr("Save As…"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_S));
+    entry(menu_, QStringLiteral("action.addLayer"), tr("Add as layer…"),
+          QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O)); // MainWindowLayers.cpp
     QMenu* recent = menu_->addMenu(tr("Recent"));
     recent->setObjectName(QStringLiteral("menu.recent"));
     menu_->addSeparator();

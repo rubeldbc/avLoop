@@ -45,7 +45,7 @@ from `build\bin`, untouched)
 | `node control/phase-tools/check-loc.mjs` | PASS: 309 code files, none over 600 lines (the largest: src/core/ClipEffects.cpp, 425 lines) |
 | `node control/phase-tools/validate-phase-system.mjs` | PASS: 31 phases, 34 requirement ids |
 | README pictures | not retaken: the default window unchanged (the align tools show with the S tool) |
-| AV-028's CI run | CI_RESULT |
+| AV-028's CI run | green, 9 m 42 s (run 40928874326) |
 
 ## The walk
 

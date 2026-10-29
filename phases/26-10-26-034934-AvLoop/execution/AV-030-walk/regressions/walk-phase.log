@@ -1,0 +1,10 @@
+PASSED walk-shell.json (8 s)
+PASSED walk-preview.json (17 s)
+PASSED walk-keyframes.json (9 s)
+PHASE WALKS PASSED
+PASSED walk-render.mjs (17 s)
+PASSED walk-loops.mjs (6 s)
+PASSED walk-project.mjs (17 s)
+PASSED walk-effects-render.mjs (4 s)
+PASSED walk-shapes-render.mjs (5 s)
+PASSED walk-memory-render.mjs (25 s)

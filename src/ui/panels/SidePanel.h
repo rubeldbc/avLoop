@@ -32,6 +32,9 @@ public:
     void bindCrop(Project* project);
     // ShapesPanel.cpp: the Crop section's Shapes list (D-022) — the shapes, their role, Delete.
     void bindShapes(Project* project);
+    // LayersPanel.cpp: the Layers section (D-027) — the videos over the main one.
+    void bindLayers(Project* project);
+    Section* layers() const { return layers_; }
     // LoopPanel.cpp: the Loop section; OutputPanel.cpp: the Output section (its frame rate until AV-009).
     void bindLoop(Project* project);
     void bindOutput(Project* project);
@@ -49,6 +52,7 @@ private:
     QToolButton* savePreset_ = nullptr;
     QToolButton* deletePreset_ = nullptr;
     Section* crop_ = nullptr;
+    Section* layers_ = nullptr;
     Section* loop_ = nullptr;
     Section* output_ = nullptr;
     Section* quality_ = nullptr;

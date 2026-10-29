@@ -18,7 +18,8 @@ struct ProjectData {
     VideoTransform transform;
     Keyframes keyframes; // "transform": {"keyframes": […]} (spec §11.1)
     CropShape crop;
-    ClipEffects effects; // "effects" (version 2)
+    ClipEffects effects;      // "effects" (version 2)
+    QList<VideoLayer> layers; // "layers" (version 3): the videos on the tracks above (D-027)
     ViewState view;
     QString exportPath;   // "export": {"lastPath"} — the last file this project was exported to
     QJsonObject original; // the JSON as read: unknown keys are written back unchanged (spec §11.1)

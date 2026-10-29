@@ -1,0 +1,7 @@
+PASS save-open: the app's walk: 39 steps passed
+PASS S12: avloop-cli frame 10 of p1 and of p2 (opened, saved again): 921600 bytes each, mean 0, max 0
+PASS p2 keeps every key of p1 (the view aside): crop, effects, format, layers, loop, output, quality, range, source, transform, version
+PASS moved: the app's walk: 4 steps passed
+PASS locate: the app's walk: 9 steps passed
+PASS the log asks for Locate source…: [project] the video was not found by its path or beside the project: …\a\src\clip.mp4 — Locate source…
+WALK PASSED

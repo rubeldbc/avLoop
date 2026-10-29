@@ -137,3 +137,10 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-94 | The objects are the shapes; six aligns, two distributes, to selection or frame | "align tool set for multiple object" | `READINGS.md`; AV-029 |
 | R-95 | A flat layers panel: order, eye, lock, name, duplicate | "a layer system for multiple objects" | `READINGS.md`; AV-029 |
 | R-96 | Buttons on the S bar; icons 54 … 61 | Illustrator's panel, no keys asked | `READINGS.md`; AV-029 |
+| R-97 | Video tracks above the main video; the loop and crop the sequence's | "multiple layer system in the time line like adobe premiere pro" | `READINGS.md`; AV-030 |
+| R-98 | Layers carry transform and opacity only; effects, keyframes, shapes stay the main video's | the panels bound to one video | `READINGS.md`; AV-030 |
+| R-99 | No transitions, audio, nesting, speed ramps, markers | not asked | `READINGS.md`; AV-030 |
+| R-100 | The one-video API kept; the layers their own | no panel changes meaning | `READINGS.md`; AV-030 |
+| R-101 | "layers" at the top, version 3 | unreleased version 3 | `READINGS.md`; AV-030 |
+| R-102 | One CPU pass after either back end, inside the mask | AVADR-0001 parity | `READINGS.md`; AV-030 |
+| R-103 | The canvas's layer frames decoded at rest, ≤ 960 px | a live canvas | `READINGS.md`; AV-030 |

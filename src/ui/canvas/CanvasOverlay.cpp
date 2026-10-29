@@ -63,6 +63,7 @@ QPainterPath keptByShapes(const QList<MaskShape>& shapes, const QTransform& toVi
 void Canvas::paintOverlay() {
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing);
+    if (underlay_ && project_->source().isValid()) underlay_(p);
     const CropShape* preview = tool_ ? tool_->previewCrop() : nullptr;
     const CropShape crop = preview ? *preview : project_->crop();
     if (maskshapes::anyVisible(crop.shapes) && project_->source().isValid()) {

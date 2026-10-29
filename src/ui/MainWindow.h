@@ -168,6 +168,9 @@ private:
     QString suggestedExportPath() const;
     // MainWindowFinder.cpp — the Loop Finder's window.
     void buildFinder();
+    // MainWindowLayers.cpp — the video layers (D-027): Add as layer…, the canvas's look of them.
+    void buildLayers();
+    void addLayer(const QString& path);
     void openFinder();
     QObject* exportContext(); // made at first use, as the estimator
     exporting::SizeEstimator* estimator();

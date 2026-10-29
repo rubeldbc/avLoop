@@ -135,6 +135,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     buildExport();
     buildProject();
     buildFinder();
+    buildLayers();
     buildBatch();
     registerProbes();
     registerMediaProbes();

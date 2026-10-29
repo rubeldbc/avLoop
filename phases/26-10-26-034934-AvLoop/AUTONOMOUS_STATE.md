@@ -22,9 +22,9 @@ words: *"I want to build a piece of software called AvLoop. Its main job is to t
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: AV-030
-Next eligible: AV-030 (in progress)
-Completed: 29 of 31
+Active phase: AV-031
+Next eligible: AV-031 (in progress)
+Completed: 30 of 31
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph
@@ -111,6 +111,7 @@ obs-websocket, not on this PC; the libvpx half passes); no code signing (§1.3, 
 none. Waiting legs: one — the owner's own 1.0.1 upgraded to 1.1.0 (AV-021, R-75).
 
 New records are written here, newest first. Each phase's full record is its own `execution/<phase>-EXECUTION.md`.
+- **AV-030** DONE 2026-10-30 — The timeline layers I (late, item 27): up to 8 videos on tracks over the main one, laid over it inside the crop by one CPU pass after either back end; Add as layer…, the Layers section; walks layers and layers-render PASSED, nine earlier walks again Record: `execution/AV-030-EXECUTION.md`.
 - **AV-029** DONE 2026-10-30 — The align tools and the shape layers (late, item 26): Align and Distribute to the selection or the frame; a layers panel — eye, lock, name, order, duplicate; walks align and align-render PASSED, four earlier walks again Record: `execution/AV-029-EXECUTION.md`.
 - **AV-028** DONE 2026-10-30 — The resets (late, item 25): a label's click resets its control, a section's right-click Reset its group, one Undo step each; walk resets PASSED, five earlier walks again Record: `execution/AV-028-EXECUTION.md`.
 - **AV-027** DONE 2026-10-29 — The soft parts (late, item 24): Feather and Strength a shape — a Cut at 40 % leaves 60 %, its edge softened by an exact distance transform; walks soft and soft-render PASSED, six earlier walks again Record: `execution/AV-027-EXECUTION.md`.

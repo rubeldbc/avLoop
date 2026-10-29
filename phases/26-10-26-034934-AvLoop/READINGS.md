@@ -237,3 +237,17 @@ from `README.md` §3 on 2026-10-29, when the README passed the 300-line ceiling 
 95. **R-95** "A layer system for multiple objects": the shapes' list as a flat layers panel — order (drag, Up, Down),
     eye, lock, name, duplicate; no groups or sublayers (not asked).
 96. **R-96** The align tools are buttons on the S bar, no keys; the 54th … 61st icons.
+97. **R-97** "Multiple layer system in the timeline like Premiere Pro": video tracks above the main video, each holding a
+    clip (a video) with its place in time, its own In/Out, its place and scale on the canvas, opacity, eye and lock; the
+    loop, the range, the crop and the output stay the main video's (the sequence's), the loop made of the composite.
+98. **R-98** The main video keeps its keyframes, effects, crop and shapes; a layer has its transform and opacity only —
+    the plan's "a clip's own effects and shapes" (`control/30` §1) is not built: every panel and tool is bound to the one
+    video, and re-binding them to a selected clip is a rework larger than the wish; open for the owner's veto.
+99. **R-99** No transitions, audio, nesting, speed ramps or markers (not asked).
+100. **R-100** The project keeps its one-video API (the main video); layers have their own (`layers()`, `changeLayers`,
+     `selectedLayer`) — no panel or tool changes meaning.
+101. **R-101** The file: `"layers"` at the top, version 3 (unreleased since AV-023, R-80); a version-2 file has none.
+102. **R-102** Layers are composited after either back end by one CPU pass inside the crop's mask (AVADR-0001 kept); a
+     layer adds no alpha decision of its own (Alpha Auto follows the main video).
+103. **R-103** The canvas shows the layers by their decoded frame at the playhead (paused) at ≤ 960 px; the thumbnails
+     and the Loop Finder read the main video.

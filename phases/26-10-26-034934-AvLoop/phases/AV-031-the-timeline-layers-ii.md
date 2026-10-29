@@ -1,7 +1,7 @@
 ---
 phase: AV-031
 title: "The timeline layers II — the tracks"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 27
 track: B
 checkpoint_id: CP-B1

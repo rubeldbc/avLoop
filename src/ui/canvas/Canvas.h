@@ -43,6 +43,8 @@ public:
     QPointF viewToScene(const QPointF& view) const;
     QPointF sceneToView(const QPointF& scene) const;
     QRectF sceneToView(const QRectF& scene) const;
+    // What is drawn over the video before the crop's dim (the video layers, D-027).
+    void setUnderlay(std::function<void(QPainter&)> paint) { underlay_ = std::move(paint); }
     // The scene → view mapping as a transform (zoom and pan).
     QTransform sceneToViewTransform() const;
     void setZoom(double zoom, const QPointF& anchorView);
@@ -79,10 +81,11 @@ protected:
 
 private:
     struct Gl;
-    void paintScene();                                    // CanvasGl.cpp
-    void paintFallback();                                 // CanvasGl.cpp: QPainter only, when OpenGL 3.3 is missing
-    void setEffectUniforms();                             // CanvasGl.cpp: the clip effects on the video
-    void paintOverlay();                                  // CanvasOverlay.cpp
+    void paintScene();        // CanvasGl.cpp
+    void paintFallback();     // CanvasGl.cpp: QPainter only, when OpenGL 3.3 is missing
+    void setEffectUniforms(); // CanvasGl.cpp: the clip effects on the video
+    void paintOverlay();      // CanvasOverlay.cpp
+    std::function<void(QPainter&)> underlay_;
     void paintShapes(QPainter& p, const CropShape& crop); // the dim and outlines with shapes (D-022)
     void releaseGl();                                     // CanvasGl.cpp
     void viewChangedNow();

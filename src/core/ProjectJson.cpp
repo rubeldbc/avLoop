@@ -93,6 +93,10 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
     };
     root.insert(QStringLiteral("crop"), merged(d.original, QStringLiteral("crop"), crop));
     root.insert(QStringLiteral("effects"), merged(d.original, QStringLiteral("effects"), d.effects.toJson()));
+    QJsonArray layers;
+    for (const VideoLayer& l : d.layers)
+        layers.append(l.toJson());
+    root.insert(QStringLiteral("layers"), layers);
 
     QJsonObject view{
         {QStringLiteral("zoom"), d.view.zoom},
@@ -164,6 +168,9 @@ bool fromJson(const QJsonObject& read, ProjectData& d, QString* error, const QSt
         d.crop.shapes.append(MaskShape::fromJson(v.toObject()));
     d.crop = d.crop.clamped();
     d.effects = ClipEffects::fromJson(json.value(QStringLiteral("effects")).toObject());
+    d.layers.clear();
+    for (const QJsonValue& v : json.value(QStringLiteral("layers")).toArray())
+        if (d.layers.size() < VideoLayer::kMaxLayers) d.layers.append(VideoLayer::fromJson(v.toObject()));
 
     const QJsonObject v = json.value(QStringLiteral("view")).toObject();
     d.view.zoom = v.value(QStringLiteral("zoom")).toDouble(1.0);

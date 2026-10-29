@@ -68,6 +68,10 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
 - **Align and layers for shapes**: Align left, centre, right, top, middle or bottom and Distribute horizontally or
   vertically — to the selection or to the frame — from the Shape bar; the Crop section's shape list is a layers panel:
   a check box shows or hides each shape, drag rows (or Up / Down) to reorder, rename, lock, duplicate.
+- **Video layers**: ☰ → **Add as layer…** (Ctrl+Shift+O) puts another video on a track above the main one, from the
+  playhead; the **Layers** section places, scales, fades (Opacity), shifts in time (Start), restacks (Track), shows,
+  hides, locks and deletes each. The canvas shows them; the Preview and every export lay them over the main video,
+  inside the crop and its shapes.
 - **Quick resets**: click the label beside a control to put it back to its default (Crossfade's 0.5 s, Speed 1×, an
   effect's none …); right-click a section of the side panel — or a tool's options bar — for **Reset <section>**. Each
   is one Undo step.

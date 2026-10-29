@@ -19,6 +19,7 @@ RenderJob RenderJob::of(const ProjectData& p, const media::MediaInfo& source) {
     job.output = p.output;
     job.quality = p.quality;
     job.effects = p.effects.clamped();
+    job.layers = p.layers;
     const QSizeF video(source.width, source.height);
     job.fps = p.output.effectiveFps(source.avgFps.isValid() ? source.avgFps : source.realFps, source.vfr);
     // Without a crop the frame is the video where it stands at In; the crop is never keyframed (spec §1.3).

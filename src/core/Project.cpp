@@ -21,6 +21,8 @@ void Project::setSource(const SourceInfo& source) {
     current_ = transform_;
     crop_ = CropShape{};
     selectedShapes_.clear();
+    layers_.clear();
+    selectedLayer_ = -1;
     effects_ = ClipEffects{};
     undo_.clear();
     emit changed(Aspect::Source);
@@ -28,6 +30,7 @@ void Project::setSource(const SourceInfo& source) {
     emit changed(Aspect::Transform);
     emit changed(Aspect::Crop);
     emit changed(Aspect::Effects);
+    emit changed(Aspect::Layers);
 }
 
 QList<int> Project::selectedShapes() const {
@@ -55,6 +58,7 @@ ProjectData Project::snapshot() const {
     d.keyframes = keyframes_;
     d.crop = crop_;
     d.effects = effects_;
+    d.layers = layers_;
     d.view = view_;
     d.exportPath = exportPath_;
     d.original = extra_;
@@ -72,6 +76,8 @@ void Project::restore(const ProjectData& data) {
     current_ = transformAt(time_);
     crop_ = data.crop.clamped();
     selectedShapes_.clear();
+    layers_ = data.layers;
+    selectedLayer_ = -1;
     effects_ = data.effects.clamped();
     view_ = data.view;
     exportPath_ = data.exportPath;
@@ -86,6 +92,7 @@ void Project::restore(const ProjectData& data) {
     emit changed(Aspect::Output);
     emit changed(Aspect::Quality);
     emit changed(Aspect::Effects);
+    emit changed(Aspect::Layers);
     emit changed(Aspect::View);
 }
 
@@ -288,6 +295,26 @@ void Project::changeEffects(const ClipEffects& after, const QString& mergeKey) {
     undo_.push(new SetEffectsCommand(
         SetEffectsId, tr("Change the clip effects"), effects_, target,
         [this](const ClipEffects& e) { applyEffects(e); }, mergeKey));
+}
+
+void Project::setSelectedLayer(int index) {
+    const int valid = index >= 0 && index < layers_.size() ? index : -1;
+    if (valid == selectedLayer_) return;
+    selectedLayer_ = valid;
+    emit changed(Aspect::LayerSelection);
+}
+
+void Project::changeLayers(const QList<VideoLayer>& after, const QString& mergeKey) {
+    if (after == layers_) return;
+    undo_.push(new SetLayersCommand(
+        SetLayersId, tr("Change the layers"), layers_, after.mid(0, VideoLayer::kMaxLayers),
+        [this](const QList<VideoLayer>& l) { applyLayers(l); }, mergeKey));
+}
+
+void Project::applyLayers(const QList<VideoLayer>& l) {
+    layers_ = l;
+    if (selectedLayer_ >= layers_.size()) selectedLayer_ = -1;
+    emit changed(Aspect::Layers);
 }
 
 void Project::applyEffects(const ClipEffects& e) {

@@ -6,6 +6,7 @@
 #include "core/LoopSettings.h"
 #include "core/Rational.h"
 #include "core/TimeRange.h"
+#include "core/VideoLayer.h"
 #include "core/VideoTransform.h"
 
 #include <QDateTime>
@@ -54,7 +55,23 @@ class Project : public QObject {
 public:
     // Time: the playhead moved and, with keyframes, the transform shown with it (nothing to export changed).
     // Shapes: which shapes are selected (D-022; not in Undo, not in the file).
-    enum class Aspect { Source, Range, Transform, Crop, Loop, Output, Quality, Keyframes, View, Time, Effects, Shapes };
+    // Layers: the video layers above the main video (D-027); LayerSelection: which one is selected (not in Undo).
+    enum class Aspect {
+        Source,
+        Range,
+        Transform,
+        Crop,
+        Loop,
+        Output,
+        Quality,
+        Keyframes,
+        View,
+        Time,
+        Effects,
+        Shapes,
+        Layers,
+        LayerSelection
+    };
     Q_ENUM(Aspect)
     static constexpr int kUndoLimit = 200;
 
@@ -81,6 +98,12 @@ public:
     const OutputSettings& output() const { return output_; }
     const QualitySettings& quality() const { return quality_; }
     const ClipEffects& effects() const { return effects_; }
+    // The videos on the tracks above the main one (D-027), and the one selected (−1: none, the main video's).
+    const QList<VideoLayer>& layers() const { return layers_; }
+    int selectedLayer() const { return selectedLayer_ < layers_.size() ? selectedLayer_ : -1; }
+    void setSelectedLayer(int index);
+    void changeLayers(const QList<VideoLayer>& after, const QString& mergeKey = {});
+    void applyLayers(const QList<VideoLayer>& l);
     // The output frame grid In, Out and the playhead snap to (spec §6.4, §8.3): the Output section's FPS.
     Rational outputFps() const;
     // The export's frame as the Output section makes it (spec §10.2): the scene rectangle, its size, its alpha.
@@ -151,6 +174,8 @@ private:
     OutputSettings output_;
     QualitySettings quality_;
     ClipEffects effects_;
+    QList<VideoLayer> layers_;
+    int selectedLayer_ = -1;
     ViewState view_;
     QJsonObject extra_;
     QString exportPath_;

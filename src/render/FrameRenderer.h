@@ -4,6 +4,7 @@
 #include "media/Interpolator.h"
 #include "render/CpuRenderer.h"
 #include "render/EffectsPass.h"
+#include "render/LayerPass.h"
 #include "render/MaskBuilder.h"
 #include "render/RenderJob.h"
 
@@ -56,6 +57,7 @@ public:
 
 private:
     media::Frame sourceFrame(double seconds, int lane);
+    void layOver(QImage& out); // the LayerPass, after either back end
 
     RenderJob job_;
     media::DiskCache* disk_;
@@ -67,6 +69,8 @@ private:
     CpuRenderer cpu_;
     MaskBuilder masks_;
     EffectsPass effects_;
+    LayerPass videoLayers_;   // the layers over the main video (D-027)
+    double frameSeconds_ = 0; // the sequence time of the frame last composed (its dominant source frame)
     double effectsScale_ = 1; // working px a source px
     QImage mask_;
     std::unique_ptr<media::Decoder> decoders_[2];

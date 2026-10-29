@@ -3,6 +3,7 @@
 #include "core/MaskShape.h"
 #include "core/ShapeAlign.h"
 #include "core/ShapeCombine.h"
+#include "core/VideoLayer.h"
 #include "ui/tools/PathEdit.h"
 #include "ui/tools/ShapeEdit.h"
 
@@ -195,6 +196,37 @@ private slots:
         QCOMPARE(dup.size(), 3);
         QCOMPARE(dup[2].name, QStringLiteral("Rectangle 2 copy"));
         QCOMPARE(dup[2].rect.topLeft(), QPointF(50, 30));
+    }
+    // The video layers (D-027): own time, presence, the draw order, hits, the overlap rule, the file form.
+    void videoLayers() {
+        VideoLayer a;
+        a.name = QStringLiteral("a");
+        a.size = QSizeF(320, 180);
+        a.range = {2, 6};
+        a.start = 1;
+        a.track = 3;
+        double own = 0;
+        QVERIFY(a.sourceTime(1, &own));
+        QCOMPARE(own, 2.0);
+        QVERIFY(a.sourceTime(4.5, &own));
+        QCOMPARE(own, 5.5);
+        QVERIFY(!a.sourceTime(5, nullptr)); // its end: Out is not shown
+        QVERIFY(!a.sourceTime(0.5, nullptr));
+        VideoLayer b = a;
+        b.track = 2;
+        b.transform.x = 300;                                          // the centre: b spans x 140 … 460, a −160 … 160
+        QCOMPARE(videolayers::drawOrder({a, b}), (QList<int>{1, 0})); // track 2 under track 3
+        QCOMPARE(videolayers::hitLayer({a, b}, QPointF(150, 50), 2), 0);  // the higher track
+        QCOMPARE(videolayers::hitLayer({a, b}, QPointF(400, 50), 2), 1);  // only b reaches there
+        QCOMPARE(videolayers::hitLayer({a, b}, QPointF(150, 50), 9), -1); // neither shows at 9 s
+        QVERIFY(!videolayers::fits({a}, 3, 3, 2));
+        QVERIFY(videolayers::fits({a}, 3, 5, 2));    // right after it
+        QVERIFY(videolayers::fits({a}, 2, 3, 2));    // another track
+        QVERIFY(videolayers::fits({a}, 3, 3, 2, 0)); // itself, moved
+        a.opacity = 40;
+        a.visible = false;
+        a.transform.flipH = true;
+        QCOMPARE(VideoLayer::fromJson(a.toJson()), a);
     }
     void joins() {
         using R = MaskShape::Role;

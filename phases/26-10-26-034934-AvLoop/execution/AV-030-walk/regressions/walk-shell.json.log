@@ -1,0 +1,44 @@
+startup: 742 ms
+walk walk-shell.json: 53 steps
+-- S1: the window opens maximized with only three buttons in the top bar @1342 ms
+PASS expect window.frame: frame 8,0 1904x1024 · work area 0,0 1920x1032
+PASS waitFor window.maximized: true after 0 ms
+PASS expect topbar.buttons: Open,Preview,Export
+PASS expect window.title: AvLoop by Rubel
+-- every icon of spec §5.3 is there and renders @1714 ms
+PASS expect icons.count: 61
+PASS expect icons.missing: none
+PASS expect rail.count: 11
+PASS expect dropzone.visible: true
+PASS expect status.source: No video open
+-- the rail's tools by their keys (the active tool turns orange) @2115 ms
+PASS expect tool.active: select
+PASS expect tool.active: crop-rect
+PASS expect tool.active: crop-round
+PASS expect tool.active: crop-ellipse
+PASS shot rail-ellipse-active.png: 40x784 px
+PASS expect tool.active: hand
+PASS expect tool.active: zoom
+PASS expect tool.active: in
+PASS expect tool.active: out
+PASS expect tool.active: keyframe
+PASS expect tool.active: select
+-- a click on the rail @3853 ms
+PASS expect tool.active: crop-ellipse
+-- the theme switches from the menu without a restart @4135 ms
+PASS shot main-navy.png: 1904x993 px
+     menu: Theme
+     menu: Black
+PASS expect theme: black
+PASS shot main-black.png: 1904x993 px
+     menu: Theme
+     menu: Navy
+PASS expect theme: navy
+-- a section collapses and opens again @6408 ms
+PASS shot side-crop-closed.png: 260x935 px
+-- the minimum size, then maximized again @6692 ms
+PASS expect window.size: 1280x720
+PASS shot min-1280x720.png: 1280x720 px
+PASS expect window.maximized: true
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

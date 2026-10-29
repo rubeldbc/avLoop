@@ -6,6 +6,30 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-027 — The timeline layers I: the layers and their composite (AV-030, late, 2026-10-30)
+
+- **Video layers** (R-97 … R-103): the project's video stays the main one (track 1) with everything it had — its
+  range, loop, transform and keyframes, effects, crop and shapes; up to 8 other videos sit on tracks 2 … 9 above it
+  (`"layers"`, version 3): each its file, display size and length, its track, its Start on the main video's time, its
+  own In/Out, its place and scale in scene space (as the Selection's transform, flips included), Opacity, shown,
+  locked. A layer shows while Start ≤ t < Start + (Out − In), its own time In + (t − Start). A file without
+  `"layers"` has none.
+- **The composite** (AVADR-0001 kept): either back end draws the main video's frame as before — masked, with alpha —
+  and the `LayerPass` lays each shown layer present at the frame's time (the loop's dominant source frame) over it in
+  track order, bilinear by its own place, at its opacity, inside the crop's mask (acc = mask·L + acc·(1 − αL)); with
+  Alpha Off the background goes under last. The same CPU pass after either back end: GPU = CPU (max diff 0 in the
+  walk). One software decoder a layer, opened on first use (at most 8). The Preview, every export, the batch and
+  avloop-cli carry the layers; hidden, absent or none: the main video's bytes.
+- **The UI**: ☰ → Add as layer… (Ctrl+Shift+O) — a probed video on the lowest free track (no overlap on a track) from
+  the playhead, at its own size, its top-left at the scene's (R-18), selected; one Undo step. The **Layers** section
+  (after Crop): its rows top first ("name · V3", a check box to show or hide), and for the selected X, Y, Scale,
+  Opacity, Start, Track, Locked, Delete — one Undo step each; a right click "Reset Layers" removes them all. The
+  canvas draws each shown layer's frame at the playhead under the crop's dim (decoded when the playhead rests, at most
+  960 px, the last frame kept while playing) with its outline — the selected one solid and named. Probes
+  `layers.count`, `layers.selected`, `layers.summary`, `layers.previewDecoders`; the walk's `"addLayer"` step.
+- Not done here (R-98, R-103): a layer has no keyframes, effects or shapes of its own; the Selection tool, the
+  thumbnails and the Loop Finder work on the main video. The tracks on the timeline are AV-031's.
+
 ### D-026 — The align tools and the shape layers (AV-029, late, 2026-10-30)
 
 - **Align** on the S bar (R-94, R-96): "Align to" Selection (the selected shapes' joined box) or Frame (the crop's, else

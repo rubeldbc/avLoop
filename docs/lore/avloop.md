@@ -446,3 +446,12 @@ end of its section.
 - **The memory suite can fail without a word under load**: `avloop-memory` failed once right after five GUI walks,
   printing nothing, and passed alone and in the next full run. Rule: a silent failure of a measuring suite is re-run,
   alone and then whole, before blaming the change — and written in the record either way. (AV-029)
+
+## The timeline layers (late)
+
+- **A walk that saves into a folder of before changes it**: AV-008's preview walk, re-run, rewrote `preview.avloop` as
+  version 3. Rule: after the regressions, `git status` over the earlier walk folders and put back what changed. (AV-030)
+- **The counter's bars are 640 / 6 px wide**: at x 100 it is red, not green. Rule: a walk that reads a colour reads it
+  from the base frame first and checks the change, rather than naming the bar by eye. (AV-030)
+- **A transform's x, y is the video's centre**: a layer at x 100 of 320 px spans −60 … 260. Rule: tests and walks place
+  layers and shapes by their centre (the project file's `transform`). (AV-030)

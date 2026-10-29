@@ -179,6 +179,29 @@ private slots:
         QCOMPARE(back.crop.shapes[0], r);
         QCOMPARE(back.crop.shapes[1], p);
     }
+    // The video layers (D-027) under "layers", read back; a file without them has none.
+    void layersRoundTrip() {
+        ProjectData d = sample(QStringLiteral("a.mp4"));
+        VideoLayer l;
+        l.name = QStringLiteral("b");
+        l.path = QStringLiteral("D:/clips/b.mp4");
+        l.size = QSizeF(640, 360);
+        l.duration = 4;
+        l.range = {0, 4};
+        l.start = 1.5;
+        l.opacity = 60;
+        d.layers = {l};
+        const QJsonObject json = projectjson::toJson(d);
+        ProjectData back;
+        QString error;
+        QVERIFY2(projectjson::fromJson(json, back, &error), qPrintable(error));
+        QCOMPARE(back.layers.size(), 1);
+        QCOMPARE(back.layers.first(), l);
+        QJsonObject without = json;
+        without.remove(QStringLiteral("layers"));
+        QVERIFY(projectjson::fromJson(without, back, &error));
+        QVERIFY(back.layers.isEmpty());
+    }
     void cropRoundTrip() {
         ProjectData d = sample(QStringLiteral("a.mp4"));
         d.crop.kind = CropShape::Kind::Rounded;

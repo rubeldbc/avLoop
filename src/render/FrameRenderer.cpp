@@ -53,6 +53,7 @@ bool FrameRenderer::open(QString* error) {
     if (!job_.crop.isEmpty() || maskshapes::anyVisible(job_.crop.shapes))
         mask_ = masks_.mask(job_.crop, job_.frame, job_.outputSize);
     effectsScale_ = job_.source.width > 0 ? double(job_.workingSize.width()) / job_.source.width : 1.0;
+    videoLayers_.setLayers(job_.layers, job_.frame, job_.outputSize);
     backend_ = Backend::Cpu;
     if (gl_) {
         if (gl_->ready() || gl_->init(&gpuNote_))
@@ -110,7 +111,8 @@ bool FrameRenderer::compose(int k, Composite& c, QString* error) {
     c.size = job_.outputSize;
     c.layers.clear();
     c.mask = mask_.isNull() ? nullptr : &mask_;
-    c.alpha = job_.alpha;
+    c.alpha = job_.alpha || !videoLayers_.empty(); // with layers the background goes under them, last
+    frameSeconds_ = job_.tau(pick.w < 0.5 ? pick.a : pick.b);
     c.background = job_.background;
     c.look = job_.effects.key();
     // One segment frame's source frames, at its share of the blend; the loop's partner frame on the second lane.
@@ -148,14 +150,24 @@ bool FrameRenderer::render(int k, QImage& out, QString* error) {
     if (out.size() != c.size || out.format() != QImage::Format_RGBA8888_Premultiplied)
         out = QImage(c.size, QImage::Format_RGBA8888_Premultiplied);
     if (backend_ == Backend::Gpu) {
-        if (gl_->render(c, out.bits(), int(out.bytesPerLine()))) return true;
+        const auto done = [&] {
+            layOver(out);
+            return true;
+        };
+        if (gl_->render(c, out.bits(), int(out.bytesPerLine()))) return done();
         // A lost or failing GPU: made again once, else the CPU from this frame on (spec §3.6).
-        if (gl_->recover() && gl_->render(c, out.bits(), int(out.bytesPerLine()))) return true;
+        if (gl_->recover() && gl_->render(c, out.bits(), int(out.bytesPerLine()))) return done();
         gpuNote_ = QStringLiteral("the GPU failed at frame %1; the CPU renders from here").arg(k);
         backend_ = Backend::Cpu;
     }
     cpu_.render(c, out.bits(), int(out.bytesPerLine()));
+    layOver(out);
     return true;
+}
+
+void FrameRenderer::layOver(QImage& out) {
+    if (!videoLayers_.empty())
+        videoLayers_.apply(frameSeconds_, out, mask_.isNull() ? nullptr : &mask_, job_.alpha, job_.background);
 }
 
 } // namespace avloop::render

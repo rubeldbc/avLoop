@@ -3,7 +3,7 @@
 add_library(avloop_core STATIC
     core/AppInfo.h core/AppInfo.cpp core/Rational.h
     core/Geometry.h core/Geometry.cpp core/VideoTransform.h core/VideoTransform.cpp
-    core/CropShape.h core/CropShape.cpp core/MaskShape.h core/MaskShape.cpp core/ShapeCombine.h core/ShapeCombine.cpp core/ShapeAlign.h core/ShapeAlign.cpp core/AspectRatio.h core/AspectRatio.cpp core/Keyframes.h core/Keyframes.cpp
+    core/CropShape.h core/CropShape.cpp core/MaskShape.h core/MaskShape.cpp core/ShapeCombine.h core/ShapeCombine.cpp core/ShapeAlign.h core/ShapeAlign.cpp core/VideoLayer.h core/VideoLayer.cpp core/AspectRatio.h core/AspectRatio.cpp core/Keyframes.h core/Keyframes.cpp
     core/Timecode.h core/Timecode.cpp core/TimeRange.h core/TimeRange.cpp
     core/LoopSettings.h core/LoopSettings.cpp core/LoopMap.h core/LoopMap.cpp core/TimeMap.h core/TimeMap.cpp
     core/QualitySettings.h core/QualitySettings.cpp core/ClipEffects.h core/ClipEffects.cpp
@@ -28,7 +28,7 @@ target_link_libraries(avloop_media
     PRIVATE FFmpeg::avformat FFmpeg::avcodec FFmpeg::avutil FFmpeg::swscale FFmpeg::avfilter dxgi psapi avloop_warnings)
 
 add_library(avloop_render STATIC
-    render/Shaders.h render/Shaders.cpp render/MaskBuilder.h render/MaskBuilder.cpp render/DistanceField.h render/DistanceField.cpp
+    render/Shaders.h render/Shaders.cpp render/MaskBuilder.h render/MaskBuilder.cpp render/DistanceField.h render/DistanceField.cpp render/LayerPass.h render/LayerPass.cpp
     render/RenderJob.h render/RenderJob.cpp render/CpuRenderer.h render/CpuRenderer.cpp
     render/GlRenderer.h render/GlRenderer.cpp render/FrameRenderer.h render/FrameRenderer.cpp
     render/RenderService.h render/RenderService.cpp render/EffectsPass.h render/EffectsPass.cpp)
@@ -48,7 +48,7 @@ add_library(avloop_ui STATIC
     ui/dialogs/SettingsDialog.h ui/dialogs/SettingsDialog.cpp ui/dialogs/AboutDialog.h ui/dialogs/AboutDialog.cpp
     ui/dialogs/ShortcutOverlay.h ui/dialogs/ShortcutOverlay.cpp
     ui/export/ExportBar.h ui/export/ExportBar.cpp ui/export/LoopFinderWindow.h ui/export/LoopFinderWindow.cpp
-    ui/MainWindowFinder.cpp ui/MainWindowBatch.cpp ui/export/BatchWindow.h ui/export/BatchWindow.cpp
+    ui/MainWindowFinder.cpp ui/MainWindowLayers.cpp ui/MainWindowBatch.cpp ui/export/BatchWindow.h ui/export/BatchWindow.cpp
     ui/preview/PreviewWindow.h ui/preview/PreviewWindow.cpp ui/preview/PreviewWidgets.h ui/preview/PreviewWidgets.cpp
     ui/preview/PreviewPlayer.h ui/preview/PreviewPlayer.cpp ui/preview/PreviewEncode.cpp
     ui/WalkRunner.h ui/WalkRunner.cpp ui/WalkSteps.cpp
@@ -57,7 +57,7 @@ add_library(avloop_ui STATIC
     ui/widgets/Toast.h ui/widgets/Toast.cpp
     ui/panels/Section.h ui/panels/Section.cpp
     ui/panels/SidePanel.h ui/panels/SidePanel.cpp ui/panels/CropPanel.cpp ui/panels/LoopPanel.cpp
-    ui/panels/OutputPanel.cpp ui/panels/QualityPanel.cpp ui/panels/PresetPanel.cpp ui/panels/EffectsPanel.cpp ui/panels/ShapesPanel.cpp ui/widgets/ColourField.h ui/widgets/ColourField.cpp ui/widgets/ResetLabel.h ui/widgets/ResetLabel.cpp
+    ui/panels/OutputPanel.cpp ui/panels/QualityPanel.cpp ui/panels/PresetPanel.cpp ui/panels/EffectsPanel.cpp ui/panels/ShapesPanel.cpp ui/panels/LayersPanel.cpp ui/widgets/ColourField.h ui/widgets/ColourField.cpp ui/widgets/ResetLabel.h ui/widgets/ResetLabel.cpp
     ui/canvas/DropZone.h ui/canvas/DropZone.cpp
     ui/canvas/Canvas.h ui/canvas/Canvas.cpp ui/canvas/CanvasView.cpp ui/canvas/CanvasGl.cpp ui/canvas/CanvasGlState.h ui/canvas/CanvasOverlay.cpp
     ui/tools/Tool.h ui/tools/ToolManager.h ui/tools/ToolManager.cpp
