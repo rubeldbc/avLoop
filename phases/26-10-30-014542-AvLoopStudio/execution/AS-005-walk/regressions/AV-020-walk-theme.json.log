@@ -1,0 +1,39 @@
+startup: 675 ms
+walk walk-theme.json: 45 steps
+-- Replace colour: the eyedropper takes the yellow bar's colour from the canvas @1376 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect effects.summary: 
+PASS expect effects.summary: replace=100 replaceFrom=#fdfd00
+PASS expect effects.summary: replace=100 replaceFrom=#fdfd00
+PASS expect undo.count: 1
+PASS expect tool.active: select
+PASS expect transform.x: 320
+-- To red, typed: the yellow bar turns red, the others stay @3226 ms
+PASS expect effects.summary: replace=100 replaceFrom=#fdfd00 replaceTo=#ff0000
+PASS expect undo.count: 2
+PASS shot canvas-replaced.png: 1000x559 px
+-- Esc cancels a pick: the click after it picks nothing @3759 ms
+PASS expect undo.count: 2
+-- Colourise: the whole clip in one red, its lightness kept @4277 ms
+PASS expect effects.summary: colourise=100 replace=100 replaceFrom=#fdfd00 replaceTo=#ff0000
+PASS shot canvas-colourise.png: 1000x559 px
+-- Duotone: a colour chosen at 0 % turns it full on; navy shadows, warm lights @4811 ms
+PASS expect effects.summary: duotone=100 duotoneDark=#101040 replace=100 replaceFrom=#fdfd00 replaceTo=#ff0000
+PASS shot canvas-duotone.png: 1000x559 px
+-- Split toning: blue shadows, orange highlights @5470 ms
+PASS expect effects.summary: duotoneDark=#101040 duotoneLight=#ffc070 replace=100 replaceFrom=#fdfd00 replaceTo=#ff0000 split=80
+PASS shot canvas-split.png: 1000x559 px
+PASS shot panel-theme.png: 309x1239 px
+-- Undo takes Split toning back; the Preview shows the exact output @6018 ms
+PASS expect effects.summary: duotoneDark=#101040 duotoneLight=#ffc070 replace=100 replaceFrom=#fdfd00 replaceTo=#ff0000
+PASS waitFor preview.frame: 640x360 after 0 ms
+PASS shot preview-replaced.png: 680x500 px
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 0000022e24810cc0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000022e24810cc0] v1.16.0
+[libvpx-vp9 @ 0000022e248147c0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000022e248147c0] v1.16.0
+[libvpx-vp9 @ 0000022e248147c0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000022e248147c0] v1.16.0

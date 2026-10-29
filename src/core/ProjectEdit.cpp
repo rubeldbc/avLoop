@@ -2,6 +2,7 @@
 // the matte, In/Out, the effects, the layers, the sequence's own edits — and the Loop, Output and Quality sections.
 #include "core/Commands.h"
 #include "core/Project.h"
+#include "core/SequenceEdit.h"
 #include "core/SequenceView.h"
 
 namespace avloop {
@@ -133,11 +134,23 @@ void Project::changeLayers(const QList<VideoLayer>& after, const QString& mergeK
 }
 
 void Project::changePanelEffects(const ClipEffects& after, const QString& mergeKey) {
-    const int i = selectedLayer();
-    if (i < 0) return changeEffects(after, mergeKey);
-    QList<VideoLayer> l = layers_;
-    l[i].effects = after.clamped();
-    changeLayers(l, mergeKey);
+    const Clip* selected = selectedClip_ ? sequenceedit::clip(seq_, selectedClip_) : nullptr;
+    if (!selected) return changeEffects(after, mergeKey);
+    Clip c = *selected;
+    c.effects = after.clamped();
+    if (c.effects == selected->effects) return;
+    Sequence next = seq_;
+    const sequenceedit::Where w = sequenceedit::find(next, c.id);
+    next.tracks[w.track].clips[w.index] = c;
+    pushSequence(SetEffectsId, tr("Change the clip effects"), next, mergeKey);
+}
+
+void Project::changeClip(const Clip& after, const QString& text, const QString& mergeKey) {
+    Sequence next = seq_;
+    const sequenceedit::Where w = sequenceedit::find(next, after.id);
+    if (!w.valid()) return;
+    next.tracks[w.track].clips[w.index] = after;
+    pushSequence(SetSequenceId, text, next, mergeKey);
 }
 
 void Project::changeSettings(const LoopSettings& loop, const OutputSettings& output, const QualitySettings& quality,

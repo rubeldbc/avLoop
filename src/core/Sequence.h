@@ -43,6 +43,10 @@ struct Clip {
     bool ownTime(double t, double* own) const;
     VideoLayer::Look look(double own) const;
     QRectF rectAt(double own) const { return look(own).transform.rect(size); }
+    // The key within `tolerance` s of `own`, else −1; `look` written at `own` — into the key there (made when none)
+    // when keyed (the stopwatch on), else into the transform and opacity (D-029's, D-035).
+    int keyAt(double own, double tolerance) const;
+    void setLook(double own, const VideoLayer::Look& look, double tolerance);
 
     QJsonObject toJson() const;
     static Clip fromJson(const QJsonObject& json);

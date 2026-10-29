@@ -48,7 +48,8 @@ void MonitorComposite::paint(QPainter& p) {
             canvas_->update();
         });
     }
-    if (!image_.isNull()) p.drawImage(rect_, image_);
+    // The painter draws in the view's px (as the layers' underlay): the composite's scene rectangle mapped there.
+    if (!image_.isNull()) p.drawImage(canvas_->sceneToView(rect_), image_);
 }
 
 void MonitorComposite::make() {

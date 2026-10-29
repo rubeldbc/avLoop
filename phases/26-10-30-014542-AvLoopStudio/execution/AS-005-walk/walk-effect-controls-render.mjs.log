@@ -1,0 +1,7 @@
+PASS the project saved by the GUI walk: controls.avloop
+PASS V2's clip: two keys, a Cut mask, Invert — the main clip without it: keys 2, mask cut, invert true
+PASS 0 s: V2 inverted at its own (400, 260): magenta: 255,0,254,255
+PASS 1 s: half way, half seen — magenta half over V1: 128,127,127,255 (wanted ≈ 128,127,128,255)
+PASS 1 s: through the hole, V1 alone: 0,0,254,255 = 0,0,254,255
+PASS 2 s: opacity 0 — V1 alone, byte for byte: 640×360
+WALK PASSED

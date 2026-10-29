@@ -3,6 +3,7 @@
 #include "core/Commands.h"
 #include "core/Geometry.h"
 #include "core/ProjectJson.h"
+#include "core/SequenceEdit.h"
 #include "core/SequenceView.h"
 #include "core/Timecode.h"
 
@@ -65,7 +66,7 @@ void Project::setSource(const SourceInfo& source) {
     sv::settle(s);
     seq_ = s;
     selectedShapes_.clear();
-    selectedLayer_ = -1;
+    selectedClip_ = 0;
     undo_.clear();
     sync(true);
 }
@@ -129,7 +130,7 @@ void Project::restore(const ProjectData& data) {
     sv::settle(s);
     seq_ = s;
     selectedShapes_.clear();
-    selectedLayer_ = -1;
+    selectedClip_ = 0;
     view_ = data.view;
     exportPath_ = data.exportPath;
     extra_ = data.original;
@@ -172,7 +173,8 @@ void Project::sync(bool all) {
     const VideoTransform now = transformAt(time_);
     const bool currentChanged = !(now == current_);
     current_ = now;
-    if (selectedLayer_ >= layers_.size()) selectedLayer_ = -1;
+    const bool selectionGone = selectedClip_ && !sequenceedit::clip(seq_, selectedClip_);
+    if (selectionGone) selectedClip_ = 0;
     if (all || sourceChanged) emit changed(Aspect::Source);
     if (all || rangeChanged) emit changed(Aspect::Range);
     if (all || keysChanged) emit changed(Aspect::Keyframes);
@@ -180,6 +182,7 @@ void Project::sync(bool all) {
     if (all || cropChanged) emit changed(Aspect::Crop);
     if (all || effectsChanged) emit changed(Aspect::Effects);
     if (all || layersChanged) emit changed(Aspect::Layers);
+    if (selectionGone) emit changed(Aspect::LayerSelection);
     emit changed(Aspect::Sequence);
 }
 
@@ -253,16 +256,30 @@ Rational Project::outputFps() const {
     return output_.effectiveFps(source_.fps, source_.vfr);
 }
 
+int Project::selectedLayer() const {
+    for (qsizetype i = 0; i < layers_.size(); ++i)
+        if (selectedClip_ && layers_[i].id == selectedClip_) return int(i);
+    return -1;
+}
+
 void Project::setSelectedLayer(int index) {
-    const int valid = index >= 0 && index < layers_.size() ? index : -1;
-    if (valid == selectedLayer_) return;
-    selectedLayer_ = valid;
+    setSelectedClip(index >= 0 && index < layers_.size() ? layers_[index].id : 0);
+}
+
+int Project::selectedClip() const {
+    return selectedClip_ && sequenceedit::clip(seq_, selectedClip_) ? selectedClip_ : 0;
+}
+
+void Project::setSelectedClip(int id) {
+    const int valid = id && sequenceedit::clip(seq_, id) ? id : 0;
+    if (valid == selectedClip_) return;
+    selectedClip_ = valid;
     emit changed(Aspect::LayerSelection);
 }
 
 const ClipEffects& Project::panelEffects() const {
-    const int i = selectedLayer();
-    return i >= 0 ? layers_[i].effects : effects_;
+    const Clip* c = selectedClip_ ? sequenceedit::clip(seq_, selectedClip_) : nullptr;
+    return c ? c->effects : effects_;
 }
 
 void Project::applySequence(const Sequence& s) {

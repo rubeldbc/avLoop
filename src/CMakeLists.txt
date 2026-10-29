@@ -48,7 +48,7 @@ add_library(avloop_ui STATIC
     ui/dialogs/SettingsDialog.h ui/dialogs/SettingsDialog.cpp ui/dialogs/AboutDialog.h ui/dialogs/AboutDialog.cpp
     ui/dialogs/ShortcutOverlay.h ui/dialogs/ShortcutOverlay.cpp
     ui/export/ExportBar.h ui/export/ExportBar.cpp ui/export/LoopFinderWindow.h ui/export/LoopFinderWindow.cpp
-    ui/MainWindowFinder.cpp ui/MainWindowLayers.cpp ui/MainWindowMonitor.cpp ui/MonitorComposite.h ui/panels/ProjectPanel.h ui/panels/ProjectPanel.cpp ui/MainWindowBatch.cpp ui/export/BatchWindow.h ui/export/BatchWindow.cpp
+    ui/MainWindowFinder.cpp ui/MainWindowLayers.cpp ui/MainWindowMonitor.cpp ui/MonitorComposite.h ui/panels/ProjectPanel.h ui/panels/ProjectPanel.cpp ui/panels/EffectControlsPanel.cpp ui/MainWindowBatch.cpp ui/export/BatchWindow.h ui/export/BatchWindow.cpp
     ui/preview/PreviewWindow.h ui/preview/PreviewWindow.cpp ui/preview/PreviewWidgets.h ui/preview/PreviewWidgets.cpp
     ui/preview/PreviewPlayer.h ui/preview/PreviewPlayer.cpp ui/preview/PreviewEncode.cpp
     ui/WalkRunner.h ui/WalkRunner.cpp ui/WalkSteps.cpp

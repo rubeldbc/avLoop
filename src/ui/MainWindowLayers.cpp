@@ -4,6 +4,7 @@
 // its outline (the selected one solid, its name); the Preview and the export make the layers exactly (the
 // SequenceRenderer).
 #include "core/Project.h"
+#include "core/SequenceEdit.h"
 #include "media/Decoder.h"
 #include "media/MediaProbe.h"
 #include "render/EffectsPass.h"
@@ -159,6 +160,7 @@ void MainWindow::addLayer(const QString& path) {
 
 void MainWindow::buildLayers() {
     side_->bindLayers(project_);
+    side_->bindControls(project_, [this](double t) { seek(t); });
     // The tracks (AV-031; the sequence's since D-034): lanes above the main video's timeline, on its time scale.
     lanes_ = new SequenceLanes(project_, timeline_, [this](double t) { seek(t); }, timeline_->parentWidget());
     if (auto* column = qobject_cast<QVBoxLayout*>(timeline_->parentWidget()->layout()))
@@ -200,10 +202,11 @@ void MainWindow::buildLayers() {
         return 400;
     });
     connect(project_, &Project::changed, side_, [this](Project::Aspect a) {
-        if (a != Project::Aspect::LayerSelection && a != Project::Aspect::Layers) return;
-        const int i = project_->selectedLayer();
-        side_->effects()->setTitle(i >= 0 ? tr("Clip effects — %1").arg(project_->layers()[i].name)
-                                          : tr("Clip effects"));
+        if (a != Project::Aspect::LayerSelection && a != Project::Aspect::Layers && a != Project::Aspect::Sequence)
+            return;
+        // The selected clip's own effects (D-035), else the main video's.
+        const Clip* c = sequenceedit::clip(project_->sequence(), project_->selectedClip());
+        side_->effects()->setTitle(c ? tr("Clip effects — %1").arg(c->name) : tr("Clip effects"));
     });
     WalkProbes::add(QStringLiteral("layers.previewDecoders"), [preview] { return preview->decoders(); });
 }

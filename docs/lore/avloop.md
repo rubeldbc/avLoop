@@ -492,3 +492,8 @@ end of its section.
   CI said so. Rule: both programmes' `validate-phase-system.mjs` run before a commit that removes or renames a file. (AS-003)
 - **A drag in px is never on a frame**: a trim dragged to "5 s" ended at 5.01. Rule: timeline edits land on the output's
   frame grid (after snapping); a walk that drags reads whole frames. (AS-004)
+- **A picture read as expected is not a picture read**: AS-003's monitor picture showed the composite at view px under
+  scene-px outlines, and the record called it right; AS-005's picture of the same canvas showed the outlines off.
+  Rule: on a canvas picture, check the overlay (outlines, handles) lines up with the image before describing it. (AS-005)
+- **An underlay paints in view px**: the canvas's underlay painter has no scene transform; the layers map each rectangle
+  by `sceneToView`. Rule: anything drawn there maps its scene rectangle the same way. (AS-005)

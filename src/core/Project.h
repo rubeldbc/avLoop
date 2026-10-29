@@ -109,11 +109,17 @@ public:
     const ClipEffects& effects() const { return effects_; }
     // The videos on the tracks above the main one (D-027), and the one selected (−1: none, the main video's).
     const QList<VideoLayer>& layers() const { return layers_; }
-    int selectedLayer() const { return selectedLayer_ < layers_.size() ? selectedLayer_ : -1; }
+    int selectedLayer() const; // the selected clip's index among the layers, else −1
     void setSelectedLayer(int index);
+    // The selected clip (D-035; not in Undo): what the Effect Controls and the Clip effects section edit; 0 for none
+    // (the main clip's then). A change says LayerSelection.
+    int selectedClip() const;
+    void setSelectedClip(int id);
+    // A clip replaced by `after` (its id) as one step; `mergeKey` as the other edits'.
+    void changeClip(const Clip& after, const QString& text, const QString& mergeKey = {});
     void changeLayers(const QList<VideoLayer>& after, const QString& mergeKey = {});
     void applyLayers(const QList<VideoLayer>& l);
-    // What the Clip effects section edits (D-029): the selected layer's effects, else the main video's.
+    // What the Clip effects section edits (D-029, D-035): the selected clip's effects, else the main video's.
     const ClipEffects& panelEffects() const;
     void changePanelEffects(const ClipEffects& after, const QString& mergeKey = {});
     // Half an output frame of the layers' own time: one key a frame (as the main video's, D-011).
@@ -202,7 +208,7 @@ private:
     QualitySettings quality_;
     ClipEffects effects_;
     QList<VideoLayer> layers_;
-    int selectedLayer_ = -1;
+    int selectedClip_ = 0;
     ViewState view_;
     QJsonObject extra_;
     QString exportPath_;

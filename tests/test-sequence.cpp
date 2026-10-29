@@ -257,6 +257,48 @@ private slots:
         p.undoStack()->undo();
         QCOMPARE(p.sequence().tracks[0].clips.size(), 1);
     }
+    // The selected clip (D-035): the Clip effects and the Effect Controls edit it alone; the stopwatch's write.
+    void selectedClip() {
+        ProjectData d;
+        d.source.path = QStringLiteral("D:/clips/fire.mp4");
+        d.source.width = 640;
+        d.source.height = 360;
+        d.source.duration = 10;
+        d.source.fps = {30, 1};
+        d.range = {0, 10};
+        d.transform = VideoTransform::initial({640, 360});
+        VideoLayer l;
+        l.name = QStringLiteral("b");
+        l.path = QStringLiteral("D:/clips/b.mp4");
+        l.size = QSizeF(320, 180);
+        l.duration = 5;
+        l.range = {0, 5};
+        d.layers = {l};
+        Project p;
+        p.restore(d);
+        const int id = p.sequence().tracks[1].clips[0].id;
+        p.setSelectedClip(id);
+        QCOMPARE(p.selectedLayer(), 0);
+        ClipEffects e;
+        e.invert = true;
+        p.changePanelEffects(e);
+        QVERIFY(p.sequence().tracks[1].clips[0].effects.invert);
+        QVERIFY(!p.effects().invert); // the main clip's untouched
+        Clip c = p.sequence().tracks[1].clips[0];
+        c.setLook(1, {c.transform, 40}, 0.01); // the stopwatch off: the clip's own opacity
+        QCOMPARE(c.opacity, 40.0);
+        QVERIFY(c.keys.isEmpty());
+        c.keys = {{0, 10, 20, 1, 100, false}};
+        c.setLook(2, {c.transform, 50}, 0.01); // on: a key made at 2 s
+        QCOMPARE(c.keys.size(), 2);
+        QCOMPARE(c.keys[1].opacity, 50.0);
+        p.changeClip(c, QStringLiteral("Fade"));
+        QCOMPARE(p.sequence().tracks[1].clips[0].keys.size(), 2);
+        p.undoStack()->undo();
+        QVERIFY(p.sequence().tracks[1].clips[0].keys.isEmpty());
+        p.changeLayers({});
+        QCOMPARE(p.selectedClip(), 0); // the selected clip gone: none
+    }
     // Keys over sequence time on a clip that starts later: own = In + (t − start).
     void keysOverSequenceTime() {
         Clip c = media(10);

@@ -73,6 +73,31 @@ VideoLayer::Look Clip::look(double own) const {
     return videolayers::keyedLook(keys, transform, opacity, own);
 }
 
+int Clip::keyAt(double own, double tolerance) const {
+    for (qsizetype i = 0; i < keys.size(); ++i)
+        if (std::abs(keys[i].t - own) <= tolerance) return int(i);
+    return -1;
+}
+
+void Clip::setLook(double own, const VideoLayer::Look& l, double tolerance) {
+    if (keys.isEmpty()) {
+        const bool flipH = transform.flipH, flipV = transform.flipV;
+        transform = l.transform;
+        transform.flipH = flipH;
+        transform.flipV = flipV;
+        opacity = l.opacity;
+        return;
+    }
+    const LayerKey k{own, l.transform.x, l.transform.y, l.transform.scale, l.opacity, false};
+    if (const int i = keyAt(own, tolerance); i >= 0) {
+        keys[i] = {keys[i].t, k.x, k.y, k.scale, k.opacity, keys[i].ease};
+        return;
+    }
+    if (keys.size() >= VideoLayer::kMaxKeys) return;
+    keys.append(k);
+    std::sort(keys.begin(), keys.end(), [](const LayerKey& a, const LayerKey& b) { return a.t < b.t; });
+}
+
 QJsonObject Clip::toJson() const {
     QJsonArray maskList;
     for (const MaskShape& m : masks)

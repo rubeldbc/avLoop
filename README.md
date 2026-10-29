@@ -59,6 +59,11 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   to trim, Alt+drag to copy. **C** is the Razor — click a clip to cut it there; **Ctrl+K** cuts at the playhead;
   **Delete** leaves a gap and **Shift+Delete** closes it. Right-click a track's name to hide or lock it. The timeline
   runs as long as the sequence.
+- **The Effect Controls** (the side panel's first section), as in Premiere Pro, for the clip selected on the timeline:
+  Position, Scale and Opacity at the playhead; the stopwatch (**Keyframes**) — on, a value changed at the playhead
+  makes or updates a key there; ◀ ◆ ▶ go to the previous key, add or remove one, go to the next. **Masks**: add a
+  rectangle or an ellipse, set its **Mode** to Cut to make a hole (or Keep only, Exclude), its Feather and Strength.
+  The Clip effects section edits the selected clip alone.
 - **The Project panel** (left of the canvas), as in Premiere Pro: **Import…** adds videos to the project's media;
   **Insert** puts the selected one at the playhead on the chosen track (V1 … V8) — what is there is cut and the rest
   of the track moves right — and **Overwrite** covers what is there; each one Undo step. A clip is placed centred in the

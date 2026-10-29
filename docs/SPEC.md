@@ -27,6 +27,21 @@ its model, under the UI that is still AvLoop's (RS-7).
   the frame's corner; each layer on its own track; the crop with its shapes the sequence's matte (D-032). A migrated
   file renders byte for byte as before. `avloop-cli sequence <project> [--save x.avloop]` prints it.
 
+### D-035 — The Effect Controls (AS-005, AvLoop Studio, 2026-10-30)
+
+- **The selected clip** (one clip selected on the timeline, or a layer in the Layers section) is the project's — not in
+  Undo; none, the main clip. The Layers section's selection is a view of it.
+- **The Effect Controls** (the side panel's first section, "Effect Controls — <clip>"), as Premiere's: Position X, Y,
+  Scale and Opacity at the playhead; the **stopwatch** (Keyframes): on, a value typed at the playhead makes or updates
+  the key there (D-029's keys: place, scale and opacity together), off, the keys go and the clip stays as shown; ◀ ◆ ▶
+  — to the previous key, a key at the playhead added or removed (the last one: as the stopwatch off), to the next key.
+- **Masks** on the clip: Rectangle and Ellipse add one over its middle half (Select: the rest goes), and the selected
+  one's **Mode** — Select, Cut (a hole), Keep only, Exclude —, Feather (0–200 px), Strength (0–100 %), Delete. In the
+  clip's own px, with it as it moves (the composite, D-032). Drawn on the monitor in AS-006.
+- **The Clip effects** section edits the selected clip ("Clip effects — <clip>"), else the main clip's; one clip's edit
+  never changes another's. Every edit one Undo step (a typed field merges its own).
+- The monitor's composite is drawn at its scene place in the canvas's view (AS-003 drew it in view px).
+
 ### D-034 — The timeline editor (AS-004, AvLoop Studio, 2026-10-30)
 
 - **The tracks on the timeline** are the sequence's (the lanes, AV-031's, now over every clip): V1 at the bottom — the

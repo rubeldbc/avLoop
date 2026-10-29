@@ -53,3 +53,8 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md`; `DECISI
 19. **RS-19** (AS-004) The time axis is the project's length (the main media's, or the sequence's when longer). The
     timeline's thumbnail strip still shows the main clip's media over the axis, and the bars carry names and keys, no
     thumbnails — for CP-S1 (AS-009) to weigh.
+20. **RS-20** (AS-005) One stopwatch for Motion and Opacity: a clip's keys hold place, scale and opacity together
+    (D-029's file form, kept), not a stopwatch a property as Premiere's. The keys' lane is the clip's bar on the
+    timeline (its diamonds), not a lane in the panel.
+21. **RS-21** (AS-005) A mask added is Select (Premiere's Add) over the clip's middle half; Cut makes it a hole. Its
+    shape is drawn and edited on the monitor in AS-006; here its mode, feather and strength.

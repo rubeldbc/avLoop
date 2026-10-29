@@ -59,13 +59,14 @@ SidePanel::SidePanel(QWidget* parent) : QWidget(parent) {
     auto* sections = new QVBoxLayout(body);
     sections->setContentsMargins(0, 0, 0, 0);
     sections->setSpacing(0);
+    controls_ = new Section(QStringLiteral("controls"), tr("Effect Controls"), body);
     crop_ = new Section(QStringLiteral("crop"), tr("Crop"), body);
     layers_ = new Section(QStringLiteral("layers"), tr("Layers"), body);
     loop_ = new Section(QStringLiteral("loop"), tr("Loop"), body);
     output_ = new Section(QStringLiteral("output"), tr("Output"), body);
     quality_ = new Section(QStringLiteral("quality"), tr("Quality"), body);
     effects_ = new Section(QStringLiteral("effects"), tr("Clip effects"), body);
-    for (Section* s : {crop_, layers_, loop_, output_, quality_, effects_})
+    for (Section* s : {controls_, crop_, layers_, loop_, output_, quality_, effects_})
         sections->addWidget(s);
     sections->addStretch(1);
     scroll->setWidget(body);

@@ -1,0 +1,27 @@
+walk walk-effect-controls.json: 45 steps
+-- D-035: the counter; the 1080p counter overwritten on V2 at 0 s — the Effect Controls show the main clip @1450 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect controls.clip: counter-640p30
+     import 1
+PASS expect sequence.ends: V1:0.00-10.00 V2:0.00-10.00
+-- a click on its bar selects it: the Effect Controls are its; Scale 25 %, its place the top-left quarter @3147 ms
+PASS expect controls.clip: counter-1080p30
+PASS expect controls.look: 160.0,90.0,25.0,100.0
+PASS expect controls.keyCount: 0
+-- the stopwatch at 0 s: a key; at 2 s X 480, Y 270 and Opacity 0 write a second; at 1 s half way @4038 ms
+PASS expect controls.keyCount: 1
+PASS expect controls.keyCount: 2
+PASS expect controls.look: 320.0,180.0,25.0,50.0
+PASS expect playhead: 0
+PASS expect playhead: 2
+-- a mask: an ellipse over its middle, Mode Cut — a hole in V2; Invert on V2's clip effects alone @5939 ms
+PASS expect controls.maskList: ellipse:add
+PASS expect controls.maskList: ellipse:cut
+PASS expect effects.main: false
+PASS expect monitor.composite: true
+PASS shot effect-controls.png: 260x842 px
+PASS shot monitor-1s.png: 938x691 px
+     saveAs D:/Code5/avLoop/phases/26-10-30-014542-AvLoopStudio/execution/AS-005-walk/controls.avloop
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

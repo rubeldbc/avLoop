@@ -15,8 +15,8 @@ namespace avloop {
 class Project;
 class Section;
 
-// The right panel (spec §5.1): the preset row above five collapsible sections — Crop, Loop, Output, Quality and Clip
-// effects (D-017). Each later phase fills its section's rows.
+// The right panel (spec §5.1): the preset row above the collapsible sections — the Effect Controls (D-035), Crop,
+// Layers, Loop, Output, Quality and Clip effects (D-017). Each later phase fills its section's rows.
 class SidePanel : public QWidget {
     Q_OBJECT
 public:
@@ -34,6 +34,10 @@ public:
     void bindShapes(Project* project);
     // LayersPanel.cpp: the Layers section (D-027) — the videos over the main one.
     void bindLayers(Project* project);
+    // EffectControlsPanel.cpp: the Effect Controls (D-035) — the selected clip's motion, opacity, keys and masks;
+    // `seek` takes the playhead to a key.
+    void bindControls(Project* project, std::function<void(double)> seek);
+    Section* controls() const { return controls_; }
     Section* layers() const { return layers_; }
     // LoopPanel.cpp: the Loop section; OutputPanel.cpp: the Output section (its frame rate until AV-009).
     void bindLoop(Project* project);
@@ -51,6 +55,7 @@ private:
     QComboBox* presets_ = nullptr;
     QToolButton* savePreset_ = nullptr;
     QToolButton* deletePreset_ = nullptr;
+    Section* controls_ = nullptr;
     Section* crop_ = nullptr;
     Section* layers_ = nullptr;
     Section* loop_ = nullptr;

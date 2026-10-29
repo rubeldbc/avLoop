@@ -84,24 +84,16 @@ void SequenceLanes::setRazor(bool on) {
 
 void SequenceLanes::select(const QList<int>& ids) {
     selected_ = ids;
-    // A layer's selection is the Layers section's too (its index among AvLoop's layers).
-    int layer = -1;
-    const QList<VideoLayer> layers = project_->layers();
-    if (ids.size() == 1)
-        for (qsizetype i = 0; i < layers.size(); ++i)
-            if (layers[i].id == ids.first()) layer = int(i);
-    project_->setSelectedLayer(layer);
+    // One clip selected is the project's (the Effect Controls, the Clip effects, a layer's the Layers section's too).
+    project_->setSelectedClip(ids.size() == 1 ? ids.first() : 0);
     update();
 }
 
 void SequenceLanes::followLayerSelection() {
-    const int i = project_->selectedLayer();
-    if (i >= 0) {
-        const int id = project_->layers()[i].id;
-        if (selected_ != QList<int>{id}) selected_ = {id};
-    } else if (selected_.size() == 1 && sequenceedit::find(project_->sequence(), selected_.first()).track > 0) {
-        selected_.clear(); // the Layers section let it go
-    }
+    if (const int id = project_->selectedClip())
+        selected_ = {id};
+    else if (selected_.size() == 1)
+        selected_.clear(); // a panel let it go
 }
 
 bool SequenceLanes::eventFilter(QObject* watched, QEvent* event) {
