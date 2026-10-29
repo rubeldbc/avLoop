@@ -1,8 +1,9 @@
 # AvLoop — rules for the implementation agent
 
-The programme: `phases/26-10-26-034934-AvLoop` (start at its `AGENT_BOOTSTRAP.md`, then `AUTONOMOUS_STATE.md`,
-`EXECUTOR-PREAMBLE.md`, `CONTINUE.md`). The specification: `docs/SPEC.md` (§0 takes D-001 … D-014, newest first).
-The traps found so far: `docs/lore/avloop.md`.
+The active programme: `phases/26-10-30-014542-AvLoopStudio` — AvLoop restructured as a mini Premiere Pro (start at its
+`AGENT_BOOTSTRAP.md`, then `AUTONOMOUS_STATE.md`, `control/03_SHAPES_THE_EDITOR.md`, `READINGS.md`). The programme
+before it, whose rules and readings stand: `phases/26-10-26-034934-AvLoop` (33 phases; AV-032 deferred to CP-S1). The
+specification: `docs/SPEC.md` (§0 takes D-001 … D-039, newest first). The traps found so far: `docs/lore/avloop.md`.
 
 ## Hard rules
 

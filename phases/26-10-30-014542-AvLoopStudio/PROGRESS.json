@@ -1,0 +1,238 @@
+{
+  "programId": "AVSTUDIO",
+  "programmeVersion": "1.0.0",
+  "generatedBy": "control/phase-tools/sync-progress.mjs",
+  "generatedAt": "2026-10-29T19:48:58.436Z",
+  "state": "ACTIVE",
+  "activePhase": "AS-001",
+  "nextEligiblePhase": null,
+  "lastCompletedPhase": null,
+  "completed": 0,
+  "total": 9,
+  "blocked": [],
+  "deferred": [],
+  "branch": "main",
+  "publicationPolicy": "COMMIT_AND_PUSH_TO_ORIGIN_MAIN_AT_EVERY_PHASE_CLOSE",
+  "adrPrefix": "AVADR",
+  "reservedAdrs": [],
+  "readBudget": {},
+  "phases": [
+    {
+      "id": "AS-001",
+      "title": "The sequence",
+      "status": "IN_PROGRESS",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [],
+      "unlocks": [
+        "AS-002",
+        "AS-009"
+      ],
+      "requirements": [
+        "REQ-AS-001"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 900,
+      "ownerItem": 1,
+      "file": "phases/AS-001-the-sequence.md",
+      "record": "execution/AS-001-EXECUTION.md"
+    },
+    {
+      "id": "AS-002",
+      "title": "The composite",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AS-001"
+      ],
+      "unlocks": [
+        "AS-003",
+        "AS-009"
+      ],
+      "requirements": [
+        "REQ-AS-002"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 800,
+      "ownerItem": 2,
+      "file": "phases/AS-002-the-composite.md",
+      "record": "execution/AS-002-EXECUTION.md"
+    },
+    {
+      "id": "AS-003",
+      "title": "The editor's shell",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AS-002"
+      ],
+      "unlocks": [
+        "AS-004",
+        "AS-009"
+      ],
+      "requirements": [
+        "REQ-AS-003"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 900,
+      "ownerItem": 3,
+      "file": "phases/AS-003-the-editors-shell.md",
+      "record": "execution/AS-003-EXECUTION.md"
+    },
+    {
+      "id": "AS-004",
+      "title": "The timeline editor",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AS-003"
+      ],
+      "unlocks": [
+        "AS-005",
+        "AS-009"
+      ],
+      "requirements": [
+        "REQ-AS-004"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 1100,
+      "ownerItem": 4,
+      "file": "phases/AS-004-the-timeline-editor.md",
+      "record": "execution/AS-004-EXECUTION.md"
+    },
+    {
+      "id": "AS-005",
+      "title": "The Effect Controls",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AS-004"
+      ],
+      "unlocks": [
+        "AS-006",
+        "AS-009"
+      ],
+      "requirements": [
+        "REQ-AS-005"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 800,
+      "ownerItem": 5,
+      "file": "phases/AS-005-the-effect-controls.md",
+      "record": "execution/AS-005-EXECUTION.md"
+    },
+    {
+      "id": "AS-006",
+      "title": "The masks on the monitor",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AS-005"
+      ],
+      "unlocks": [
+        "AS-007",
+        "AS-009"
+      ],
+      "requirements": [
+        "REQ-AS-006"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 900,
+      "ownerItem": 6,
+      "file": "phases/AS-006-the-masks-on-the-monitor.md",
+      "record": "execution/AS-006-EXECUTION.md"
+    },
+    {
+      "id": "AS-007",
+      "title": "The export",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AS-006"
+      ],
+      "unlocks": [
+        "AS-008",
+        "AS-009"
+      ],
+      "requirements": [
+        "REQ-AS-007"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 500,
+      "ownerItem": 7,
+      "file": "phases/AS-007-the-export.md",
+      "record": "execution/AS-007-EXECUTION.md"
+    },
+    {
+      "id": "AS-008",
+      "title": "The project",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AS-007"
+      ],
+      "unlocks": [
+        "AS-009"
+      ],
+      "requirements": [
+        "REQ-AS-008"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 400,
+      "ownerItem": 8,
+      "file": "phases/AS-008-the-project.md",
+      "record": "execution/AS-008-EXECUTION.md"
+    },
+    {
+      "id": "AS-009",
+      "title": "CP-S1 the studio walked",
+      "status": "NOT_STARTED",
+      "track": "A",
+      "checkpointId": "CP-A1",
+      "isCheckpoint": true,
+      "risk": "High",
+      "dependsOn": [
+        "AS-001",
+        "AS-002",
+        "AS-003",
+        "AS-004",
+        "AS-005",
+        "AS-006",
+        "AS-007",
+        "AS-008"
+      ],
+      "unlocks": [],
+      "requirements": [
+        "REQ-AS-009"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 150,
+      "ownerItem": 0,
+      "file": "phases/AS-009-cp-s1-the-studio-walked.md",
+      "record": "execution/AS-009-EXECUTION.md"
+    }
+  ]
+}
