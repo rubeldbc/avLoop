@@ -2,7 +2,10 @@
 
 Program: AVLOOP
 Programme version: 1.0.0
-State: **COMPLETE 2026-10-27** — every phase DONE (AV-021, the owner's late item 19; `v1.1.0` released, R-74).
+State: **ACTIVE 2026-10-29** — the owner's late wishes (items 20 … 27): AV-022 … AV-031, confirmed by the owner's
+"commit, push and start and go till end of all phases".
+Was: **PLANNED 2026-10-29, awaiting the owner's confirmation** — items 20 … 27 shaped as AV-022 … AV-031.
+Was: **COMPLETE 2026-10-27** — every phase DONE (AV-021, the owner's late item 19; `v1.1.0` released, R-74).
 Was: **ACTIVE 2026-10-27** — the owner's late wish (item 19): AV-021, the release 1.1.0.
 Was: **COMPLETE 2026-10-27** — every phase DONE (AV-020, the owner's late item 18; no Release, R-73).
 Was: **ACTIVE 2026-10-27** — the owner's late wish (item 18): AV-020, the colour theme.
@@ -19,9 +22,9 @@ words: *"I want to build a piece of software called AvLoop. Its main job is to t
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: none
-Next eligible: none — every phase is closed
-Completed: 21 of 21
+Active phase: AV-022
+Next eligible: none while AV-022 is open
+Completed: 21 of 31
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph

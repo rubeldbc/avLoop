@@ -2,7 +2,7 @@
 
 Reserved numbers, newest first in `docs/SPEC.md` §0 when taken — delivered behaviour only. AvLoop's series starts at
 D-001: **D-001 … D-014 are this programme's, reserved 2026-10-26 as the fourteen items were planned**, one an item; D-015
-the late fifteenth (AV-017); D-016 the late sixteenth (AV-018); D-017 the late seventeenth (AV-019); D-018 the late eighteenth (AV-020); D-019 the late nineteenth (AV-021). Two
+the late fifteenth (AV-017); D-016 the late sixteenth (AV-018); D-017 the late seventeenth (AV-019); D-018 the late eighteenth (AV-020); D-019 the late nineteenth (AV-021); **D-020 … D-027 the late twentieth to twenty-seventh (AV-022 … AV-031), reserved 2026-10-29**. Two
 ADRs are owed: **AVADR-0001** (one renderer, GPU/CPU parity), accepted by AV-007 before the code it governs, and
 **AVADR-0002** (memory budgets and caches), accepted by AV-002. The readings (`README.md` §3) are listed after the
 D-numbers; each is the agent's decision under autonomous mode, open for the owner's veto.
@@ -28,6 +28,14 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | D-017 | **The clip effects** (late): a Clip effects section — light, colour, creative and detail effects on the clip, the same on the canvas, in the Preview and in every export; the project file's version 2. | "add a righ side group, Clip effects. where a lots of clip effect could be applied to the clip to change or color correction the clip before export" | AV-019 |
 | D-018 | **The colour theme** (late): Replace colour with an eyedropper, Colourise, Split toning, Duotone. | "say a clip is orange color but i want to change it to red color theme. this kind of effect needed" | AV-020 |
 | D-019 | **The release 1.1.0** (late): version 1.1.0; the GitHub Release `v1.1.0` with its installer and SHA-256. | "bump to 1.1.0 and publish a release" | AV-021 |
+| D-020 | **The clip as cut** (late): Mode None — the clip from In to Out, no loop treatment, said so everywhere. | "export without applying a loop at the end, or without adding a crossfade in the middle" | AV-022 |
+| D-021 | **The inverse selection** (late): the crop's area a hole in the whole video, the feather outward; the file's version 3. | "'inverse selection' of a chosen area, ensuring that the unselected (inverted) portion is included in the output" | AV-023 |
+| D-022 | **The shapes and the pen** (late): standard and custom shapes that select or cut inside the frame; the Shape tool and Illustrator's Pen. | "create custom shapes … standard shapes—such as rectangles and ellipses"; "full pen tool" | AV-024, AV-025 |
+| D-023 | **The shape combinations** (late): Add, Cut, Keep only, Exclude live; Combine into one path. | "Similar to Adobe Illustrator … combining or permuting multiple existing shapes" | AV-026 |
+| D-024 | **The soft parts** (late): Feather and Strength a shape. | "custom feathering or transparency, allowing any part of the selection to be made transparent" | AV-027 |
+| D-025 | **The resets** (late): a label's click resets its control; a group's right-click Reset. | "Clicking on the text label next to any control should reset its value"; "right-click context menu with a 'Reset' option" | AV-028 |
+| D-026 | **The align tools and the shape layers** (late): Align and Distribute; the layers panel. | "align tool set for multiple object and make a layer system for multiple objects" | AV-029 |
+| D-027 | **The timeline layers** (late): tracks and clips, the composite, the tracks on the timeline. | "multiple layer system in the time line like adobe premiere pro" | AV-030, AV-031 |
 
 ## The readings (the agent's decisions)
 

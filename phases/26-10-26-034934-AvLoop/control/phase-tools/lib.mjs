@@ -20,16 +20,17 @@ export const PROGRAM_ID = 'AVLOOP';
 export const PHASE_PREFIX = 'AV';
 export const TRACKS = {
   A: 'The loop maker — the ground, the media, the canvas and the Selection, the crop tools, the timeline, the loop engine, the renderer, the preview window, the export, the project and the settings',
-  B: 'The extras — the keyframes, the loop finder, the batch and the other formats, the installer, the name and the About box, the wheel and the keyframe copy, the clip effects, the colour theme, the release 1.1.0',
+  B: 'The extras — the keyframes, the loop finder, the batch and the other formats, the installer, the name and the About box, the wheel and the keyframe copy, the clip effects, the colour theme, the release 1.1.0, the clip as cut, the inverse selection, the shapes and the pen, the shape combinations, the soft parts, the resets, the align tools and the shape layers, the timeline layers',
 };
 
 /**
- * The items of `README.md` §2: 19. A non-checkpoint phase's ordinal is its item. A checkpoint takes the free ordinal
+ * The items of `README.md` §2: 27. A non-checkpoint phase's ordinal is its item. A checkpoint takes the free ordinal
  * after the last item (CP-A1 = AV-015, CP-B1 = AV-016). An item the owner adds after a checkpoint has closed is a late
- * phase — `late: true`, the next free ordinal above it (`control/01_PHASE_DEPENDENCY_GRAPH.md`): item 15, AV-017;
- * item 16, AV-018; item 17, AV-019; item 18, AV-020; item 19, AV-021.
+ * phase — `late: true`, the next free ordinal above it (`control/01_PHASE_DEPENDENCY_GRAPH.md`); a large late item
+ * may take two phases of one owner_item (item 22: AV-024, AV-025; item 27: AV-030, AV-031): item 15, AV-017;
+ * item 16, AV-018; item 17, AV-019; item 18, AV-020; item 19, AV-021; items 20 … 27, AV-022 … AV-031.
  */
-export const OWNER_ITEMS = 19;
+export const OWNER_ITEMS = 27;
 
 export const STATUSES = [
   'NOT_STARTED', 'READY', 'IN_PROGRESS', 'TESTING', 'RECOVERY', 'BLOCKED_EXTERNAL',

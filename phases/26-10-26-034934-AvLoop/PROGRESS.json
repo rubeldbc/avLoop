@@ -2,13 +2,13 @@
   "programId": "AVLOOP",
   "programmeVersion": "1.0.0",
   "generatedBy": "control/phase-tools/sync-progress.mjs",
-  "generatedAt": "2026-10-27T16:08:54.911Z",
-  "state": "COMPLETE",
-  "activePhase": null,
+  "generatedAt": "2026-10-29T16:57:02.485Z",
+  "state": "ACTIVE",
+  "activePhase": "AV-022",
   "nextEligiblePhase": null,
   "lastCompletedPhase": "AV-021",
   "completed": 21,
-  "total": 21,
+  "total": 31,
   "blocked": [],
   "deferred": [],
   "branch": "main",
@@ -536,7 +536,9 @@
       "dependsOn": [
         "AV-020"
       ],
-      "unlocks": [],
+      "unlocks": [
+        "AV-022"
+      ],
       "requirements": [
         "REQ-AV-026"
       ],
@@ -545,6 +547,234 @@
       "ownerItem": 19,
       "file": "phases/AV-021-the-release-1-1-0.md",
       "record": "execution/AV-021-EXECUTION.md"
+    },
+    {
+      "id": "AV-022",
+      "title": "The clip as cut",
+      "status": "IN_PROGRESS",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Low",
+      "dependsOn": [
+        "AV-021"
+      ],
+      "unlocks": [
+        "AV-023"
+      ],
+      "requirements": [
+        "REQ-AV-027"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 250,
+      "ownerItem": 20,
+      "file": "phases/AV-022-the-clip-as-cut.md",
+      "record": "execution/AV-022-EXECUTION.md"
+    },
+    {
+      "id": "AV-023",
+      "title": "The inverse selection",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-022"
+      ],
+      "unlocks": [
+        "AV-024"
+      ],
+      "requirements": [
+        "REQ-AV-028"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 400,
+      "ownerItem": 21,
+      "file": "phases/AV-023-the-inverse-selection.md",
+      "record": "execution/AV-023-EXECUTION.md"
+    },
+    {
+      "id": "AV-024",
+      "title": "The shapes",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AV-023"
+      ],
+      "unlocks": [
+        "AV-025"
+      ],
+      "requirements": [
+        "REQ-AV-029"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 1300,
+      "ownerItem": 22,
+      "file": "phases/AV-024-the-shapes.md",
+      "record": "execution/AV-024-EXECUTION.md"
+    },
+    {
+      "id": "AV-025",
+      "title": "The pen tool",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AV-024"
+      ],
+      "unlocks": [
+        "AV-026"
+      ],
+      "requirements": [
+        "REQ-AV-029"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 800,
+      "ownerItem": 22,
+      "file": "phases/AV-025-the-pen-tool.md",
+      "record": "execution/AV-025-EXECUTION.md"
+    },
+    {
+      "id": "AV-026",
+      "title": "The shape combinations",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-025"
+      ],
+      "unlocks": [
+        "AV-027"
+      ],
+      "requirements": [
+        "REQ-AV-030"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 500,
+      "ownerItem": 23,
+      "file": "phases/AV-026-the-shape-combinations.md",
+      "record": "execution/AV-026-EXECUTION.md"
+    },
+    {
+      "id": "AV-027",
+      "title": "The soft parts",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-026"
+      ],
+      "unlocks": [
+        "AV-028"
+      ],
+      "requirements": [
+        "REQ-AV-031"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 450,
+      "ownerItem": 24,
+      "file": "phases/AV-027-the-soft-parts.md",
+      "record": "execution/AV-027-EXECUTION.md"
+    },
+    {
+      "id": "AV-028",
+      "title": "The resets",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Low",
+      "dependsOn": [
+        "AV-027"
+      ],
+      "unlocks": [
+        "AV-029"
+      ],
+      "requirements": [
+        "REQ-AV-032"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 350,
+      "ownerItem": 25,
+      "file": "phases/AV-028-the-resets.md",
+      "record": "execution/AV-028-EXECUTION.md"
+    },
+    {
+      "id": "AV-029",
+      "title": "The align tools and the shape layers",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-028"
+      ],
+      "unlocks": [
+        "AV-030"
+      ],
+      "requirements": [
+        "REQ-AV-033"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 700,
+      "ownerItem": 26,
+      "file": "phases/AV-029-the-align-and-the-shape-layers.md",
+      "record": "execution/AV-029-EXECUTION.md"
+    },
+    {
+      "id": "AV-030",
+      "title": "The timeline layers I — the clips and the composite",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AV-029"
+      ],
+      "unlocks": [
+        "AV-031"
+      ],
+      "requirements": [
+        "REQ-AV-034"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 1400,
+      "ownerItem": 27,
+      "file": "phases/AV-030-the-timeline-layers-i.md",
+      "record": "execution/AV-030-EXECUTION.md"
+    },
+    {
+      "id": "AV-031",
+      "title": "The timeline layers II — the tracks",
+      "status": "NOT_STARTED",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AV-030"
+      ],
+      "unlocks": [],
+      "requirements": [
+        "REQ-AV-034"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 1300,
+      "ownerItem": 27,
+      "file": "phases/AV-031-the-timeline-layers-ii.md",
+      "record": "execution/AV-031-EXECUTION.md"
     }
   ]
 }

@@ -8,6 +8,11 @@ other formats, AV-014 the installer; the checkpoints AV-015 (CP-A1) and AV-016 (
 → AV-015 → AV-011 → … → AV-014 → AV-016. Autonomous mode: the owner is never asked; the readings of `README.md` §3 are
 open for a veto later.
 
+**2026-10-29**: items 20 … 27 are planned as AV-022 … AV-031 (the clip as cut, the inverse selection, the shapes and
+the pen, the shape combinations, the soft parts, the resets, the align tools and the shape layers, the timeline
+layers I and II); the owner confirmed: *"commit, push and start and go till end of all phases"* — run them by the
+chain to the end, autonomous again.
+
 Pick up here after a break or a new session.
 
 1. Read `AUTONOMOUS_STATE.md` (state, active phase, next eligible), then `EXECUTOR-PREAMBLE.md`.

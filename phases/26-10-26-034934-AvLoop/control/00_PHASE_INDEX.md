@@ -3,9 +3,9 @@
 
 Canonical current execution state: `../AUTONOMOUS_STATE.md`
 
-Phases: **21** · done: **21** · state: **COMPLETE** · generated: 2026-10-27T16:08:54.911Z
+Phases: **31** · done: **21** · state: **ACTIVE** · generated: 2026-10-29T16:57:02.485Z
 
-Tracks: A The loop maker — the ground, the media, the canvas and the Selection, the crop tools, the timeline, the loop engine, the renderer, the preview window, the export, the project and the settings · B The extras — the keyframes, the loop finder, the batch and the other formats, the installer, the name and the About box, the wheel and the keyframe copy, the clip effects, the colour theme, the release 1.1.0
+Tracks: A The loop maker — the ground, the media, the canvas and the Selection, the crop tools, the timeline, the loop engine, the renderer, the preview window, the export, the project and the settings · B The extras — the keyframes, the loop finder, the batch and the other formats, the installer, the name and the About box, the wheel and the keyframe copy, the clip effects, the colour theme, the release 1.1.0, the clip as cut, the inverse selection, the shapes and the pen, the shape combinations, the soft parts, the resets, the align tools and the shape layers, the timeline layers
 
 "Item" is the owner's numbered item the phase implements (`../README.md` §1).
 
@@ -32,3 +32,13 @@ Tracks: A The loop maker — the ground, the media, the canvas and the Selection
 | AV-019 | 17 | B | CP-B1 | DONE | Medium | verify-env | The clip effects | AV-018 |
 | AV-020 | 18 | B | CP-B1 | DONE | Low | verify-env | The colour theme | AV-019 |
 | AV-021 | 19 | B | CP-B1 | DONE | Low | verify-env | The release 1.1.0 | AV-020 |
+| AV-022 | 20 | B | CP-B1 | IN_PROGRESS | Low | verify-env | The clip as cut | AV-021 |
+| AV-023 | 21 | B | CP-B1 | NOT_STARTED | Medium | verify-env | The inverse selection | AV-022 |
+| AV-024 | 22 | B | CP-B1 | NOT_STARTED | High | verify-env | The shapes | AV-023 |
+| AV-025 | 22 | B | CP-B1 | NOT_STARTED | High | verify-env | The pen tool | AV-024 |
+| AV-026 | 23 | B | CP-B1 | NOT_STARTED | Medium | verify-env | The shape combinations | AV-025 |
+| AV-027 | 24 | B | CP-B1 | NOT_STARTED | Medium | verify-env | The soft parts | AV-026 |
+| AV-028 | 25 | B | CP-B1 | NOT_STARTED | Low | verify-env | The resets | AV-027 |
+| AV-029 | 26 | B | CP-B1 | NOT_STARTED | Medium | verify-env | The align tools and the shape layers | AV-028 |
+| AV-030 | 27 | B | CP-B1 | NOT_STARTED | High | verify-env | The timeline layers I — the clips and the composite | AV-029 |
+| AV-031 | 27 | B | CP-B1 | NOT_STARTED | High | verify-env | The timeline layers II — the tracks | AV-030 |

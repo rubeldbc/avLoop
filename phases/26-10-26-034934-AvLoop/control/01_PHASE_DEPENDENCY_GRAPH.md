@@ -7,8 +7,9 @@ Track A — the loop maker (items 1-10)
 AV-001 ──► AV-002 ──► AV-003 ──► AV-004 ──► AV-005 ──► AV-006 ──► AV-007 ──► AV-008 ──► AV-009 ──► AV-010 ──► AV-015 (CP-A1; every item of A also ──► AV-015)
 Track B — the extras (items 11-14)
 AV-015 ──► AV-011 ──► AV-012 ──► AV-013 ──► AV-014 ──► AV-016 (CP-B1; every item of B and AV-015 also ──► AV-016)
-Late — the owner's wishes after both checkpoints (items 15 … 19)
-AV-016 ──► AV-017 ──► AV-018 ──► AV-019 ──► AV-020 ──► AV-021
+Late — the owner's wishes after both checkpoints (items 15 … 27)
+AV-016 ──► AV-017 ──► AV-018 ──► AV-019 ──► AV-020 ──► AV-021 ──► AV-022 ──► AV-023 ──► AV-024 ──► AV-025 ──► AV-026
+  ──► AV-027 ──► AV-028 ──► AV-029 ──► AV-030 ──► AV-031
 ```
 
 | Phase | Depends on | Why |
@@ -34,6 +35,16 @@ AV-016 ──► AV-017 ──► AV-018 ──► AV-019 ──► AV-020 ─�
 | AV-019 | AV-018 | late: the clip effects change the frames every output is made of, and walk the earlier outputs again |
 | AV-020 | AV-019 | late: the colour theme adds to the clip effects AV-019 made |
 | AV-021 | AV-020 | late: the release 1.1.0 gives main as AV-020 left it |
+| AV-022 | AV-021 | late: Mode None changes the loop's words the Release left; walked itself |
+| AV-023 | AV-022 | late: the inverse bumps the file to version 3 — after the mode's new value, so one bump carries both |
+| AV-024 | AV-023 | late: the shapes live in the inverted crop's model and mask |
+| AV-025 | AV-024 | late: the Pen edits the shapes' paths AV-024 made |
+| AV-026 | AV-025 | late: the combinations bake paths and need the Pen to edit the result |
+| AV-027 | AV-026 | late: the soft parts ride the four ops' maths |
+| AV-028 | AV-027 | late: the resets reset the shapes' fields too; the panels then stand still |
+| AV-029 | AV-028 | late: the align tools and the layers panel act on the finished shapes |
+| AV-030 | AV-029 | late: a clip takes the shapes as they finally are; the model and the composite before the tracks |
+| AV-031 | AV-030 | late: the tracks show the clips AV-030 made |
 
 Only the lowest ordinal of each track may have no dependency: AV-001 (track A). Track B's lowest, AV-011, depends on
 AV-015 by the spec's order (§13).
