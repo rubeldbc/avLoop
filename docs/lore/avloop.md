@@ -460,3 +460,7 @@ end of its section.
   the model freezes its layout from the press to the release. (AV-031)
 - **Presses merging into one Undo step**: the Ease click and the Delete key shared the field merge key and were undone
   together. Rule: a press (a button, a check box) pushes a step of its own; only a typed field merges. (AV-033)
+- **A gate piped into `tail` passes every time**: `node tools/check-secrets.mjs | tail -1 && git commit` took tail's exit
+  status, and a sweep log with a temp path naming this PC's user was committed and pushed (c6273ee). Rule: a gate's
+  exit code decides — run it on its own (`node tools/check-secrets.mjs || exit 1`), never through a pipe, before a
+  commit; a walk log that quotes a temp path is redacted (`%TEMP%`) before it is staged. (AV-032)

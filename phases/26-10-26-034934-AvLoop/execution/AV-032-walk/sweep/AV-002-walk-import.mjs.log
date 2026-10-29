@@ -48,7 +48,7 @@ node:fs:560
   return binding.open(
                  ^
 
-Error: ENOENT: no such file or directory, open 'C:\Users\admin\AppData\Local\Temp\avloop-import-r70VMV\ref-with-interlaced.mpg.png'
+Error: ENOENT: no such file or directory, open '%TEMP%\avloop-import-r70VMV\ref-with-interlaced.mpg.png'
     at Object.openSync (node:fs:560:18)
     at Object.readFileSync (node:fs:444:35)
     at pngSize (file:///D:/Code5/avLoop/phases/26-10-26-034934-AvLoop/execution/AV-002-walk/walk-import.mjs:17:39)
@@ -58,7 +58,7 @@ Error: ENOENT: no such file or directory, open 'C:\Users\admin\AppData\Local\Tem
   errno: -4058,
   code: 'ENOENT',
   syscall: 'open',
-  path: 'C:\\Users\\admin\\AppData\\Local\\Temp\\avloop-import-r70VMV\\ref-with-interlaced.mpg.png'
+  path: '%TEMP%\\avloop-import-r70VMV\\ref-with-interlaced.mpg.png'
 }
 
 Node.js v24.12.0
