@@ -3,7 +3,7 @@
 
 Canonical current execution state: `../AUTONOMOUS_STATE.md`
 
-Phases: **9** · done: **0** · state: **ACTIVE** · generated: 2026-10-29T19:48:58.436Z
+Phases: **9** · done: **1** · state: **ACTIVE** · generated: 2026-10-29T20:04:25.882Z
 
 Tracks: A The editor — the sequence, the composite, the shell, the timeline, the effect controls, the masks, the export, the project
 
@@ -11,8 +11,8 @@ Tracks: A The editor — the sequence, the composite, the shell, the timeline, t
 
 | Phase | Item | Track | CP | Status | Risk | Class | Title | Depends on |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| AS-001 | 1 | A | CP-A1 | IN_PROGRESS | High | verify-env | The sequence | — |
-| AS-002 | 2 | A | CP-A1 | NOT_STARTED | High | verify-env | The composite | AS-001 |
+| AS-001 | 1 | A | CP-A1 | DONE | High | verify-env | The sequence | — |
+| AS-002 | 2 | A | CP-A1 | IN_PROGRESS | High | verify-env | The composite | AS-001 |
 | AS-003 | 3 | A | CP-A1 | NOT_STARTED | High | verify-env | The editor's shell | AS-002 |
 | AS-004 | 4 | A | CP-A1 | NOT_STARTED | High | verify-env | The timeline editor | AS-003 |
 | AS-005 | 5 | A | CP-A1 | NOT_STARTED | Medium | verify-env | The Effect Controls | AS-004 |

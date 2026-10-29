@@ -3,6 +3,7 @@
 #include "core/Commands.h"
 #include "core/Geometry.h"
 #include "core/ProjectJson.h"
+#include "core/Sequence.h"
 #include "core/Timecode.h"
 
 #include <algorithm>
@@ -63,6 +64,10 @@ ProjectData Project::snapshot() const {
     d.exportPath = exportPath_;
     d.original = extra_;
     return d;
+}
+
+Sequence Project::sequence() const {
+    return Sequence::fromAvLoop(snapshot());
 }
 
 void Project::restore(const ProjectData& data) {

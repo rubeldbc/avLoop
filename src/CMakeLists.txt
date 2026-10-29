@@ -3,7 +3,7 @@
 add_library(avloop_core STATIC
     core/AppInfo.h core/AppInfo.cpp core/Rational.h
     core/Geometry.h core/Geometry.cpp core/VideoTransform.h core/VideoTransform.cpp
-    core/CropShape.h core/CropShape.cpp core/MaskShape.h core/MaskShape.cpp core/ShapeCombine.h core/ShapeCombine.cpp core/ShapeAlign.h core/ShapeAlign.cpp core/VideoLayer.h core/VideoLayer.cpp core/AspectRatio.h core/AspectRatio.cpp core/Keyframes.h core/Keyframes.cpp
+    core/CropShape.h core/CropShape.cpp core/MaskShape.h core/MaskShape.cpp core/ShapeCombine.h core/ShapeCombine.cpp core/ShapeAlign.h core/ShapeAlign.cpp core/VideoLayer.h core/VideoLayer.cpp core/Sequence.h core/Sequence.cpp core/SequenceEdit.h core/SequenceEdit.cpp core/AspectRatio.h core/AspectRatio.cpp core/Keyframes.h core/Keyframes.cpp
     core/Timecode.h core/Timecode.cpp core/TimeRange.h core/TimeRange.cpp
     core/LoopSettings.h core/LoopSettings.cpp core/LoopMap.h core/LoopMap.cpp core/TimeMap.h core/TimeMap.cpp
     core/QualitySettings.h core/QualitySettings.cpp core/ClipEffects.h core/ClipEffects.cpp
@@ -84,7 +84,8 @@ add_executable(avloop WIN32 app/main.cpp app/Diagnostics.h app/Diagnostics.cpp $
 target_link_libraries(avloop PRIVATE avloop_ui dbghelp avloop_warnings)
 avloop_copy_ffmpeg_dlls(avloop)
 
-add_executable(avloop-cli cli/main.cpp cli/CliMedia.cpp cli/CliRender.cpp cli/CliExport.cpp cli/CliFind.cpp)
+add_executable(avloop-cli cli/main.cpp cli/CliMedia.cpp cli/CliRender.cpp cli/CliExport.cpp cli/CliFind.cpp
+               cli/CliSequence.cpp)
 target_link_libraries(avloop-cli PRIVATE avloop_core avloop_media avloop_render avloop_export Qt6::Gui
     FFmpeg::avcodec FFmpeg::avformat FFmpeg::avutil avloop_warnings)
 avloop_copy_ffmpeg_dlls(avloop-cli)

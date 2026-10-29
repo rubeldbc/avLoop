@@ -45,7 +45,12 @@ bool upgrade(QJsonObject& json, int current, QString* error) {
         toVersion3(json);
         version = 3;
     }
-    // Later versions add their steps here: if (version < 4) { toVersion4(json); version = 4; } …
+    if (version < 4) {
+        // Version 3 → 4: "sequence" (D-031) — made from the rest when the file has none (Sequence::fromAvLoop).
+        json.insert(QStringLiteral("version"), 4);
+        version = 4;
+    }
+    // Later versions add their steps here: if (version < 5) { toVersion5(json); version = 5; } …
     return version == current;
 }
 

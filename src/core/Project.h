@@ -21,6 +21,7 @@
 namespace avloop {
 
 struct ProjectData;
+struct Sequence;
 
 // The source as the project knows it (spec §11.1 "source"): enough to find it again and to lay it in scene space.
 struct SourceInfo {
@@ -124,6 +125,9 @@ public:
     // Everything as a value (to save, to snapshot for an export) and back (a project read: Undo cleared).
     ProjectData snapshot() const;
     void restore(const ProjectData& data);
+    // The project as AvLoop Studio's sequence of tracks and clips (D-031): made from the fields above until the editor
+    // edits the sequence itself (AS-003, RS-9).
+    Sequence sequence() const;
     // The view and the unknown keys are kept outside Undo.
     void setView(const ViewState& view);
     void setExtra(const QJsonObject& extra);

@@ -1,6 +1,7 @@
 #include "core/ProjectJson.h"
 
 #include "core/ProjectMigrate.h"
+#include "core/Sequence.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -97,6 +98,11 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
     for (const VideoLayer& l : d.layers)
         layers.append(l.toJson());
     root.insert(QStringLiteral("layers"), layers);
+    // The sequence (version 4, D-031): AvLoop's model as tracks and clips — derived from it until the editor edits the
+    // sequence itself (RS-7). Only a probed source gives it (its size and length are not in the file); else the one
+    // read stays (the root starts as the file read).
+    if (d.source.width > 0 && d.source.height > 0)
+        root.insert(QStringLiteral("sequence"), Sequence::fromAvLoop(d).toJson());
 
     QJsonObject view{
         {QStringLiteral("zoom"), d.view.zoom},

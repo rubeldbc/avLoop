@@ -15,7 +15,12 @@ bool VideoLayer::sourceTime(double t, double* own) const {
 }
 
 VideoLayer::Look VideoLayer::at(double own) const {
-    Look look{transform, opacity};
+    return videolayers::keyedLook(keys, transform, opacity, own);
+}
+
+VideoLayer::Look videolayers::keyedLook(const QList<LayerKey>& keys, const VideoTransform& transform, double opacity,
+                                        double own) {
+    VideoLayer::Look look{transform, opacity};
     if (keys.isEmpty()) return look;
     auto apply = [&](const LayerKey& k) {
         look.transform.x = k.x;

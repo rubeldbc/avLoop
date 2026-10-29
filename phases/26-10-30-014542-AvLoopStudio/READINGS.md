@@ -19,3 +19,6 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md`; `DECISI
 7. **RS-7** While AS-003 … AS-006 move the UI, AvLoop's model and panels keep working beside the sequence; each phase
    moves what it names, so main never holds a broken app.
 8. **RS-8** The export's loop mode defaults to None (the sequence as cut); the loop modes stay a choice.
+9. **RS-9** (AS-001) Until AS-003 the sequence is made from AvLoop's model (`Project::sequence()`, `Sequence::fromAvLoop`)
+   and written to the file only when the source was probed (its size and length are not in the file); `changeSequence`
+   comes with the editor that edits it (AS-003). The JSON lives in `core/Sequence.cpp` (no `SequenceJson`: 243 lines).

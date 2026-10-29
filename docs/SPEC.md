@@ -6,6 +6,27 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-031 — The sequence (AS-001, AvLoop Studio, 2026-10-30)
+
+AvLoop Studio (the programme `phases/26-10-30-014542-AvLoopStudio`) restructures AvLoop as a mini Premiere Pro; this is
+its model, under the UI that is still AvLoop's (RS-7).
+
+- **The sequence**: a frame (w × h), a rate, In/Out, video tracks V1 … V8 (each shown, locked), at most 64 clips. A
+  **clip** — the first as any other — is media (path, size, length), a start on the sequence, its In/Out in the media,
+  its place (x, y the centre, scale, flips) and keys `[t, x, y, scale, opacity, ease]` over its own seconds (D-029's),
+  an opacity, ClipEffects, masks (MaskShape: Add, Cut, Keep only, Exclude; feather; strength) in its own pixels, and an
+  on/off.
+- **The edits**, pure (`core/SequenceEdit`), each refused whole: the Razor (a clip cut in two at a time; or every clip
+  under it on the unlocked tracks), trim In and Out (within the media, at least 1/60 s), move in time and between
+  tracks, remove (a gap) and ripple remove (the later clips on its track close it), Insert (a clip under the time cut
+  there, the later ones pushed right) and Overwrite (what it covers cut away); a track added (at most 8) or removed
+  (V1 stays). A clip never overlaps another on its track; a locked track refuses.
+- **The file**: version 4 writes `"sequence"` beside AvLoop's keys, which stay (none renamed); every file of version
+  1 … 3 reads. Until the editor edits the sequence (AS-003) it is made from AvLoop's model (RS-9): the frame the export
+  frame; V1 the main video — its keyframes, effects, the crop's shapes and the crop's own shape (Keep only, or Cut when
+  inverted: the hole) unless a plain rectangle —, placed from the frame's corner; each layer on its own track. A
+  migrated file renders byte for byte as before. `avloop-cli sequence <project> [--save x.avloop]` prints it.
+
 ### D-029 — The layers' keyframes and effects (AV-033, late, 2026-10-30)
 
 - A layer's **keyframes** (`"keys"`: [t, x, y, scale, opacity, ease] over its own seconds; at most 256): its place,

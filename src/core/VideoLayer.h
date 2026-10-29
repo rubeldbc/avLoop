@@ -71,6 +71,10 @@ struct VideoLayer {
 
 namespace videolayers {
 
+// Keys over own seconds → the place, scale and opacity at `own` (held before and after, linear, or eased after an
+// Ease key); no keys: `transform` and `opacity` (D-029; a sequence's clips too, D-031).
+VideoLayer::Look keyedLook(const QList<LayerKey>& keys, const VideoTransform& transform, double opacity, double own);
+
 // The layers drawn in order: by track, then as listed (a stable sort).
 QList<int> drawOrder(const QList<VideoLayer>& layers);
 // The topmost shown, unlocked layer whose rectangle holds `scene` at time `t`, else −1.

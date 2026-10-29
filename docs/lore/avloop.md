@@ -464,3 +464,12 @@ end of its section.
   status, and a sweep log with a temp path naming this PC's user was committed and pushed (c6273ee). Rule: a gate's
   exit code decides — run it on its own (`node tools/check-secrets.mjs || exit 1`), never through a pipe, before a
   commit; a walk log that quotes a temp path is redacted (`%TEMP%`) before it is staged. (AV-032)
+
+## AvLoop Studio: the sequence
+
+- **A section made from the model must depend only on what the file keeps**: the derived `"sequence"` used the
+  source's size and length, which the file does not store, so save → open → save gave other bytes. Rule: a section
+  derived at save time is written only when its inputs are known (a probed source), else the one read is kept; the
+  save-open-save test catches the rest. (AS-001)
+- **A Qt test prints nothing to the Bash tool's console here**: `test-sequence.exe` exits 0 with no output. Rule: read
+  a suite's cases with `-o <file>,txt` (PATH with Qt's and FFmpeg's bin), or trust ctest's verdict. (AS-001)

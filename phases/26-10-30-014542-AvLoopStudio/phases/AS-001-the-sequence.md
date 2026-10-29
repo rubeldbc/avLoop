@@ -1,7 +1,7 @@
 ---
 phase: AS-001
 title: "The sequence"
-status: IN_PROGRESS
+status: DONE
 owner_item: 1
 track: A
 checkpoint_id: CP-A1

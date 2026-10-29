@@ -1,7 +1,7 @@
 ---
 phase: AS-002
 title: "The composite"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 2
 track: A
 checkpoint_id: CP-A1

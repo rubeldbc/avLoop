@@ -43,7 +43,7 @@ private slots:
         QCOMPARE(back.source.modified, d.source.modified);
         const QJsonObject json = projectjson::toJson(d);
         QCOMPARE(json.value(QStringLiteral("format")).toString(), QStringLiteral("avloop"));
-        QCOMPARE(json.value(QStringLiteral("version")).toInt(), 3);
+        QCOMPARE(json.value(QStringLiteral("version")).toInt(), 4);
         QCOMPARE(json.value(QStringLiteral("source")).toObject().value(QStringLiteral("mtime")).toString(),
                  QStringLiteral("2026-10-26T10:12:00Z"));
     }
@@ -85,7 +85,7 @@ private slots:
         QString error;
         QVERIFY2(projectjson::fromJson(old, back, &error), qPrintable(error));
         QCOMPARE(back.transform.scale, 1.25);
-        QCOMPARE(projectjson::toJson(back).value(QStringLiteral("version")).toInt(), 3);
+        QCOMPARE(projectjson::toJson(back).value(QStringLiteral("version")).toInt(), 4);
         QVERIFY(back.effects.isNeutral());
         QJsonObject one = old;
         one.insert(QStringLiteral("version"), 1);

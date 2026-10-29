@@ -5,6 +5,7 @@
 //   avloop-cli frames …    output frames in a row, round the loop (CliRender.cpp)
 //   avloop-cli export …    a project's loop written as the app exports it (CliExport.cpp)
 //   avloop-cli find …      the Loop Finder's best five (CliFind.cpp)
+//   avloop-cli sequence …  a project as AvLoop Studio's sequence of tracks and clips (CliSequence.cpp)
 #include "core/AppInfo.h"
 
 #include <QGuiApplication>
@@ -27,6 +28,7 @@ int renderFrame(const QStringList& args);
 int renderFrames(const QStringList& args);
 int exportLoop(const QStringList& args);
 int findLoops(const QStringList& args);
+int sequence(const QStringList& args);
 } // namespace avloop::cli
 
 namespace {
@@ -59,7 +61,8 @@ int version() {
 
 int usage() {
     out(QStringLiteral("usage: avloop-cli version | probe <video> | frame <video|project> --at N -o x.png | "
-                       "frames <project> [--count N] | export <project> -o out.webm | find <video|project>"));
+                       "frames <project> [--count N] | export <project> -o out.webm | find <video|project> | "
+                       "sequence <project> [--save x.avloop]"));
     return 1;
 }
 
@@ -82,6 +85,7 @@ int main(int argc, char** argv) {
     if (args.first() == QLatin1String("frames")) return avloop::cli::renderFrames(args.mid(1));
     if (args.first() == QLatin1String("export")) return avloop::cli::exportLoop(args.mid(1));
     if (args.first() == QLatin1String("find")) return avloop::cli::findLoops(args.mid(1));
+    if (args.first() == QLatin1String("sequence")) return avloop::cli::sequence(args.mid(1));
     if (args.first() == QLatin1String("frame"))
         return renders ? avloop::cli::renderFrame(args.mid(1)) : avloop::cli::frame(args.mid(1));
     return usage();
