@@ -41,7 +41,7 @@ from `build\bin`, untouched)
 | `node control/phase-tools/check-loc.mjs` | PASS: 319 code files, none over 600 lines (the largest: src/core/ClipEffects.cpp, 425 lines) |
 | `node control/phase-tools/validate-phase-system.mjs` | PASS: 31 phases, 34 requirement ids |
 | README pictures | `readme-shots.json` by `build-lab`: 11 taken, the largest `main-window.png` 205 KB (the Layers header) |
-| AV-029's CI; AV-030's and this phase's | green, 9 m 9 s (run 40930909417); AV-030 and AV-031 pushed together, one run on AV-031 (below) |
+| AV-029's CI; AV-030's and this phase's | green, 9 m 9 s (run 40930909417); AV-030 and AV-031 pushed together: one run on `658cc61`, green, 7 m 37 s (run 40932639286) |
 
 ## The walk
 
