@@ -22,7 +22,7 @@ RenderJob RenderJob::of(const ProjectData& p, const media::MediaInfo& source) {
     const QSizeF video(source.width, source.height);
     job.fps = p.output.effectiveFps(source.avgFps.isValid() ? source.avgFps : source.realFps, source.vfr);
     // Without a crop the frame is the video where it stands at In; the crop is never keyframed (spec §1.3).
-    job.frame = geometry::exportFrame(p.crop.rect, job.transformAt(p.range.in), video);
+    job.frame = geometry::exportFrame(p.crop, job.transformAt(p.range.in), video);
     const QList<VideoTransform> extremes = keyframes::extremes(p.keyframes, p.transform);
     job.outputSize = p.output.sizeFor(job.frame.size(), &job.sizeLimited);
     using A = OutputSettings::Alpha;

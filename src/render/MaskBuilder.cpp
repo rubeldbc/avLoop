@@ -44,17 +44,38 @@ QImage MaskBuilder::build(CropShape::Kind kind, const QSize& size, double radius
     return mask;
 }
 
-QImage MaskBuilder::mask(const CropShape& crop, const QSize& outputSize) {
-    // The radius is the crop's (scene px); the mask works in output px.
-    const double k = crop.isEmpty() ? 1.0 : outputSize.width() / crop.rect.width();
-    const double radius = crop.radius * k;
-    if (cached_.isNull() || crop.kind != kind_ || outputSize != size_ || radius != radius_ ||
-        crop.feather != feather_) {
-        cached_ = build(crop.kind, outputSize, radius, crop.feather);
-        kind_ = crop.kind;
+QImage MaskBuilder::build(const CropShape& crop, const QRectF& frame, const QSize& size) {
+    if (!crop.invert || frame.isEmpty()) {
+        // The radius is the crop's (scene px); the mask works in output px.
+        const double k = crop.isEmpty() ? 1.0 : size.width() / crop.rect.width();
+        return build(crop.kind, size, crop.radius * k, crop.feather);
+    }
+    // The hole: the shape at its place in the frame, in output px; outside it rises from 0 to 1 over the feather.
+    const double kx = size.width() / frame.width();
+    const double ky = size.height() / frame.height();
+    const double cx = (crop.rect.center().x() - frame.left()) * kx;
+    const double cy = (crop.rect.center().y() - frame.top()) * ky;
+    const double hw = crop.rect.width() / 2 * kx;
+    const double hh = crop.rect.height() / 2 * ky;
+    const double radius = crop.radius * std::min(kx, ky);
+    const double soft = std::max(crop.feather, 1.0);
+    QImage mask(size, QImage::Format_Grayscale8);
+    for (int y = 0; y < size.height(); ++y) {
+        uchar* row = mask.scanLine(y);
+        for (int x = 0; x < size.width(); ++x) {
+            const double d = distance(crop.kind, hw, hh, radius, x + 0.5 - cx, y + 0.5 - cy);
+            row[x] = uchar(std::lround(std::clamp((d + 0.5) / soft, 0.0, 1.0) * 255.0));
+        }
+    }
+    return mask;
+}
+
+QImage MaskBuilder::mask(const CropShape& crop, const QRectF& frame, const QSize& outputSize) {
+    if (cached_.isNull() || !(crop == crop_) || frame != frame_ || outputSize != size_) {
+        cached_ = build(crop, frame, outputSize);
+        crop_ = crop;
+        frame_ = frame;
         size_ = outputSize;
-        radius_ = radius;
-        feather_ = crop.feather;
         ++builds_;
     }
     return cached_;

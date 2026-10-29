@@ -29,7 +29,7 @@ struct ProjectData {
 // migration (AV-010).
 namespace projectjson {
 
-constexpr int kVersion = 2;
+constexpr int kVersion = 3;
 
 QJsonObject toJson(const ProjectData& data, const QString& projectPath = {});
 // Fails on another format or a newer version, with a message that says so; an older one is brought up to date

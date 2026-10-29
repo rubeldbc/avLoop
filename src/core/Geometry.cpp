@@ -31,6 +31,10 @@ QRectF exportFrame(const QRectF& crop, const VideoTransform& t, const QSizeF& vi
     return crop.isEmpty() ? t.rect(video) : crop;
 }
 
+QRectF exportFrame(const CropShape& crop, const VideoTransform& t, const QSizeF& video) {
+    return exportFrame(crop.invert ? QRectF() : crop.rect, t, video);
+}
+
 double effectiveScale(const VideoTransform& t, const QRectF& frame) {
     if (frame.isEmpty()) return t.scale;
     const QSize out = outputSize(frame.size());
@@ -40,6 +44,7 @@ double effectiveScale(const VideoTransform& t, const QRectF& frame) {
 bool needsAlpha(const CropShape& crop, const VideoTransform& t, const QSizeF& video, bool sourceAlpha) {
     if (sourceAlpha) return true;
     if (crop.isEmpty()) return false; // the whole video rectangle
+    if (crop.invert) return true;     // a hole is clear
     if (crop.kind != CropShape::Kind::Rect || crop.feather > 0) return true;
     return coverage(crop, t, video) != Coverage::Full;
 }
@@ -47,6 +52,7 @@ bool needsAlpha(const CropShape& crop, const VideoTransform& t, const QSizeF& vi
 Coverage coverage(const CropShape& crop, const VideoTransform& t, const QSizeF& video) {
     if (crop.isEmpty()) return Coverage::Full;
     const QRectF v = t.rect(video);
+    if (crop.invert) return v.intersects(crop.rect) ? Coverage::Partly : Coverage::Full; // the hole in the video
     if (v.contains(crop.rect)) return Coverage::Full;
     return v.intersects(crop.rect) ? Coverage::Partly : Coverage::None;
 }

@@ -384,3 +384,11 @@ end of its section.
   N + 30) and asks for the nearest, not a fixed threshold. (AV-022)
 - **A new enum value goes last**: the panels' combo boxes and the walks choose by the enum's int (`"data": 0` is
   Simple); None was added after PingPongSmooth and shown first by its place in the list, not by its value. (AV-022)
+
+## The inverse selection (late)
+
+- **A sed on a common line edits every copy**: `VideoTransform t;` stood in two tests, the substitution changed both
+  and one assigned to the now-const value (C3892). Rule: a code edit names its context (the function's first line),
+  never a bare line that may repeat. (AV-023)
+- **A `QSignalBlocker block` in a refresh lambda hides an outer one** (C4456, an error under /WX). Rule: a second
+  blocker in the same scope takes its own name. (AV-023)

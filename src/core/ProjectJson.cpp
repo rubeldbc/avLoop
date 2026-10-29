@@ -81,6 +81,7 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
         {QStringLiteral("ratio"), d.crop.ratio},
         {QStringLiteral("radius"), d.crop.radius},
         {QStringLiteral("feather"), d.crop.feather},
+        {QStringLiteral("invert"), d.crop.invert},
     };
     root.insert(QStringLiteral("crop"), merged(d.original, QStringLiteral("crop"), crop));
     root.insert(QStringLiteral("effects"), merged(d.original, QStringLiteral("effects"), d.effects.toJson()));
@@ -149,6 +150,7 @@ bool fromJson(const QJsonObject& read, ProjectData& d, QString* error, const QSt
     d.crop.ratio = c.value(QStringLiteral("ratio")).toString(QStringLiteral("free"));
     d.crop.radius = c.value(QStringLiteral("radius")).toDouble();
     d.crop.feather = c.value(QStringLiteral("feather")).toDouble();
+    d.crop.invert = c.value(QStringLiteral("invert")).toBool(); // absent before version 3: not inverted
     d.crop = d.crop.clamped();
     d.effects = ClipEffects::fromJson(json.value(QStringLiteral("effects")).toObject());
 

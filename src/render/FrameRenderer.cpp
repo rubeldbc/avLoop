@@ -50,7 +50,7 @@ bool FrameRenderer::open(QString* error) {
                                                        : std::int64_t(std::ceil(job_.source.duration * rate.value()));
         times_ = FrameTimes::constant(rate, std::max<std::int64_t>(1, frames));
     }
-    if (!job_.crop.isEmpty()) mask_ = masks_.mask(job_.crop, job_.outputSize);
+    if (!job_.crop.isEmpty()) mask_ = masks_.mask(job_.crop, job_.frame, job_.outputSize);
     effectsScale_ = job_.source.width > 0 ? double(job_.workingSize.width()) / job_.source.width : 1.0;
     backend_ = Backend::Cpu;
     if (gl_) {

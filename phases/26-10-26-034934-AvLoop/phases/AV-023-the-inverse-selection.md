@@ -1,7 +1,7 @@
 ---
 phase: AV-023
 title: "The inverse selection"
-status: IN_PROGRESS
+status: DONE
 owner_item: 21
 track: B
 checkpoint_id: CP-B1

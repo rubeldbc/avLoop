@@ -1,0 +1,41 @@
+walk walk-inverse.json: 54 steps
+-- D-021: the counter at 100 %; an ellipse crop drawn with E @1107 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect tool.active: crop-ellipse
+PASS expect crop.kind: ellipse
+PASS expect crop.w: 200
+PASS expect crop.invert: false
+PASS expect panel.crop.output: 200 × 200 · alpha
+PASS expect undo.count: 1
+-- Inverse in the Crop section: the whole video kept, the ellipse a hole; one Undo step @3242 ms
+PASS expect crop.invert: true
+PASS expect undo.count: 2
+PASS expect panel.crop.output: 640 × 360 · alpha
+PASS expect status.notice: Transparent area in output
+PASS shot canvas-inverse.png: 1200x587 px
+PASS shot panel-inverse.png: 252x262 px
+-- Feather 20 on the bar; the Preview shows the hole, softened outward @4193 ms
+PASS expect crop.feather: 20
+PASS expect preview.open: true
+PASS waitFor preview.frame: 640x360 after 0 ms
+PASS shot preview-inverse.png: 680x500 px
+     previewClose
+-- Undo: the feather, then the inverse; Redo; the options bar's toggle the same @6176 ms
+PASS expect crop.feather: 0
+PASS expect crop.invert: false
+PASS expect panel.crop.output: 200 × 200 · alpha
+PASS expect crop.invert: true
+PASS expect crop.invert: false
+PASS expect crop.invert: true
+-- M keeps the inverse; a new crop drawn outside keeps it; Delete clears both @7554 ms
+PASS expect crop.kind: rect
+PASS expect crop.invert: true
+PASS expect crop.x: 20.5
+PASS expect crop.invert: true
+PASS shot canvas-inverse-rect.png: 1200x587 px
+PASS expect crop.empty: true
+PASS expect crop.invert: false
+PASS expect panel.crop.output: 640 × 360
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

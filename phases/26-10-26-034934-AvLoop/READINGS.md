@@ -190,3 +190,10 @@ from `README.md` §3 on 2026-10-29, when the README passed the 300-line ceiling 
     it is found.
 78. **R-78** None is written `"mode": "none"` under version 2 until AV-023 bumps the file to 3 (the first new key);
     1.1.0 would read it as Crossfade, so no Release is made between the two phases (RISKS 24).
+79. **R-79** "Inverse selection … the unselected portion included in the output" is the crop turned into a hole: the
+    whole video (where it stands at In, as with no crop) is exported, the crop's shape transparent in it, its feather
+    softening outward into the kept part. The crop keeps its tools and meaning; only what is kept flips.
+80. **R-80** The project file's version 3 (`ProjectMigrate` 2 → 3) carries `"invert"` and every key items 20 … 27 add
+    while unreleased (as R-73 did under 2); 1.1.0 refuses it with its message rather than drop the hole silently.
+81. **R-81** Delete and Clear remove the crop and its inverse (no crop, nothing to invert); a new crop drawn and another
+    crop tool keep Inverse (the user's choice stands while a crop is redrawn). The 45th icon, "invert".

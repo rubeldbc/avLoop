@@ -92,14 +92,53 @@ private slots:
         c.kind = CropShape::Kind::Ellipse;
         c.rect = QRectF(0, 0, 320, 320);
         c.feather = 4;
-        b.mask(c, {320, 320});
-        b.mask(c, {320, 320});
+        b.mask(c, c.rect, {320, 320});
+        b.mask(c, c.rect, {320, 320});
         QCOMPARE(b.builds(), 1);
         c.feather = 8;
-        b.mask(c, {320, 320});
+        b.mask(c, c.rect, {320, 320});
         QCOMPARE(b.builds(), 2);
-        b.mask(c, {640, 640}); // another output size
+        b.mask(c, c.rect, {640, 640}); // another output size
         QCOMPARE(b.builds(), 3);
+        c.invert = true; // another crop
+        b.mask(c, QRectF(0, 0, 640, 640), {640, 640});
+        QCOMPARE(b.builds(), 4);
+        b.mask(c, QRectF(0, 0, 640, 640), {640, 640});
+        QCOMPARE(b.builds(), 4);
+    }
+    // Inverted (D-021): the ellipse a hole in a 640 × 360 frame — its centre 0, the corners 255; not inverted, the
+    // same crop's own mask byte for byte as before.
+    void inverse() {
+        CropShape c;
+        c.kind = CropShape::Kind::Ellipse;
+        c.rect = QRectF(200, 80, 200, 200);
+        const QRectF frame(0, 0, 640, 360);
+        QCOMPARE(MaskBuilder::build(c, c.rect, {200, 200}), MaskBuilder::build(c.kind, {200, 200}, 0, 0));
+        c.invert = true;
+        const QImage m = MaskBuilder::build(c, frame, {640, 360});
+        QCOMPARE(m.size(), QSize(640, 360));
+        QCOMPARE(at(m, 300, 180), 0); // the hole's centre
+        QCOMPARE(at(m, 0, 0), 255);   // the frame's corners kept
+        QCOMPARE(at(m, 639, 359), 255);
+        QCOMPARE(at(m, 210, 90), 255);  // the crop's own corner: outside the ellipse, kept
+        QCOMPARE(at(m, 100, 180), 255); // left of the hole
+        // The edge: one pixel of anti-aliasing at feather 0.
+        QVERIFY(at(m, 199, 180) > 200 && at(m, 201, 180) < 60);
+        // Feather 20: from the edge outward it rises over ~20 px, monotonically.
+        c.feather = 20;
+        const QImage f = MaskBuilder::build(c, frame, {640, 360});
+        QCOMPARE(at(f, 300, 180), 0);
+        int last = -1;
+        for (int x = 200; x >= 176; --x) {
+            QVERIFY(at(f, x, 180) >= last);
+            last = at(f, x, 180);
+        }
+        QVERIFY(at(f, 199, 180) < 30);
+        QCOMPARE(at(f, 178, 180), 255);
+        // Scaled: a 1280 × 720 output of the same frame puts the hole at twice the place.
+        const QImage big = MaskBuilder::build(c, frame, {1280, 720});
+        QCOMPARE(at(big, 600, 360), 0);
+        QCOMPARE(at(big, 300, 360), 255);
     }
 };
 

@@ -21,6 +21,8 @@ QSize outputSize(const QSizeF& frame);
 
 // What is exported with no crop: the whole video rectangle (reading R-8).
 QRectF exportFrame(const QRectF& crop, const VideoTransform& t, const QSizeF& video);
+// The crop's frame: its rectangle, or the video's with no crop or an inverted one (a hole in the whole video, R-79).
+QRectF exportFrame(const CropShape& crop, const VideoTransform& t, const QSizeF& video);
 
 // Whether the output needs an alpha channel (spec §6.1, Alpha Auto): a source with alpha, a rounded or elliptic crop,
 // a feather, or a rectangle reaching past the video.

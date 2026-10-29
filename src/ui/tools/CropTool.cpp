@@ -106,6 +106,7 @@ public:
         if (c.isEmpty()) return false;
         if (e->key() == Qt::Key_Delete) {
             c.rect = QRectF();
+            c.invert = false; // no crop, nothing inverted (R-81)
             project_->changeCrop(c);
             return true;
         }

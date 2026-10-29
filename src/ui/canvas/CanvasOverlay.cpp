@@ -1,4 +1,5 @@
-// What is painted over the frame (spec §6.1, §6.2): the crop in every tool — 60% black outside it, a 1.5 px orange
+// What is painted over the frame (spec §6.1, §6.2): the crop in every tool — 60% black outside it (inside it when
+// inverted, D-021, the export's frame outlined), a 1.5 px orange
 // outline following its shape, a dashed bounding box for the Ellipse and the Rounded rect — then the active tool's
 // overlay (the Selection's border and handles, the crop's handles and guides, the Zoom tool's rectangle).
 #include "core/Project.h"
@@ -40,11 +41,20 @@ void Canvas::paintOverlay() {
         const ThemeTokens& t = Theme::instance().tokens();
         const QRectF r = sceneToView(crop.rect);
         const QPainterPath shape = shapePath(crop, r, zoom_);
-        QPainterPath outside;
-        outside.addRect(QRectF(rect()).adjusted(-1, -1, 1, 1));
-        outside.addPath(shape);
-        outside.setFillRule(Qt::OddEvenFill);
-        p.fillPath(outside, QColor(0, 0, 0, 153)); // 60% black (spec §6.1)
+        if (crop.invert) {
+            // The hole is dimmed (D-021); the export's frame — the video where it stands — outlined thinly.
+            p.fillPath(shape, QColor(0, 0, 0, 153));
+            QColor frame = t.accent;
+            frame.setAlphaF(0.5f);
+            p.setPen(QPen(frame, 1));
+            p.drawRect(sceneToView(project_->exportFrame()));
+        } else {
+            QPainterPath outside;
+            outside.addRect(QRectF(rect()).adjusted(-1, -1, 1, 1));
+            outside.addPath(shape);
+            outside.setFillRule(Qt::OddEvenFill);
+            p.fillPath(outside, QColor(0, 0, 0, 153)); // 60% black (spec §6.1)
+        }
         p.setPen(QPen(t.accent, 1.5));
         p.setBrush(Qt::NoBrush);
         p.drawPath(shape);

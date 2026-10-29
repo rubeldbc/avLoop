@@ -6,6 +6,22 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-021 — The inverse selection (AV-023, late, 2026-10-29)
+
+- The crop's **Inverse** (`"invert"` under `crop`): the export's frame is the whole video where it stands at In (the
+  no-crop rule, R-8, R-49) and the crop's shape is a transparent hole at its place in it; the feather softens outward
+  from the shape's edge, into what is kept (a 1 px anti-aliased edge at 0) (R-79). The crop's rectangle, ratio, radius,
+  feather, tools, handles, snapping and keys are unchanged; only what is kept flips.
+- Alpha Auto is on with an inverted crop; the status bar says "Transparent area in output" while the hole touches the
+  video; the Crop section's and the Output section's size read the video's (scaled by Long side or Custom as before).
+- The canvas dims the hole instead of the outside and outlines the export's frame thinly. The Crop section has an
+  "Inverse" check box after Shape; each crop bar an Inverse toggle (the 45th icon, "invert"). One Undo step a change.
+  Delete or Clear removes the crop and the inverse; a new crop drawn, or another crop tool, keeps it (R-81).
+- The mask (`MaskBuilder::build(crop, frame, size)`): not inverted, byte for byte AV-004's; inverted, 0 inside, 255
+  outside, clamp((d + ½) / max(feather, 1)) — cached by the crop, the frame and the size. Both back ends use it.
+- **The project file's version 3** (R-80): `ProjectMigrate` 2 → 3; a version-2 file opens with `invert` false; AvLoop
+  1.1.0 refuses a version-3 file with its "saved by a newer AvLoop" message. Items 20 … 27 add their keys under 3.
+
 ### D-020 — The clip as cut (AV-022, late, 2026-10-29)
 
 - A fifth loop Mode, **None** (`"none"` under `loop`): the clip from In to Out as cut — no crossfade, no return, no

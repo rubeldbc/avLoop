@@ -16,6 +16,11 @@ void toVersion2(QJsonObject& json) {
     json.insert(QStringLiteral("version"), 2);
 }
 
+// Version 2 → 3: the crop's "invert" (D-021) and what items 20 … 27 add; a file without them has none.
+void toVersion3(QJsonObject& json) {
+    json.insert(QStringLiteral("version"), 3);
+}
+
 } // namespace
 
 bool upgrade(QJsonObject& json, int current, QString* error) {
@@ -36,7 +41,11 @@ bool upgrade(QJsonObject& json, int current, QString* error) {
         toVersion2(json);
         version = 2;
     }
-    // Later versions add their steps here: if (version < 3) { toVersion3(json); version = 3; } …
+    if (version < 3) {
+        toVersion3(json);
+        version = 3;
+    }
+    // Later versions add their steps here: if (version < 4) { toVersion4(json); version = 4; } …
     return version == current;
 }
 

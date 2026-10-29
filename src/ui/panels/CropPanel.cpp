@@ -1,5 +1,6 @@
-// The side panel's Crop section (spec §5.1, §6.1): Shape, Ratio, X / Y, W / H, Radius, Feather and the output's size
-// with whether it carries alpha. The same crop as the canvas and the options bar; every edit one Undo step.
+// The side panel's Crop section (spec §5.1, §6.1): Shape, Inverse (D-021), Ratio, X / Y, W / H, Radius, Feather and the
+// output's size with whether it carries alpha. The same crop as the canvas and the options bar; every edit one Undo
+// step.
 #include "core/AspectRatio.h"
 #include "core/Project.h"
 #include "ui/WalkRunner.h"
@@ -8,6 +9,7 @@
 #include "ui/panels/SidePanel.h"
 #include "ui/widgets/StepSpinBox.h"
 
+#include <QCheckBox>
 #include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -45,6 +47,11 @@ void SidePanel::bindCrop(Project* project) {
     shape->addItem(tr("Rounded"), int(CropShape::Kind::Rounded));
     shape->addItem(tr("Ellipse"), int(CropShape::Kind::Ellipse));
     s->addRow(tr("Shape"), shape);
+    auto* invert = new QCheckBox(tr("Inverse"), body);
+    invert->setObjectName(QStringLiteral("panel.crop.invert"));
+    invert->setToolTip(tr("The chosen area is cut out; the rest is kept"));
+    invert->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Fixed);
+    s->addRow(QString(), invert);
     QComboBox* ratio = createRatioBox(body);
     ratio->setObjectName(QStringLiteral("panel.crop.ratio"));
     s->addRow(tr("Ratio"), ratio);
@@ -71,6 +78,8 @@ void SidePanel::bindCrop(Project* project) {
             const QSignalBlocker b1(shape);
             const QSignalBlocker b2(ratio);
             shape->setCurrentIndex(shape->findData(int(c.kind)));
+            const QSignalBlocker b3(invert);
+            invert->setChecked(c.invert);
             const int r = ratio->findData(c.ratio);
             ratio->setCurrentIndex(r >= 0 ? r : ratio->findData(QStringLiteral("custom")));
         }
@@ -85,6 +94,7 @@ void SidePanel::bindCrop(Project* project) {
                            static_cast<QWidget*>(h), static_cast<QWidget*>(radius)})
             f->setEnabled(!c.isEmpty());
         radius->setEnabled(!c.isEmpty() && c.kind == CropShape::Kind::Rounded);
+        invert->setEnabled(!c.isEmpty());
         // What the export makes of it: the Output section's size and alpha (spec §10.2).
         const QSize out = project->outputSize();
         const bool alpha = project->outputAlpha();
@@ -104,6 +114,10 @@ void SidePanel::bindCrop(Project* project) {
     connect(shape, &QComboBox::activated, this, [=] {
         const auto kind = static_cast<CropShape::Kind>(shape->currentData().toInt());
         edit(QStringLiteral("kind"), [kind](CropShape& c) { c.kind = kind; });
+    });
+    connect(invert, &QCheckBox::clicked, this, [=](bool on) {
+        if (project->crop().isEmpty()) return;
+        edit(QStringLiteral("invert"), [on](CropShape& c) { c.invert = on; });
     });
     connect(ratio, &QComboBox::activated, this, [=] { applyRatio(project, ratio->currentData().toString()); });
     connect(x, &StepSpinBox::valueChanged, this,

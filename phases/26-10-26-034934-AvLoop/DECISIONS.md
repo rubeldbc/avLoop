@@ -119,3 +119,6 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-76 | AV-017's walks read the version from `CMakeLists.txt` | the next version changes no walk | `README.md` §3; AV-021 |
 | R-77 | Mode None: the clip as cut, L = D, said "Clip"; Simple kept | "without applying a loop … without adding a crossfade" | `READINGS.md`; AV-022 |
 | R-78 | "none" under version 2 until AV-023's version 3; no Release between | 1.1.0 would read it as Crossfade | `READINGS.md`; AV-022 |
+| R-79 | Inverse: the whole video kept, the crop's shape a hole, the feather outward | "the unselected (inverted) portion is included in the output" | `READINGS.md`; AV-023 |
+| R-80 | The file's version 3; 1.1.0 refuses it | a new key, never dropped silently | `READINGS.md`; AV-023 |
+| R-81 | Delete/Clear remove the inverse; a redrawn crop keeps it; the 45th icon | no crop, nothing to invert | `READINGS.md`; AV-023 |

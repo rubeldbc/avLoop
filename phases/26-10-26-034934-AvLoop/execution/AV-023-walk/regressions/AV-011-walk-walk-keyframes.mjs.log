@@ -1,0 +1,14 @@
+PASS a white 160×90 clip: 6 s at 30 fps
+PASS Linear, halfway (2 s): centre 600.00, 360.00 (want 600, 360)
+PASS Linear, a quarter (1.5 s): centre 400.00, 360.00 (want 400, 360)
+PASS Ease, a quarter (1.5 s): smoothstep 0.15625: centre 325.00, 360.00 (want 325, 360)
+PASS Ease, halfway (2 s): centre 600.00, 360.00 (want 600, 360)
+PASS before the first keyframe (0.5 s): it holds: centre 200.00, 360.00 (want 200, 360)
+PASS after the last keyframe (3.5 s): it holds: centre 1000.00, 360.00 (want 1000, 360)
+PASS Linear, halfway (2 s) (CPU): centre 600.00, 360.00 (want 600, 360)
+PASS Linear, a quarter (1.5 s) (CPU): centre 400.00, 360.00 (want 400, 360)
+PASS Ease, a quarter (1.5 s): smoothstep 0.15625 (CPU): centre 325.00, 360.00 (want 325, 360)
+PASS Ease, halfway (2 s) (CPU): centre 600.00, 360.00 (want 600, 360)
+PASS before the first keyframe (0.5 s): it holds (CPU): centre 200.00, 360.00 (want 200, 360)
+PASS after the last keyframe (3.5 s): it holds (CPU): centre 1000.00, 360.00 (want 1000, 360)
+WALK PASSED

@@ -43,7 +43,7 @@ private slots:
         QCOMPARE(back.source.modified, d.source.modified);
         const QJsonObject json = projectjson::toJson(d);
         QCOMPARE(json.value(QStringLiteral("format")).toString(), QStringLiteral("avloop"));
-        QCOMPARE(json.value(QStringLiteral("version")).toInt(), 2);
+        QCOMPARE(json.value(QStringLiteral("version")).toInt(), 3);
         QCOMPARE(json.value(QStringLiteral("source")).toObject().value(QStringLiteral("mtime")).toString(),
                  QStringLiteral("2026-10-26T10:12:00Z"));
     }
@@ -76,8 +76,8 @@ private slots:
         QCOMPARE(plain.output.background, QStringLiteral("#000000"));
         QVERIFY(plain.output.lockRatio);
     }
-    // Spec §11.1: ProjectMigrate — a file without a version (version 0) or of version 1 reads as written, without clip
-    // effects, and is written as version 2; a newer one is refused with the message that says so.
+    // Spec §11.1: ProjectMigrate — a file without a version (version 0), of version 1 or 2 reads as written, without
+    // clip effects (before 2) or an inverted crop (before 3), and is written as version 3; a newer one is refused.
     void migration() {
         QJsonObject old = projectjson::toJson(sample(QStringLiteral("D:/a.mp4")));
         old.remove(QStringLiteral("version"));
@@ -85,13 +85,20 @@ private slots:
         QString error;
         QVERIFY2(projectjson::fromJson(old, back, &error), qPrintable(error));
         QCOMPARE(back.transform.scale, 1.25);
-        QCOMPARE(projectjson::toJson(back).value(QStringLiteral("version")).toInt(), 2);
+        QCOMPARE(projectjson::toJson(back).value(QStringLiteral("version")).toInt(), 3);
         QVERIFY(back.effects.isNeutral());
         QJsonObject one = old;
         one.insert(QStringLiteral("version"), 1);
         one.remove(QStringLiteral("effects"));
         QVERIFY2(projectjson::fromJson(one, back, &error), qPrintable(error));
         QCOMPARE(back.effects, ClipEffects{});
+        QJsonObject two = old;
+        two.insert(QStringLiteral("version"), 2);
+        QJsonObject crop = two.value(QStringLiteral("crop")).toObject();
+        crop.remove(QStringLiteral("invert"));
+        two.insert(QStringLiteral("crop"), crop);
+        QVERIFY2(projectjson::fromJson(two, back, &error), qPrintable(error));
+        QVERIFY(!back.crop.invert);
         QJsonObject newer = old;
         newer.insert(QStringLiteral("version"), 7);
         QVERIFY(!projectjson::fromJson(newer, back, &error));
@@ -139,6 +146,20 @@ private slots:
         ProjectData read;
         QVERIFY2(projectjson::load(path, read, &error), qPrintable(error));
         QCOMPARE(read.loop.mode, LoopSettings::Mode::None);
+    }
+    // The inverted crop (D-021): "invert" under crop, read back.
+    void invertRoundTrip() {
+        ProjectData d = sample(QStringLiteral("a.mp4"));
+        d.crop.kind = CropShape::Kind::Ellipse;
+        d.crop.rect = QRectF(10, 20, 100, 80);
+        d.crop.invert = true;
+        const QJsonObject json = projectjson::toJson(d);
+        QCOMPARE(json.value(QStringLiteral("crop")).toObject().value(QStringLiteral("invert")).toBool(), true);
+        ProjectData back;
+        QString error;
+        QVERIFY2(projectjson::fromJson(json, back, &error), qPrintable(error));
+        QVERIFY(back.crop.invert);
+        QCOMPARE(back.crop.rect, d.crop.rect);
     }
     void cropRoundTrip() {
         ProjectData d = sample(QStringLiteral("a.mp4"));

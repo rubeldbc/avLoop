@@ -1,6 +1,7 @@
-// A crop tool's options (spec §6's table): Rect — Ratio, X, Y, W, H, Swap W/H, Clear; Rounded — Ratio, X, Y, W, H,
-// Radius, Feather; Ellipse — Ratio, X, Y, W, H, Feather. The ratio list (Free, Original, 1:1 … 4:5, Custom W:H) is
-// shared with the Crop panel; choosing a ratio keeps the crop's centre and its area as close as possible.
+// A crop tool's options (spec §6's table): Rect — Ratio, X, Y, W, H, Inverse, Swap W/H, Clear; Rounded — Ratio, X, Y,
+// W, H, Inverse, Radius, Feather; Ellipse — Ratio, X, Y, W, H, Inverse, Feather (D-021: the area cut out of the video).
+// The ratio list (Free, Original, 1:1 … 4:5, Custom W:H) is shared with the Crop panel; choosing a ratio keeps the
+// crop's centre and its area as close as possible.
 #include "core/AspectRatio.h"
 #include "core/Project.h"
 #include "ui/WalkRunner.h"
@@ -83,6 +84,8 @@ QWidget* createCropOptions(Project* project, Canvas* canvas, int kindValue, QWid
     StepSpinBox* feather = nullptr;
     QPushButton* swap = nullptr;
     QToolButton* clear = nullptr;
+    QToolButton* invert = row->addIcon(k + QStringLiteral(".invert"), QStringLiteral("invert"),
+                                       QObject::tr("Inverse: cut the area out, keep the rest"), true);
     if (kind == CropShape::Kind::Rect) {
         swap = row->addButton(k + QStringLiteral(".swap"), QObject::tr("Swap W/H"));
         clear =
@@ -118,6 +121,11 @@ QWidget* createCropOptions(Project* project, Canvas* canvas, int kindValue, QWid
             radius->setEnabled(!c.isEmpty());
         }
         if (feather) feather->setValueQuietly(c.feather);
+        {
+            const QSignalBlocker quiet(invert);
+            invert->setChecked(c.invert);
+        }
+        invert->setEnabled(!c.isEmpty());
         row->setEnabled(project->source().isValid());
     };
     QObject::connect(project, &Project::changed, row, [refresh](Project::Aspect) { refresh(); });
@@ -162,10 +170,17 @@ QWidget* createCropOptions(Project* project, Canvas* canvas, int kindValue, QWid
             if (colon > 0) c.ratio = c.ratio.mid(colon + 1) + QLatin1Char(':') + c.ratio.left(colon); // 16:9 → 9:16
             project->changeCrop(c);
         });
+    QObject::connect(invert, &QToolButton::toggled, row, [=](bool on) {
+        CropShape c = project->crop();
+        if (c.isEmpty() || c.invert == on) return;
+        c.invert = on;
+        project->changeCrop(c);
+    });
     if (clear)
         QObject::connect(clear, &QToolButton::clicked, row, [=] {
             CropShape c = project->crop();
             c.rect = QRectF();
+            c.invert = false;
             project->changeCrop(c);
         });
     if (radius)

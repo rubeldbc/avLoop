@@ -68,7 +68,7 @@ QWidget* createSelectionOptions(Project* project, Canvas* canvas, QWidget* paren
         lock->setIcon(IconFactory::icon(lock->isChecked() ? QStringLiteral("lock") : QStringLiteral("unlock")));
         flipH->setChecked(t.flipH);
         flipV->setChecked(t.flipV);
-        const QRectF frame = geometry::exportFrame(project->crop().rect, t, video);
+        const QRectF frame = geometry::exportFrame(project->crop(), t, video);
         warning->setVisible(project->source().isValid() && geometry::effectiveScale(t, frame) > 1.0 + 1e-9);
         row->setEnabled(project->source().isValid());
     };

@@ -75,7 +75,7 @@ void Project::restore(const ProjectData& data) {
 
 QRectF Project::exportFrame() const {
     // Without a crop the video's own rectangle, where it stands at In (the crop itself is never keyframed, §1.3).
-    return geometry::exportFrame(crop_.rect, transformAt(range_.in), source_.size());
+    return geometry::exportFrame(crop_, transformAt(range_.in), source_.size());
 }
 
 QSize Project::outputSize(bool* limited) const {

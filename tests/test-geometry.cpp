@@ -92,6 +92,22 @@ private slots:
         QCOMPARE(centred.scale, t.scale);
         QCOMPARE(centred.centre(), crop.center());
     }
+    // Inverted (D-021): the export's frame is the video's rectangle and it needs alpha; the hole's coverage is Partly.
+    void inverse() {
+        const VideoTransform t = VideoTransform::initial({640, 360});
+        const QSizeF video(640, 360);
+        CropShape c;
+        c.kind = CropShape::Kind::Rect;
+        c.rect = QRectF(100, 100, 200, 100);
+        QCOMPARE(geometry::exportFrame(c, t, video), c.rect);
+        QVERIFY(!geometry::needsAlpha(c, t, video, false));
+        c.invert = true;
+        QCOMPARE(geometry::exportFrame(c, t, video), t.rect(video));
+        QVERIFY(geometry::needsAlpha(c, t, video, false));
+        QCOMPARE(geometry::coverage(c, t, video), geometry::Coverage::Partly);
+        c.rect = QRectF();
+        QVERIFY(!geometry::needsAlpha(c, t, video, false)); // no crop: nothing to cut
+    }
     void scaleLimits() {
         VideoTransform t;
         t.scale = 50;

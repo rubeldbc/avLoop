@@ -50,6 +50,8 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   Free, Original, 1:1, 4:3, 3:4, 16:9, 9:16, 21:9, 3:2, 2:3, 4:5 or a custom W:H keep the crop's centre and area.
   Radius and Feather (0–200 px, softening inward) for the round shapes; the outside is dimmed; the side panel shows the
   output size and whether it needs transparency, and the status bar warns when the crop leaves the video.
+  **Inverse** (the Crop section, or the toggle on the crop's bar) turns the selection inside out: the whole video is
+  exported and the chosen area becomes a transparent hole in it, its feather softening outward.
 
   ![An ellipse crop on the canvas](docs/screenshots/crop-ellipse.png)
 

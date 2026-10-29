@@ -80,6 +80,7 @@ void MainWindow::buildCanvasTools() {
     const auto& c = [this]() -> const CropShape& { return project_->crop(); };
     WalkProbes::add(QStringLiteral("crop.empty"), [c] { return c().isEmpty(); });
     WalkProbes::add(QStringLiteral("crop.kind"), [c] { return CropShape::kindId(c().kind); });
+    WalkProbes::add(QStringLiteral("crop.invert"), [c] { return c().invert; });
     WalkProbes::add(QStringLiteral("crop.ratio"), [c] { return c().ratio; });
     WalkProbes::add(QStringLiteral("crop.x"), [c] { return c().rect.x(); });
     WalkProbes::add(QStringLiteral("crop.y"), [c] { return c().rect.y(); });
@@ -91,7 +92,7 @@ void MainWindow::buildCanvasTools() {
     WalkProbes::add(QStringLiteral("crop.feather"), [c] { return c().feather; });
     WalkProbes::add(QStringLiteral("crop.output"), [this] {
         const QSize out = geometry::outputSize(
-            geometry::exportFrame(project_->crop().rect, project_->transform(), project_->source().size()).size());
+            geometry::exportFrame(project_->crop(), project_->transform(), project_->source().size()).size());
         return QStringLiteral("%1x%2").arg(out.width()).arg(out.height());
     });
     WalkProbes::add(QStringLiteral("status.notice"), [this] {
