@@ -2,6 +2,7 @@
 
 #include "core/VideoLayer.h"
 #include "media/MediaInfo.h"
+#include "render/EffectsPass.h"
 
 #include <QColor>
 #include <QImage>
@@ -44,6 +45,7 @@ private:
     std::vector<std::unique_ptr<media::Decoder>> decoders_;
     std::vector<media::MediaInfo> infos_;
     std::vector<bool> failed_;
+    EffectsPass effects_; // a layer's own clip effects (D-029)
 };
 
 } // namespace avloop::render

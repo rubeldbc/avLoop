@@ -28,9 +28,9 @@ export const TRACKS = {
  * after the last item (CP-A1 = AV-015, CP-B1 = AV-016). An item the owner adds after a checkpoint has closed is a late
  * phase — `late: true`, the next free ordinal above it (`control/01_PHASE_DEPENDENCY_GRAPH.md`); a large late item
  * may take two phases of one owner_item (item 22: AV-024, AV-025; item 27: AV-030, AV-031): item 15, AV-017;
- * item 16, AV-018; item 17, AV-019; item 18, AV-020; item 19, AV-021; items 20 … 27, AV-022 … AV-031.
+ * item 16, AV-018; item 17, AV-019; item 18, AV-020; item 19, AV-021; items 20 … 27, AV-022 … AV-031; item 28, AV-032; item 29, AV-033 (before AV-032).
  */
-export const OWNER_ITEMS = 27;
+export const OWNER_ITEMS = 29;
 
 export const STATUSES = [
   'NOT_STARTED', 'READY', 'IN_PROGRESS', 'TESTING', 'RECOVERY', 'BLOCKED_EXTERNAL',

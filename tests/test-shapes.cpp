@@ -228,6 +228,43 @@ private slots:
         a.transform.flipH = true;
         QCOMPARE(VideoLayer::fromJson(a.toJson()), a);
     }
+    // A layer's keyframes (D-029): its look between keys linear, eased, held before and after; a value written at a
+    // key changes it, between keys makes one; without keys the layer's own; the file keeps keys and effects.
+    void layerKeys() {
+        VideoLayer l;
+        l.size = QSizeF(100, 100);
+        l.transform.x = 50;
+        l.opacity = 100;
+        QCOMPARE(l.at(3).transform.x, 50.0);
+        l.keys = {{1, 0, 0, 1, 100, false}, {3, 200, 100, 2, 0, false}};
+        QCOMPARE(l.at(0).transform.x, 0.0);
+        QCOMPARE(l.at(2).transform.x, 100.0);
+        QCOMPARE(l.at(2).opacity, 50.0);
+        QCOMPARE(l.at(2).transform.scale, 1.5);
+        QCOMPARE(l.at(9).transform.y, 100.0);
+        QCOMPARE(l.rectAt(3), QRectF(100, 0, 200, 200)); // centre (200, 100), scale 2
+        l.keys[0].ease = true;
+        QVERIFY(l.at(1.5).transform.x < 50); // eased: slower at first
+        VideoLayer::Look look = l.at(3);
+        look.transform.x = 300;
+        l.setLook(3.01, look, 0.02); // within the key's tolerance: that key
+        QCOMPARE(l.keys.size(), 2);
+        QCOMPARE(l.keys[1].x, 300.0);
+        look.transform.x = 77;
+        l.setLook(2, look, 0.02); // between: a new key, in order
+        QCOMPARE(l.keys.size(), 3);
+        QCOMPARE(l.keys[1].t, 2.0);
+        QCOMPARE(l.keyAt(2.01, 0.02), 1);
+        l.effects.exposure = 1;
+        QCOMPARE(VideoLayer::fromJson(l.toJson()), l);
+        VideoLayer none;
+        none.transform.x = 9;
+        look = none.at(0);
+        look.transform.x = 12;
+        none.setLook(0, look, 0.02); // no keys: the layer's own
+        QCOMPARE(none.transform.x, 12.0);
+        QVERIFY(none.keys.isEmpty());
+    }
     void joins() {
         using R = MaskShape::Role;
         QCOMPARE(maskshapes::join(R::Add, 0.25, 0.5), 0.5);

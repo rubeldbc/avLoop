@@ -1,0 +1,4 @@
+PASS avloop-cli frames: 600 frames of a loop with three layers: 600 frames of a 105-frame loop · 640x360 · GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2 · 4.1 s · 146.1 fps
+PASS the memory logged each second: 5 samples
+PASS Private Bytes after the first second: growth under 50 MB: 351.7 → peak 356.9, last 356.9 MB (+5.2)
+WALK PASSED

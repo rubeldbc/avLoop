@@ -79,9 +79,17 @@ pro"*. Read as eight items (§2, items 20 … 27): [1] item 20; [2] item 21; [3]
 item 24; [6] and [7] item 25 (one wish of one kind, as item 16); the align and the shape layers item 26; the timeline
 layers item 27 (R-77 … R-103 are theirs). The phase files were written first; then the go: *"commit, push and start and go till end of all phases"*.
 
+Added by the owner on 2026-10-30, item 28, verbatim: *"is everything done? all e2e and walk test completed?"*; then
+*"push to main and complete all the task and test then rebuild and push"* — read as a sweep: every walk again on a
+fresh build with the ASan and Debug-leak suites, as the checkpoints did (AV-032).
+
+Added by the owner on 2026-10-30, item 29, verbatim (while AV-032's sweep ran): *"video layer will have all the
+facility like adobe premiere pro with keyframes functionality also. do it first. then do the test. if needed do the
+phase files and complete all the task"* — R-98 vetoed: AV-033 before the sweep, which waits for it.
+
 ## 2. The items
 
-Twenty-seven, in two tracks; a checkpoint closes each track. The fifteenth to the twenty-seventh came after both had
+Twenty-nine, in two tracks; a checkpoint closes each track. The fifteenth to the twenty-ninth came after both had
 closed: late phases.
 
 | # | Item | What it gives |
@@ -113,6 +121,8 @@ closed: late phases.
 | 25 | **The resets** (AV-028, late) | a click on a control's label resets it; a right click on a group of the right panel offers "Reset <group>"; each one Undo step |
 | 26 | **The align tools and the shape layers** (AV-029, late) | Align and Distribute the selected shapes to each other or the frame; a layers panel for them: order, eye, lock, names, duplicate |
 | 27 | **The timeline layers** (AV-030, AV-031, late) | video tracks and clips as Premiere Pro's: each clip its own source, place, In/Out, transform, keyframes, effects, shapes; the composite rendered; the tracks on the timeline with drags, trims, snapping |
+| 28 | **The sweep** (AV-032, late) | every walk of AV-001 … AV-031 again on one fresh build; Release, ASan and Debug-leak suites; rebuilt and pushed |
+| 29 | **The layers' keyframes and effects** (AV-033, late) | a layer's position, scale and opacity keyframed, its own clip effects, its keys on its bar |
 
 Checkpoints: CP-A1 (AV-015) walks track A on one fresh build; CP-B1 (AV-016) walks the whole, installed, and makes
 the GitHub Release `v1.0.0`.

@@ -94,6 +94,10 @@ QList<QWidget*> Section::row(QWidget* value) const {
     return both;
 }
 
+void Section::setTitle(const QString& title) {
+    header_->setText(title);
+}
+
 void Section::addResetAction(const QString& text, const QString& key, std::function<void()> reset) {
     resets_.append({text, key, std::move(reset)});
 }

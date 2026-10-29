@@ -74,7 +74,9 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   inside the crop and its shapes. On the **timeline**, as in Premiere Pro, each layer is a bar on its track (V2, V3 …)
   above the main video: drag it in time (it snaps to In, Out, the playhead and other bars) or to another track, drag its
   ends to trim it, Alt+drag to copy it, Delete to remove it; with the Selection tool, click a layer on the canvas to
-  pick it and drag to move it.
+  pick it and drag to move it. Each layer has **keyframes** for its position, scale and opacity (Key, Delete key, Ease;
+  once keyed, a change at the playhead makes or updates the key there, as in Premiere) shown as diamonds on its bar,
+  and its **own clip effects**: with a layer selected, the Clip effects section edits that layer.
 - **Quick resets**: click the label beside a control to put it back to its default (Crossfade's 0.5 s, Speed 1×, an
   effect's none …); right-click a section of the side panel — or a tool's options bar — for **Reset <section>**. Each
   is one Undo step.

@@ -6,6 +6,23 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-029 — The layers' keyframes and effects (AV-033, late, 2026-10-30)
+
+- A layer's **keyframes** (`"keys"`: [t, x, y, scale, opacity, ease] over its own seconds; at most 256): its place,
+  scale and opacity at a time — held before the first and after the last, linear between, eased (smoothstep) after an
+  Ease key (R-106). Without keys the layer's own transform and opacity hold. The LayerPass, the canvas's look, the
+  Selection's hit and the lanes all use the keyed look.
+- The Layers section: X, Y, Scale, Opacity show the selected layer's values at the playhead; **Key** adds a key there
+  with them, **Delete key** removes the key there (the last one leaves the layer where it was shown), **Ease** marks it;
+  "Keyframe 2 of 2". Once keyed, a value typed — or the Selection's drag on the canvas — writes into the key at the
+  playhead, making one there when none (half an output frame its tolerance, as D-011's). Each a step of its own (a
+  typed field merges its own edits). The lanes draw the keys as diamonds on the bar; a double-click on one takes the
+  playhead there.
+- A layer's own **clip effects** (`"effects"`, ClipEffects' keys): while a layer is selected the Clip effects section
+  edits it — its title "Clip effects — <layer>" — and the main video's are untouched (R-107); the LayerPass and the
+  canvas apply them to the layer's frames by EffectsPass. A layer without keys or effects: AV-031's bytes.
+- R-98 (layers with transform and opacity only) is vetoed by the owner and replaced by this.
+
 ### D-027 — The timeline layers II: the tracks (AV-031, late, 2026-10-30)
 
 - **The tracks on the timeline**, as Premiere Pro's: lanes between the transport and the main video's timeline, on its

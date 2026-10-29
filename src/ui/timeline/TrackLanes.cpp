@@ -8,6 +8,7 @@
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPolygonF>
 
 #include <cmath>
 
@@ -130,6 +131,13 @@ void TrackLanes::paintEvent(QPaintEvent*) {
         const bool selected = int(i) == project_->selectedLayer();
         p.setPen(QPen(selected ? t.text : t.accent, selected ? 1.5 : 1));
         p.drawRect(bar);
+        // Its keyframes (D-029): diamonds at their time on the sequence.
+        p.setBrush(t.text);
+        for (const LayerKey& k : l.keys) {
+            const QPointF c(timeline_->xOf(l.start + (k.t - l.range.in)), bar.bottom() - 4);
+            p.drawPolygon(QPolygonF({c + QPointF(0, -4), c + QPointF(4, 0), c + QPointF(0, 4), c + QPointF(-4, 0)}));
+        }
+        p.setBrush(Qt::NoBrush);
         p.setPen(l.visible ? t.text : t.text2);
         p.drawText(bar.adjusted(6, 0, -4, 0), Qt::AlignVCenter | Qt::AlignLeft,
                    l.locked ? tr("%1 (locked)").arg(l.name) : l.name);
@@ -210,7 +218,15 @@ void TrackLanes::mouseReleaseEvent(QMouseEvent*) {
 }
 
 void TrackLanes::mouseDoubleClickEvent(QMouseEvent* event) {
-    if (const int i = barAt(event->position(), nullptr); i >= 0 && seek_) seek_(project_->layers()[i].start);
+    const int i = barAt(event->position(), nullptr);
+    if (i < 0 || !seek_) return;
+    // On a keyframe's diamond: to that key; else to the bar's start.
+    const VideoLayer& l = project_->layers()[i];
+    for (const LayerKey& k : l.keys) {
+        const double at = l.start + (k.t - l.range.in);
+        if (std::abs(timeline_->xOf(at) - event->position().x()) <= 5) return seek_(at);
+    }
+    seek_(l.start);
 }
 
 void TrackLanes::keyPressEvent(QKeyEvent* event) {

@@ -5,9 +5,11 @@
 #include "core/Project.h"
 #include "media/Decoder.h"
 #include "media/MediaProbe.h"
+#include "render/EffectsPass.h"
 #include "ui/MainWindow.h"
 #include "ui/WalkRunner.h"
 #include "ui/canvas/Canvas.h"
+#include "ui/panels/Section.h"
 #include "ui/panels/SidePanel.h"
 #include "ui/theme/Theme.h"
 #include "ui/timeline/PlaybackClock.h"
@@ -47,17 +49,32 @@ public:
         const double now = project_->time();
         for (int i : videolayers::drawOrder(layers)) {
             const VideoLayer& l = layers[i];
-            const QRectF view = canvas->sceneToView(l.rect());
             double own = 0;
-            if (l.visible && l.sourceTime(now, &own)) {
+            const bool present = l.sourceTime(now, &own);
+            const VideoLayer::Look look = l.at(present ? own : l.range.in);
+            const QRectF view = canvas->sceneToView(look.transform.rect(l.size));
+            if (l.visible && present) {
                 Shown& s = shown_[i];
                 if (!playing && (s.image.isNull() || std::abs(s.own - own) > 1e-3)) {
                     s.image = frameOf(l, own);
+                    if (!s.image.isNull() && !l.effects.isNeutral()) { // its own clip effects (D-029)
+                        media::Frame f{
+                            s.image.width(),
+                            s.image.height(),
+                            int(s.image.bytesPerLine()),
+                            0,
+                            own,
+                            std::shared_ptr<const std::uint8_t>(s.image.constBits(), [](const std::uint8_t*) {})};
+                        f = effects_.apply(l.effects, f, l.size.width() > 0 ? f.width / l.size.width() : 1.0);
+                        s.image =
+                            QImage(f.data.get(), f.width, f.height, f.stride, QImage::Format_RGBA8888_Premultiplied)
+                                .copy();
+                    }
                     s.own = own;
                 }
                 if (!s.image.isNull()) {
                     p.save();
-                    p.setOpacity(l.opacity / 100.0);
+                    p.setOpacity(look.opacity / 100.0);
                     p.drawImage(view, s.image.mirrored(l.transform.flipH, l.transform.flipV));
                     p.restore();
                 }
@@ -101,6 +118,7 @@ private:
     }
 
     Project* project_;
+    render::EffectsPass effects_;
     QHash<QString, std::shared_ptr<media::Decoder>> decoders_;
     QHash<int, Shown> shown_;
 };
@@ -163,6 +181,12 @@ void MainWindow::buildLayers() {
         walk.log(QStringLiteral("     addLayer %1").arg(file));
         addLayer(QDir::isAbsolutePath(file) ? file : QDir::current().absoluteFilePath(file));
         return 400;
+    });
+    connect(project_, &Project::changed, side_, [this](Project::Aspect a) {
+        if (a != Project::Aspect::LayerSelection && a != Project::Aspect::Layers) return;
+        const int i = project_->selectedLayer();
+        side_->effects()->setTitle(i >= 0 ? tr("Clip effects — %1").arg(project_->layers()[i].name)
+                                          : tr("Clip effects"));
     });
     WalkProbes::add(QStringLiteral("layers.previewDecoders"), [preview] { return preview->decoders(); });
 }

@@ -104,6 +104,11 @@ public:
     void setSelectedLayer(int index);
     void changeLayers(const QList<VideoLayer>& after, const QString& mergeKey = {});
     void applyLayers(const QList<VideoLayer>& l);
+    // What the Clip effects section edits (D-029): the selected layer's effects, else the main video's.
+    const ClipEffects& panelEffects() const;
+    void changePanelEffects(const ClipEffects& after, const QString& mergeKey = {});
+    // Half an output frame of the layers' own time: one key a frame (as the main video's, D-011).
+    double layerKeyTolerance() const { return keyTolerance(); }
     // The output frame grid In, Out and the playhead snap to (spec §6.4, §8.3): the Output section's FPS.
     Rational outputFps() const;
     // The export's frame as the Output section makes it (spec §10.2): the scene rectangle, its size, its alpha.

@@ -50,8 +50,13 @@ public:
         if (mode_ == Mode::None) return;
         if (mode_ == Mode::Layer) {
             QList<VideoLayer> layers = layersAtStart_;
-            layers[layer_].transform.x += e.scene.x() - start_.x();
-            layers[layer_].transform.y += e.scene.y() - start_.y();
+            VideoLayer& l = layers[layer_];
+            double own = l.range.in;
+            l.sourceTime(project_->time(), &own);
+            VideoLayer::Look look = l.at(own);
+            look.transform.x += e.scene.x() - start_.x();
+            look.transform.y += e.scene.y() - start_.y();
+            l.setLook(own, look, project_->layerKeyTolerance()); // a keyed layer: into the key at the playhead (D-029)
             project_->changeLayers(layers, mergeKey_);
             return;
         }

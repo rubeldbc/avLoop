@@ -311,6 +311,19 @@ void Project::changeLayers(const QList<VideoLayer>& after, const QString& mergeK
         [this](const QList<VideoLayer>& l) { applyLayers(l); }, mergeKey));
 }
 
+const ClipEffects& Project::panelEffects() const {
+    const int i = selectedLayer();
+    return i >= 0 ? layers_[i].effects : effects_;
+}
+
+void Project::changePanelEffects(const ClipEffects& after, const QString& mergeKey) {
+    const int i = selectedLayer();
+    if (i < 0) return changeEffects(after, mergeKey);
+    QList<VideoLayer> l = layers_;
+    l[i].effects = after.clamped();
+    changeLayers(l, mergeKey);
+}
+
 void Project::applyLayers(const QList<VideoLayer>& l) {
     layers_ = l;
     if (selectedLayer_ >= layers_.size()) selectedLayer_ = -1;

@@ -82,9 +82,9 @@ void SidePanel::bindEffects(Project* project, const ColourField::Picker& pick) {
         numbers.append({box, value});
         fields << box;
         connect(box, &StepSpinBox::valueChanged, this, [project, key, value](double v) {
-            ClipEffects e = project->effects();
+            ClipEffects e = project->panelEffects();
             e.*value = v;
-            project->changeEffects(e, QStringLiteral("field:effects.%1").arg(QLatin1String(key)));
+            project->changePanelEffects(e, QStringLiteral("field:effects.%1").arg(QLatin1String(key)));
         });
         return box;
     };
@@ -121,10 +121,10 @@ void SidePanel::bindEffects(Project* project, const ColourField::Picker& pick) {
         colours.append({field, value});
         fields << field;
         connect(field, &ColourField::colourChosen, this, [project, value, amount](const QColor& c) {
-            ClipEffects e = project->effects();
+            ClipEffects e = project->panelEffects();
             e.*value = c.rgb() & 0xffffffu;
             if (e.*amount == 0) e.*amount = 100;
-            project->changeEffects(e);
+            project->changePanelEffects(e);
         });
         return field;
     };
@@ -173,7 +173,7 @@ void SidePanel::bindEffects(Project* project, const ColourField::Picker& pick) {
         ->setToolTip(tr("Radius in the video's own pixels"));
 
     auto refresh = [=] {
-        const ClipEffects& e = project->effects();
+        const ClipEffects& e = project->panelEffects();
         const bool open = project->source().isValid();
         hint->setVisible(!open);
         for (QWidget* w : fields)
@@ -188,34 +188,36 @@ void SidePanel::bindEffects(Project* project, const ColourField::Picker& pick) {
             c.field->setColourQuietly(QColor::fromRgb(QRgb(e.*(c.value))));
     };
     connect(project, &Project::changed, this, [refresh](Project::Aspect a) {
-        if (a == Project::Aspect::Effects || a == Project::Aspect::Source) refresh();
+        if (a == Project::Aspect::Effects || a == Project::Aspect::Source || a == Project::Aspect::Layers ||
+            a == Project::Aspect::LayerSelection)
+            refresh();
     });
     connect(on, &QCheckBox::clicked, this, [project](bool checked) {
-        ClipEffects e = project->effects();
+        ClipEffects e = project->panelEffects();
         e.on = checked;
-        project->changeEffects(e);
+        project->changePanelEffects(e);
     });
     connect(invert, &QCheckBox::clicked, this, [project](bool checked) {
-        ClipEffects e = project->effects();
+        ClipEffects e = project->panelEffects();
         e.invert = checked;
-        project->changeEffects(e);
+        project->changePanelEffects(e);
     });
     connect(posterize, &StepSpinBox::valueChanged, this, [project, posterize](double v) {
         // One level is no picture: a step up from Off goes to 2, a step down from 2 to Off.
-        ClipEffects e = project->effects();
+        ClipEffects e = project->panelEffects();
         e.posterize = int(v) == 1 ? (e.posterize >= 2 ? 0 : 2) : int(v);
         posterize->setValueQuietly(e.posterize);
-        project->changeEffects(e, QStringLiteral("field:effects.posterize"));
+        project->changePanelEffects(e, QStringLiteral("field:effects.posterize"));
     });
-    connect(reset, &QPushButton::clicked, this, [project] { project->changeEffects(ClipEffects{}); });
+    connect(reset, &QPushButton::clicked, this, [project] { project->changePanelEffects(ClipEffects{}); });
 
-    WalkProbes::add(QStringLiteral("effects.summary"), [project] { return summary(project->effects()); });
-    WalkProbes::add(QStringLiteral("effects.on"), [project] { return project->effects().on; });
+    WalkProbes::add(QStringLiteral("effects.summary"), [project] { return summary(project->panelEffects()); });
+    WalkProbes::add(QStringLiteral("effects.on"), [project] { return project->panelEffects().on; });
     reset::setDefault(posterize, 0.0);
     reset::setDefault(invert, false);
     reset::setDefault(on, true);
     s->addResetAction(tr("Reset Clip effects"), QStringLiteral("effects"),
-                      [project] { project->changeEffects(ClipEffects{}); });
+                      [project] { project->changePanelEffects(ClipEffects{}); });
     refresh();
 }
 

@@ -11,7 +11,7 @@ risk: High
 permission_class: VERIFY_ENVIRONMENT_FIRST
 code_budget: 1300
 depends_on: [AV-030]
-unlocks: []
+unlocks: [AV-033]
 requirements: [REQ-AV-034]
 read_scope:
   - phases/26-10-26-034934-AvLoop/control/30_SHAPES_THE_TIMELINE_LAYERS.md

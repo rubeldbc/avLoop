@@ -1,0 +1,57 @@
+{
+  "delay": 120,
+  "settle": 700,
+  "steps": [
+    { "label": "Replace colour: the eyedropper takes the yellow bar's colour from the canvas" },
+    { "do": "open", "file": "samples/counter-640p30.mp4" },
+    { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 10000 },
+    { "do": "wait", "ms": 300 },
+    { "do": "expect", "probe": "effects.summary", "eq": "" },
+    { "do": "click", "on": "panel.effects.replaceFrom.pick" },
+    { "do": "click", "on": "canvas", "space": "canvas", "at": [266, 250] },
+    { "do": "expect", "probe": "effects.summary", "contains": "replace=100 replaceFrom=#" },
+    { "do": "expect", "probe": "effects.summary", "lacks": "replaceFrom=#ff8000" },
+    { "do": "expect", "probe": "undo.count", "eq": 1 },
+    { "do": "expect", "probe": "tool.active", "eq": "select" },
+    { "do": "expect", "probe": "transform.x", "eq": 320 },
+
+    { "label": "To red, typed: the yellow bar turns red, the others stay" },
+    { "do": "type", "on": "panel.effects.replaceTo", "text": "#ff0000" },
+    { "do": "expect", "probe": "effects.summary", "contains": "replaceTo=#ff0000" },
+    { "do": "expect", "probe": "undo.count", "eq": 2 },
+    { "do": "shot", "on": "CanvasArea", "file": "canvas-replaced.png", "maxWidth": 1000 },
+
+    { "label": "Esc cancels a pick: the click after it picks nothing" },
+    { "do": "click", "on": "panel.effects.replaceFrom.pick" },
+    { "do": "key", "keys": "Escape", "on": "canvas" },
+    { "do": "click", "on": "canvas", "space": "canvas", "at": [53, 250] },
+    { "do": "expect", "probe": "undo.count", "eq": 2 },
+
+    { "label": "Colourise: the whole clip in one red, its lightness kept" },
+    { "do": "type", "on": "panel.effects.colourise", "text": "100" },
+    { "do": "expect", "probe": "effects.summary", "contains": "colourise=100" },
+    { "do": "shot", "on": "CanvasArea", "file": "canvas-colourise.png", "maxWidth": 1000 },
+    { "do": "type", "on": "panel.effects.colourise", "text": "0" },
+
+    { "label": "Duotone: a colour chosen at 0 % turns it full on; navy shadows, warm lights" },
+    { "do": "type", "on": "panel.effects.duotoneDark", "text": "#101040" },
+    { "do": "expect", "probe": "effects.summary", "contains": "duotone=100 duotoneDark=#101040" },
+    { "do": "type", "on": "panel.effects.duotoneLight", "text": "#ffc070" },
+    { "do": "shot", "on": "CanvasArea", "file": "canvas-duotone.png", "maxWidth": 1000 },
+    { "do": "type", "on": "panel.effects.duotone", "text": "0" },
+
+    { "label": "Split toning: blue shadows, orange highlights" },
+    { "do": "type", "on": "panel.effects.split", "text": "80" },
+    { "do": "expect", "probe": "effects.summary", "contains": "split=80" },
+    { "do": "shot", "on": "CanvasArea", "file": "canvas-split.png", "maxWidth": 1000 },
+    { "do": "shot", "on": "Section.effects", "file": "panel-theme.png" },
+
+    { "label": "Undo takes Split toning back; the Preview shows the exact output" },
+    { "do": "key", "keys": "Ctrl+Z", "on": "MainWindow" },
+    { "do": "expect", "probe": "effects.summary", "lacks": "split=" },
+    { "do": "key", "keys": "F5", "on": "MainWindow" },
+    { "do": "waitFor", "probe": "preview.frame", "eq": "640x360", "timeout": 10000 },
+    { "do": "wait", "ms": 800 },
+    { "do": "shot", "on": "PreviewWindow", "file": "preview-replaced.png", "maxWidth": 1000 }
+  ]
+}

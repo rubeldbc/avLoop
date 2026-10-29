@@ -27,6 +27,7 @@ public:
     // A row's value and its label: what a setting that does not apply hides together.
     QList<QWidget*> row(QWidget* value) const;
     // The right-click menu's resets (D-025): "Reset <title>" and any others, each named "menu.reset.<key>" for walks.
+    void setTitle(const QString& title);
     void addResetAction(const QString& text, const QString& key, std::function<void()> reset);
 
     bool isOpen() const;

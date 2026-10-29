@@ -2,13 +2,13 @@
   "programId": "AVLOOP",
   "programmeVersion": "1.0.0",
   "generatedBy": "control/phase-tools/sync-progress.mjs",
-  "generatedAt": "2026-10-29T18:37:26.199Z",
-  "state": "COMPLETE",
-  "activePhase": null,
+  "generatedAt": "2026-10-29T19:27:36.287Z",
+  "state": "ACTIVE",
+  "activePhase": "AV-032",
   "nextEligiblePhase": null,
-  "lastCompletedPhase": "AV-031",
-  "completed": 31,
-  "total": 31,
+  "lastCompletedPhase": "AV-033",
+  "completed": 32,
+  "total": 33,
   "blocked": [],
   "deferred": [],
   "branch": "main",
@@ -766,7 +766,9 @@
       "dependsOn": [
         "AV-030"
       ],
-      "unlocks": [],
+      "unlocks": [
+        "AV-033"
+      ],
       "requirements": [
         "REQ-AV-034"
       ],
@@ -775,6 +777,50 @@
       "ownerItem": 27,
       "file": "phases/AV-031-the-timeline-layers-ii.md",
       "record": "execution/AV-031-EXECUTION.md"
+    },
+    {
+      "id": "AV-032",
+      "title": "The sweep",
+      "status": "IN_PROGRESS",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "Medium",
+      "dependsOn": [
+        "AV-033"
+      ],
+      "unlocks": [],
+      "requirements": [
+        "REQ-AV-035"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 100,
+      "ownerItem": 28,
+      "file": "phases/AV-032-the-sweep.md",
+      "record": "execution/AV-032-EXECUTION.md"
+    },
+    {
+      "id": "AV-033",
+      "title": "The layers' keyframes and effects",
+      "status": "DONE",
+      "track": "B",
+      "checkpointId": "CP-B1",
+      "isCheckpoint": false,
+      "risk": "High",
+      "dependsOn": [
+        "AV-031"
+      ],
+      "unlocks": [
+        "AV-032"
+      ],
+      "requirements": [
+        "REQ-AV-036"
+      ],
+      "permissionClass": "VERIFY_ENVIRONMENT_FIRST",
+      "codeBudget": 700,
+      "ownerItem": 29,
+      "file": "phases/AV-033-the-layers-keyframes-and-effects.md",
+      "record": "execution/AV-033-EXECUTION.md"
     }
   ]
 }

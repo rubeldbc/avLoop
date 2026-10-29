@@ -54,7 +54,27 @@ void SidePanel::bindLayers(Project* project) {
     flagsRow->addStretch(1);
     flagsRow->addWidget(remove);
     s->addRow(QString(), flags);
-    const QList<QWidget*> fields = {x, y, scale, opacity, start, track, flags};
+    auto* keys = new QWidget(body);
+    auto* keysRow = new QHBoxLayout(keys);
+    keysRow->setContentsMargins(0, 0, 0, 0);
+    keysRow->setSpacing(4);
+    auto* key = new QPushButton(tr("Key"), keys);
+    key->setObjectName(QStringLiteral("panel.layers.key"));
+    key->setToolTip(tr("A keyframe at the playhead: its place, scale and opacity"));
+    auto* unkey = new QPushButton(tr("Delete key"), keys);
+    unkey->setObjectName(QStringLiteral("panel.layers.unkey"));
+    auto* ease = new QCheckBox(tr("Ease"), keys);
+    ease->setObjectName(QStringLiteral("panel.layers.ease"));
+    keysRow->addWidget(key);
+    keysRow->addWidget(unkey);
+    keysRow->addWidget(ease);
+    keysRow->addStretch(1);
+    s->addRow(tr("Keyframes"), keys);
+    auto* keyInfo = new QLabel(body);
+    keyInfo->setProperty("quiet", true);
+    keyInfo->setObjectName(QStringLiteral("panel.layers.keyInfo"));
+    s->addRow(QString(), keyInfo);
+    const QList<QWidget*> fields = {x, y, scale, opacity, start, track, flags, keys, keyInfo};
 
     // Rows top first: by track, the higher above.
     auto order = [project] {
@@ -84,17 +104,30 @@ void SidePanel::bindLayers(Project* project) {
                 part->setVisible(sel >= 0);
         if (sel < 0) return;
         const VideoLayer& l = layers[sel];
-        x->setValueQuietly(l.transform.x);
-        y->setValueQuietly(l.transform.y);
-        scale->setValueQuietly(l.transform.scale * 100);
-        opacity->setValueQuietly(l.opacity);
+        // The values shown are the layer's at the playhead (keyed, D-029).
+        double own = l.range.in;
+        l.sourceTime(project->time(), &own);
+        const VideoLayer::Look look = l.at(own);
+        x->setValueQuietly(look.transform.x);
+        y->setValueQuietly(look.transform.y);
+        scale->setValueQuietly(look.transform.scale * 100);
+        opacity->setValueQuietly(look.opacity);
+        const int k = l.keyAt(own, project->layerKeyTolerance());
+        keyInfo->setText(l.keys.isEmpty() ? tr("No keyframes")
+                         : k >= 0         ? tr("Keyframe %1 of %2").arg(k + 1).arg(l.keys.size())
+                                          : tr("%1 keyframes").arg(l.keys.size()));
+        const QSignalBlocker be(ease);
+        ease->setChecked(k >= 0 && l.keys[k].ease);
+        ease->setEnabled(k >= 0);
+        unkey->setEnabled(k >= 0);
         start->setValueQuietly(l.start);
         track->setValueQuietly(l.track);
         const QSignalBlocker b(locked);
         locked->setChecked(l.locked);
     };
     connect(project, &Project::changed, this, [refresh](Project::Aspect a) {
-        if (a == Project::Aspect::Layers || a == Project::Aspect::LayerSelection || a == Project::Aspect::Source)
+        if (a == Project::Aspect::Layers || a == Project::Aspect::LayerSelection || a == Project::Aspect::Source ||
+            a == Project::Aspect::Time)
             refresh();
     });
     connect(list, &QListWidget::itemSelectionChanged, this, [=] {
@@ -113,22 +146,68 @@ void SidePanel::bindLayers(Project* project) {
         if (i < 0) return;
         QList<VideoLayer> l = project->layers();
         change(l[i]);
-        project->changeLayers(l, QStringLiteral("field:layers.%1").arg(field));
+        // A typed field merges its edits; a press ("!…": Key, Delete key, Ease, Locked) is a step of its own.
+        project->changeLayers(l, field.startsWith(QLatin1Char('!')) ? QString()
+                                                                    : QStringLiteral("field:layers.%1").arg(field));
+    };
+    // A place, scale or opacity typed: into the key at the playhead when the layer is keyed (made when none, as
+    // Premiere's once its stopwatch runs), else the layer's own (D-029).
+    auto look = [=](const QString& field, auto change) {
+        edit(field, [=](VideoLayer& l) {
+            double own = l.range.in;
+            l.sourceTime(project->time(), &own);
+            VideoLayer::Look now = l.at(own);
+            change(now);
+            l.setLook(own, now, project->layerKeyTolerance());
+        });
     };
     connect(x, &StepSpinBox::valueChanged, this,
-            [=](double v) { edit(QStringLiteral("x"), [v](VideoLayer& l) { l.transform.x = v; }); });
+            [=](double v) { look(QStringLiteral("x"), [v](VideoLayer::Look& k) { k.transform.x = v; }); });
     connect(y, &StepSpinBox::valueChanged, this,
-            [=](double v) { edit(QStringLiteral("y"), [v](VideoLayer& l) { l.transform.y = v; }); });
-    connect(scale, &StepSpinBox::valueChanged, this,
-            [=](double v) { edit(QStringLiteral("scale"), [v](VideoLayer& l) { l.transform.scale = v / 100; }); });
+            [=](double v) { look(QStringLiteral("y"), [v](VideoLayer::Look& k) { k.transform.y = v; }); });
+    connect(scale, &StepSpinBox::valueChanged, this, [=](double v) {
+        look(QStringLiteral("scale"), [v](VideoLayer::Look& k) { k.transform.scale = v / 100; });
+    });
     connect(opacity, &StepSpinBox::valueChanged, this,
-            [=](double v) { edit(QStringLiteral("opacity"), [v](VideoLayer& l) { l.opacity = v; }); });
+            [=](double v) { look(QStringLiteral("opacity"), [v](VideoLayer::Look& k) { k.opacity = v; }); });
+    // The keyframes: Key adds one at the playhead with the values shown (or keeps the one there); Delete key; Ease.
+    connect(key, &QPushButton::clicked, this, [=] {
+        edit(QStringLiteral("!key"), [=](VideoLayer& l) {
+            double own = l.range.in;
+            l.sourceTime(project->time(), &own);
+            const VideoLayer::Look now = l.at(own);
+            if (l.keyAt(own, project->layerKeyTolerance()) >= 0 || l.keys.size() >= VideoLayer::kMaxKeys) return;
+            l.keys.append({own, now.transform.x, now.transform.y, now.transform.scale, now.opacity, false});
+            std::sort(l.keys.begin(), l.keys.end(), [](const LayerKey& a, const LayerKey& b) { return a.t < b.t; });
+        });
+    });
+    auto atKey = [=](auto change) {
+        edit(QStringLiteral("!keys"), [=](VideoLayer& l) {
+            double own = l.range.in;
+            l.sourceTime(project->time(), &own);
+            if (const int k = l.keyAt(own, project->layerKeyTolerance()); k >= 0) change(l, k);
+        });
+    };
+    connect(unkey, &QPushButton::clicked, this, [=] {
+        atKey([](VideoLayer& l, int k) {
+            // The last key gone: the layer stays where it was shown.
+            if (l.keys.size() == 1) {
+                l.transform.x = l.keys[0].x;
+                l.transform.y = l.keys[0].y;
+                l.transform.scale = l.keys[0].scale;
+                l.opacity = l.keys[0].opacity;
+            }
+            l.keys.removeAt(k);
+        });
+    });
+    connect(ease, &QCheckBox::clicked, this,
+            [=](bool on) { atKey([on](VideoLayer& l, int k) { l.keys[k].ease = on; }); });
     connect(start, &StepSpinBox::valueChanged, this,
             [=](double v) { edit(QStringLiteral("start"), [v](VideoLayer& l) { l.start = v; }); });
     connect(track, &StepSpinBox::valueChanged, this,
             [=](double v) { edit(QStringLiteral("track"), [v](VideoLayer& l) { l.track = int(v); }); });
     connect(locked, &QCheckBox::clicked, this,
-            [=](bool on) { edit(QStringLiteral("locked"), [on](VideoLayer& l) { l.locked = on; }); });
+            [=](bool on) { edit(QStringLiteral("!locked"), [on](VideoLayer& l) { l.locked = on; }); });
     connect(remove, &QPushButton::clicked, this, [project] {
         const int i = project->selectedLayer();
         if (i < 0) return;
@@ -143,6 +222,26 @@ void SidePanel::bindLayers(Project* project) {
     });
     WalkProbes::add(QStringLiteral("layers.count"), [project] { return int(project->layers().size()); });
     WalkProbes::add(QStringLiteral("layers.selected"), [project] { return project->selectedLayer(); });
+    // The selected layer's keys "t:x,y,scale,opacity" (";" between) and its effects (D-029).
+    WalkProbes::add(QStringLiteral("layers.keys"), [project] {
+        const int i = project->selectedLayer();
+        QStringList parts;
+        if (i >= 0)
+            for (const LayerKey& k : project->layers()[i].keys)
+                parts << QStringLiteral("%1:%2,%3,%4,%5%6")
+                             .arg(k.t, 0, 'f', 2)
+                             .arg(std::lround(k.x))
+                             .arg(std::lround(k.y))
+                             .arg(std::lround(k.scale * 100))
+                             .arg(std::lround(k.opacity))
+                             .arg(k.ease ? QStringLiteral("e") : QString());
+        return parts.join(QLatin1Char(';'));
+    });
+    WalkProbes::add(QStringLiteral("layers.effects"), [project] {
+        const int i = project->selectedLayer();
+        return i >= 0 ? !project->layers()[i].effects.isNeutral() : false;
+    });
+    WalkProbes::add(QStringLiteral("effects.main"), [project] { return !project->effects().isNeutral(); });
     // The selected layer's timing and track (AV-031's walks read them with near).
     auto selectedOf = [project](auto read) {
         const int i = project->selectedLayer();

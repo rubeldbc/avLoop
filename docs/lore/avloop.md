@@ -458,3 +458,5 @@ end of its section.
 - **Lanes that grow under a drag move the rows under the pointer**: a bar dragged into the empty top lane added a lane,
   the rows shifted by one and the next move took it a track higher, and so on. Rule: a widget whose layout follows
   the model freezes its layout from the press to the release. (AV-031)
+- **Presses merging into one Undo step**: the Ease click and the Delete key shared the field merge key and were undone
+  together. Rule: a press (a button, a check box) pushes a step of its own; only a typed field merges. (AV-033)

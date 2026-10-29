@@ -9,7 +9,7 @@ Track B — the extras (items 11-14)
 AV-015 ──► AV-011 ──► AV-012 ──► AV-013 ──► AV-014 ──► AV-016 (CP-B1; every item of B and AV-015 also ──► AV-016)
 Late — the owner's wishes after both checkpoints (items 15 … 27)
 AV-016 ──► AV-017 ──► AV-018 ──► AV-019 ──► AV-020 ──► AV-021 ──► AV-022 ──► AV-023 ──► AV-024 ──► AV-025 ──► AV-026
-  ──► AV-027 ──► AV-028 ──► AV-029 ──► AV-030 ──► AV-031
+  ──► AV-027 ──► AV-028 ──► AV-029 ──► AV-030 ──► AV-031 ──► AV-033 ──► AV-032
 ```
 
 | Phase | Depends on | Why |
@@ -45,6 +45,8 @@ AV-016 ──► AV-017 ──► AV-018 ──► AV-019 ──► AV-020 ─�
 | AV-029 | AV-028 | late: the align tools and the layers panel act on the finished shapes |
 | AV-030 | AV-029 | late: a clip takes the shapes as they finally are; the model and the composite before the tracks |
 | AV-031 | AV-030 | late: the tracks show the clips AV-030 made |
+| AV-033 | AV-031 | late: the layers' keyframes and effects (the owner put them before the sweep) |
+| AV-032 | AV-033 | late: the sweep walks everything as AV-033 left it |
 
 Only the lowest ordinal of each track may have no dependency: AV-001 (track A). Track B's lowest, AV-011, depends on
 AV-015 by the spec's order (§13).

@@ -255,3 +255,10 @@ from `README.md` §3 on 2026-10-29, when the README passed the 300-line ceiling 
      thumbnails, and the eye and lock live in the Layers section (its check box and Locked) rather than on a track
      header — one layer a track at a time is the common case and the section is beside it; a track exists while a
      layer is on it (no track menu). Open for the owner's veto.
+105. **R-105** The sweep (item 28): every walk of every phase on one fresh build, the install and release walks skipped
+     (R-75); the Release, ASan and Debug-leak suites — after AV-033, at the owner's word.
+106. **R-106** "All the facility like Premiere with keyframes": a layer's position, scale and opacity keyframed over its
+     own time (Linear or Ease), Premiere's stopwatch behaviour (once keyed, an edit at the playhead keys), keys on the
+     bar; R-98 vetoed. Rotation is not keyed (no rotation tool, §1.3).
+107. **R-107** A layer's own clip effects through the one Clip effects section, which follows the selected layer (its
+     title says so); not keyframed (the main video's are not either). Shapes stay the frame's.

@@ -3,7 +3,7 @@
 
 Canonical current execution state: `../AUTONOMOUS_STATE.md`
 
-Phases: **31** · done: **31** · state: **COMPLETE** · generated: 2026-10-29T18:37:26.199Z
+Phases: **33** · done: **32** · state: **ACTIVE** · generated: 2026-10-29T19:27:36.287Z
 
 Tracks: A The loop maker — the ground, the media, the canvas and the Selection, the crop tools, the timeline, the loop engine, the renderer, the preview window, the export, the project and the settings · B The extras — the keyframes, the loop finder, the batch and the other formats, the installer, the name and the About box, the wheel and the keyframe copy, the clip effects, the colour theme, the release 1.1.0, the clip as cut, the inverse selection, the shapes and the pen, the shape combinations, the soft parts, the resets, the align tools and the shape layers, the timeline layers
 
@@ -42,3 +42,5 @@ Tracks: A The loop maker — the ground, the media, the canvas and the Selection
 | AV-029 | 26 | B | CP-B1 | DONE | Medium | verify-env | The align tools and the shape layers | AV-028 |
 | AV-030 | 27 | B | CP-B1 | DONE | High | verify-env | The timeline layers I — the clips and the composite | AV-029 |
 | AV-031 | 27 | B | CP-B1 | DONE | High | verify-env | The timeline layers II — the tracks | AV-030 |
+| AV-032 | 28 | B | CP-B1 | IN_PROGRESS | Medium | verify-env | The sweep | AV-033 |
+| AV-033 | 29 | B | CP-B1 | DONE | High | verify-env | The layers' keyframes and effects | AV-031 |

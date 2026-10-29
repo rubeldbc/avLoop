@@ -36,6 +36,8 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | D-025 | **The resets** (late): a label's click resets its control; a group's right-click Reset. | "Clicking on the text label next to any control should reset its value"; "right-click context menu with a 'Reset' option" | AV-028 |
 | D-026 | **The align tools and the shape layers** (late): Align and Distribute; the layers panel. | "align tool set for multiple object and make a layer system for multiple objects" | AV-029 |
 | D-027 | **The timeline layers** (late): tracks and clips, the composite, the tracks on the timeline. | "multiple layer system in the time line like adobe premiere pro" | AV-030, AV-031 |
+| D-028 | **The sweep** (late): every walk again on a fresh build; Release, ASan, Debug-leak suites. | "complete all the task and test then rebuild and push" | AV-032 |
+| D-029 | **The layers' keyframes and effects** (late): position, scale, opacity keyed; a layer's own clip effects. | "video layer will have all the facility like adobe premiere pro with keyframes functionality also" | AV-033 |
 
 ## The readings (the agent's decisions)
 
@@ -145,3 +147,6 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-102 | One CPU pass after either back end, inside the mask | AVADR-0001 parity | `READINGS.md`; AV-030 |
 | R-103 | The canvas's layer frames decoded at rest, ≤ 960 px | a live canvas | `READINGS.md`; AV-030 |
 | R-104 | The lanes: drags, trims, snapping, Alt-copy, Delete; names, no thumbnails; eye and lock in the Layers section | Premiere's tracks, the section beside them | `READINGS.md`; AV-031 |
+| R-105 | The sweep after AV-033; install and release walks skipped | "complete all the task and test then rebuild" | `READINGS.md`; AV-032 |
+| R-106 | A layer's position, scale, opacity keyframed, Premiere's stopwatch; R-98 vetoed | "all the facility like adobe premiere pro with keyframes" | `READINGS.md`; AV-033 |
+| R-107 | A layer's own effects through the Clip effects section following the selection | one section, one target at a time | `READINGS.md`; AV-033 |

@@ -73,15 +73,18 @@ void LayerPass::apply(double seconds, QImage& out, const QImage* mask, bool alph
     for (int index : order_) {
         const VideoLayer& l = layers_[index];
         double own = 0;
-        if (!l.visible || l.opacity <= 0 || !l.sourceTime(seconds, &own)) continue;
-        const media::Frame f = frameOf(index, own);
+        if (!l.visible || !l.sourceTime(seconds, &own)) continue;
+        media::Frame f = frameOf(index, own);
         if (f.isNull()) continue;
+        if (!l.effects.isNeutral()) // its own clip effects (D-029), at its frame's size
+            f = effects_.apply(l.effects, f, l.size.width() > 0 ? f.width / l.size.width() : 1.0);
+        const VideoLayer::Look look = l.at(own);
         // Output px → scene → the layer's own 0 … 1 (its flips folded in).
-        const QRectF r = l.rect();
-        if (r.isEmpty()) continue;
+        const QRectF r = look.transform.rect(l.size);
+        if (r.isEmpty() || look.opacity <= 0) continue;
         const double ax = frame_.width() / (w * r.width()), bx = (frame_.left() - r.left()) / r.width();
         const double ay = frame_.height() / (h * r.height()), by = (frame_.top() - r.top()) / r.height();
-        const float opacity = float(l.opacity / 100.0);
+        const float opacity = float(look.opacity / 100.0);
         for (int y = 0; y < h; ++y) {
             std::uint8_t* row = out.scanLine(y);
             const uchar* m = mask ? mask->constScanLine(y) : nullptr;
