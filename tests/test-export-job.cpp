@@ -63,6 +63,15 @@ private slots:
         QCOMPARE(
             exporting::defaultFileName(QStringLiteral("D:/clips/fire.mp4"), QSize(640, 640), OutputFormat::WebmVp9),
             QStringLiteral("fire_loop_640x640.webm"));
+        // Mode None names a clip (D-020); a template without "_loop" stays as it is.
+        const QString clip = exporting::namePattern(QStringLiteral("{source}_loop_{w}x{h}"), true);
+        QCOMPARE(exporting::defaultFileName(QStringLiteral("D:/clips/fire.mp4"), QSize(640, 640), OutputFormat::WebmVp9,
+                                            clip),
+                 QStringLiteral("fire_clip_640x640.webm"));
+        QCOMPARE(exporting::namePattern(QStringLiteral("{source}_loop"), true), QStringLiteral("{source}_clip"));
+        QCOMPARE(exporting::namePattern(QStringLiteral("{source}-{w}"), true), QStringLiteral("{source}-{w}"));
+        QCOMPARE(exporting::namePattern(QStringLiteral("{source}_loop_{w}"), false),
+                 QStringLiteral("{source}_loop_{w}"));
         QTemporaryDir dir;
         const QString path = dir.filePath(QStringLiteral("loop.webm"));
         QCOMPARE(exporting::alternativePath(path), dir.filePath(QStringLiteral("loop (1).webm")));

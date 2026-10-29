@@ -17,6 +17,7 @@
 #include <QFile>
 #include <QPushButton>
 #include <QTimer>
+#include <QToolButton>
 
 namespace avloop {
 
@@ -62,6 +63,12 @@ void MainWindow::buildPreview() {
     WalkProbes::add(QStringLiteral("preview.cached"), [p] { return p() ? p()->cachedCount() : 0; });
     WalkProbes::add(QStringLiteral("preview.playing"), [p] { return p() && p()->playing(); });
     WalkProbes::add(QStringLiteral("preview.aroundSeam"), [p] { return p() && p()->aroundSeam(); });
+    // Whether Around seam can be pressed: not for a clip as cut (D-020).
+    WalkProbes::add(QStringLiteral("preview.aroundSeamEnabled"), [this] {
+        auto* b =
+            previewWindow_ ? previewWindow_->findChild<QToolButton*>(QStringLiteral("preview.aroundSeam")) : nullptr;
+        return b && b->isEnabled();
+    });
     WalkProbes::add(QStringLiteral("preview.mode"), [p] {
         return p() && p()->mode() == PreviewPlayer::Mode::Encoded ? QStringLiteral("encoded") : QStringLiteral("live");
     });

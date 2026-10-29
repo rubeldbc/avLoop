@@ -1,7 +1,7 @@
 ---
 phase: AV-022
 title: "The clip as cut"
-status: IN_PROGRESS
+status: DONE
 owner_item: 20
 track: B
 checkpoint_id: CP-B1

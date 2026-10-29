@@ -125,6 +125,21 @@ private slots:
         QCOMPARE(read.loop, d.loop);
         QCOMPARE(read.quality, d.quality);
     }
+    // Mode None is written "none" and read back (D-020).
+    void noneRoundTrip() {
+        QTemporaryDir dir;
+        ProjectData d = sample(QStringLiteral("D:/clips/fire.mp4"));
+        d.loop.mode = LoopSettings::Mode::None;
+        const QString path = dir.filePath(QStringLiteral("none.avloop"));
+        QString error;
+        QVERIFY(projectjson::save(d, path, &error));
+        QFile f(path);
+        QVERIFY(f.open(QIODevice::ReadOnly));
+        QVERIFY(f.readAll().contains("\"mode\": \"none\""));
+        ProjectData read;
+        QVERIFY2(projectjson::load(path, read, &error), qPrintable(error));
+        QCOMPARE(read.loop.mode, LoopSettings::Mode::None);
+    }
     void cropRoundTrip() {
         ProjectData d = sample(QStringLiteral("a.mp4"));
         d.crop.kind = CropShape::Kind::Rounded;

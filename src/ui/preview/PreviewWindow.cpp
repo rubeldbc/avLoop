@@ -161,7 +161,14 @@ void PreviewWindow::setJob(const render::RenderJob& job) {
     const bool fade = job.loop.mode == LoopSettings::Mode::Crossfade;
     const bool pingPong =
         job.loop.mode == LoopSettings::Mode::PingPong || job.loop.mode == LoopSettings::Mode::PingPongSmooth;
-    slider_->setSeams(fade ? p.segment - 2 * p.fade : -1, pingPong ? QList<int>{0, p.segment - 1} : QList<int>{});
+    const bool clip = job.loop.mode == LoopSettings::Mode::None;
+    slider_->setSeams(fade ? p.segment - 2 * p.fade : -1, pingPong ? QList<int>{0, p.segment - 1} : QList<int>{},
+                      !clip);
+    // A clip as cut has no seam to watch (D-020): Around seam waits for a loop.
+    if (clip && player_->aroundSeam()) player_->setAroundSeam(false);
+    aroundSeam_->setEnabled(!clip);
+    aroundSeam_->setToolTip(clip ? tr("The clip is not a loop")
+                                 : tr("Play the last 2 s and the first 2 s, again and again"));
     if (first && !QSettings().contains(QStringLiteral("preview/geometry"))) {
         // The output's size and the controls, at most 80% of the screen.
         const QSize avail = screen() ? screen()->availableSize() * 0.8 : QSize(1280, 800);

@@ -1,4 +1,5 @@
-// The side panel's Loop section (spec §8.5) and the Output section's frame rate (§8.3, §10.2). Loop: Mode, Crossfade
+// The side panel's Loop section (spec §8.5) and the Output section's frame rate (§8.3, §10.2). Loop: Mode (None first,
+// D-020: the clip as cut, its summary "Clip …"), Crossfade
 // in seconds and frames (linked), Curve, Turn, Speed, FPS method, the slow-motion hint and the summary
 // "Loop 4.97 s · 149 frames @ 30 fps"; a value the loop clamps flashes yellow for 600 ms. Every edit is one Undo
 // step (typing or the wheel in one field merges).
@@ -50,6 +51,8 @@ void SidePanel::bindLoop(Project* project) {
     s->addWide(hint);
     auto* mode = new QComboBox(body);
     mode->setObjectName(QStringLiteral("panel.loop.mode"));
+    mode->addItem(tr("None (the clip as cut)"), int(Mode::None));
+    mode->setItemData(0, tr("No loop: In to Out as cut, no crossfade, no return"), Qt::ToolTipRole);
     mode->addItem(tr("Simple"), int(Mode::Simple));
     mode->addItem(tr("Crossfade"), int(Mode::Crossfade));
     mode->addItem(tr("Ping-pong"), int(Mode::PingPong));
@@ -121,8 +124,10 @@ void SidePanel::bindLoop(Project* project) {
         for (QWidget* w : turnWidgets)
             w->setVisible(l.mode == Mode::PingPongSmooth);
         slow->setVisible(open && l.speed < 1.0 - 1e-9 && l.method == LoopSettings::Method::Nearest);
-        summary->setText(open ? tr("Loop %1 s · %2 frames @ %3 fps")
-                                    .arg(loopmap::secondsOf(plan.length, fps), 0, 'f', 2)
+        // None makes no loop: the summary says what it is, a clip.
+        const QString what =
+            l.mode == Mode::None ? tr("Clip %1 s · %2 frames @ %3 fps") : tr("Loop %1 s · %2 frames @ %3 fps");
+        summary->setText(open ? what.arg(loopmap::secondsOf(plan.length, fps), 0, 'f', 2)
                                     .arg(plan.length)
                                     .arg(timecode::rateText(fps))
                               : QString());

@@ -372,3 +372,15 @@ end of its section.
   (AV-020)
 - **A `&&` chain stops at the first red**: a regression walk after a failed one never ran, and a log line almost
   said it had. Rule: a walk is PASSED only by its own run's line in walk-phase.log. (AV-020)
+
+## The clip as cut (late)
+
+- **The owner's own AvLoop runs from `buildin`** (opened from the build, a project unsaved): the link of `avloop.exe`
+  fails with LNK1104 and a walk would race the owner's window. Rule: a phase builds into `build-lab` when an AvLoop
+  holds `buildin`, and runs its walks with `AVLOOP_BIN_DIR=build-lab/bin` and ctest with `--test-dir build-lab`;
+  the owner's process is never stopped. (AV-022)
+- **An encoded frame against a rendered one is never exact**: VP9's 4:2:0 and its colour matrix moved a counter frame's
+  mean by ~3 even at 160 × 90. Rule: a walk that says "this is frame N" compares against neighbours (N, N + 15,
+  N + 30) and asks for the nearest, not a fixed threshold. (AV-022)
+- **A new enum value goes last**: the panels' combo boxes and the walks choose by the enum's int (`"data": 0` is
+  Simple); None was added after PingPongSmooth and shown first by its place in the list, not by its value. (AV-022)

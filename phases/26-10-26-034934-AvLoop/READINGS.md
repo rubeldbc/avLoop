@@ -184,3 +184,9 @@ from `README.md` §3 on 2026-10-29, when the README passed the 300-line ceiling 
     `1.0.1`, so the next version needs no walk changed. The earlier installer of this sitting
     (`AvLoop-1.0.1-81e425c-setup.exe`, local) is not released.
 
+77. **R-77** "Export without applying a loop at the end, or without adding a crossfade in the middle" is a fifth
+    Mode, None: the clip from In to Out as cut, D frames, no blend, no return — presented as a clip ("Clip …", no seam
+    mark, Around seam off, `_clip_` in the suggested name). Simple stays a loop with a hard seam; None is listed first so
+    it is found.
+78. **R-78** None is written `"mode": "none"` under version 2 until AV-023 bumps the file to 3 (the first new key);
+    1.1.0 would read it as Crossfade, so no Release is made between the two phases (RISKS 24).

@@ -52,6 +52,14 @@ QString defaultFileName(const QString& sourcePath, QSize size, OutputFormat form
     return name + QLatin1Char('.') + profileOf(format).extension;
 }
 
+QString namePattern(const QString& pattern, bool clip) {
+    QString p = pattern;
+    if (!clip) return p;
+    p.replace(QStringLiteral("_loop_"), QStringLiteral("_clip_"));
+    if (p.endsWith(QLatin1String("_loop"))) p.replace(p.size() - 5, 5, QStringLiteral("_clip"));
+    return p;
+}
+
 QString alternativePath(const QString& path) {
     const QFileInfo info(path);
     const QString stem = info.completeBaseName();

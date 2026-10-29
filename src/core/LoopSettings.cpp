@@ -25,6 +25,8 @@ QString LoopSettings::modeId(Mode m) {
         return QStringLiteral("pingpong");
     case Mode::PingPongSmooth:
         return QStringLiteral("pingpong-smooth");
+    case Mode::None:
+        return QStringLiteral("none");
     case Mode::Crossfade:
         break;
     }
@@ -32,7 +34,7 @@ QString LoopSettings::modeId(Mode m) {
 }
 
 LoopSettings::Mode LoopSettings::modeFromId(const QString& id) {
-    for (Mode m : {Mode::Simple, Mode::Crossfade, Mode::PingPong, Mode::PingPongSmooth})
+    for (Mode m : {Mode::Simple, Mode::Crossfade, Mode::PingPong, Mode::PingPongSmooth, Mode::None})
         if (modeId(m) == id) return m;
     return Mode::Crossfade;
 }

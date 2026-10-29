@@ -27,6 +27,9 @@ bool available(OutputFormat format, QString* reason = nullptr);
 // the format's extension.
 QString defaultFileName(const QString& sourcePath, QSize size, OutputFormat format,
                         const QString& pattern = QStringLiteral("{source}_loop_{w}x{h}"));
+// The name template for a clip exported without a loop (Mode None, D-020): "_loop_" (or a closing "_loop") said
+// "_clip_"; any other template as it is.
+QString namePattern(const QString& pattern, bool clip);
 // The first free "name (1).webm", "name (2).webm" … beside `path` (spec §12.3: a file OBS holds).
 QString alternativePath(const QString& path);
 

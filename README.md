@@ -64,7 +64,8 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
 - **Playback** that never waits for the decoder: Space plays and pauses, loop on cycles In → Out, and a dropped frame
   is counted in the status bar — 1080p H.264 plays at 30 and 60 fps with none dropped.
 - **Four loop modes** worked out exactly: Simple, Crossfade inside the range (Linear or Smooth), Ping-pong and Ping-pong
-  with a smooth turn; Speed 0.10–4.00×; the output frame rate (Source, 15 … 60 or custom) with Nearest, Frame Blend
+  with a smooth turn — or **None**, the clip from In to Out as cut, with no loop at the end and no crossfade (the
+  panel then says "Clip …", the Preview shows no seam, the file is named `…_clip_…`); Speed 0.10–4.00×; the output frame rate (Source, 15 … 60 or custom) with Nearest, Frame Blend
   or Motion Interpolation. The Loop panel shows the result ("Loop 4.50 s · 135 frames @ 30 fps"), and the crossfade
   shows on the timeline as a band whose edge you drag.
 - **Keyframes** for the video's position and scale: **K** adds one at the playhead (or updates the one there); with

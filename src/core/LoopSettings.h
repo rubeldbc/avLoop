@@ -12,8 +12,9 @@ namespace avloop {
 
 // How the segment becomes a loop (spec §8, §11.1 "loop"): the mode, the crossfade's length and curve, the smooth
 // turn's length, Speed and how a segment frame is made. Times in seconds; they sit on the output grid when used.
+// None (D-020) is no loop at all: the clip from In to Out as cut.
 struct LoopSettings {
-    enum class Mode { Simple, Crossfade, PingPong, PingPongSmooth };
+    enum class Mode { Simple, Crossfade, PingPong, PingPongSmooth, None };
     enum class Curve { Linear, Smooth };
     enum class Method { Nearest, FrameBlend, Motion };
     static constexpr double kMinSpeed = 0.10;
@@ -29,7 +30,7 @@ struct LoopSettings {
     LoopSettings clamped() const; // Speed 0.10–4.00 on its 0.05 steps; F and T ≥ 0
     friend bool operator==(const LoopSettings&, const LoopSettings&) = default;
 
-    static QString modeId(Mode m); // "simple", "crossfade", "pingpong", "pingpong-smooth"
+    static QString modeId(Mode m); // "simple", "crossfade", "pingpong", "pingpong-smooth", "none"
     static Mode modeFromId(const QString& id);
     static QString curveId(Curve c); // "linear", "smooth"
     static Curve curveFromId(const QString& id);

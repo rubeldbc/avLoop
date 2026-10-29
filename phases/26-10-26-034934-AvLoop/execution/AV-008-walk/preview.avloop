@@ -1,0 +1,101 @@
+{
+    "crop": {
+        "feather": 12,
+        "h": 360,
+        "kind": "ellipse",
+        "radius": 0,
+        "ratio": "free",
+        "w": 640,
+        "x": 0,
+        "y": 0
+    },
+    "effects": {
+        "blacks": 0,
+        "blur": 0,
+        "colourise": 0,
+        "colouriseColour": "#e02020",
+        "contrast": 0,
+        "duotone": 0,
+        "duotoneDark": "#1a1040",
+        "duotoneLight": "#ffb060",
+        "exposure": 0,
+        "highlights": 0,
+        "hue": 0,
+        "invert": false,
+        "on": true,
+        "opacity": 100,
+        "posterize": 0,
+        "replace": 0,
+        "replaceFrom": "#ff8000",
+        "replaceRange": 30,
+        "replaceSoftness": 20,
+        "replaceTo": "#e01010",
+        "saturation": 100,
+        "sepia": 0,
+        "shadows": 0,
+        "sharpen": 0,
+        "split": 0,
+        "splitHighlights": "#ffa040",
+        "splitShadows": "#2060ff",
+        "temperature": 0,
+        "tint": 0,
+        "vibrance": 0,
+        "vignette": 0,
+        "vignetteSize": 50,
+        "whites": 0
+    },
+    "format": "avloop",
+    "loop": {
+        "curve": "smooth",
+        "fade": 0.5,
+        "fpsMethod": "nearest",
+        "mode": "crossfade",
+        "speed": 1,
+        "turn": 0.3
+    },
+    "output": {
+        "alpha": "auto",
+        "background": "#000000",
+        "format": "webm-vp9",
+        "fps": "source",
+        "h": 640,
+        "lock": true,
+        "size": "crop",
+        "w": 640
+    },
+    "quality": {
+        "crf": 31,
+        "maxBitrate": 0,
+        "preset": "medium",
+        "speed": 2,
+        "targetMB": 0,
+        "twoPass": false
+    },
+    "range": {
+        "in": 2,
+        "out": 5
+    },
+    "source": {
+        "mtime": "2026-10-26T14:06:16Z",
+        "path": "D:/Code5/avLoop/samples/counter-640p30.mp4",
+        "relativePath": "../../../../samples/counter-640p30.mp4",
+        "size": 1923416,
+        "stream": 0
+    },
+    "transform": {
+        "flipH": false,
+        "flipV": false,
+        "keyframes": [
+        ],
+        "scale": 1,
+        "x": 320,
+        "y": 180
+    },
+    "version": 2,
+    "view": {
+        "panX": 320,
+        "panY": 180,
+        "tool": "crop-ellipse",
+        "zoom": 1.9555555555555555
+    }
+}

@@ -50,6 +50,7 @@ int length(Mode mode, int segment, int fade, int turn) {
     Q_UNUSED(turn);
     switch (mode) {
     case Mode::Simple:
+    case Mode::None: // the clip as cut: the segment's frames, nothing more
         return segment;
     case Mode::Crossfade:
         return segment - clampFade(fade, segment);
@@ -76,6 +77,7 @@ Pick pick(Mode mode, int segment, int fade, int turn, Curve c, int k) {
     k = std::clamp(k, 0, std::max(0, length(mode, segment, fade, turn) - 1));
     switch (mode) {
     case Mode::Simple:
+    case Mode::None:
         return {k, k, 0};
     case Mode::Crossfade: {
         const int f = clampFade(fade, d);

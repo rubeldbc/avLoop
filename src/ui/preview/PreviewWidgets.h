@@ -40,7 +40,8 @@ public:
     void setValue(int k);
     int value() const { return value_; }
     // Crossfade: the strip from `from` to the end; Ping-pong: the turn frames.
-    void setSeams(int fadeFrom, const QList<int>& turns);
+    // `seam` false: a clip as cut (Mode None) — no mark where the end joins the start.
+    void setSeams(int fadeFrom, const QList<int>& turns, bool seam = true);
     void setCached(std::function<bool(int)> cached);
     double xOf(int k) const;
 
@@ -59,6 +60,7 @@ private:
     int value_ = 0;
     int fadeFrom_ = -1;
     QList<int> turns_;
+    bool seam_ = true;
     std::function<bool(int)> cached_;
 };
 

@@ -1,8 +1,8 @@
 // The main window's export side (spec §10.1, §12.2, §12.3): Export and Ctrl+E open the Save dialog (the project's last
-// export, else `<source>_loop_<W>x<H>.webm` in the last folder), the job runs in the background from a snapshot with
-// its bar in the status bar, the toast says how it ended (Show in folder; the OBS tip once a session, Don't show
-// again), quitting asks first. Export and Preview stand disabled with the reason when they cannot run. The size
-// estimate follows the project's changes while the Quality section is open.
+// export, else `<source>_loop_<W>x<H>.webm` — `_clip_` for Mode None — in the last folder), the job runs in the
+// background from a snapshot with its bar in the status bar, the toast says how it ended (Show in folder; the OBS tip
+// once a session, Don't show again), quitting asks first. Export and Preview stand disabled with the reason when they
+// cannot run. The size estimate follows the project's changes while the Quality section is open.
 #include "core/AppInfo.h"
 #include "core/AppSettings.h"
 #include "core/Geometry.h"
@@ -121,8 +121,10 @@ void MainWindow::buildExport() {
     WalkProbes::add(QStringLiteral("export.renderer"), [job] { return job() ? job()->result().renderer : QString(); });
     WalkProbes::add(QStringLiteral("export.text"), [this] { return exportBar_->text(); });
     WalkProbes::add(QStringLiteral("export.defaultName"), [this] {
-        return video_ ? exporting::defaultFileName(project_->source().path, project_->outputSize(),
-                                                   project_->output().format, appsettings::nameTemplate())
+        return video_ ? exporting::defaultFileName(
+                            project_->source().path, project_->outputSize(), project_->output().format,
+                            exporting::namePattern(appsettings::nameTemplate(),
+                                                   project_->loop().mode == LoopSettings::Mode::None))
                       : QString();
     });
     WalkProbes::add(QStringLiteral("question.last"), [this] { return lastQuestion_; });
@@ -234,8 +236,9 @@ QString MainWindow::suggestedExportPath() const {
         return info.dir().filePath(info.completeBaseName() + QLatin1Char('.') + extension);
     }
     return QDir(exportFolder())
-        .filePath(exporting::defaultFileName(project_->source().path, project_->outputSize(), project_->output().format,
-                                             appsettings::nameTemplate()));
+        .filePath(exporting::defaultFileName(
+            project_->source().path, project_->outputSize(), project_->output().format,
+            exporting::namePattern(appsettings::nameTemplate(), project_->loop().mode == LoopSettings::Mode::None)));
 }
 
 void MainWindow::chooseExport() {

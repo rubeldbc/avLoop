@@ -106,9 +106,10 @@ void PreviewSlider::setValue(int k) {
     update();
 }
 
-void PreviewSlider::setSeams(int fadeFrom, const QList<int>& turns) {
+void PreviewSlider::setSeams(int fadeFrom, const QList<int>& turns, bool seam) {
     fadeFrom_ = fadeFrom;
     turns_ = turns;
+    seam_ = seam;
     update();
 }
 
@@ -141,8 +142,9 @@ void PreviewSlider::paintEvent(QPaintEvent*) {
     }
     // The seam: where the end joins the start; the Ping-pongs' turns.
     p.setPen(QPen(t.accent, 2));
-    for (double x : {x0, x1})
-        p.drawLine(QPointF(x, mid - 7), QPointF(x, mid + 7));
+    if (seam_)
+        for (double x : {x0, x1})
+            p.drawLine(QPointF(x, mid - 7), QPointF(x, mid + 7));
     for (int k : turns_)
         p.drawLine(QPointF(xOf(k), mid + 4), QPointF(xOf(k), mid + 9));
     // The frames already made: a thin bar under the track.

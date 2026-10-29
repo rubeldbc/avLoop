@@ -110,6 +110,27 @@ private slots:
         QCOMPARE(p.b, p.a + 1);
         QVERIFY(p.w > 0 && p.w < 1);
     }
+    // None (D-020): the clip as cut — D frames, each the segment's own, no blend; the same picks as Simple.
+    void none() {
+        for (int d : {2, 3, 10, 150}) {
+            QCOMPARE(lm::length(Mode::None, d, 15, 9), d);
+            for (int k = 0; k < d; ++k) {
+                const Pick p = lm::pick(Mode::None, d, 15, 9, Curve::Smooth, k);
+                QCOMPARE(p, (Pick{k, k, 0}));
+                QCOMPARE(p, lm::pick(Mode::Simple, d, 15, 9, Curve::Smooth, k));
+            }
+        }
+        QCOMPARE(lm::segmentFrames(1.0, 1.01, {30, 1}, 1.0, Mode::None), 2);
+        LoopSettings l;
+        l.mode = Mode::None;
+        l.fade = 10;
+        l.turn = 10;
+        const LoopPlan p = LoopPlan::of(l, 1.0, 2.0, {30, 1});
+        QCOMPARE(p.length, 30);
+        QVERIFY(!p.fadeClamped && !p.turnClamped);
+        QCOMPARE(LoopSettings::modeId(Mode::None), QStringLiteral("none"));
+        QCOMPARE(LoopSettings::modeFromId(QStringLiteral("none")), Mode::None);
+    }
     void plan() {
         LoopSettings l;
         l.mode = Mode::Crossfade;

@@ -6,6 +6,19 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-020 — The clip as cut (AV-022, late, 2026-10-29)
+
+- A fifth loop Mode, **None** (`"none"` under `loop`): the clip from In to Out as cut — no crossfade, no return, no
+  seam treatment. L = D; output frame k is segment frame k, byte for byte Simple's (R-77). It is the first entry of the
+  Mode list, "None (the clip as cut)"; Crossfade, Curve and Turn are hidden as for Simple; the summary reads
+  `Clip 2.00 s · 60 frames @ 30 fps`. The timeline shows no band.
+- The Preview: no seam mark at the slider's ends; Around seam disabled, its tip "The clip is not a loop" (the player
+  still repeats, as a Media Source does). The export's and the batch's suggested name says `_clip_` where the template
+  says `_loop_` (or ends in `_loop`); any other template is as typed. Formats, quality, alpha, avloop-cli unchanged;
+  the Loop Finder unchanged.
+- The file stays at version 2 on main until AV-023 makes it 3 (R-78): 1.1.0 would read `"none"` as Crossfade, so no
+  Release carries this phase alone.
+
 ### D-019 — The release 1.1.0 (AV-021, late, 2026-10-27)
 
 - Version 1.1.0, from the root `CMakeLists.txt` alone: avloop.exe's VERSIONINFO (1.1.0.0), the About box's "Version

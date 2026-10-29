@@ -117,3 +117,5 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-74 | 1.1.0, a minor step; the Release `v1.1.0` as R-5 and R-62, latest | features and file version 2 since 1.0.1 | `README.md` §3; AV-021 |
 | R-75 | No silent install here; the build, deployment and installer checked by their details | the owner's own install shares the AppId | `README.md` §3; AV-021 |
 | R-76 | AV-017's walks read the version from `CMakeLists.txt` | the next version changes no walk | `README.md` §3; AV-021 |
+| R-77 | Mode None: the clip as cut, L = D, said "Clip"; Simple kept | "without applying a loop … without adding a crossfade" | `READINGS.md`; AV-022 |
+| R-78 | "none" under version 2 until AV-023's version 3; no Release between | 1.1.0 would read it as Crossfade | `READINGS.md`; AV-022 |
