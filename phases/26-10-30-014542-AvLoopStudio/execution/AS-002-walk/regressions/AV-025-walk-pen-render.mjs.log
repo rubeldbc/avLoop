@@ -1,0 +1,8 @@
+PASS the path renders, 640 × 360: 640x360
+PASS between the chord (y 100) and the curve (y ≈ 40): inside: alpha 255
+PASS above the curve: outside: alpha 0
+PASS the square below: inside; beside it: outside: 255, 0, 0
+PASS the curve's top at x 200 where the cubic says (y = 40): alpha crosses ½ at y ≈ 40
+PASS the same anchors without handles: the chord, that pixel clear: 0, 255
+PASS the GPU and the CPU: the same picture: max diff 1
+WALK PASSED

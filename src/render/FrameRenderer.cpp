@@ -53,9 +53,17 @@ bool FrameRenderer::open(QString* error) {
     if (!job_.crop.isEmpty() || maskshapes::anyVisible(job_.crop.shapes))
         mask_ = masks_.mask(job_.crop, job_.frame, job_.outputSize);
     effectsScale_ = job_.source.width > 0 ? double(job_.workingSize.width()) / job_.source.width : 1.0;
-    videoLayers_.setLayers(job_.layers, job_.frame, job_.outputSize);
+    if (job_.composite) {
+        sequence_ = std::make_unique<SequenceRenderer>(job_.sequence, QRectF(QPointF(0, 0), job_.frame.size()),
+                                                       job_.outputSize, job_.loop.method, job_.alpha, job_.background);
+        // Motion's pre-pass is the main video's: V1's clip from the source's start (AvLoop's own), by segment frame.
+        const QList<Clip>& v1 = job_.sequence.tracks.isEmpty() ? QList<Clip>{} : job_.sequence.tracks[0].clips;
+        if (job_.loop.method == LoopSettings::Method::Motion && !v1.isEmpty() && v1.first().start == 0)
+            sequence_->setMotion(v1.first().id,
+                                 [this](int i) { return motion_ ? motion_->frame(motionJob_, i) : media::Frame{}; });
+    }
     backend_ = Backend::Cpu;
-    if (gl_) {
+    if (gl_ && !sequence_) { // the composite is the CPU's (RS-6)
         if (gl_->ready() || gl_->init(&gpuNote_))
             backend_ = Backend::Gpu;
         else
@@ -111,8 +119,7 @@ bool FrameRenderer::compose(int k, Composite& c, QString* error) {
     c.size = job_.outputSize;
     c.layers.clear();
     c.mask = mask_.isNull() ? nullptr : &mask_;
-    c.alpha = job_.alpha || !videoLayers_.empty(); // with layers the background goes under them, last
-    frameSeconds_ = job_.tau(pick.w < 0.5 ? pick.a : pick.b);
+    c.alpha = job_.alpha;
     c.background = job_.background;
     c.look = job_.effects.key();
     // One segment frame's source frames, at its share of the blend; the loop's partner frame on the second lane.
@@ -144,30 +151,37 @@ bool FrameRenderer::compose(int k, Composite& c, QString* error) {
     return true;
 }
 
+int FrameRenderer::decodersOpen() const {
+    return sequence_ ? sequence_->decodersOpen() : 0;
+}
+
 bool FrameRenderer::render(int k, QImage& out, QString* error) {
+    if (sequence_) {
+        // The sequence at the loop's times: each blend term a whole composite (RS-11).
+        if (k < 0 || k >= job_.plan.length) {
+            if (error) *error = QStringLiteral("frame %1 is outside the loop's %2").arg(k).arg(job_.plan.length);
+            return false;
+        }
+        const LoopPlan& plan = job_.plan;
+        const Pick pick = loopmap::pick(job_.loop.mode, plan.segment, plan.fade, plan.turn, job_.loop.curve, k);
+        QList<SequenceRenderer::Term> terms;
+        if (pick.w < 1) terms.append({job_.tau(pick.a), 1 - pick.w, pick.a, 0});
+        if (pick.w > 0) terms.append({job_.tau(pick.b), pick.w, pick.b, 1});
+        return sequence_->render(terms, out, error);
+    }
     Composite c;
     if (!compose(k, c, error)) return false;
     if (out.size() != c.size || out.format() != QImage::Format_RGBA8888_Premultiplied)
         out = QImage(c.size, QImage::Format_RGBA8888_Premultiplied);
     if (backend_ == Backend::Gpu) {
-        const auto done = [&] {
-            layOver(out);
-            return true;
-        };
-        if (gl_->render(c, out.bits(), int(out.bytesPerLine()))) return done();
+        if (gl_->render(c, out.bits(), int(out.bytesPerLine()))) return true;
         // A lost or failing GPU: made again once, else the CPU from this frame on (spec §3.6).
-        if (gl_->recover() && gl_->render(c, out.bits(), int(out.bytesPerLine()))) return done();
+        if (gl_->recover() && gl_->render(c, out.bits(), int(out.bytesPerLine()))) return true;
         gpuNote_ = QStringLiteral("the GPU failed at frame %1; the CPU renders from here").arg(k);
         backend_ = Backend::Cpu;
     }
     cpu_.render(c, out.bits(), int(out.bytesPerLine()));
-    layOver(out);
     return true;
-}
-
-void FrameRenderer::layOver(QImage& out) {
-    if (!videoLayers_.empty())
-        videoLayers_.apply(frameSeconds_, out, mask_.isNull() ? nullptr : &mask_, job_.alpha, job_.background);
 }
 
 } // namespace avloop::render

@@ -1,0 +1,9 @@
+PASS frame 0: the layer in the top-left quarter (its green at 100, 125): 0,255,1,255
+PASS frame 30 (1 s): moved half way — the main red back, the layer's red at (200, 150): 253,0,0,255 | 254,0,0,255
+PASS opacity keyed 100 → 0: half at 1 s: 127,128,1,255
+PASS Invert on the layer: its green made magenta: 255,0,254,255
+PASS the main video untouched beside it: 254,0,253,255
+PASS Ease: at 0.5 s a different place than linear: max diff 255
+PASS no keys, no effects: byte for byte AV-030's: equal
+PASS the GPU and the CPU: the same picture: max diff 0
+WALK PASSED

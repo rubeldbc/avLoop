@@ -176,9 +176,9 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
 - `avloop-cli probe <video>`, `avloop-cli frame <video> --at N -o x.png`, of a project
   `avloop-cli frame <project.avloop> --at N -o x.png [--cpu]`, `avloop-cli export <project.avloop> -o x.webm
   [--format webm-vp9|webm-vp8|gif|apng|mp4-h264|mov-prores]` and
-  `avloop-cli find <video|project>` for scripts; `avloop-cli sequence <project.avloop>` prints the project as a
-  sequence of tracks and clips (AvLoop Studio's model, file version 4); `avloop-cli version` shows the FFmpeg build
-  in use and refuses a GPL build.
+  `avloop-cli find <video|project>` for scripts; `avloop-cli sequence <project.avloop> [--at T -o x.png]` prints the
+  project as a sequence of tracks and clips (AvLoop Studio's model, file version 4) and draws it at T by the composite;
+  `avloop-cli version` shows the FFmpeg build in use and refuses a GPL build.
 
 ## What is not in this version
 

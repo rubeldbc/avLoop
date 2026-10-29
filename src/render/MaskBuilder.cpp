@@ -101,19 +101,7 @@ namespace {
 
 // The crop's own coverage with the shapes joined into it, bottom to top (D-022).
 QImage withShapes(const QImage& own, const CropShape& crop, const QRectF& frame, const QSize& size) {
-    const qsizetype n = qsizetype(size.width()) * size.height();
-    std::vector<float> running(size_t(n), float(maskshapes::start(crop.shapes)));
-    for (const MaskShape& shape : crop.shapes) {
-        if (!shape.visible) continue;
-        const QImage s = MaskBuilder::shapeCoverage(shape, frame, size);
-        const float strength = float(shape.strength / 100.0);
-        for (int y = 0; y < size.height(); ++y) {
-            const uchar* row = s.constScanLine(y);
-            float* r = running.data() + qsizetype(y) * size.width();
-            for (int x = 0; x < size.width(); ++x)
-                r[x] = float(maskshapes::join(shape.role, r[x], row[x] / 255.f * strength));
-        }
-    }
+    const std::vector<float> running = MaskBuilder::shapesCoverage(crop.shapes, frame, size);
     QImage out(size, QImage::Format_Grayscale8);
     for (int y = 0; y < size.height(); ++y) {
         const uchar* base = own.constScanLine(y);
@@ -126,6 +114,23 @@ QImage withShapes(const QImage& own, const CropShape& crop, const QRectF& frame,
 }
 
 } // namespace
+
+std::vector<float> MaskBuilder::shapesCoverage(const QList<MaskShape>& shapes, const QRectF& frame, const QSize& size) {
+    const qsizetype n = qsizetype(size.width()) * size.height();
+    std::vector<float> running(size_t(n), float(maskshapes::start(shapes)));
+    for (const MaskShape& shape : shapes) {
+        if (!shape.visible) continue;
+        const QImage s = shapeCoverage(shape, frame, size);
+        const float strength = float(shape.strength / 100.0);
+        for (int y = 0; y < size.height(); ++y) {
+            const uchar* row = s.constScanLine(y);
+            float* r = running.data() + qsizetype(y) * size.width();
+            for (int x = 0; x < size.width(); ++x)
+                r[x] = float(maskshapes::join(shape.role, r[x], row[x] / 255.f * strength));
+        }
+    }
+    return running;
+}
 
 QImage MaskBuilder::build(const CropShape& crop, const QRectF& frame, const QSize& size) {
     if (!crop.shapes.isEmpty()) {

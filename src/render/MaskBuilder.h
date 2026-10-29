@@ -5,6 +5,8 @@
 #include <QImage>
 #include <QSize>
 
+#include <vector>
+
 namespace avloop::render {
 
 // The crop's alpha mask at the output size (spec §6.1, §3.4 step 6; AVADR-0001): 255 inside, 0 outside, the edge
@@ -28,6 +30,9 @@ public:
     // A shape's own coverage at the output size (QImage::Format_Grayscale8): its outline anti-aliased; with a feather
     // (D-024) softened inward over it from the shape's signed distance (strength is applied where shapes join).
     static QImage shapeCoverage(const MaskShape& shape, const QRectF& frame, const QSize& size);
+    // The shown `shapes` joined bottom to top into one running coverage, 0 … 1 a pixel (row by row) — from
+    // `maskshapes::start`, each at its strength by its role: the crop's shapes, and a clip's masks (D-032).
+    static std::vector<float> shapesCoverage(const QList<MaskShape>& shapes, const QRectF& frame, const QSize& size);
 
     // The mask from the cache when nothing changed.
     QImage mask(const CropShape& crop, const QRectF& frame, const QSize& outputSize);

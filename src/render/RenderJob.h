@@ -2,6 +2,7 @@
 
 #include "core/LoopMap.h"
 #include "core/ProjectJson.h"
+#include "core/Sequence.h"
 #include "media/MediaInfo.h"
 
 #include <QColor>
@@ -21,9 +22,12 @@ struct RenderJob {
     LoopSettings loop;
     OutputSettings output;
     QualitySettings quality;
-    ClipEffects effects;      // applied to each source frame before it is placed (EffectsPass)
-    QList<VideoLayer> layers; // the videos over the main one (D-027), laid by the LayerPass
-    bool alpha = true;        // Alpha: Auto (needed → kept), On, Off (composited over `background`)
+    ClipEffects effects; // applied to each source frame before it is placed (EffectsPass)
+    // The project as a sequence (D-031) — its clips, its matte; `composite`: more than AvLoop's one plain video, so the
+    // SequenceRenderer makes every frame (D-032, RS-10).
+    Sequence sequence;
+    bool composite = false;
+    bool alpha = true; // Alpha: Auto (needed → kept), On, Off (composited over `background`)
     QColor background = Qt::black;
     bool sizeLimited = false; // the long-side limit of 1920 took the asked size down (spec §10.2's note)
 
@@ -47,6 +51,8 @@ struct Placement {
     double ax = 1, bx = 0, ay = 1, by = 0;
     static Placement of(const RenderJob& job); // the transform without keyframes
     static Placement of(const RenderJob& job, const VideoTransform& transform);
+    // Media of `size` placed by `transform` in `frame` (scene px) at an output of `output` (a sequence's clips).
+    static Placement of(const QRectF& frame, const QSize& output, const VideoTransform& transform, const QSizeF& size);
 };
 
 } // namespace avloop::render

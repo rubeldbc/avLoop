@@ -1,0 +1,8 @@
+PASS an AV-019 file without the theme's keys renders: 921600 bytes
+PASS the yellow bar as it is: 253,253,0,255
+PASS Replace yellow → red: the yellow bar red: 253,0,0,255
+PASS the red and green bars (60° away) untouched: 253,0,0,255 | 0,254,0,255
+PASS Colourise red: the blue bar red: 223,31,31,255
+PASS Duotone: black becomes #000040: 0,0,64,255
+PASS a whole theme: the GPU and the CPU draw the same: max diff 0
+WALK PASSED

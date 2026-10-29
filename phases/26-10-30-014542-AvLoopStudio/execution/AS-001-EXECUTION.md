@@ -52,7 +52,7 @@ hole a video and export as transparent."*
 | `node tools/check-secrets.mjs` | PASS (run on its own, exit code 0) |
 | `check-loc.mjs` | PASS: 337 code files, the largest `src/core/ClipEffects.cpp` 425 |
 | `validate-phase-system.mjs` | PASS: 9 phases, 9 requirement ids, 0 errors, 0 warnings |
-| `git push origin main`; CI | see the commit `[AS-001]` and its run |
+| `git push origin main`; CI | pushed `d71708b`; CI green (run 40945823147, 9 m 34 s) |
 
 ## The walk
 

@@ -1,0 +1,8 @@
+PASS Strength 40: the cut's centre keeps 60 %: alpha 153
+PASS outside the cut 255; outside the rectangle 0: 255, 0
+PASS Feather 30: from the edge (x 220) inward 255 falls to 153 over ~30 px: 255 → 245 → 218 → 184 → 153 → 153
+PASS the centre as without feather: alpha 153
+PASS a feathered polygon (the distance transform): rising inward from its top edge, full by ~20 px: 13 → 77 → 140 → 204 → 255 → 255
+PASS the defaults: AV-024's frame byte for byte (the cut's centre 0): alpha 0
+PASS the GPU and the CPU: the same picture: max diff 1
+WALK PASSED

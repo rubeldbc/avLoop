@@ -23,9 +23,27 @@ its model, under the UI that is still AvLoop's (RS-7).
   (V1 stays). A clip never overlaps another on its track; a locked track refuses.
 - **The file**: version 4 writes `"sequence"` beside AvLoop's keys, which stay (none renamed); every file of version
   1 … 3 reads. Until the editor edits the sequence (AS-003) it is made from AvLoop's model (RS-9): the frame the export
-  frame; V1 the main video — its keyframes, effects, the crop's shapes and the crop's own shape (Keep only, or Cut when
-  inverted: the hole) unless a plain rectangle —, placed from the frame's corner; each layer on its own track. A
-  migrated file renders byte for byte as before. `avloop-cli sequence <project> [--save x.avloop]` prints it.
+  frame (the crop, else the video where it stands at In); V1 the main video — its keyframes and effects —, placed from
+  the frame's corner; each layer on its own track; the crop with its shapes the sequence's matte (D-032). A migrated
+  file renders byte for byte as before. `avloop-cli sequence <project> [--save x.avloop]` prints it.
+
+### D-032 — The composite (AS-002, AvLoop Studio, 2026-10-30)
+
+- **The composite** (`render/SequenceRenderer`): at a sequence time every shown track bottom to top, the clip present
+  → its media's frames at its own time — the FPS method by that media's own frame times — → its clip effects → placed
+  by its keyed motion, at its keyed opacity, inside its masks (the shapes joined as the crop's, in the clip's own px,
+  moving with it) → over the tracks below (acc = L·k + acc·(1 − αL·k)). Empty is transparent. A loop's blend (a
+  crossfade, a boomerang's turn) mixes whole composites, layers too (RS-11). The **matte** — AvLoop's crop: a shape
+  over every track, kept inside or Inverted a hole, feathered, with its shapes — goes over everything; with Alpha Off
+  the background under last; rounded once.
+- One decoder a file, decode size and lane, at most 8 open (the least recently used closes); each clip decoded at its
+  media's size × min(1, its largest effective scale) (R-16's rule, every clip's); media offline: the clip not drawn.
+  Motion Interpolation stays the main video's (V1's clip from the source's start); other clips blend (RS-12).
+- Every output — the Preview, the export, the batch, `avloop-cli` — of a sequence beyond one plain clip is made by it,
+  on the CPU (GPU setting or not: the same bytes). One plain clip (V1, from its media's start, no masks, 100 %) keeps
+  AvLoop's own path and its GPU back end — the composite makes it within 1/255 (RS-10). The LayerPass is gone.
+- `avloop-cli sequence <project> --at T -o x.png [--raw x.rgba]` draws the file's own sequence (else the one made from
+  AvLoop's model) at T.
 
 ### D-029 — The layers' keyframes and effects (AV-033, late, 2026-10-30)
 

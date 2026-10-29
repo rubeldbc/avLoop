@@ -1,7 +1,7 @@
 ---
 phase: AS-002
 title: "The composite"
-status: IN_PROGRESS
+status: DONE
 owner_item: 2
 track: A
 checkpoint_id: CP-A1
@@ -15,7 +15,7 @@ requirements: [REQ-AS-002]
 read_scope:
   - phases/26-10-30-014542-AvLoopStudio/control/03_SHAPES_THE_EDITOR.md
   - src/render/FrameRenderer.cpp
-  - src/render/LayerPass.cpp
+  - src/render/SequenceRenderer.cpp
   - src/render/MaskBuilder.cpp
   - src/core/LoopMap.h
   - spec: §3, §6, §11

@@ -62,7 +62,7 @@ int version() {
 int usage() {
     out(QStringLiteral("usage: avloop-cli version | probe <video> | frame <video|project> --at N -o x.png | "
                        "frames <project> [--count N] | export <project> -o out.webm | find <video|project> | "
-                       "sequence <project> [--save x.avloop]"));
+                       "sequence <project> [--save x.avloop] [--at T -o x.png]"));
     return 1;
 }
 
@@ -71,6 +71,7 @@ int usage() {
 int main(int argc, char** argv) {
     // Rendering a project needs OpenGL, so a GUI application (no window is shown); everything else does not.
     const bool renders = argc > 2 && (std::strcmp(argv[1], "frames") == 0 || std::strcmp(argv[1], "export") == 0 ||
+                                      std::strcmp(argv[1], "sequence") == 0 ||
                                       (std::strcmp(argv[1], "frame") == 0 && std::strstr(argv[2], ".avloop")));
     std::unique_ptr<QCoreApplication> app;
     if (renders)

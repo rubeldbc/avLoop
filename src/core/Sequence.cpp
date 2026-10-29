@@ -1,6 +1,7 @@
 #include "core/Sequence.h"
 
 #include "core/Geometry.h"
+#include "core/Keyframes.h"
 #include "core/ProjectJson.h"
 
 #include <QFileInfo>
@@ -32,17 +33,43 @@ QList<LayerKey> keysFrom(const QJsonArray& list) {
     return keys;
 }
 
-// A shape of the old scene in a clip's own pixels: (scene − its rectangle's top-left) / its scale.
-MaskShape ownPixels(MaskShape s, const QRectF& video, double scale) {
-    const auto map = [&](const QPointF& p) { return (p - video.topLeft()) / scale; };
-    s.rect = QRectF(map(s.rect.topLeft()), s.rect.size() / scale);
-    s.radius /= scale;
+// A shape moved by `by` (the old scene → the frame's px).
+MaskShape moved(MaskShape s, const QPointF& by) {
+    s.rect.translate(by);
     for (PathPoint& pt : s.points) {
-        pt.p = map(pt.p);
-        pt.in = map(pt.in);
-        pt.out = map(pt.out);
+        pt.p += by;
+        pt.in += by;
+        pt.out += by;
     }
     return s;
+}
+
+QJsonObject matteJson(const CropShape& m) {
+    QJsonArray shapes;
+    for (const MaskShape& s : m.shapes)
+        shapes.append(s.toJson());
+    return {{QStringLiteral("kind"), CropShape::kindId(m.kind)},
+            {QStringLiteral("x"), m.rect.x()},
+            {QStringLiteral("y"), m.rect.y()},
+            {QStringLiteral("w"), m.rect.width()},
+            {QStringLiteral("h"), m.rect.height()},
+            {QStringLiteral("radius"), m.radius},
+            {QStringLiteral("feather"), m.feather},
+            {QStringLiteral("invert"), m.invert},
+            {QStringLiteral("shapes"), shapes}};
+}
+
+CropShape matteFrom(const QJsonObject& json) {
+    CropShape m;
+    m.kind = CropShape::kindFromId(json.value(QStringLiteral("kind")).toString());
+    m.rect = QRectF(json.value(QStringLiteral("x")).toDouble(), json.value(QStringLiteral("y")).toDouble(),
+                    json.value(QStringLiteral("w")).toDouble(), json.value(QStringLiteral("h")).toDouble());
+    m.radius = json.value(QStringLiteral("radius")).toDouble();
+    m.feather = json.value(QStringLiteral("feather")).toDouble();
+    m.invert = json.value(QStringLiteral("invert")).toBool();
+    for (const QJsonValue& v : json.value(QStringLiteral("shapes")).toArray())
+        if (m.shapes.size() < MaskShape::kMaxShapes) m.shapes.append(MaskShape::fromJson(v.toObject()));
+    return m;
 }
 
 } // namespace
@@ -137,7 +164,8 @@ QJsonObject Sequence::toJson() const {
             {QStringLiteral("in"), inOut.in},
             {QStringLiteral("out"), inOut.out},
             {QStringLiteral("nextId"), nextId},
-            {QStringLiteral("tracks"), trackList}};
+            {QStringLiteral("tracks"), trackList},
+            {QStringLiteral("matte"), matteJson(matte)}};
 }
 
 Sequence Sequence::fromJson(const QJsonObject& json) {
@@ -148,6 +176,7 @@ Sequence Sequence::fromJson(const QJsonObject& json) {
     if (!s.fps.isValid()) s.fps = {30, 1};
     s.inOut = {json.value(QStringLiteral("in")).toDouble(), json.value(QStringLiteral("out")).toDouble()};
     s.nextId = std::max(1, json.value(QStringLiteral("nextId")).toInt(1));
+    s.matte = matteFrom(json.value(QStringLiteral("matte")).toObject());
     for (const QJsonValue& v : json.value(QStringLiteral("tracks")).toArray()) {
         if (s.tracks.size() >= kMaxTracks) break;
         const QJsonObject o = v.toObject();
@@ -168,7 +197,8 @@ Sequence Sequence::fromJson(const QJsonObject& json) {
 Sequence Sequence::fromAvLoop(const ProjectData& d) {
     Sequence s;
     const QSizeF video(d.source.width, d.source.height);
-    const QRectF frame = geometry::exportFrame(d.crop, d.transform, video);
+    // The export's frame: the crop, else the video where it stands at In (RenderJob's).
+    const QRectF frame = geometry::exportFrame(d.crop, keyframes::valueAt(d.keyframes, d.transform, d.range.in), video);
     const QPointF origin = frame.topLeft();
     s.frame = QSize(std::max(16, int(std::lround(frame.width()))), std::max(16, int(std::lround(frame.height()))));
     s.fps = d.output.sourceFps && d.source.fps.isValid() ? d.source.fps : d.output.fps;
@@ -189,26 +219,14 @@ Sequence Sequence::fromAvLoop(const ProjectData& d) {
         for (const Keyframe& k : d.keyframes)
             main.keys.append({k.t, k.x - origin.x(), k.y - origin.y(), k.scale, 100, k.ease});
         main.effects = d.effects;
-        // The crop's shapes, then its own shape (a hole when inverted), in the clip's own pixels at its place at In.
-        const QRectF placed = d.transform.rect(video);
-        const double scale = d.transform.scale > 0 ? d.transform.scale : 1.0;
-        for (const MaskShape& m : d.crop.shapes)
-            main.masks.append(ownPixels(m, placed, scale));
-        const bool plainRect = d.crop.kind == CropShape::Kind::Rect && d.crop.feather <= 0 && !d.crop.invert;
-        if (!d.crop.isEmpty() && !plainRect) {
-            MaskShape own;
-            own.kind = d.crop.kind == CropShape::Kind::Ellipse   ? MaskShape::Kind::Ellipse
-                       : d.crop.kind == CropShape::Kind::Rounded ? MaskShape::Kind::Rounded
-                                                                 : MaskShape::Kind::Rect;
-            own.role = d.crop.invert ? MaskShape::Role::Cut : MaskShape::Role::KeepOnly;
-            own.rect = d.crop.rect;
-            own.radius = d.crop.radius;
-            own.feather = d.crop.feather;
-            own.name = QStringLiteral("Crop");
-            main.masks.append(ownPixels(own, placed, scale));
-        }
         s.tracks[0].clips.append(main);
     }
+    // The crop over everything, as AvLoop drew it over the main video and the layers (RS-10).
+    s.matte = d.crop;
+    s.matte.ratio = CropShape().ratio;
+    if (!s.matte.isEmpty()) s.matte.rect.translate(-origin);
+    for (MaskShape& m : s.matte.shapes)
+        m = moved(m, -origin);
     for (const VideoLayer& l : d.layers) {
         const int index = std::clamp(l.track, 2, kMaxTracks) - 1;
         while (s.tracks.size() <= index)

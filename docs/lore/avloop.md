@@ -473,3 +473,9 @@ end of its section.
   save-open-save test catches the rest. (AS-001)
 - **A Qt test prints nothing to the Bash tool's console here**: `test-sequence.exe` exits 0 with no output. Rule: read
   a suite's cases with `-o <file>,txt` (PATH with Qt's and FFmpeg's bin), or trust ctest's verdict. (AS-001)
+- **A Qt test run by hand without Qt's plugin path hangs**: `test-composite.exe` (QTEST_MAIN, a GUI application) waited
+  over two minutes on the platform plugin's message box. Rule: run a suite by hand as ctest does — `QT_PLUGIN_PATH`,
+  `QT_QPA_PLATFORM=offscreen`, Qt's and FFmpeg's bin on PATH — through Node's `spawnSync` with a timeout. (AS-002)
+- **A pixel check where both answers look alike proves nothing**: the hole's centre was blue in V1 and in V2 alike, so
+  "V1 through the hole" passed with no hole drawn; the picture showed it. Rule: a walk that tells two sources apart
+  makes them differ where it reads (a mirrored V1) and checks the other source is not there. (AS-002)

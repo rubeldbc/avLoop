@@ -1,6 +1,7 @@
 // AS-001's walk (D-031): AvLoop's files read as AvLoop Studio's sequence by the built avloop-cli. Version-3 projects
 // of each kind — plain, a feathered ellipse crop with a Cut shape, an inverse (the hole), main keyframes and a layer on
-// V3 with its own keys — and a version-1 file: each one's tracks, clips, places and masks; saved as version 4 with the
+// V3 with its own keys — and a version-1 file: each one's tracks, clips, places and matte (the crop over everything,
+// AS-002's reading RS-10); saved as version 4 with the
 // "sequence" the CLI printed and every key of the file it read kept; read again — the same sequence, saved again —
 // the same bytes; and rendered — a migrated file's frames byte for byte the version-3 file's.
 import fs from 'node:fs';
@@ -74,16 +75,18 @@ const cropped = migrate('crop', project('crop', { crop }));
 const c = cropped.s && main(cropped.s);
 w.check(cropped.s && cropped.s.w === 200 && cropped.s.h === 100 && c.x === 220 && c.y === 130,
   'crop: the frame the crop\'s 200×100, the video placed from its corner', c && `${cropped.s.w}×${cropped.s.h} at ${c.x},${c.y}`);
-w.check(c && c.masks.length === 2 && c.masks[0].role === 'cut' && c.masks[0].x === 120 && c.masks[1].role === 'keep' &&
-  c.masks[1].kind === 'ellipse' && c.masks[1].feather === 10,
-  'crop: masks — the Cut square in the video\'s pixels, then the ellipse kept, feathered 10',
-  c && c.masks.map((m) => `${m.role} ${m.kind} ${m.x},${m.y} f${m.feather}`).join(' | '));
+const cm = cropped.s?.matte;
+w.check(c && c.masks.length === 0 && cm.kind === 'ellipse' && cm.x === 0 && cm.y === 0 && cm.w === 200 &&
+  cm.feather === 10 && !cm.invert && cm.shapes[0]?.role === 'cut' && cm.shapes[0]?.x === 20 && cm.shapes[0]?.y === 10,
+  'crop: the matte — the ellipse at the frame\'s place, feathered 10, the Cut square with it',
+  cm && `${cm.kind} ${cm.x},${cm.y} ${cm.w}×${cm.h} f${cm.feather} | ${cm.shapes.map((m) => `${m.role} ${m.x},${m.y}`)}`);
 
 const hole = migrate('hole', project('hole', { crop: { ...crop, invert: true, shapes: [] } }));
 const h = hole.s && main(hole.s);
-w.check(hole.s && hole.s.w === 640 && hole.s.h === 360 && h.masks.length === 1 && h.masks[0].role === 'cut' &&
-  h.masks[0].kind === 'ellipse' && h.masks[0].x === 100 && h.masks[0].w === 200,
-  'hole: the whole video, the ellipse a Cut mask — the hole', h && `${hole.s.w}×${hole.s.h} ${h.masks.map((m) => `${m.role} ${m.kind}`)}`);
+const hm = hole.s?.matte;
+w.check(hole.s && hole.s.w === 640 && hole.s.h === 360 && h.masks.length === 0 && hm.invert && hm.kind === 'ellipse' &&
+  hm.x === 100 && hm.w === 200, 'hole: the whole video, the matte the ellipse inverted — the hole',
+  hm && `${hole.s.w}×${hole.s.h} ${hm.kind} at ${hm.x},${hm.y} inverted ${hm.invert}`);
 
 const layer = { name: 'counter', path: sample, w: 640, h: 360, duration, track: 3, start: 0.5, in: 1, out: 3, x: 160,
   y: 90, scale: 0.5, opacity: 80, visible: true, locked: false, keys: [[0, 160, 90, 0.5, 100, 0], [2, 480, 270, 0.5, 40, 1]] };
@@ -93,15 +96,18 @@ const k = keyed.s;
 const v3 = k && k.tracks[2]?.clips[0];
 w.check(k && k.tracks.length === 3 && k.tracks.map((t) => t.name).join() === 'V1,V2,V3' && k.tracks[1].clips.length === 0,
   'layers: tracks V1, V2 (empty), V3', k && k.tracks.map((t) => `${t.name}:${t.clips.length}`).join(' '));
-w.check(v3 && v3.start === 0.5 && v3.in === 1 && v3.out === 3 && v3.x === 160 && v3.opacity === 80 &&
-  JSON.stringify(v3.keys) === JSON.stringify(layer.keys), 'layers: the layer on V3 — its time, In/Out, place, opacity, keys',
+// The frame: the main video where it stands at In — held at its key (400, 200, ×1.5): 960×540 from (−80, −70).
+const shifted = layer.keys.map(([t, x, y, ...rest]) => [t, x + 80, y + 70, ...rest]);
+w.check(k && k.w === 960 && k.h === 540 && v3 && v3.start === 0.5 && v3.in === 1 && v3.out === 3 && v3.x === 240 &&
+  v3.opacity === 80 && JSON.stringify(v3.keys) === JSON.stringify(shifted),
+  'layers: a 960×540 frame from (−80, −70); the layer on V3 — its time, In/Out, place, opacity, keys from there',
   v3 && `start ${v3.start} ${v3.in}–${v3.out} at ${v3.x} ${v3.opacity}% keys ${JSON.stringify(v3.keys)}`);
-w.check(k && JSON.stringify(main(k).keys) === JSON.stringify([[1, 400, 200, 1.5, 100, 1]]) && main(k).id !== v3.id,
+w.check(k && JSON.stringify(main(k).keys) === JSON.stringify([[1, 480, 270, 1.5, 100, 1]]) && main(k).id !== v3.id,
   'layers: the main keyframe a clip key (opacity 100, Ease)', k && JSON.stringify(main(k).keys));
 
 const old = migrate('version1', project('version1', { crop: { kind: 'rounded', x: 0, y: 0, w: 320, h: 180, radius: 20 } }, 1));
-w.check(old.s && old.s.w === 320 && main(old.s).masks[0]?.kind === 'rounded' && main(old.s).masks[0]?.radius === 20,
-  'version 1: read, the rounded crop a mask', old.s && `${old.s.w}×${old.s.h} ${main(old.s).masks.map((m) => m.kind)}`);
+w.check(old.s && old.s.w === 320 && old.s.matte.kind === 'rounded' && old.s.matte.radius === 20,
+  'version 1: read, the rounded crop the matte', old.s && `${old.s.w}×${old.s.h} ${old.s.matte.kind} r${old.s.matte.radius}`);
 
 for (const [name, saved] of [['crop', cropped.saved], ['hole', hole.saved], ['layers', keyed.saved]]) {
   const a = frame(path.join(TMP, `${name}.avloop`), 30), b = frame(saved, 30);

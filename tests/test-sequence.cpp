@@ -125,6 +125,11 @@ private slots:
         QVERIFY(se::insert(s, 1, 1.5, c));
         s.inOut = {1, 3};
         s.frame = {1080, 1920};
+        s.matte.kind = CropShape::Kind::Ellipse;
+        s.matte.rect = QRectF(10, 20, 300, 200);
+        s.matte.invert = true;
+        s.matte.feather = 4;
+        s.matte.shapes = {MaskShape{}};
         QCOMPARE(Sequence::fromJson(s.toJson()), s);
     }
     // AvLoop's project as a sequence: an ellipse crop with a feather and a shape, keyframes, a layer.
@@ -162,16 +167,20 @@ private slots:
         const Clip& main = s.tracks[0].clips.first();
         QCOMPARE(main.transform.x, 220.0); // 320 − the frame's left 100
         QCOMPARE(main.keys.first().x, 300.0);
-        QCOMPARE(main.masks.size(), 2);
-        QCOMPARE(main.masks[0].rect, QRectF(120, 60, 20, 20)); // the video's own pixels (it stood at 0, 0)
-        QCOMPARE(main.masks[1].role, MaskShape::Role::KeepOnly);
-        QCOMPARE(main.masks[1].kind, MaskShape::Kind::Ellipse);
-        QCOMPARE(main.masks[1].feather, 10.0);
+        QVERIFY(main.masks.isEmpty());
+        QCOMPARE(s.matte.rect, QRectF(0, 0, 200, 100)); // the crop at the frame's place: over everything (RS-10)
+        QCOMPARE(s.matte.kind, CropShape::Kind::Ellipse);
+        QCOMPARE(s.matte.feather, 10.0);
+        QCOMPARE(s.matte.shapes.first().rect, QRectF(20, 10, 20, 20));
         QCOMPARE(s.tracks[2].clips.first().transform.x, 100.0);
         d.crop.invert = true;
         const Sequence hole = Sequence::fromAvLoop(d);
-        QCOMPARE(hole.frame, QSize(640, 360)); // an inverse: the whole video
-        QCOMPARE(hole.tracks[0].clips.first().masks.last().role, MaskShape::Role::Cut);
+        // An inverse: the whole video where it stands at In — held at the first key (400, 200, ×1.5): 960×540 from
+        // (−80, −70).
+        QCOMPARE(hole.frame, QSize(960, 540));
+        QVERIFY(hole.matte.invert);
+        QCOMPARE(hole.matte.rect, QRectF(180, 120, 200, 100));
+        QCOMPARE(hole.tracks[0].clips.first().keys.first().x, 480.0);
         // The file carries it, and reads it back.
         const QJsonObject json = projectjson::toJson(d);
         QCOMPARE(json.value(QStringLiteral("version")).toInt(), 4);

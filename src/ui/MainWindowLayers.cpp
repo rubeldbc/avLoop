@@ -1,7 +1,8 @@
 // The video layers in the main window (D-027): ☰ → Add as layer… (Ctrl+Shift+O) puts a video on the lowest free track
 // from the playhead, at its own size at the scene's top-left (R-18), selected; the canvas draws each shown layer's
 // frame at the playhead under the crop's dim — decoded when the playhead rests, the last one kept while playing — and
-// its outline (the selected one solid, its name); the Preview and the export make the layers exactly (LayerPass).
+// its outline (the selected one solid, its name); the Preview and the export make the layers exactly (the
+// SequenceRenderer).
 #include "core/Project.h"
 #include "media/Decoder.h"
 #include "media/MediaProbe.h"

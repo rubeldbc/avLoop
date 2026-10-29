@@ -1,0 +1,58 @@
+{
+  "delay": 120,
+  "settle": 700,
+  "steps": [
+    { "label": "D-029: the counter with itself as a layer at half size; no keys yet" },
+    { "do": "open", "file": "samples/counter-640p30.mp4" },
+    { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 10000 },
+    { "do": "wait", "ms": 300 },
+    { "do": "key", "keys": "Ctrl+1", "on": "MainWindow" },
+    { "do": "addLayer", "file": "samples/counter-640p30.mp4" },
+    { "do": "type", "on": "panel.layers.scale", "text": "50" },
+    { "do": "expect", "probe": "layers.keys", "eq": "" },
+    { "do": "expect", "probe": "layers.summary", "eq": "counter-640p30:V2:0.00:320,180,50:100" },
+
+    { "label": "Key at 0 s; at 1 s X typed — a second key made there (as Premiere's); Opacity 40 into it" },
+    { "do": "click", "on": "panel.layers.key" },
+    { "do": "expect", "probe": "layers.keys", "eq": "0.00:320,180,50,100" },
+    { "do": "type", "on": "transport.time", "text": "1" },
+    { "do": "type", "on": "panel.layers.x", "text": "160" },
+    { "do": "type", "on": "panel.layers.opacity", "text": "40" },
+    { "do": "expect", "probe": "layers.keys", "eq": "0.00:320,180,50,100;1.00:160,180,50,40" },
+
+    { "label": "Ease on the first key; Delete key; Undo" },
+    { "do": "type", "on": "transport.time", "text": "0" },
+    { "do": "click", "on": "panel.layers.ease" },
+    { "do": "expect", "probe": "layers.keys", "eq": "0.00:320,180,50,100e;1.00:160,180,50,40" },
+    { "do": "click", "on": "panel.layers.unkey" },
+    { "do": "expect", "probe": "layers.keys", "eq": "1.00:160,180,50,40" },
+    { "do": "key", "keys": "Ctrl+Z", "on": "MainWindow" },
+    { "do": "expect", "probe": "layers.keys", "contains": "0.00:320,180,50,100e" },
+
+    { "label": "the Selection's drag of the keyed layer at 1 s writes into that key" },
+    { "do": "type", "on": "transport.time", "text": "1" },
+    { "do": "key", "keys": "V", "on": "MainWindow" },
+    { "do": "drag", "on": "canvas", "space": "canvas", "from": [160, 180], "to": [200, 200], "steps": 8 },
+    { "do": "expect", "probe": "layers.keys", "contains": ";1.00:200,200,50,40" },
+    { "do": "expect", "probe": "transform.x", "near": [320, 0.01] },
+
+    { "label": "the Clip effects section edits the selected layer's effects, not the main video's" },
+    { "do": "type", "on": "panel.effects.exposure", "text": "1.5" },
+    { "do": "expect", "probe": "layers.effects", "eq": true },
+    { "do": "expect", "probe": "effects.main", "eq": false },
+    { "do": "wait", "ms": 600 },
+    { "do": "shot", "on": "canvas", "file": "canvas-layer-keys.png", "maxWidth": 1200 },
+    { "do": "shot", "on": "TimelineArea", "file": "timeline-diamonds.png", "maxWidth": 1400 },
+    { "do": "shot", "on": "Section.layers", "file": "panel-layer-keys.png" },
+    { "do": "key", "keys": "F5", "on": "MainWindow" },
+    { "do": "waitFor", "probe": "preview.frame", "eq": "640x360", "timeout": 10000 },
+    { "do": "wait", "ms": 800 },
+    { "do": "shot", "on": "PreviewWindow", "file": "preview-layer-keys.png", "maxWidth": 1000 },
+    { "do": "previewClose" },
+
+    { "label": "a click beside the layer selects the main video: the section edits its effects again" },
+    { "do": "click", "on": "canvas", "space": "canvas", "at": [600, 340] },
+    { "do": "expect", "probe": "layers.selected", "eq": -1 },
+    { "do": "expect", "probe": "effects.summary", "eq": "" }
+  ]
+}

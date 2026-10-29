@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/ClipEffects.h"
+#include "core/CropShape.h"
 #include "core/MaskShape.h"
 #include "core/Rational.h"
 #include "core/TimeRange.h"
@@ -66,6 +67,9 @@ struct Sequence {
     Rational fps{30, 1};
     TimeRange inOut;
     QList<Track> tracks;
+    // The matte (D-032): a shape over the whole composite in frame px — kept inside, or Inverted a hole — with its
+    // shapes joined (AvLoop's crop, D-021 … D-024, as its MaskBuilder makes it); empty and no shapes: none.
+    CropShape matte;
     int nextId = 1;
 
     int clipCount() const;
@@ -73,8 +77,8 @@ struct Sequence {
     QJsonObject toJson() const;
     static Sequence fromJson(const QJsonObject& json);
     // An AvLoop file (versions 1 … 3) as a sequence (RS-5): the main video → V1's clip (its transform, keyframes as
-    // keys, effects; the crop's shape and its shapes → masks; an inverted crop → a Cut mask), the layers → clips on
-    // V2 …; the crop's rectangle (else the video where it stands at In) → the frame; the range → In/Out.
+    // keys, effects), the layers → clips on V2 …; the crop's rectangle (else the video where it stands at In) → the
+    // frame, the crop with its shapes → the matte, at the frame's place (RS-10); the range → In/Out.
     static Sequence fromAvLoop(const ProjectData& d);
     friend bool operator==(const Sequence&, const Sequence&) = default;
 };

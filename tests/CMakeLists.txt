@@ -49,6 +49,10 @@ target_include_directories(test-export-queue PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 avloop_add_test(loopfinder SOURCES test-loopfinder.cpp Samples.h LIBS avloop_export)
 target_compile_definitions(test-loopfinder PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
 target_include_directories(test-loopfinder PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+# The composite (D-032) on the counter sample, on the CPU.
+avloop_add_test(composite SOURCES test-composite.cpp Samples.h LIBS avloop_render)
+target_compile_definitions(test-composite PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
+target_include_directories(test-composite PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 # The Debug leak gate: the CRT debug heap around repeated cycles (skips in Release).
 avloop_add_test(leaks SOURCES test-leaks.cpp Samples.h LIBS avloop_export)
 target_compile_definitions(test-leaks PRIVATE AVLOOP_SAMPLES_DIR="${CMAKE_SOURCE_DIR}/samples")
