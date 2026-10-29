@@ -42,7 +42,7 @@
 | `node tools/check-secrets.mjs` | PASS (on its own, exit code 0) |
 | `check-loc.mjs` | PASS: the largest code file `src/core/ClipEffects.cpp`, 425 lines |
 | `validate-phase-system.mjs` (both programmes) | PASS: 33 phases; PASS: 9 phases |
-| `git push origin main`; CI | see the commit `[AS-006]` and its run |
+| `git push origin main`; CI | pushed `1a9b572`; CI green (run 40961921335, 9 m 49 s) |
 
 ## The walk
 

@@ -97,7 +97,21 @@ void SequenceLanes::followLayerSelection() {
 }
 
 bool SequenceLanes::eventFilter(QObject* watched, QEvent* event) {
-    if (watched == timeline_ && event->type() == QEvent::Paint) update();
+    if (watched == timeline_ && event->type() == QEvent::Paint) {
+        // The timeline's zoom or scroll: all of it again; else the playhead's two columns only — a full repaint every
+        // frame of playback grew the window's textures by 72 MB of VRAM (AV-005's walk).
+        const double x0 = timeline_->xOf(0), scale = timeline_->pxPerSecond();
+        const int x = int(std::round(timeline_->xOf(project_->time())));
+        if (x0 != shownX0_ || scale != shownScale_) {
+            shownX0_ = x0;
+            shownScale_ = scale;
+            update();
+        } else if (x != shownPlayhead_) {
+            update(QRect(shownPlayhead_ - 2, 0, 5, height()));
+            update(QRect(x - 2, 0, 5, height()));
+        }
+        shownPlayhead_ = x;
+    }
     return QWidget::eventFilter(watched, event);
 }
 

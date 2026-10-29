@@ -170,6 +170,8 @@ void MainWindow::probed(const QString& path, const std::optional<media::MediaInf
     timeline_->setSource(&*video_);
     clock_->setWorker(worker_.get());
     worker_->start();
+    // A playhead past this project's length (the last one's) goes back to its start (D-038).
+    if (project_->time() > fileEnd()) seek(0);
     refreshTransport();
     lastError_.clear();
     updateStatus();

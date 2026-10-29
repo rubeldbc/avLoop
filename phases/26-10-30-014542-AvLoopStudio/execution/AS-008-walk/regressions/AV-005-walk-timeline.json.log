@@ -1,0 +1,113 @@
+startup: 703 ms
+walk walk-timeline.json: 153 steps
+-- S6: the timeline of a 10 s 1080p30 video — the whole file, the playhead at 0 @1404 ms
+     open samples/counter-1080p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect range.in: 0
+PASS expect range.out: 10
+PASS expect playhead: 0
+PASS expect transport.time: 00:00:00.00
+PASS expect range.text: In 00:00:00.00 · Out 00:00:10.00 · 00:00:10.00 (300 f)
+PASS expect timeline.labels: timecode
+PASS expect timeline.overlaps: 0
+PASS shot timeline-start.png: 1600x834 px
+-- a click on the strip scrubs there; the canvas shows that exact frame @3643 ms
+PASS waitFor frame.seconds: 2.5 after 0 ms
+PASS expect playhead: 2.5
+PASS expect transport.time: 00:00:02.15
+-- I and O at the playhead (O keeps the frame under it); arrows step 1, Shift 10; Home/End; Ctrl+Home/End @4204 ms
+PASS expect range.in: 2.5
+PASS expect playhead: 2.6
+PASS waitFor frame.seconds: 2.6 after 0 ms
+PASS expect playhead: 2.933333333
+PASS expect range.out: 2.966666667
+PASS expect range.text: In 00:00:02.15 · Out 00:00:02.29 · 00:00:00.14 (14 f)
+PASS expect playhead: 2.5
+PASS expect playhead: 2.933333333
+PASS expect playhead: 2.9
+PASS expect playhead: 9.966666667
+PASS waitFor frame.seconds: 9.966666667 after 0 ms
+PASS expect playhead: 0
+PASS expect range.in: 0
+PASS expect range.out: 10
+PASS expect undo.count: 4
+-- In after Out moves Out to the file's end; Out before In moves In to the start @7856 ms
+PASS expect playhead: 8
+PASS expect range.out: 8.033333333
+PASS expect range.in: 9
+PASS expect range.out: 10
+PASS expect range.in: 0
+PASS expect range.out: 1.033333333
+-- the In and Out tools: a click on the timeline sets them there; Out's time typed @9365 ms
+PASS expect tool.active: in
+PASS expect range.in: 4
+PASS expect range.out: 10
+PASS expect playhead: 4
+PASS expect range.out: 6.033333333
+PASS expect options.out.length: Length 00:00:02.01 · 61 frames
+PASS expect range.out: 7
+-- a handle drags In (the canvas shows that frame); the bar moves the range; Undo and Redo @10998 ms
+PASS expect range.in: 3
+PASS waitFor frame.seconds: 3 after 0 ms
+PASS expect range.in: 4
+PASS expect range.out: 8
+PASS expect range.in: 3
+PASS expect range.out: 7
+PASS expect range.in: 4
+PASS expect range.in: 3
+-- zoom: Ctrl+wheel about the pointer down to 12 px a frame — labels never overlap (five pictures) @12886 ms
+PASS shot zoom-1-fit.png: 1442x150 px
+PASS expect timeline.overlaps: 0
+PASS shot zoom-2.png: 1442x150 px
+PASS expect timeline.overlaps: 0
+PASS shot zoom-3.png: 1442x150 px
+PASS expect timeline.pxPerSecond: 360
+PASS expect timeline.overlaps: 0
+PASS shot zoom-4-max.png: 1442x150 px
+PASS expect timeline.labels: frames
+PASS expect timeline.overlaps: 0
+PASS shot zoom-5-max-frames.png: 1442x150 px
+PASS expect timeline.pxPerSecond: 142.6
+PASS expect timeline.overlaps: 0
+PASS expect timeline.pxPerSecond: 324.0909091
+PASS expect timeline.labels: timecode
+-- the transport: a frame typed, Next, Prev, Go to In, Go to Out @15852 ms
+PASS expect playhead: 5
+PASS waitFor frame.seconds: 5 after 0 ms
+PASS expect playhead: 5.033333333
+PASS expect playhead: 5
+PASS expect playhead: 3
+PASS expect playhead: 6.966666667
+-- Space plays — loop on, round In → Out — and pauses; no frame dropped @17298 ms
+PASS expect playback.playing: true
+PASS expect playback.playing: false
+PASS expect playback.dropped: 0
+PASS expect playback.shown: 83
+PASS expect playhead: 5.7
+PASS expect playhead: 5.7
+PASS expect playback.loop: false
+PASS expect playback.loop: true
+-- arrows on the canvas: the crop's nudge with a crop tool, a frame step with the Selection @21319 ms
+PASS expect crop.x: 400.0568182
+PASS expect crop.x: 401.0568182
+PASS expect playhead: 4
+PASS expect playhead: 4.033333333
+PASS expect crop.x: 401.0568182
+-- the thumbnails made on their own decoder @22780 ms
+PASS waitFor timeline.overlaps: 0 after 0 ms
+PASS expect timeline.thumbs: 300
+PASS shot timeline-end.png: 1600x834 px
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 00000268743f3040] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 00000268743f3040] v1.16.0
+[libvpx-vp9 @ 00000268743f3040] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 00000268743f3040] v1.16.0
+[libvpx-vp9 @ 00000268743f5180] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 00000268743f5180] v1.16.0
+[libvpx-vp9 @ 00000268743f2180] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 00000268743f2180] v1.16.0
+[libvpx-vp9 @ 00000268743f2cc0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 00000268743f2cc0] v1.16.0
+[libvpx-vp9 @ 00000268743f5180] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 00000268743f5180] v1.16.0

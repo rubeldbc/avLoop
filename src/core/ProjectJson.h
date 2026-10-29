@@ -26,6 +26,7 @@ struct ProjectData {
     ViewState view;
     QString exportPath;   // "export": {"lastPath"} — the last file this project was exported to
     QJsonObject original; // the JSON as read: unknown keys are written back unchanged (spec §11.1)
+    int readVersion = 0;  // the file's version before its migration (0: not read from a file)
 };
 
 // The `.avloop` file (spec §11.1): UTF-8 JSON, "format": "avloop", "version": 2 (2 added the clip's effects); times in

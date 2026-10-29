@@ -1,7 +1,7 @@
 ---
 phase: AS-009
 title: "CP-S1 the studio walked"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 0
 track: A
 checkpoint_id: CP-A1

@@ -135,6 +135,7 @@ bool fromJson(const QJsonObject& read, ProjectData& d, QString* error, const QSt
     if (!projectmigrate::upgrade(json, kVersion, error)) return false;
     d = ProjectData{};
     d.original = json;
+    d.readVersion = read.value(QStringLiteral("version")).toInt(0);
     const QJsonObject source = json.value(QStringLiteral("source")).toObject();
     d.source.path = QDir::toNativeSeparators(source.value(QStringLiteral("path")).toString());
     d.relativePath = source.value(QStringLiteral("relativePath")).toString();

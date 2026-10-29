@@ -74,6 +74,9 @@ private:
     QString mergeKey_;
     int drags_ = 0;
     int frozenHead_ = 0; // the lanes do not move under a drag
+    double shownX0_ = 0; // the timeline's scroll and zoom, and the playhead's column, last painted
+    double shownScale_ = 0;
+    int shownPlayhead_ = 0;
 };
 
 } // namespace avloop

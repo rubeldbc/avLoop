@@ -1,0 +1,38 @@
+startup: 723 ms
+walk walk-layer-keys.json: 47 steps
+-- D-029: the counter with itself as a layer at half size; no keys yet @1424 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+     addLayer samples/counter-640p30.mp4
+PASS expect layers.keys: 
+PASS expect layers.summary: counter-640p30:V2:0.00:320,180,50:100
+-- Key at 0 s; at 1 s X typed — a second key made there (as Premiere's); Opacity 40 into it @3211 ms
+PASS expect layers.keys: 0.00:320,180,50,100
+PASS expect layers.keys: 0.00:320,180,50,100;1.00:160,180,50,40
+-- Ease on the first key; Delete key; Undo @3963 ms
+PASS expect layers.keys: 0.00:320,180,50,100e;1.00:160,180,50,40
+PASS expect layers.keys: 1.00:160,180,50,40
+PASS expect layers.keys: 0.00:320,180,50,100e;1.00:160,180,50,40
+-- the Selection's drag of the keyed layer at 1 s writes into that key @4878 ms
+PASS expect layers.keys: 0.00:320,180,50,100e;1.00:200,200,50,40
+PASS expect transform.x: 320
+-- the Clip effects section edits the selected layer's effects, not the main video's @5557 ms
+PASS expect layers.effects: true
+PASS expect effects.main: false
+PASS shot canvas-layer-keys.png: 1200x671 px
+PASS shot timeline-diamonds.png: 1400x146 px
+PASS shot panel-layer-keys.png: 309x406 px
+PASS waitFor preview.frame: 640x360 after 0 ms
+PASS shot preview-layer-keys.png: 680x500 px
+     previewClose
+-- a click beside the layer selects the main video: the section edits its effects again @8578 ms
+PASS expect layers.selected: -1
+PASS expect effects.summary: 
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 000001bc347a0180] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001bc347a0180] v1.16.0
+[libvpx-vp9 @ 000001bc3479fa40] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001bc3479fa40] v1.16.0
+[libvpx-vp9 @ 000001bc4b951f40] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001bc4b951f40] v1.16.0

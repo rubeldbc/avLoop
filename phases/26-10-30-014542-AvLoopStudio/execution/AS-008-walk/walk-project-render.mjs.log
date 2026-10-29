@@ -1,0 +1,5 @@
+PASS studio.avloop: version 5, four clips on V1, two media in the bin: version 5, V1 4, media 2
+PASS 13 s: the cut clip from its media's 3 s — frame 90: frame 90
+PASS 17 s: the last clip from its 7 s — frame 210, the hole clear: frame 210, alpha 0
+PASS avloop-v3.avloop untouched: version 3, no sequence (never saved over): version 3
+WALK PASSED

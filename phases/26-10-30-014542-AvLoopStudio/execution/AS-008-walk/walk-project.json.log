@@ -1,0 +1,40 @@
+startup: 738 ms
+walk walk-project.json: 42 steps
+-- D-038: a sequence made — the 1080p counter inserted at 2 s, the last clip cut at 16 s, a hole in it @1438 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+     import 1
+PASS expect sequence.ends: V1:0.00-2.00,2.00-12.00,12.00-16.00,16.00-20.00
+-- Save As studio.avloop; New; the project opened again — the same sequence, the hole, the bin @3768 ms
+     saveAs D:/Code5/avLoop/phases/26-10-30-014542-AvLoopStudio/execution/AS-008-walk/studio.avloop
+PASS expect project.path: D:\Code5\avLoop\phases\26-10-30-014542-AvLoopStudio\execution\AS-008-walk\studio.avloop
+PASS expect project.dirty: false
+     menu: New
+PASS expect sequence.clips: 1
+PASS expect video.state: none
+     project phases/26-10-30-014542-AvLoopStudio/execution/AS-008-walk/studio.avloop
+PASS waitFor video.state: ready after 0 ms
+PASS expect sequence.ends: V1:0.00-2.00,2.00-12.00,12.00-16.00,16.00-20.00
+PASS expect project.media: 2
+PASS expect controls.maskList: ellipse:cut
+PASS expect monitor.composite: true
+PASS expect project.dirty: false
+PASS shot reopened-17s.png: 1440x900 px
+-- an AvLoop project of version 3 opened: a sequence, said so; its file untouched @7750 ms
+     project phases/26-10-30-014542-AvLoopStudio/execution/AS-008-walk/avloop-v3.avloop
+PASS waitFor video.state: ready after 0 ms
+PASS expect toast.text: An AvLoop project of version 3, opened as a sequence: Save writes version 5.
+PASS expect sequence.ends: V1:0.00-10.00 V2:1.00-4.00
+PASS expect layers.count: 1
+PASS expect crop.kind: ellipse
+PASS expect output.size: 400x280
+PASS expect playhead: 0
+PASS shot avloop-v3-opened.png: 1440x900 px
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 000001aa8827ff40] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001aa8827ff40] v1.16.0
+[libvpx-vp9 @ 000001aa8827e540] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001aa8827e540] v1.16.0
+[libvpx-vp9 @ 000001aa882802c0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001aa882802c0] v1.16.0

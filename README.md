@@ -143,6 +143,8 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   ![The Loop Finder on a clip that repeats every 4 s](docs/screenshots/finder.png)
 
 - **Undo and Redo** for every change (200 steps; one drag is one step).
+- **Projects of sequences**: a project saves every clip, key, mask and effect and the imported media, and opens
+  again as it was; an AvLoop project of before opens as a sequence (its video on V1, its layers above) and says so.
 - **Projects** (`.avloop`, plain JSON): New, Open, Save (Ctrl+S), Save As, Recent (10 projects and 10 videos), drag and
   drop or `avloop.exe <project>`. The title shows the project and `*` while it has unsaved changes; closing asks Save /
   Don't save / Cancel. A moved project finds its video beside it, else asks you to locate it. Work is **autosaved**

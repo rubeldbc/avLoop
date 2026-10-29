@@ -27,6 +27,18 @@ its model, under the UI that is still AvLoop's (RS-7).
   the frame's corner; each layer on its own track; the crop with its shapes the sequence's matte (D-032). A migrated
   file renders byte for byte as before. `avloop-cli sequence <project> [--save x.avloop]` prints it.
 
+### D-038 — The project (AS-008, AvLoop Studio, 2026-10-30)
+
+- **A project of a sequence** saves and opens as AvLoop's (Save, Save As, Open, Recent, autosave and recovery): the file
+  (version 5) holds the sequence — every clip, its keys, masks and effects — and the media bin; opened again, the same
+  sequence, the same frames.
+- **An AvLoop project of before** (version 1 … 4) opens as a sequence — its main video on V1, its layers above, its
+  crop the matte — and says so: "An AvLoop project of version N, opened as a sequence: Save writes version 5." Its
+  file is written only by the user's Save (the autosave is a file of its own).
+- A playhead past the length of the project or video opened (the last one's) goes back to its start.
+- The lanes repaint only the playhead's columns as it moves (the whole on a zoom, a scroll or an edit): a full repaint
+  every frame of playback had grown the window's textures by 72 MB of VRAM (found by AV-005's walk; since AS-004).
+
 ### D-037 — The export (AS-007, AvLoop Studio, 2026-10-30)
 
 - **The sequence exported**: In → Out of the sequence (a loop of it by the Loop section's mode; **None** exports it as

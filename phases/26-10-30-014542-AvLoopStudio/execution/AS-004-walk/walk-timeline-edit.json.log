@@ -1,6 +1,6 @@
-startup: 720 ms
+startup: 709 ms
 walk walk-timeline-edit.json: 45 steps
--- D-034: the counter, a second file inserted at 2 s on V1 — three clips, the sequence 20 s long @1421 ms
+-- D-034: the counter, a second file inserted at 2 s on V1 — three clips, the sequence 20 s long @1410 ms
      open samples/counter-640p30.mp4
 PASS waitFor video.state: ready after 0 ms
      import 1
@@ -8,21 +8,21 @@ PASS expect sequence.ends: V1:0.00-2.00,2.00-12.00,12.00-20.00
 PASS expect transport.time: 00:00:02.00
 PASS expect lanes.tracks: 0
 PASS shot timeline-inserted.png: 978x150 px
--- the Razor (C): a click at 16 s cuts the last clip there; V leaves it @3383 ms
+-- the Razor (C): a click at 16 s cuts the last clip there; V leaves it @3395 ms
 PASS expect lanes.razor: true
 PASS expect sequence.v1: counter-640p30@0.00+0.00 counter-1080p30@2.00+0.00 counter-640p30@12.00+2.00 counter-640p30@16.00+6.00
 PASS expect lanes.razor: false
--- a click selects the 1080p clip; Delete leaves a gap; Undo puts it back @4136 ms
+-- a click selects the 1080p clip; Delete leaves a gap; Undo puts it back @4150 ms
 PASS expect lanes.selected: counter-1080p30@2.00
 PASS expect sequence.ends: V1:0.00-2.00,12.00-16.00,16.00-20.00
 PASS expect sequence.ends: V1:0.00-2.00,2.00-12.00,12.00-16.00,16.00-20.00
--- Shift+Delete: a ripple delete — the clips after it close the gap @4890 ms
+-- Shift+Delete: a ripple delete — the clips after it close the gap @4900 ms
 PASS expect sequence.ends: V1:0.00-2.00,2.00-6.00,6.00-10.00
--- a drag takes the last clip up to V2 (the empty lane); its end trims the clip before @5267 ms
+-- a drag takes the last clip up to V2 (the empty lane); its end trims the clip before @5277 ms
 PASS expect sequence.ends: V1:0.00-2.00,2.00-6.00 V2:6.00-10.00
 PASS expect layers.count: 1
 PASS expect sequence.ends: V1:0.00-2.00,2.00-5.00 V2:6.00-10.00
--- Ctrl+K at 1 s with nothing selected: every clip under the playhead cut @6040 ms
+-- Ctrl+K at 1 s with nothing selected: every clip under the playhead cut @6048 ms
 PASS expect lanes.selected: 
 PASS expect sequence.ends: V1:0.00-1.00,1.00-2.00,2.00-5.00 V2:6.00-10.00
 PASS expect undo.count: 6

@@ -4,9 +4,9 @@ Program: AVSTUDIO
 Programme version: 1.0.0
 State: **ACTIVE 2026-10-30** — planned at 01:45 (Asia/Dhaka) on the owner's word and started at once ("do the planning
 and continue to code"): AS-001, the sequence.
-Active phase: AS-008
-Next eligible: AS-008 (in progress)
-Completed: 7 of 9
+Active phase: AS-009
+Next eligible: AS-009 (in progress)
+Completed: 8 of 9
 Start commit: the plan's commit `[AS] Plan` on `main`; AvLoop's last `[AV-032]` before it.
 
 ## Plan in one paragraph
@@ -20,6 +20,7 @@ CP-S1 walking the whole (AS-009). AvLoop's model stays beside the sequence until
 ## Completion record
 
 New records are written here, newest first.
+- **AS-008** DONE 2026-10-30 — The project: a sequence saved and opened again; AvLoop files opened as sequences Record: `execution/AS-008-EXECUTION.md`.
 - **AS-007** DONE 2026-10-30 — The export: the sequence as cut, every format, Alpha Auto from the composite Record: `execution/AS-007-EXECUTION.md`.
 - **AS-006** DONE 2026-10-30 — The masks on the monitor: S and P draw the selected clip's masks; the Selection moves V1 clips Record: `execution/AS-006-EXECUTION.md`.
 - **AS-005** DONE 2026-10-30 — The Effect Controls: the selected clip's motion, opacity, stopwatch, masks and effects Record: `execution/AS-005-EXECUTION.md`.

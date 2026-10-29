@@ -497,3 +497,10 @@ end of its section.
   Rule: on a canvas picture, check the overlay (outlines, handles) lines up with the image before describing it. (AS-005)
 - **An underlay paints in view px**: the canvas's underlay painter has no scene transform; the layers map each rectangle
   by `sceneToView`. Rule: anything drawn there maps its scene rectangle the same way. (AS-005)
+- **A widget repainted every frame in a window with a QOpenGLWidget costs VRAM**: the window's widgets are composed as
+  textures; AS-004's lanes, repainted whole on every timeline paint during playback, grew VRAM by 72 MB once (AV-005's
+  playback walk: 162 → 234 MB). Rule: a widget that follows the playhead repaints the playhead's columns only, the
+  whole on a zoom, a scroll or a model change; the playback memory walk runs after any timeline widget change. (AS-008)
+- **A walk that "opens" while the last state is still "ready" waits for nothing**: after a New that never ran (no
+  shortcut), `waitFor video.state ready` passed at once and the project's checks read the old one. Rule: before a
+  waitFor, check the state left first (`video.state none` after New). (AS-008)

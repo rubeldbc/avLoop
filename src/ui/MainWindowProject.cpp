@@ -189,6 +189,13 @@ void MainWindow::projectOpened(const QString& projectFile, const ProjectData& re
         QFile::remove(projectFile);
     } else if (!projectFile.isEmpty()) {
         appsettings::addRecent(appsettings::Recent::Projects, projectFile);
+        // An AvLoop file of before (D-038): opened as a sequence; its file stays as it was until Save.
+        if (read.readVersion > 0 && read.readVersion < projectjson::kVersion)
+            Toast::post(centralWidget(),
+                        tr("An AvLoop project of version %1, opened as a sequence: Save writes version %2.")
+                            .arg(read.readVersion)
+                            .arg(projectjson::kVersion),
+                        Toast::Kind::Info, 8000);
     }
     if (video_ && read.source.fileSize > 0) {
         const QFileInfo now(video_->path);
