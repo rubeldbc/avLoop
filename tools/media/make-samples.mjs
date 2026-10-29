@@ -42,7 +42,7 @@ const SAMPLES = [
   { name: 'rotate90.mp4', need: [], from: 'counter-640p30.mp4', args: ['-display_rotation', '90', '-i', '{from}', '-c', 'copy'] },
   { name: 'vfr.mp4', need: [], args: [...counter(640, 360, 30, 6, ",select='mod(n,5)'"), ...h264, '-fps_mode', 'vfr'] },
   { name: 'hdr-pq.mkv', need: ['libx265'], args: [...src(640, 360, 25, 3), '-vf', 'format=yuv420p10le', '-c:v', 'libx265', '-x265-params', 'colorprim=bt2020:transfer=smpte2084:colormatrix=bt2020nc:log-level=error', '-color_primaries', 'bt2020', '-color_trc', 'smpte2084', '-colorspace', 'bt2020nc'] },
-  { name: 'interlaced.mpg', need: ['mpeg2video'], args: [...src(720, 576, 50, 2), '-vf', 'tinterlace=mode=interleave_top,setfield=tff', '-c:v', 'mpeg2video', '-flags', '+ilme+ildct', '-top', '1', '-b:v', '8M'] },
+  { name: 'interlaced.mpg', need: ['mpeg2video'], args: [...src(720, 576, 50, 2), '-vf', 'tinterlace=mode=interleave_top,setfield=tff', '-c:v', 'mpeg2video', '-flags', '+ilme+ildct', '-b:v', '8M'] }, // the field order from setfield (FFmpeg 9 has no -top)
   { name: 'sar43.mp4', need: [], args: [...src(640, 480, 25, 2), '-vf', 'setsar=4/3', ...h264] },
   { name: 'alpha-vp9.webm', need: ['libvpx-vp9'], args: [...alphaSrc(640, 360, 30, 3), '-c:v', 'libvpx-vp9', '-pix_fmt', 'yuva420p', '-b:v', '2M'] },
   { name: 'prores4444.mov', need: ['prores_ks'], args: [...alphaSrc(640, 360, 25, 2), '-c:v', 'prores_ks', '-profile:v', '4444', '-pix_fmt', 'yuva444p10le'] },

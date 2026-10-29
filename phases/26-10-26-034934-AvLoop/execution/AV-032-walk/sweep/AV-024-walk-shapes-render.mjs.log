@@ -1,0 +1,14 @@
+PASS no crop: the whole video, 640 × 360: 640x360
+PASS inside the Select rectangle opaque: 255, 255
+PASS inside the Cut ellipse clear: alpha 0
+PASS the ellipse's box corner (outside it) opaque: alpha 255
+PASS outside the shapes clear: 0, 0
+PASS the rectangle's edge anti-aliased within a pixel: 0 → 0 → 255 → 255
+PASS a Cut alone: its inside clear, the rest kept: 0, 255
+PASS a polygon: its inside opaque, beyond its slope clear: 255, 0
+PASS with a crop: the shapes in its frame (the rectangle's part inside it): 200x200, 255, 0
+PASS the GPU and the CPU: the same picture: max diff 1
+PASS no shapes: the crop's own mask as before: 200x200
+PASS exported with alpha: PASS export …\two.webm: 640x360, 60 frames at 30/1, 18192 bytes, 1 pass(es), 0.89 s, libvpx-vp9, GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2
+PASS the file's alpha (libvpx): the rectangle, the hole, the outside: 255, 0, 0
+WALK PASSED

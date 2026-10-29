@@ -1,0 +1,32 @@
+PASS a source that repeats every 2 s: periodic.mkv (FFV1)
+PASS simple: exported: PASS export …\simple.webm: 640x360, 60 frames at 30/1, 3115 bytes, 1 pass(es), 0.44 s, libvpx-vp9, GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2
+PASS simple: frame count = L: 60 (L = 60)
+PASS simple: frames decoded: 60
+PASS simple: seamDiff ≤ 1.5 × the median neighbour difference: seam 3.70, median 3.53, ratio 1.05
+PASS simple: no repeated frame: 0 repeats
+PASS simple: read twice in a row (S11): 120 frames (2L = 120), no error
+PASS crossfade: exported: PASS export …\crossfade.webm: 640x360, 45 frames at 30/1, 5434 bytes, 1 pass(es), 0.44 s, libvpx-vp9, GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2
+PASS crossfade: frame count = L: 45 (L = 45)
+PASS crossfade: frames decoded: 45
+PASS crossfade: seamDiff ≤ 1.5 × the median neighbour difference: seam 3.86, median 3.53, ratio 1.09
+PASS crossfade: no repeated frame: 0 repeats
+PASS crossfade: read twice in a row (S11): 90 frames (2L = 90), no error
+PASS pingpong: exported: PASS export …\pingpong.webm: 640x360, 118 frames at 30/1, 5318 bytes, 1 pass(es), 0.61 s, libvpx-vp9, GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2
+PASS pingpong: frame count = L: 118 (L = 118)
+PASS pingpong: frames decoded: 118
+PASS pingpong: seamDiff ≤ 1.5 × the median neighbour difference: seam 2.97, median 3.53, ratio 0.84
+PASS pingpong: no repeated frame: 0 repeats
+PASS pingpong: read twice in a row (S11): 236 frames (2L = 236), no error
+PASS pingpong-smooth: exported: PASS export …\pingpong-smooth.webm: 640x360, 118 frames at 30/1, 16995 bytes, 1 pass(es), 0.74 s, libvpx-vp9, GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2
+PASS pingpong-smooth: frame count = L: 118 (L = 118)
+PASS pingpong-smooth: frames decoded: 118
+PASS pingpong-smooth: seamDiff ≤ 1.5 × the median neighbour difference: seam 0.18, median 3.58, ratio 0.05
+PASS pingpong-smooth: no repeated frame: 0 repeats
+PASS pingpong-smooth: read twice in a row (S11): 236 frames (2L = 236), no error
+PASS crossfade-alpha: exported: PASS export …\crossfade-alpha.webm: 640x280, 45 frames at 30/1, 19447 bytes, 1 pass(es), 0.70 s, libvpx-vp9, GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2
+PASS crossfade-alpha: frame count = L: 45 (L = 45)
+PASS crossfade-alpha: frames decoded: 45
+PASS crossfade-alpha: seamDiff ≤ 1.5 × the median neighbour difference: seam 3.39, median 2.61, ratio 1.30
+PASS crossfade-alpha: no repeated frame: 0 repeats
+PASS crossfade-alpha: read twice in a row (S11): 90 frames (2L = 90), no error
+WALK PASSED

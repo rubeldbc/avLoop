@@ -1,7 +1,7 @@
 ---
 phase: AV-032
 title: "The sweep"
-status: IN_PROGRESS
+status: DEFERRED
 owner_item: 28
 track: B
 checkpoint_id: CP-B1

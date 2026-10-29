@@ -1,0 +1,13 @@
+PASS not inverted: the ellipse's own 200 × 200 output: 200x200
+PASS not inverted: centre opaque, corner clear: centre 255, corner 0
+PASS a version-2 file without "invert" renders byte for byte the same: 200x200
+PASS inverted: the whole video, 640 × 360: 640x360
+PASS inverted: the hole's centre clear: alpha 0
+PASS inverted: the corners and both sides opaque: 255, 255, 255
+PASS the crop's own corner (outside the ellipse) kept: alpha 255
+PASS outside the hole the video's own colour (the red bar): 253,0,0,255
+PASS feather 20: alpha rises outward from the edge over ~20 px: x 220…198: 0 → 13 → 77 → 140 → 204 → 255 → 255
+PASS the GPU and the CPU: the same picture: max diff 1
+PASS exported: VP9 with alpha, 640 × 360: PASS export …\hole.webm: 640x360, 60 frames at 30/1, 225899 bytes, 1 pass(es), 1.23 s, libvpx-vp9, GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2
+PASS the file's alpha (libvpx): the hole clear, the corner opaque: centre 0, corner 255, mean 220.2
+WALK PASSED

@@ -1,0 +1,7 @@
+PASS gpu: 18000 frames rendered: 18000 frames of a 135-frame loop · 300x300 · GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2 · 17.5 s · 1027.0 fps
+PASS gpu: Private Bytes, the last third against the first: peaks 279 / 280 / 280 MB → growth 1.2 MB, 18 samples
+PASS gpu: VRAM: peaks 43 / 43 / 43 MB → growth 0.0 MB
+PASS cpu: 3000 frames rendered: 3000 frames of a 135-frame loop · 300x300 · CPU · 3.2 s · 929.9 fps
+FAIL cpu: Private Bytes, the last third against the first: peaks 136 / 191 / 193 MB → growth 56.9 MB, 4 samples
+PASS cpu: VRAM: peaks 19 / 30 / 30 MB → growth 11.0 MB
+WALK FAILED (1)

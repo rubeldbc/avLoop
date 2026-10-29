@@ -2,8 +2,8 @@
 
 Program: AVLOOP
 Programme version: 1.0.0
-State: **ACTIVE 2026-10-30** — the owner's item 29 first: AV-033, the layers' keyframes and effects; then AV-032, the
-sweep (item 28).
+State: **SUPERSEDED 2026-10-30** — AV-033 DONE; AV-032 (the sweep) DEFERRED: the owner restructures the app as a mini
+Premiere Pro in a new programme, `phases/26-10-30-014542-AvLoopStudio`, whose checkpoint walks everything.
 Was: **COMPLETE 2026-10-30** — every phase DONE (AV-022 … AV-031, the owner's late items 20 … 27; no Release: the
 project file's version 3 waits for the owner's word, R-80).
 Was: **ACTIVE 2026-10-29** — the owner's late wishes (items 20 … 27): AV-022 … AV-031, confirmed by the owner's
@@ -26,9 +26,9 @@ words: *"I want to build a piece of software called AvLoop. Its main job is to t
 In/Out and screen area, and create a loop video of that size. … The point is that a resized WebM is exported that
 feels like a loop."* — with the ten decisions and the five later words of `README.md` §1. Fourteen items, two tracks,
 a checkpoint after each.
-Active phase: AV-032
-Next eligible: AV-032 (in progress)
-Completed: 32 of 33
+Active phase: none
+Next eligible: none — the work goes on in phases/26-10-30-014542-AvLoopStudio
+Completed: 32 of 33 (AV-032 deferred)
 Start commit: the plan's commit `[AV] Plan` on `main`. Planning baseline: `d98849f` on `main` (*Initial commit*).
 
 ## Plan in one paragraph

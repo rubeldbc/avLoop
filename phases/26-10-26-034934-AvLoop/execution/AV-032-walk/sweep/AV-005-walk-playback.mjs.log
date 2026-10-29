@@ -1,0 +1,5 @@
+PASS 10 s at 30 and 60 fps, no frame dropped: PASS expect playback.dropped: 0 | PASS expect playback.shown: 304 | PASS expect playback.dropped: 0 | PASS expect playback.shown: 607
+PASS a minute of loop playback ran, no frame dropped: PASS expect playback.dropped: 0 | PASS expect playback.shown: 1804
+PASS Private Bytes over the minute: the last third against the first: peaks 771 / 672 / 650 MB → growth -120.6 MB, 57 samples
+PASS VRAM over the minute: peaks 164 / 164 / 164 MB → growth 0.0 MB
+WALK PASSED

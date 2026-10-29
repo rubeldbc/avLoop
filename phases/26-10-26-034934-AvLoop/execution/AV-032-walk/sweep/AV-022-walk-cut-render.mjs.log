@@ -1,0 +1,12 @@
+PASS None: a 60-frame output (L = D): frame 0 of 60 · 640x360 · none · GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2 · 36 ms
+PASS None frame 0 = Simple frame 0, byte for byte: 921600 bytes
+PASS None frame 30 = Simple frame 30, byte for byte: 921600 bytes
+PASS None frame 59 = Simple frame 59, byte for byte: 921600 bytes
+PASS Crossfade starts F frames in, 45 frames: not None's: frame 0 of 45 · 640x360 · crossfade · GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2 · 38 ms
+PASS None frame F = Crossfade frame 0 (S[F]): the same segment, cut: equal
+PASS None: exported and checked: PASS export …\none.webm: 640x360, 60 frames at 30/1, 220163 bytes, 1 pass(es), 0.95 s, libvpx-vp9, GPU: NVIDIA GeForce RTX 5070/PCIe/SSE2
+PASS None: the file has D frames: 60 (D = 60; Crossfade's L would be 45)
+PASS ffprobe: vp9 640×360: vp9 640x360 r_frame_rate 30/1
+PASS the file's first frame is the frame at In: mean difference to rendered frame 0 / 15 / 30: 2.93 / 12.13 / 9.71
+PASS the project file says "mode": "none": {"mode":"none","fade":0.5}
+WALK PASSED

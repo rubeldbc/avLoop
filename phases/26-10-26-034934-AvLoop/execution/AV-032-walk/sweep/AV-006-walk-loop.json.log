@@ -1,0 +1,51 @@
+startup: 702 ms
+walk walk-loop.json: 74 steps
+-- S6/S7/S8: the Loop panel on a 5 s range (In 2 s, Out 7 s) of the 30 fps counter @1404 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect range.out: 7
+PASS expect loop.mode: crossfade
+PASS expect loop.plan: D150 F15 T9 L135
+PASS expect panel.loop.summary: Loop 4.50 s · 135 frames @ 30 fps
+-- the four modes: L = D, D − F, 2D − 2, 2D − 2 @2944 ms
+PASS expect panel.loop.summary: Loop 5.00 s · 150 frames @ 30 fps
+PASS expect panel.loop.summary: Loop 9.93 s · 298 frames @ 30 fps
+PASS expect loop.mode: pingpong-smooth
+PASS expect panel.loop.summary: Loop 9.93 s · 298 frames @ 30 fps
+PASS shot loop-smooth-turn.png: 1600x834 px
+PASS expect loop.mode: crossfade
+-- Crossfade in frames and in seconds, linked; beyond half the segment it is clamped and flashes @4291 ms
+PASS expect loop.plan: D150 F30 T9 L120
+PASS expect panel.loop.summary: Loop 4.00 s · 120 frames @ 30 fps
+PASS expect loop.plan: D150 F75 T9 L75
+PASS expect panel.loop.fadeFlash: true
+PASS expect loop.plan: D150 F15 T9 L135
+-- the crossfade band: its left edge dragged one second sets F (one Undo step) @5295 ms
+PASS expect timeline.fadeEdge: 6.5
+PASS shot band-before.png: 1643x150 px
+PASS expect loop.plan: D150 F30 T9 L120
+PASS expect timeline.fadeEdge: 6
+PASS shot band-after.png: 1643x150 px
+PASS expect loop.plan: D150 F15 T9 L135
+PASS expect loop.plan: D150 F30 T9 L120
+-- Speed 0.5: twice the frames; with Nearest the slow-motion hint; Motion Interpolation drops it @6681 ms
+PASS expect loop.speed: 0.5
+PASS expect loop.plan: D300 F30 T9 L270
+PASS expect panel.loop.slowHint: true
+PASS expect panel.loop.slowHint: false
+PASS shot loop-panel.png: 1600x834 px
+-- the output frame rate: 60, 25 (In and Out kept in seconds), Undo, Source, Custom @7622 ms
+PASS expect output.fps: 60
+PASS expect panel.loop.summary: Loop 9.00 s · 540 frames @ 60 fps
+PASS expect panel.loop.summary: Loop 9.00 s · 225 frames @ 25 fps
+PASS expect range.in: 2
+PASS expect range.out: 7
+PASS expect output.fps: 60
+PASS expect output.fps: 30
+PASS expect output.fps: 47.952
+-- playback at Speed 0.5: a second of play moves half a second of source @9507 ms
+PASS expect playhead: 2
+PASS expect playhead: 2.533333333
+PASS expect playback.dropped: 0
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

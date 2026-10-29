@@ -1,0 +1,6 @@
+PASS the Cut on top clears the overlap: overlap 0, A alone 255
+PASS the order swapped: the Select over the Cut keeps the overlap: overlap 255
+PASS the Cut hidden: byte for byte the Select alone: overlap 255
+PASS a locked shape renders as any: equal
+PASS the GPU and the CPU: the same picture: max diff 0
+WALK PASSED

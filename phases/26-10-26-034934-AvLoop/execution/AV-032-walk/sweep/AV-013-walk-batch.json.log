@@ -1,0 +1,84 @@
+startup: 742 ms
+walk walk-batch.json: 51 steps
+-- no video: nothing to add; the queue is empty and saved @1443 ms
+PASS expect batch.count: 0
+PASS expect batch.saved: true
+-- the counter sample with an ellipse; three entries: VP9, GIF (60 fps asked: 50), ProRes @1684 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+     batchAdd one.webm
+PASS expect output.format: gif
+PASS expect output.fps: 50
+PASS expect output.note: GIF plays at most 50 fps
+PASS shot output-gif.png: 252x229 px
+PASS waitFor quality.estimate: ~13.3 MB after 600 ms
+PASS shot quality-gif.png: 252x174 px
+     batchAdd two.gif
+PASS expect batch.count: 3
+PASS expect batch.states: pending,pending,pending
+PASS expect batch.files: one.webm,two.gif,counter-640p30_loop_640x360.mov
+-- Menu → Batch Queue; ProRes dragged first @5540 ms
+     menu: Batch Queue…
+PASS expect batch.open: true
+     batchMove 2 → 0
+PASS expect batch.files: counter-640p30_loop_640x360.mov,one.webm,two.gif
+PASS shot batch-pending.png: 720x360 px
+-- Start: one after another; Export waits meanwhile @6717 ms
+     batchStart
+PASS expect batch.started: true
+PASS expect export.enabled: false
+PASS waitFor batch.states: done,done,done after 8600 ms
+PASS expect batch.started: false
+PASS expect export.enabled: true
+PASS shot batch-done.png: 720x360 px
+-- a failure keeps its reason and the next entry runs @18539 ms
+     batchAdd three.mov
+     batchAdd four.apng
+     batchStart
+PASS waitFor batch.started: false after 4000 ms
+PASS expect batch.states: done,done,done,failed,done
+PASS expect batch.reasons: open %TEMP%/avloop-lab-WYjcll/no-such-folder/three.mov.part: No such file or directory
+PASS shot batch-failed.png: 720x360 px
+PASS expect batch.states: failed
+     batchClose
+PASS expect batch.open: false
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[palettegen @ 0000015124603240] 255(+1) colors generated out of 10309 colors; ratio=0.024736
+[palettegen @ 0000015124603240] Duped color: FF000000
+[palettegen @ 0000015124603240] Duped color: FF000000
+[palettegen @ 0000015124603240] Duped color: FF000000
+[palettegen @ 0000015124603240] Duped color: FF000000
+[palettegen @ 0000015124603240] Duped color: FFFDFD00
+[palettegen @ 0000015124603240] Duped color: FFFE0000
+[palettegen @ 0000015124603240] Duped color: FFFF0000
+[palettegen @ 0000015124603240] Duped color: FFFFFFFF
+[palettegen @ 0000015124603240] Duped color: FFFFFFFF
+[palettegen @ 0000015124603240] Duped color: FFFFFFFF
+[palettegen @ 0000015124603640] 255(+1) colors generated out of 9939 colors; ratio=0.025657
+[palettegen @ 0000015124603640] Duped color: FF000000
+[palettegen @ 0000015124603640] Duped color: FF000000
+[palettegen @ 0000015124603640] Duped color: FF000000
+[palettegen @ 0000015124603640] Duped color: FFFFFFFF
+[palettegen @ 0000015124603640] Duped color: FFFFFFFF
+[palettegen @ 0000015124603340] 255(+1) colors generated out of 11658 colors; ratio=0.021873
+[palettegen @ 0000015124603340] Duped color: FF000000
+[palettegen @ 0000015124603340] Duped color: FF000000
+[palettegen @ 0000015124603340] Duped color: FF2AD42A
+[palettegen @ 0000015124603340] Duped color: FF545454
+[palettegen @ 0000015124603340] Duped color: FF545454
+[palettegen @ 0000015124603340] Duped color: FF545454
+[palettegen @ 0000015124603340] Duped color: FF545454
+[palettegen @ 0000015124603340] Duped color: FF545454
+[palettegen @ 0000015124603340] Duped color: FF545454
+[palettegen @ 0000015124603340] Duped color: FFABABAB
+[palettegen @ 0000015124603340] Duped color: FFE73DC0
+[palettegen @ 0000015124603340] Duped color: FFFC0000
+[palettegen @ 0000015124603340] Duped color: FFFD0000
+[palettegen @ 0000015124603340] Duped color: FFFD0000
+[palettegen @ 0000015124603340] Duped color: FFFDFD00
+[libvpx-vp9 @ 0000015120b30f40] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 0000015120b30f40] v1.16.0
+[libvpx-vp9 @ 0000015120b30f40] v1.16.0
+[libvpx-vp9 @ 0000015120b30f40] v1.16.0
+[palettegen @ 0000015124602b40] 255(+1) colors generated out of 416576 colors; ratio=0.000612
