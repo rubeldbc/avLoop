@@ -6,11 +6,16 @@
 #include <QOpenGLWidget>
 #include <QPointF>
 #include <QRectF>
+#include <QTransform>
+
+class QPainter;
 
 #include <functional>
 #include <memory>
 
 namespace avloop {
+
+struct CropShape;
 
 class Project;
 class Tool;
@@ -38,6 +43,8 @@ public:
     QPointF viewToScene(const QPointF& view) const;
     QPointF sceneToView(const QPointF& scene) const;
     QRectF sceneToView(const QRectF& scene) const;
+    // The scene → view mapping as a transform (zoom and pan).
+    QTransform sceneToViewTransform() const;
     void setZoom(double zoom, const QPointF& anchorView);
     void setZoom(double zoom);
     void zoomStep(int direction, const QPointF& anchorView);
@@ -72,11 +79,12 @@ protected:
 
 private:
     struct Gl;
-    void paintScene();        // CanvasGl.cpp
-    void paintFallback();     // CanvasGl.cpp: QPainter only, when OpenGL 3.3 is missing
-    void setEffectUniforms(); // CanvasGl.cpp: the clip effects on the video
-    void paintOverlay();      // CanvasOverlay.cpp
-    void releaseGl();         // CanvasGl.cpp
+    void paintScene();                                    // CanvasGl.cpp
+    void paintFallback();                                 // CanvasGl.cpp: QPainter only, when OpenGL 3.3 is missing
+    void setEffectUniforms();                             // CanvasGl.cpp: the clip effects on the video
+    void paintOverlay();                                  // CanvasOverlay.cpp
+    void paintShapes(QPainter& p, const CropShape& crop); // the dim and outlines with shapes (D-022)
+    void releaseGl();                                     // CanvasGl.cpp
     void viewChangedNow();
 
     Project* project_;

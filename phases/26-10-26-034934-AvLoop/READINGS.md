@@ -197,3 +197,16 @@ from `README.md` §3 on 2026-10-29, when the README passed the 300-line ceiling 
     while unreleased (as R-73 did under 2); 1.1.0 refuses it with its message rather than drop the hole silently.
 81. **R-81** Delete and Clear remove the crop and its inverse (no crop, nothing to invert); a new crop drawn and another
     crop tool keep Inverse (the user's choice stands while a crop is redrawn). The 45th icon, "invert".
+82. **R-82** Shapes live inside the one crop frame (R-8 stands: one frame, one output); with no crop they act on the
+    whole video. "Selection or inverse selection" by shape is each shape's role: Select keeps its inside, Cut makes it
+    clear. Not keyframed (the crop is not, §1.3).
+83. **R-83** The file: `"shapes"` under `crop`, a shape's `"role"` written `"add"` / `"cut"` (AV-026 adds `"keep"`,
+    `"exclude"`) — not `"select"` as `control/25` first wrote, so no written value is ever renamed; each shape carries
+    `name`, `visible`, `locked`, `feather`, `strength` from the start, at their defaults until their phases.
+84. **R-84** The mask joins the shapes bottom to top into one running coverage (Select max, Cut ×(1 − s)), from nothing
+    when one selects, from the whole frame when they only cut; the crop's own coverage multiplies it. QtGui's
+    `QPainterPath` in `core` (`MaskShape::path`) — geometry, no widgets — widens R-17 as `ClipEffects`' QColor did.
+85. **R-85** The Shape tool: S; Draw and Role on its bar; X, Y, W, H, Radius of one selected standard shape on the bar,
+    not in the Crop section (the section lists the shapes, their Role, Delete); no snapping for shapes — a snap would
+    fight a polygon's clicks and a freehand line; Ctrl does nothing there.
+87. **R-87** The 46th … 49th icons: `tool-shape`, `shape-polygon`, `shape-freehand`, `shape-cut` (the Pen's at AV-025).

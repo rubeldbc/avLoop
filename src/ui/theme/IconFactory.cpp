@@ -198,6 +198,10 @@ const QStringList& IconFactory::allNames() {
         QStringLiteral("chevron"),
         QStringLiteral("eyedropper"),
         QStringLiteral("invert"),
+        QStringLiteral("tool-shape"),
+        QStringLiteral("shape-polygon"),
+        QStringLiteral("shape-freehand"),
+        QStringLiteral("shape-cut"),
     };
     // icons:end
     return names;

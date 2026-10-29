@@ -43,8 +43,9 @@ double effectiveScale(const VideoTransform& t, const QRectF& frame) {
 
 bool needsAlpha(const CropShape& crop, const VideoTransform& t, const QSizeF& video, bool sourceAlpha) {
     if (sourceAlpha) return true;
-    if (crop.isEmpty()) return false; // the whole video rectangle
-    if (crop.invert) return true;     // a hole is clear
+    if (maskshapes::anyVisible(crop.shapes)) return true; // shapes select or cut inside the frame (D-022)
+    if (crop.isEmpty()) return false;                     // the whole video rectangle
+    if (crop.invert) return true;                         // a hole is clear
     if (crop.kind != CropShape::Kind::Rect || crop.feather > 0) return true;
     return coverage(crop, t, video) != Coverage::Full;
 }

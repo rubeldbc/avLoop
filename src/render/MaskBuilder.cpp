@@ -1,5 +1,9 @@
 #include "render/MaskBuilder.h"
 
+#include <QPainter>
+
+#include <vector>
+
 #include <algorithm>
 #include <cmath>
 
@@ -44,7 +48,71 @@ QImage MaskBuilder::build(CropShape::Kind kind, const QSize& size, double radius
     return mask;
 }
 
+QImage MaskBuilder::shapeCoverage(const MaskShape& shape, const QRectF& frame, const QSize& size) {
+    // Drawn white on clear into ARGB (QPainter's anti-aliasing), its alpha taken: scene px → output px.
+    QImage layer(size, QImage::Format_ARGB32_Premultiplied);
+    layer.fill(Qt::transparent);
+    if (!frame.isEmpty()) {
+        QPainter p(&layer);
+        p.setRenderHint(QPainter::Antialiasing);
+        p.setPen(Qt::NoPen);
+        p.setBrush(Qt::white);
+        const double kx = size.width() / frame.width();
+        const double ky = size.height() / frame.height();
+        p.setTransform(QTransform(kx, 0, 0, ky, -frame.left() * kx, -frame.top() * ky));
+        p.drawPath(shape.path());
+    }
+    QImage out(size, QImage::Format_Grayscale8);
+    for (int y = 0; y < size.height(); ++y) {
+        const auto* in = reinterpret_cast<const QRgb*>(layer.constScanLine(y));
+        uchar* row = out.scanLine(y);
+        for (int x = 0; x < size.width(); ++x)
+            row[x] = uchar(qAlpha(in[x]));
+    }
+    return out;
+}
+
+namespace {
+
+// The crop's own coverage with the shapes joined into it, bottom to top (D-022).
+QImage withShapes(const QImage& own, const CropShape& crop, const QRectF& frame, const QSize& size) {
+    const qsizetype n = qsizetype(size.width()) * size.height();
+    std::vector<float> running(size_t(n), float(maskshapes::start(crop.shapes)));
+    for (const MaskShape& shape : crop.shapes) {
+        if (!shape.visible) continue;
+        const QImage s = MaskBuilder::shapeCoverage(shape, frame, size);
+        const float strength = float(shape.strength / 100.0);
+        for (int y = 0; y < size.height(); ++y) {
+            const uchar* row = s.constScanLine(y);
+            float* r = running.data() + qsizetype(y) * size.width();
+            for (int x = 0; x < size.width(); ++x)
+                r[x] = float(maskshapes::join(shape.role, r[x], row[x] / 255.f * strength));
+        }
+    }
+    QImage out(size, QImage::Format_Grayscale8);
+    for (int y = 0; y < size.height(); ++y) {
+        const uchar* base = own.constScanLine(y);
+        const float* r = running.data() + qsizetype(y) * size.width();
+        uchar* row = out.scanLine(y);
+        for (int x = 0; x < size.width(); ++x)
+            row[x] = uchar(std::lround(std::clamp(r[x], 0.f, 1.f) * base[x]));
+    }
+    return out;
+}
+
+} // namespace
+
 QImage MaskBuilder::build(const CropShape& crop, const QRectF& frame, const QSize& size) {
+    if (!crop.shapes.isEmpty()) {
+        CropShape alone = crop;
+        alone.shapes.clear();
+        QImage own(size, QImage::Format_Grayscale8);
+        if (crop.isEmpty())
+            own.fill(255); // no crop: the whole frame, then the shapes
+        else
+            own = build(alone, frame, size);
+        return withShapes(own, crop, frame, size);
+    }
     if (!crop.invert || frame.isEmpty()) {
         // The radius is the crop's (scene px); the mask works in output px.
         const double k = crop.isEmpty() ? 1.0 : size.width() / crop.rect.width();

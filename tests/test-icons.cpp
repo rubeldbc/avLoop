@@ -28,7 +28,7 @@ private slots:
     void initTestCase() { Theme::instance().apply(ThemeId::Navy); }
 
     void listMatchesTheSpec() {
-        QCOMPARE(IconFactory::allNames().size(), 45);
+        QCOMPARE(IconFactory::allNames().size(), 49);
         QStringList names = IconFactory::allNames();
         QCOMPARE(names.removeDuplicates(), 0);
     }

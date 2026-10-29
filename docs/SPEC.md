@@ -6,6 +6,30 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-022 — The shapes (AV-024, late, 2026-10-29)
+
+- **Shapes** inside the crop's frame (`"shapes"` under `crop`, version 3; at most 64): a rectangle, a rounded
+  rectangle or an ellipse by their rectangle, a polygon or a freehand outline by their anchors, all in scene px, never
+  keyframed. Each has a role — **Select** (`"add"`: keeps its inside) or **Cut** (`"cut"`: makes it clear) — and a name
+  ("Rectangle 1"), and carries `visible`, `locked`, `feather`, `strength` for the phases after (R-82, R-83).
+- The mask (R-84): each visible shape drawn anti-aliased at the output size, joined bottom to top into one running
+  coverage — Select max(r, s), Cut r·(1 − s) — starting at nothing when a shape selects, at the whole frame when they
+  only cut; the crop's own coverage (its shape, feather, inverse) multiplies it. No shapes: the crop's mask byte for
+  byte. Shapes without a crop act on the whole video. Alpha Auto is on with a visible shape. Both back ends use it.
+- **The Shape tool (S)**, after the crop tools on the rail (the 46th … 49th icons: the tool, polygon, freehand, cut):
+  its bar's Draw (Rectangle, Rounded, Ellipse, Polygon, Freehand) and Role for the next shape; a drag draws a standard
+  one (Shift square or circle, Alt from the centre; under 16 px cancelled); clicks draw a polygon, closed by a click on
+  its first anchor, Enter or a double-click, Esc cancelling; a freehand drag is simplified to 1 scene px. A click
+  selects the topmost visible, unlocked shape (Shift adds); a drag moves the selected; one standard shape has the
+  crop's eight handles, a polygon its anchors (one dragged alone); Delete, arrows (Shift 10 px), Esc deselects. The bar
+  types X, Y, W, H, Radius of one selected standard shape and deletes. No snapping for shapes (R-85). One Undo step an
+  edit ("Change the crop"); the selection is not in Undo or the file.
+- The canvas dims what the shapes and the crop do not keep (their outlines' path booleans; feather and strength are
+  the Preview's, R-22) and outlines each shape — a selecting one solid, the others dashed. The Crop section lists the
+  shapes top first ("Polygon 1 · Select"), its rows selecting them; Role and Delete act on the selected.
+- Probes `shapes.count`, `shapes.selected`, `shapes.summary`, `panel.shapes.rows`, `shape.mode`, `shape.points`,
+  `shape.freehand`. The walk's drag takes `"via"` points (a freehand outline).
+
 ### D-021 — The inverse selection (AV-023, late, 2026-10-29)
 
 - The crop's **Inverse** (`"invert"` under `crop`): the export's frame is the whole video where it stands at In (the

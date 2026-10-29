@@ -106,6 +106,52 @@ private slots:
         b.mask(c, QRectF(0, 0, 640, 640), {640, 640});
         QCOMPARE(b.builds(), 4);
     }
+    // Shapes (D-022): an Add ellipse inside a rectangle crop keeps its inside only; a Cut rectangle over it clears its
+    // part; two Add shapes unite; cuts alone cut from the whole frame; no visible shape, the crop's own mask.
+    void shapes() {
+        CropShape c;
+        c.rect = QRectF(0, 0, 400, 200);
+        MaskShape e;
+        e.kind = MaskShape::Kind::Ellipse;
+        e.rect = QRectF(100, 0, 200, 200);
+        c.shapes = {e};
+        QImage m = MaskBuilder::build(c, c.rect, {400, 200});
+        QCOMPARE(at(m, 200, 100), 255); // the ellipse's centre
+        QCOMPARE(at(m, 10, 10), 0);     // the crop's corner, outside the ellipse
+        QCOMPARE(at(m, 102, 2), 0);     // the ellipse's box corner
+        MaskShape cut;
+        cut.kind = MaskShape::Kind::Rect;
+        cut.role = MaskShape::Role::Cut;
+        cut.rect = QRectF(180, 80, 40, 40);
+        c.shapes = {e, cut};
+        m = MaskBuilder::build(c, c.rect, {400, 200});
+        QCOMPARE(at(m, 200, 100), 0);   // cut
+        QCOMPARE(at(m, 150, 100), 255); // still selected
+        MaskShape left = e;
+        left.rect = QRectF(0, 0, 100, 100);
+        c.shapes = {e, left};
+        m = MaskBuilder::build(c, c.rect, {400, 200});
+        QCOMPARE(at(m, 50, 50), 255);
+        QCOMPARE(at(m, 200, 100), 255);
+        c.shapes = {cut};
+        m = MaskBuilder::build(c, c.rect, {400, 200});
+        QCOMPARE(at(m, 10, 10), 255); // the whole frame kept …
+        QCOMPARE(at(m, 200, 100), 0); // … but the cut
+        c.shapes[0].visible = false;
+        QCOMPARE(MaskBuilder::build(c, c.rect, {400, 200}),
+                 MaskBuilder::build(CropShape::Kind::Rect, {400, 200}, 0, 0));
+        // A polygon (a triangle), scaled: its inside, its outside.
+        CropShape none;
+        none.shapes = {[] {
+            MaskShape t;
+            t.kind = MaskShape::Kind::Polygon;
+            t.points = {PathPoint::corner({0, 0}), PathPoint::corner({100, 0}), PathPoint::corner({0, 100})};
+            return t;
+        }()};
+        m = MaskBuilder::build(none, QRectF(0, 0, 100, 100), {200, 200});
+        QCOMPARE(at(m, 20, 20), 255);
+        QCOMPARE(at(m, 180, 180), 0);
+    }
     // Inverted (D-021): the ellipse a hole in a 640 × 360 frame — its centre 0, the corners 255; not inverted, the
     // same crop's own mask byte for byte as before.
     void inverse() {

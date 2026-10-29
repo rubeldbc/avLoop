@@ -53,7 +53,8 @@ class Project : public QObject {
     Q_OBJECT
 public:
     // Time: the playhead moved and, with keyframes, the transform shown with it (nothing to export changed).
-    enum class Aspect { Source, Range, Transform, Crop, Loop, Output, Quality, Keyframes, View, Time, Effects };
+    // Shapes: which shapes are selected (D-022; not in Undo, not in the file).
+    enum class Aspect { Source, Range, Transform, Crop, Loop, Output, Quality, Keyframes, View, Time, Effects, Shapes };
     Q_ENUM(Aspect)
     static constexpr int kUndoLimit = 200;
 
@@ -73,6 +74,9 @@ public:
     double keyTolerance() const; // half an output frame: one keyframe a frame
     int keyframeAtTime() const;  // the keyframe at the playhead, else −1
     const CropShape& crop() const { return crop_; }
+    // The shapes the Shape tool, its bar and the Crop section act on: valid indices, ascending.
+    QList<int> selectedShapes() const;
+    void setSelectedShapes(const QList<int>& indices);
     const LoopSettings& loop() const { return loop_; }
     const OutputSettings& output() const { return output_; }
     const QualitySettings& quality() const { return quality_; }
@@ -142,6 +146,7 @@ private:
     Keyframes keyframes_;
     double time_ = 0;
     CropShape crop_;
+    QList<int> selectedShapes_;
     LoopSettings loop_;
     OutputSettings output_;
     QualitySettings quality_;

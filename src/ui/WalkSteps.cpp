@@ -147,11 +147,23 @@ int WalkRunner::stepDrag(const QJsonObject& step) {
     const int steps = qMax(1, step.value(QStringLiteral("steps")).toInt(12));
     const Qt::MouseButton b = buttonOf(step);
     const Qt::KeyboardModifiers mods = modifiersOf(step);
+    // "via": points the drag passes through on its way (a freehand outline), each leg in `steps` moves.
+    QList<QPoint> legs;
+    for (const QJsonValue& v : step.value(QStringLiteral("via")).toArray()) {
+        QJsonObject one = step;
+        one.insert(QStringLiteral("at"), v);
+        legs << point(w, one, QStringLiteral("at"));
+    }
+    legs << to;
     sendMouse(w, QEvent::MouseButtonPress, from, b, b, mods);
-    for (int i = 1; i <= steps; ++i) {
-        const QPointF p = QPointF(from) + (QPointF(to) - QPointF(from)) * (double(i) / steps);
-        sendMouse(w, QEvent::MouseMove, p.toPoint(), Qt::NoButton, b, mods);
-        QApplication::processEvents();
+    QPoint last = from;
+    for (const QPoint& leg : legs) {
+        for (int i = 1; i <= steps; ++i) {
+            const QPointF p = QPointF(last) + (QPointF(leg) - QPointF(last)) * (double(i) / steps);
+            sendMouse(w, QEvent::MouseMove, p.toPoint(), Qt::NoButton, b, mods);
+            QApplication::processEvents();
+        }
+        last = leg;
     }
     // "keyBeforeRelease": a key pressed while the button is still down (Esc cancelling a drawing).
     if (const QString key = step.value(QStringLiteral("keyBeforeRelease")).toString(); !key.isEmpty()) {

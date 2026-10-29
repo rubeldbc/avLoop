@@ -12,7 +12,9 @@ namespace avloop::render {
 // radius scaled to output px) and ellipse by their signed distance. Inverted (D-021), the shape is a hole in the
 // export frame — the whole video — at its own place: 0 inside, 255 outside, the feather softening outward over
 // `feather` px. Both renderers use this one mask; it is built once and kept until the crop, the frame or the size
-// changes.
+// changes. With shapes (D-022) each is drawn at the output size in turn into one running coverage — Add, Cut, Keep
+// only, Exclude by its role (`maskshapes::join`) — and the crop's own coverage multiplies the result; no shapes, the
+// crop's mask byte for byte as before.
 class MaskBuilder {
 public:
     // One coverage value 0…1 at the pixel centre (x + ½, y + ½) of an output of `size`.
@@ -23,6 +25,8 @@ public:
     // The mask of a crop whose export frame is `frame` (scene px) at an output of `size`: the crop's own shape filling
     // the output, or, inverted, the shape a hole at its place in the frame.
     static QImage build(const CropShape& crop, const QRectF& frame, const QSize& size);
+    // A shape's own coverage at the output size (QImage::Format_Grayscale8): its outline anti-aliased.
+    static QImage shapeCoverage(const MaskShape& shape, const QRectF& frame, const QSize& size);
 
     // The mask from the cache when nothing changed.
     QImage mask(const CropShape& crop, const QRectF& frame, const QSize& outputSize);

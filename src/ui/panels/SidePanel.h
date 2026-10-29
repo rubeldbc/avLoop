@@ -30,6 +30,8 @@ public:
     QComboBox* presetBox() const { return presets_; }
     // CropPanel.cpp: the Crop section's rows, bound to the project.
     void bindCrop(Project* project);
+    // ShapesPanel.cpp: the Crop section's Shapes list (D-022) — the shapes, their role, Delete.
+    void bindShapes(Project* project);
     // LoopPanel.cpp: the Loop section; OutputPanel.cpp: the Output section (its frame rate until AV-009).
     void bindLoop(Project* project);
     void bindOutput(Project* project);

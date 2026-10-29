@@ -20,6 +20,7 @@ void Project::setSource(const SourceInfo& source) {
     keyframes_.clear();
     current_ = transform_;
     crop_ = CropShape{};
+    selectedShapes_.clear();
     effects_ = ClipEffects{};
     undo_.clear();
     emit changed(Aspect::Source);
@@ -27,6 +28,20 @@ void Project::setSource(const SourceInfo& source) {
     emit changed(Aspect::Transform);
     emit changed(Aspect::Crop);
     emit changed(Aspect::Effects);
+}
+
+QList<int> Project::selectedShapes() const {
+    QList<int> valid;
+    for (int i : selectedShapes_)
+        if (i >= 0 && i < crop_.shapes.size() && !valid.contains(i)) valid.append(i);
+    std::sort(valid.begin(), valid.end());
+    return valid;
+}
+
+void Project::setSelectedShapes(const QList<int>& indices) {
+    if (indices == selectedShapes_) return;
+    selectedShapes_ = indices;
+    emit changed(Aspect::Shapes);
 }
 
 ProjectData Project::snapshot() const {
@@ -56,6 +71,7 @@ void Project::restore(const ProjectData& data) {
     keyframes_ = data.keyframes;
     current_ = transformAt(time_);
     crop_ = data.crop.clamped();
+    selectedShapes_.clear();
     effects_ = data.effects.clamped();
     view_ = data.view;
     exportPath_ = data.exportPath;

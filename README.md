@@ -31,7 +31,7 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   transport row and the status bar.
 - **Navy** (default) and **Black** themes in orange — switch from the ☰ menu without a restart.
 - The app draws its own icons; they stay sharp at any display scale (checked at 100%, 150% and 200%).
-- Tools switch by their keys: **V** Selection, **M** / **U** / **E** crop shapes, **H** Hand, **Z** Zoom, **I** / **O**
+- Tools switch by their keys: **V** Selection, **M** / **U** / **E** crop shapes, **S** shapes, **H** Hand, **Z** Zoom, **I** / **O**
   In / Out, **K** Keyframe.
 - **Opens any video by its content** — Open, Ctrl+O, drag and drop, or `avloop.exe <file>`: MP4, MOV, MKV, WebM, AVI,
   WMV/ASF, FLV, MPEG-TS/M2TS, MPEG-PS/VOB, MXF, 3GP, OGV, Y4M, animated GIF and APNG; H.264, HEVC, AV1, VP8, VP9 (with
@@ -52,6 +52,10 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   output size and whether it needs transparency, and the status bar warns when the crop leaves the video.
   **Inverse** (the Crop section, or the toggle on the crop's bar) turns the selection inside out: the whole video is
   exported and the chosen area becomes a transparent hole in it, its feather softening outward.
+- **Shapes** (**S**) inside the crop — or the whole video — say what is kept: rectangles, rounded rectangles and
+  ellipses by a drag, polygons by clicks, freehand outlines by dragging round. Each shape **selects** (keeps its inside)
+  or **cuts** (makes it transparent); select, move, resize, nudge and delete them on the canvas, and see them listed in
+  the Crop section. The Preview and every export apply them exactly.
 
   ![An ellipse crop on the canvas](docs/screenshots/crop-ellipse.png)
 

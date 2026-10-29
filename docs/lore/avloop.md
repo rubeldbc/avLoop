@@ -392,3 +392,22 @@ end of its section.
   never a bare line that may repeat. (AV-023)
 - **A `QSignalBlocker block` in a refresh lambda hides an outer one** (C4456, an error under /WX). Rule: a second
   blocker in the same scope takes its own name. (AV-023)
+
+## The shapes (late)
+
+- **A walk run before the build that carries its step**: the freehand walk's `"via"` drag ran on a binary built before
+  `WalkSteps` learnt it — a straight 4 px drag, rightly refused — and looked like a tool bug. Rule: after a change to the
+  walk runner, build before walking; a failing walk is first re-run on a fresh build. (AV-024)
+- **The canvas puts a walk's scene point ½ px in** (the view pixel's centre): a shape drawn from (100, 60) starts at
+  100.5 and a rounded summary reads 101. Rule: a walk reads a drawn position with `near` (±0.6) or expects the
+  rounding as observed, never an exact typed value. (AV-024)
+- **A tool sees a buttonless move only as `cursor()`**: the canvas asks the tool for its cursor and calls `mouseMove`
+  only while a button is down, so a polygon's rubber segment stood still. Rule: what must follow the hover is updated
+  in `cursor()` (a `mutable` member). (AV-024)
+- **`QPainterPath::contains` leaves out the far edges**: a rectangle (0, 0, 100, 100) does not contain (100, 100). Rule:
+  hit tests and their tests use a point inside, never a corner. (AV-024)
+- **ci-watch.mjs takes the full SHA**: `gh run list --commit` matches no short one ("NO RUN … after 10 minutes"), and
+  CI's `cancel-in-progress` cancels a run when the next push comes within its ~9 minutes. Rule: `ci-watch.mjs` with no
+  argument (HEAD) right after the push; the next phase's push waits for the green of the one before. (AV-024)
+- **A Bash heredoc trips on a long script full of quotes and backticks** ("unexpected EOF while looking for matching
+  `'`"). Rule: a script of more than a few lines is written with the Write tool and run from the scratchpad. (AV-024)

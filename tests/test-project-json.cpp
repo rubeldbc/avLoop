@@ -161,6 +161,24 @@ private slots:
         QVERIFY(back.crop.invert);
         QCOMPARE(back.crop.rect, d.crop.rect);
     }
+    // The shapes (D-022) under crop, read back in their order with every value.
+    void shapesRoundTrip() {
+        ProjectData d = sample(QStringLiteral("a.mp4"));
+        MaskShape r;
+        r.rect = QRectF(1, 2, 30, 40);
+        r.name = QStringLiteral("Rectangle 1");
+        MaskShape p;
+        p.kind = MaskShape::Kind::Polygon;
+        p.role = MaskShape::Role::Cut;
+        p.points = {PathPoint::corner({0, 0}), PathPoint::corner({10, 0}), PathPoint::corner({5, 9})};
+        d.crop.shapes = {r, p};
+        ProjectData back;
+        QString error;
+        QVERIFY2(projectjson::fromJson(projectjson::toJson(d), back, &error), qPrintable(error));
+        QCOMPARE(back.crop.shapes.size(), 2);
+        QCOMPARE(back.crop.shapes[0], r);
+        QCOMPARE(back.crop.shapes[1], p);
+    }
     void cropRoundTrip() {
         ProjectData d = sample(QStringLiteral("a.mp4"));
         d.crop.kind = CropShape::Kind::Rounded;

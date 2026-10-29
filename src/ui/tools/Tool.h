@@ -66,6 +66,8 @@ Tool* createZoomTool(Canvas* canvas, Project* project);
 Tool* createHandTool(Canvas* canvas, Project* project);
 // CropTool.cpp: one tool a kind — M Rect, U Rounded, E Ellipse.
 Tool* createCropTool(int kind, Canvas* canvas, Project* project);
+// ShapeTool.cpp: S — shapes inside the crop's frame that select or cut (D-022).
+Tool* createShapeTool(Canvas* canvas, Project* project);
 // InOutTool.cpp: "in" or "out" — a click on the timeline sets it there (spec §6.4).
 Tool* createInOutTool(bool out, Canvas* canvas, Project* project);
 // KeyframeTool.cpp: `seek` takes the playhead to a keyframe (◀ / ▶).

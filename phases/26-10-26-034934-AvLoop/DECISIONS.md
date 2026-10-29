@@ -122,3 +122,8 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-79 | Inverse: the whole video kept, the crop's shape a hole, the feather outward | "the unselected (inverted) portion is included in the output" | `READINGS.md`; AV-023 |
 | R-80 | The file's version 3; 1.1.0 refuses it | a new key, never dropped silently | `READINGS.md`; AV-023 |
 | R-81 | Delete/Clear remove the inverse; a redrawn crop keeps it; the 45th icon | no crop, nothing to invert | `READINGS.md`; AV-023 |
+| R-82 | Shapes inside the one frame (the whole video with no crop); Select or Cut; not keyframed | "used to define a selection or an inverse selection" | `READINGS.md`; AV-024 |
+| R-83 | `"shapes"` under crop; roles `"add"`/`"cut"`; every later field written from the start | no written value renamed later | `READINGS.md`; AV-024 |
+| R-84 | One running coverage bottom to top, the crop's multiplying; QPainterPath in core | one mask (AVADR-0001), bounded memory | `READINGS.md`; AV-024 |
+| R-85 | S; its bar types one standard shape's place; no snapping for shapes | a snap would fight clicks and freehand | `READINGS.md`; AV-024 |
+| R-87 | Icons 46 … 49 | the app draws its own icons | `READINGS.md`; AV-024 |

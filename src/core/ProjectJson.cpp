@@ -21,6 +21,13 @@ QString tr(const char* text) {
 }
 
 // A known object written over the one read, so its unknown keys stay.
+QJsonArray shapesJson(const QList<MaskShape>& shapes) {
+    QJsonArray list;
+    for (const MaskShape& s : shapes)
+        list.append(s.toJson());
+    return list;
+}
+
 QJsonObject merged(const QJsonObject& original, const QString& key, const QJsonObject& known) {
     QJsonObject o = original.value(key).toObject();
     for (auto it = known.begin(); it != known.end(); ++it)
@@ -82,6 +89,7 @@ QJsonObject toJson(const ProjectData& d, const QString& projectPath) {
         {QStringLiteral("radius"), d.crop.radius},
         {QStringLiteral("feather"), d.crop.feather},
         {QStringLiteral("invert"), d.crop.invert},
+        {QStringLiteral("shapes"), shapesJson(d.crop.shapes)},
     };
     root.insert(QStringLiteral("crop"), merged(d.original, QStringLiteral("crop"), crop));
     root.insert(QStringLiteral("effects"), merged(d.original, QStringLiteral("effects"), d.effects.toJson()));
@@ -151,6 +159,9 @@ bool fromJson(const QJsonObject& read, ProjectData& d, QString* error, const QSt
     d.crop.radius = c.value(QStringLiteral("radius")).toDouble();
     d.crop.feather = c.value(QStringLiteral("feather")).toDouble();
     d.crop.invert = c.value(QStringLiteral("invert")).toBool(); // absent before version 3: not inverted
+    d.crop.shapes.clear();
+    for (const QJsonValue& v : c.value(QStringLiteral("shapes")).toArray())
+        d.crop.shapes.append(MaskShape::fromJson(v.toObject()));
     d.crop = d.crop.clamped();
     d.effects = ClipEffects::fromJson(json.value(QStringLiteral("effects")).toObject());
 

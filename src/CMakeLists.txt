@@ -3,7 +3,7 @@
 add_library(avloop_core STATIC
     core/AppInfo.h core/AppInfo.cpp core/Rational.h
     core/Geometry.h core/Geometry.cpp core/VideoTransform.h core/VideoTransform.cpp
-    core/CropShape.h core/CropShape.cpp core/AspectRatio.h core/AspectRatio.cpp core/Keyframes.h core/Keyframes.cpp
+    core/CropShape.h core/CropShape.cpp core/MaskShape.h core/MaskShape.cpp core/AspectRatio.h core/AspectRatio.cpp core/Keyframes.h core/Keyframes.cpp
     core/Timecode.h core/Timecode.cpp core/TimeRange.h core/TimeRange.cpp
     core/LoopSettings.h core/LoopSettings.cpp core/LoopMap.h core/LoopMap.cpp core/TimeMap.h core/TimeMap.cpp
     core/QualitySettings.h core/QualitySettings.cpp core/ClipEffects.h core/ClipEffects.cpp
@@ -57,14 +57,15 @@ add_library(avloop_ui STATIC
     ui/widgets/Toast.h ui/widgets/Toast.cpp
     ui/panels/Section.h ui/panels/Section.cpp
     ui/panels/SidePanel.h ui/panels/SidePanel.cpp ui/panels/CropPanel.cpp ui/panels/LoopPanel.cpp
-    ui/panels/OutputPanel.cpp ui/panels/QualityPanel.cpp ui/panels/PresetPanel.cpp ui/panels/EffectsPanel.cpp ui/widgets/ColourField.h ui/widgets/ColourField.cpp
+    ui/panels/OutputPanel.cpp ui/panels/QualityPanel.cpp ui/panels/PresetPanel.cpp ui/panels/EffectsPanel.cpp ui/panels/ShapesPanel.cpp ui/widgets/ColourField.h ui/widgets/ColourField.cpp
     ui/canvas/DropZone.h ui/canvas/DropZone.cpp
     ui/canvas/Canvas.h ui/canvas/Canvas.cpp ui/canvas/CanvasView.cpp ui/canvas/CanvasGl.cpp ui/canvas/CanvasGlState.h ui/canvas/CanvasOverlay.cpp
     ui/tools/Tool.h ui/tools/ToolManager.h ui/tools/ToolManager.cpp
     ui/tools/SelectionTool.cpp ui/tools/ZoomTool.cpp ui/tools/HandTool.cpp
-    ui/tools/CropTool.cpp ui/tools/CropHandles.h ui/tools/CropHandles.cpp ui/tools/InOutTool.cpp ui/tools/KeyframeTool.cpp
+    ui/tools/CropTool.cpp ui/tools/CropHandles.h ui/tools/CropHandles.cpp ui/tools/ShapeTool.cpp ui/tools/ShapeEdit.h
+    ui/tools/ShapeEdit.cpp ui/tools/InOutTool.cpp ui/tools/KeyframeTool.cpp
     ui/options/OptionsBar.h ui/options/OptionsBar.cpp ui/options/SelectionOptions.cpp ui/options/ZoomOptions.cpp
-    ui/options/CropOptions.cpp
+    ui/options/CropOptions.cpp ui/options/ShapeOptions.cpp
     ui/widgets/StepSpinBox.h ui/widgets/StepSpinBox.cpp ui/widgets/TimeEdit.h ui/widgets/TimeEdit.cpp
     ui/timeline/Transport.h ui/timeline/Transport.cpp
     ui/timeline/Timeline.h ui/timeline/Timeline.cpp ui/timeline/TimelinePaint.cpp ui/timeline/TimelineInput.cpp

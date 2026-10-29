@@ -9,6 +9,9 @@ CropShape CropShape::clamped() const {
     c.rect = rect.normalized();
     c.feather = std::clamp(feather, 0.0, kMaxFeather);
     c.radius = std::clamp(radius, 0.0, c.maxRadius());
+    if (c.shapes.size() > MaskShape::kMaxShapes) c.shapes.resize(MaskShape::kMaxShapes);
+    for (MaskShape& s : c.shapes)
+        s = s.clamped();
     return c;
 }
 

@@ -1,7 +1,7 @@
 ---
 phase: AV-024
 title: "The shapes"
-status: IN_PROGRESS
+status: DONE
 owner_item: 22
 track: B
 checkpoint_id: CP-B1

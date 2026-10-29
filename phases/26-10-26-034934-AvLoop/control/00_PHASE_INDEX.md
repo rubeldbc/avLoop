@@ -3,7 +3,7 @@
 
 Canonical current execution state: `../AUTONOMOUS_STATE.md`
 
-Phases: **31** · done: **23** · state: **ACTIVE** · generated: 2026-10-29T17:13:59.620Z
+Phases: **31** · done: **24** · state: **ACTIVE** · generated: 2026-10-29T17:32:01.868Z
 
 Tracks: A The loop maker — the ground, the media, the canvas and the Selection, the crop tools, the timeline, the loop engine, the renderer, the preview window, the export, the project and the settings · B The extras — the keyframes, the loop finder, the batch and the other formats, the installer, the name and the About box, the wheel and the keyframe copy, the clip effects, the colour theme, the release 1.1.0, the clip as cut, the inverse selection, the shapes and the pen, the shape combinations, the soft parts, the resets, the align tools and the shape layers, the timeline layers
 
@@ -34,8 +34,8 @@ Tracks: A The loop maker — the ground, the media, the canvas and the Selection
 | AV-021 | 19 | B | CP-B1 | DONE | Low | verify-env | The release 1.1.0 | AV-020 |
 | AV-022 | 20 | B | CP-B1 | DONE | Low | verify-env | The clip as cut | AV-021 |
 | AV-023 | 21 | B | CP-B1 | DONE | Medium | verify-env | The inverse selection | AV-022 |
-| AV-024 | 22 | B | CP-B1 | IN_PROGRESS | High | verify-env | The shapes | AV-023 |
-| AV-025 | 22 | B | CP-B1 | NOT_STARTED | High | verify-env | The pen tool | AV-024 |
+| AV-024 | 22 | B | CP-B1 | DONE | High | verify-env | The shapes | AV-023 |
+| AV-025 | 22 | B | CP-B1 | IN_PROGRESS | High | verify-env | The pen tool | AV-024 |
 | AV-026 | 23 | B | CP-B1 | NOT_STARTED | Medium | verify-env | The shape combinations | AV-025 |
 | AV-027 | 24 | B | CP-B1 | NOT_STARTED | Medium | verify-env | The soft parts | AV-026 |
 | AV-028 | 25 | B | CP-B1 | NOT_STARTED | Low | verify-env | The resets | AV-027 |

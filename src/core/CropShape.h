@@ -1,5 +1,8 @@
 #pragma once
 
+#include "core/MaskShape.h"
+
+#include <QList>
 #include <QRectF>
 #include <QString>
 
@@ -21,7 +24,8 @@ struct CropShape {
     double radius = 0;
     double feather = 0;
     QString ratio = QStringLiteral("free");
-    bool invert = false; // the chosen area cut out of the whole video (R-79)
+    bool invert = false;     // the chosen area cut out of the whole video (R-79)
+    QList<MaskShape> shapes; // inside the frame, bottom to top: what they add, cut … (D-022, R-82)
 
     bool isEmpty() const { return rect.width() <= 0 || rect.height() <= 0; }
     double maxRadius() const { return isEmpty() ? 0 : std::min(rect.width(), rect.height()) / 2; }

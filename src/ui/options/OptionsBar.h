@@ -14,6 +14,7 @@ namespace avloop {
 class Canvas;
 class Project;
 class StepSpinBox;
+struct ShapeDraft;
 
 // A tool's row in the top bar's options slot (spec §5.1, §6's table): the tool's name, then its numbers, toggles and
 // buttons, each named for walks ("options.<name>").
@@ -42,6 +43,12 @@ QWidget* createZoomOptions(Canvas* canvas, QWidget* parent);
 // CropOptions.cpp: a crop tool's row (`kind`: CropShape::Kind), and the ratio list shared with the Crop panel.
 QWidget* createCropOptions(Project* project, Canvas* canvas, int kind, QWidget* parent);
 QComboBox* createRatioBox(QWidget* parent);
+// ShapeOptions.cpp: the Shape tool's row — what it draws next (`draft`), the selected shapes' role, place and size.
+QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent);
+// A shape role list (Select, Cut …) shared by the bar and the Crop section; a role set on the selected shapes (one Undo
+// step, nothing when none changes).
+QComboBox* createRoleBox(QWidget* parent);
+void setShapesRole(Project* project, int role);
 // Applies the ratio chosen in a ratio box to the project's crop (one Undo step); Custom… takes the crop's own.
 void applyRatio(Project* project, const QString& id);
 // What walks read of a bar's field: its value while its row is shown, nothing once a tool switch has removed it.
