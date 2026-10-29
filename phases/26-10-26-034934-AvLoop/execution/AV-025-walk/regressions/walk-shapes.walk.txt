@@ -1,0 +1,50 @@
+walk walk-shapes.json: 79 steps
+-- D-022: the counter at 100 %, no crop; S, the Shape tool; no shapes (a canvas point lands ½ px in, as walk-crop's) @1078 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect tool.active: shape
+PASS expect shapes.count: 0
+PASS expect panel.crop.output: 640 × 360
+-- a rectangle drawn (Select): one Undo step, selected; the output needs alpha @2553 ms
+PASS expect shapes.count: 1
+PASS expect shapes.summary: rect:add:101,60,200,140
+PASS expect shapes.selected: 0
+PASS expect undo.count: 1
+PASS expect options.shape.w: 200
+PASS expect panel.crop.output: 640 × 360 · alpha
+-- moved by a drag inside; resized by its bottom-right handle; each one step @3553 ms
+PASS expect shapes.summary: rect:add:141,80,200,140
+PASS expect shapes.summary: rect:add:141,80,240,160
+PASS expect undo.count: 3
+-- Esc deselects; an ellipse that cuts, drawn beside it @4401 ms
+PASS expect shapes.selected: 
+PASS expect shapes.summary: rect:add:141,80,240,160
+PASS expect shapes.summary: rect:add:141,80,240,160;ellipse:cut:401,160,160,160
+-- a polygon of five clicks, closed on its first anchor (Select) @5405 ms
+PASS expect shape.mode: polygon
+PASS expect shape.points: 5
+PASS expect shape.mode: none
+PASS expect shapes.count: 3
+PASS expect shapes.summary: rect:add:141,80,240,160;ellipse:cut:401,160,160,160;polygon:add:n5
+-- Esc cancels a polygon being drawn @7167 ms
+PASS expect shape.mode: none
+PASS expect shapes.count: 3
+-- a freehand outline dragged round, simplified, closed @7918 ms
+PASS expect shapes.count: 4
+PASS expect shapes.summary: rect:add:141,80,240,160;ellipse:cut:401,160,160,160;polygon:add:n5;polygon:add:n7
+PASS expect panel.shapes.rows: Polygon 2 · Select|Polygon 1 · Select|Ellipse 1 · Cut|Rectangle 1 · Select
+PASS shot canvas-shapes.png: 1200x587 px
+PASS shot panel-shapes.png: 252x486 px
+-- a click selects the rectangle; the Crop section's Role makes it cut; Delete removes it; Undo @9123 ms
+PASS expect shapes.selected: 0
+PASS expect shapes.summary: rect:cut:141,80,240,160;ellipse:cut:401,160,160,160;polygon:add:n5;polygon:add:n7
+PASS expect shapes.summary: rect:add:141,80,240,160;ellipse:cut:401,160,160,160;polygon:add:n5;polygon:add:n7
+PASS expect shapes.count: 3
+PASS expect shapes.count: 4
+-- the Preview: the shapes' mask, exactly @10377 ms
+PASS expect preview.open: true
+PASS waitFor preview.frame: 640x360 after 0 ms
+PASS shot preview-shapes.png: 680x500 px
+     previewClose
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

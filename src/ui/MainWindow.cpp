@@ -63,6 +63,7 @@ QList<MainWindow::ToolInfo> MainWindow::tools() {
         {QStringLiteral("crop-ellipse"), QStringLiteral("tool-crop-ellipse"), tr("Crop: Ellipse"),
          QKeySequence(Qt::Key_E)},
         {QStringLiteral("shape"), QStringLiteral("tool-shape"), tr("Shape"), QKeySequence(Qt::Key_S)},
+        {QStringLiteral("pen"), QStringLiteral("tool-pen"), tr("Pen"), QKeySequence(Qt::Key_P)},
         {QStringLiteral("hand"), QStringLiteral("tool-hand"), tr("Hand"), QKeySequence(Qt::Key_H)},
         {QStringLiteral("zoom"), QStringLiteral("tool-zoom"), tr("Zoom"), QKeySequence(Qt::Key_Z)},
         {QStringLiteral("in"), QStringLiteral("tool-in"), tr("In"), QKeySequence(Qt::Key_I)},
@@ -234,7 +235,7 @@ QWidget* MainWindow::buildRail() {
 
     toolGroup_ = new QButtonGroup(rail);
     toolGroup_->setExclusive(true);
-    const QStringList groupEnds = {QStringLiteral("select"), QStringLiteral("shape"), QStringLiteral("zoom")};
+    const QStringList groupEnds = {QStringLiteral("select"), QStringLiteral("pen"), QStringLiteral("zoom")};
     for (const ToolInfo& tool : tools()) {
         auto* b = new QToolButton(rail);
         b->setObjectName(QStringLiteral("tool.%1").arg(tool.id));

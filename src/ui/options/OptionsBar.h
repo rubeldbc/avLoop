@@ -45,6 +45,8 @@ QWidget* createCropOptions(Project* project, Canvas* canvas, int kind, QWidget* 
 QComboBox* createRatioBox(QWidget* parent);
 // ShapeOptions.cpp: the Shape tool's row — what it draws next (`draft`), the selected shapes' role, place and size.
 QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent);
+// The Pen's row: the role of the next path and of the selected shapes, and how the Pen is used.
+QWidget* createPenOptions(Project* project, ShapeDraft* draft, QWidget* parent);
 // A shape role list (Select, Cut …) shared by the bar and the Crop section; a role set on the selected shapes (one Undo
 // step, nothing when none changes).
 QComboBox* createRoleBox(QWidget* parent);

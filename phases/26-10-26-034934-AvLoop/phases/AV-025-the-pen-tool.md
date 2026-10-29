@@ -1,7 +1,7 @@
 ---
 phase: AV-025
 title: "The pen tool"
-status: IN_PROGRESS
+status: DONE
 owner_item: 22
 track: B
 checkpoint_id: CP-B1

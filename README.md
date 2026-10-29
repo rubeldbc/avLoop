@@ -31,7 +31,7 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   transport row and the status bar.
 - **Navy** (default) and **Black** themes in orange — switch from the ☰ menu without a restart.
 - The app draws its own icons; they stay sharp at any display scale (checked at 100%, 150% and 200%).
-- Tools switch by their keys: **V** Selection, **M** / **U** / **E** crop shapes, **S** shapes, **H** Hand, **Z** Zoom, **I** / **O**
+- Tools switch by their keys: **V** Selection, **M** / **U** / **E** crop shapes, **S** shapes, **P** Pen, **H** Hand, **Z** Zoom, **I** / **O**
   In / Out, **K** Keyframe.
 - **Opens any video by its content** — Open, Ctrl+O, drag and drop, or `avloop.exe <file>`: MP4, MOV, MKV, WebM, AVI,
   WMV/ASF, FLV, MPEG-TS/M2TS, MPEG-PS/VOB, MXF, 3GP, OGV, Y4M, animated GIF and APNG; H.264, HEVC, AV1, VP8, VP9 (with
@@ -56,6 +56,9 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   ellipses by a drag, polygons by clicks, freehand outlines by dragging round. Each shape **selects** (keeps its inside)
   or **cuts** (makes it transparent); select, move, resize, nudge and delete them on the canvas, and see them listed in
   the Crop section. The Preview and every export apply them exactly.
+- **The Pen** (**P**), as in Illustrator: click for corner anchors, click-and-drag for smooth ones with their handles,
+  close on the first anchor (or Enter). Edit any path or polygon: drag anchors and handles (Alt breaks a handle pair),
+  Alt+click converts smooth ↔ corner, click a segment to add an anchor, Delete removes one; Ctrl+click selects.
 
   ![An ellipse crop on the canvas](docs/screenshots/crop-ellipse.png)
 

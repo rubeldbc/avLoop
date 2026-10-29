@@ -9,6 +9,7 @@
 #include "ui/widgets/StepSpinBox.h"
 
 #include <QComboBox>
+#include <QLabel>
 #include <QPointer>
 #include <QToolButton>
 
@@ -122,6 +123,31 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
     });
     for (auto [name, box] : {std::pair{"x", x}, {"y", y}, {"w", w}, {"h", h}, {"radius", radius}})
         probeValue(QStringLiteral("options.shape.%1").arg(QLatin1String(name)), box);
+    refresh();
+    return row;
+}
+
+QWidget* createPenOptions(Project* project, ShapeDraft* draft, QWidget* parent) {
+    auto* row = new OptionsRow(QStringLiteral("pen"), QObject::tr("Pen"), parent);
+    QComboBox* role = createRoleBox(row);
+    role->setObjectName(QStringLiteral("options.pen.role"));
+    row->add(role, QObject::tr("Role"));
+    QLabel* how = row->addLabel(QObject::tr("Drag: smooth · Alt: convert, break · Ctrl: select"));
+    how->setToolTip(QObject::tr("Click a segment to add an anchor; Delete removes the selected one"));
+    auto refresh = [=] {
+        const QSignalBlocker block(role);
+        const QList<int> selected = project->selectedShapes();
+        const MaskShape::Role shown = selected.isEmpty() ? draft->role : project->crop().shapes[selected.first()].role;
+        role->setCurrentIndex(std::max(0, role->findData(int(shown))));
+        row->setEnabled(project->source().isValid());
+    };
+    QObject::connect(project, &Project::changed, row, [refresh](Project::Aspect a) {
+        if (a == Project::Aspect::Crop || a == Project::Aspect::Shapes || a == Project::Aspect::Source) refresh();
+    });
+    QObject::connect(role, &QComboBox::activated, row, [=] {
+        draft->role = MaskShape::Role(role->currentData().toInt());
+        setShapesRole(project, int(draft->role));
+    });
     refresh();
     return row;
 }

@@ -210,3 +210,7 @@ from `README.md` §3 on 2026-10-29, when the README passed the 300-line ceiling 
     not in the Crop section (the section lists the shapes, their Role, Delete); no snapping for shapes — a snap would
     fight a polygon's clicks and a freehand line; Ctrl does nothing there.
 87. **R-87** The 46th … 49th icons: `tool-shape`, `shape-polygon`, `shape-freehand`, `shape-cut` (the Pen's at AV-025).
+86. **R-86** "Full pen tool like Illustrator": anchors and handles, corner and smooth, close, add on a segment, delete,
+    convert, break a pair, the direct selection by Ctrl — not pressure, width profiles, open strokes or brushes (a mask
+    shape is a closed area). A polygon or freehand outline edited by the Pen becomes a Path; the Pen's new path is
+    committed when closed, one Undo step.

@@ -27,6 +27,7 @@ void MainWindow::buildCanvasTools() {
     for (CropShape::Kind kind : {CropShape::Kind::Rect, CropShape::Kind::Rounded, CropShape::Kind::Ellipse})
         tools_->add(createCropTool(int(kind), canvas_, project_));
     tools_->add(createShapeTool(canvas_, project_));
+    tools_->add(createPenTool(canvas_, project_));
     tools_->add(createInOutTool(false, canvas_, project_));
     tools_->add(createInOutTool(true, canvas_, project_));
     tools_->add(createKeyframeTool(canvas_, project_, [this](double t) { seek(t); }));

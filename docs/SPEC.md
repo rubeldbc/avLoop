@@ -29,6 +29,16 @@ Each phase writes what it delivered under its D-number here, newest first (spec 
   shapes top first ("Polygon 1 · Select"), its rows selecting them; Role and Delete act on the selected.
 - Probes `shapes.count`, `shapes.selected`, `shapes.summary`, `panel.shapes.rows`, `shape.mode`, `shape.points`,
   `shape.freehand`. The walk's drag takes `"via"` points (a freehand outline).
+- **The Pen (P; AV-025)**, after S on the rail (the 50th icon), as Illustrator's: a click adds a corner anchor, a
+  click-and-drag a smooth one with mirrored handles; a click on the first anchor or Enter closes the path (a Path shape,
+  `"kind": "path"`, its anchors `[x, y, in x, in y, out x, out y, smooth]`; one Undo step), Esc drops it. On the one
+  selected path or polygon (a polygon edited becomes a path, R-86): a handle dragged turns a smooth anchor's other
+  handle opposite at its own length, Alt breaks the pair; an anchor dragged moves with its handles; Alt+click converts
+  smooth ↔ corner (a corner's new handles along its neighbours' line, a third of the way to each); a click on a
+  segment adds an anchor by de Casteljau, the outline unchanged; Delete removes the selected anchor (the path when two
+  are left); Ctrl+click selects the shape under it without drawing. The bar: Role and how the Pen is used. The mask
+  draws a path's cubic segments; the canvas shows its anchors, handles and the next segment to the pointer. No
+  pressure, width or strokes (not asked). Probes `pen.drawing`, `pen.anchor`, `pen.anchors` ("c,s,b" a kind an anchor).
 
 ### D-021 — The inverse selection (AV-023, late, 2026-10-29)
 

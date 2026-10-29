@@ -411,3 +411,6 @@ end of its section.
   argument (HEAD) right after the push; the next phase's push waits for the green of the one before. (AV-024)
 - **A Bash heredoc trips on a long script full of quotes and backticks** ("unexpected EOF while looking for matching
   `'`"). Rule: a script of more than a few lines is written with the Write tool and run from the scratchpad. (AV-024)
+- **A hit test that samples a curve finds the anchor's own end**: a click on an anchor also lies on its segment's t = 0.
+  Rule: the Pen tests handles, then anchors, then segments, and a segment hit within 2 % of its ends is the anchor's.
+  (AV-025)

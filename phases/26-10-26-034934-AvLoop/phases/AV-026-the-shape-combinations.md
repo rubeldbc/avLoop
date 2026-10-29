@@ -1,7 +1,7 @@
 ---
 phase: AV-026
 title: "The shape combinations"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 23
 track: B
 checkpoint_id: CP-B1

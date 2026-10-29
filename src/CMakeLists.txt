@@ -62,7 +62,7 @@ add_library(avloop_ui STATIC
     ui/canvas/Canvas.h ui/canvas/Canvas.cpp ui/canvas/CanvasView.cpp ui/canvas/CanvasGl.cpp ui/canvas/CanvasGlState.h ui/canvas/CanvasOverlay.cpp
     ui/tools/Tool.h ui/tools/ToolManager.h ui/tools/ToolManager.cpp
     ui/tools/SelectionTool.cpp ui/tools/ZoomTool.cpp ui/tools/HandTool.cpp
-    ui/tools/CropTool.cpp ui/tools/CropHandles.h ui/tools/CropHandles.cpp ui/tools/ShapeTool.cpp ui/tools/ShapeEdit.h
+    ui/tools/CropTool.cpp ui/tools/CropHandles.h ui/tools/CropHandles.cpp ui/tools/ShapeTool.cpp ui/tools/PenTool.cpp ui/tools/PathEdit.h ui/tools/PathEdit.cpp ui/tools/ShapeEdit.h
     ui/tools/ShapeEdit.cpp ui/tools/InOutTool.cpp ui/tools/KeyframeTool.cpp
     ui/options/OptionsBar.h ui/options/OptionsBar.cpp ui/options/SelectionOptions.cpp ui/options/ZoomOptions.cpp
     ui/options/CropOptions.cpp ui/options/ShapeOptions.cpp

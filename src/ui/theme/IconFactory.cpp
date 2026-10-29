@@ -202,6 +202,7 @@ const QStringList& IconFactory::allNames() {
         QStringLiteral("shape-polygon"),
         QStringLiteral("shape-freehand"),
         QStringLiteral("shape-cut"),
+        QStringLiteral("tool-pen"),
     };
     // icons:end
     return names;
