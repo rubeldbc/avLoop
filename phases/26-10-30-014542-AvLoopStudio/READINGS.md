@@ -45,3 +45,11 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md`; `DECISI
 16. **RS-16** (AS-003) The composite's decoders above V1 use two threads (each thread holds frames; a crossfade doubles
     the decoders): AV-031's memory walk +34.2 MB, under its 50. The cost: 32.9 fps for a 640p crossfade with three
     layers on the CPU (AvLoop's GPU path made 138) — for CP-S1 (AS-009) to weigh.
+17. **RS-17** (AS-004) V1 always keeps a clip: AvLoop's panels need a main video, so an edit that would leave V1 empty
+    (a delete, a move up) is refused and said. A V1 clip selected does not become the main clip (the frame would move
+    with the selection); the Effect Controls (AS-005) edit the selected clip itself.
+18. **RS-18** (AS-004) A lane edit lands on the output's frame grid — after snapping; Ctrl turns snapping off, not the
+    grid —, the Razor's cut too (Premiere's edits land on frames).
+19. **RS-19** (AS-004) The time axis is the project's length (the main media's, or the sequence's when longer). The
+    timeline's thumbnail strip still shows the main clip's media over the axis, and the bars carry names and keys, no
+    thumbnails — for CP-S1 (AS-009) to weigh.

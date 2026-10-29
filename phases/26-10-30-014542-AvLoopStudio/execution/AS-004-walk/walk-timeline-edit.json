@@ -1,0 +1,56 @@
+{
+  "delay": 120,
+  "settle": 700,
+  "steps": [
+    { "label": "D-034: the counter, a second file inserted at 2 s on V1 — three clips, the sequence 20 s long" },
+    { "do": "resize", "w": 1440, "h": 900 },
+    { "do": "open", "file": "samples/counter-640p30.mp4" },
+    { "do": "waitFor", "probe": "video.state", "eq": "ready", "timeout": 10000 },
+    { "do": "import", "files": ["samples/counter-1080p30.mp4"] },
+    { "do": "type", "on": "transport.time", "text": "2" },
+    { "do": "click", "on": "project.insert" },
+    { "do": "expect", "probe": "sequence.ends", "eq": "V1:0.00-2.00,2.00-12.00,12.00-20.00" },
+    { "do": "expect", "probe": "transport.time", "contains": "00:00:02" },
+    { "do": "expect", "probe": "lanes.tracks", "eq": 0 },
+    { "do": "shot", "on": "TimelineArea", "file": "timeline-inserted.png", "maxWidth": 1400 },
+
+    { "label": "the Razor (C): a click at 16 s cuts the last clip there; V leaves it" },
+    { "do": "key", "keys": "C", "on": "MainWindow" },
+    { "do": "expect", "probe": "lanes.razor", "eq": true },
+    { "do": "click", "on": "lanes", "space": "lanes", "at": [16, 1] },
+    { "do": "expect", "probe": "sequence.v1", "eq": "counter-640p30@0.00+0.00 counter-1080p30@2.00+0.00 counter-640p30@12.00+2.00 counter-640p30@16.00+6.00" },
+    { "do": "key", "keys": "V", "on": "MainWindow" },
+    { "do": "expect", "probe": "lanes.razor", "eq": false },
+
+    { "label": "a click selects the 1080p clip; Delete leaves a gap; Undo puts it back" },
+    { "do": "click", "on": "lanes", "space": "lanes", "at": [5, 1] },
+    { "do": "expect", "probe": "lanes.selected", "eq": "counter-1080p30@2.00" },
+    { "do": "key", "keys": "Delete", "on": "lanes" },
+    { "do": "expect", "probe": "sequence.ends", "eq": "V1:0.00-2.00,12.00-16.00,16.00-20.00" },
+    { "do": "key", "keys": "Ctrl+Z", "on": "MainWindow" },
+    { "do": "expect", "probe": "sequence.ends", "eq": "V1:0.00-2.00,2.00-12.00,12.00-16.00,16.00-20.00" },
+
+    { "label": "Shift+Delete: a ripple delete — the clips after it close the gap" },
+    { "do": "click", "on": "lanes", "space": "lanes", "at": [5, 1] },
+    { "do": "key", "keys": "Shift+Delete", "on": "lanes" },
+    { "do": "expect", "probe": "sequence.ends", "eq": "V1:0.00-2.00,2.00-6.00,6.00-10.00" },
+
+    { "label": "a drag takes the last clip up to V2 (the empty lane); its end trims the clip before" },
+    { "do": "drag", "on": "lanes", "space": "lanes", "from": [8, 1], "to": [8, 2], "steps": 8 },
+    { "do": "expect", "probe": "sequence.ends", "eq": "V1:0.00-2.00,2.00-6.00 V2:6.00-10.00" },
+    { "do": "expect", "probe": "layers.count", "eq": 1 },
+    { "do": "drag", "on": "lanes", "space": "lanes", "from": [5.99, 1], "to": [5, 1], "steps": 8, "mods": "Ctrl" },
+    { "do": "expect", "probe": "sequence.ends", "eq": "V1:0.00-2.00,2.00-5.00 V2:6.00-10.00" },
+
+    { "label": "Ctrl+K at 1 s with nothing selected: every clip under the playhead cut" },
+    { "do": "click", "on": "lanes", "space": "lanes", "at": [15, 1] },
+    { "do": "expect", "probe": "lanes.selected", "eq": "" },
+    { "do": "type", "on": "transport.time", "text": "1" },
+    { "do": "key", "keys": "Ctrl+K", "on": "MainWindow" },
+    { "do": "expect", "probe": "sequence.ends", "eq": "V1:0.00-1.00,1.00-2.00,2.00-5.00 V2:6.00-10.00" },
+    { "do": "expect", "probe": "undo.count", "eq": 6 },
+    { "do": "expect", "probe": "monitor.composite", "eq": true },
+    { "do": "shot", "on": "TimelineArea", "file": "timeline-edited.png", "maxWidth": 1400 },
+    { "do": "saveAs", "file": "edited.avloop" }
+  ]
+}

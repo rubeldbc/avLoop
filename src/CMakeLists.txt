@@ -68,7 +68,7 @@ add_library(avloop_ui STATIC
     ui/options/CropOptions.cpp ui/options/ShapeOptions.cpp ui/options/AlignBar.cpp
     ui/widgets/StepSpinBox.h ui/widgets/StepSpinBox.cpp ui/widgets/TimeEdit.h ui/widgets/TimeEdit.cpp
     ui/timeline/Transport.h ui/timeline/Transport.cpp
-    ui/timeline/Timeline.h ui/timeline/Timeline.cpp ui/timeline/TrackLanes.h ui/timeline/TrackLanes.cpp ui/timeline/TimelinePaint.cpp ui/timeline/TimelineInput.cpp
+    ui/timeline/Timeline.h ui/timeline/Timeline.cpp ui/timeline/SequenceLanes.h ui/timeline/SequenceLanes.cpp ui/timeline/SequenceLanesInput.cpp ui/timeline/TimelinePaint.cpp ui/timeline/TimelineInput.cpp
     ui/timeline/TimelineScale.h ui/timeline/TimelineScale.cpp
     ui/timeline/PlaybackClock.h ui/timeline/PlaybackClock.cpp)
 target_link_libraries(avloop_ui

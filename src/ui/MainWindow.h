@@ -53,6 +53,7 @@ class MonitorComposite;
 class Project;
 class ProjectPanel;
 class ToolManager;
+class SequenceLanes;
 class SidePanel;
 class Transport;
 
@@ -192,6 +193,7 @@ private:
     SidePanel* side_ = nullptr;
     ProjectPanel* projectPanel_ = nullptr;
     MonitorComposite* monitor_ = nullptr;
+    SequenceLanes* lanes_ = nullptr;
     Transport* transport_ = nullptr;
     Timeline* timeline_ = nullptr;
     PlaybackClock* clock_ = nullptr;

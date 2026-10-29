@@ -490,3 +490,5 @@ end of its section.
   found only in AS-003's sweep. Rule: a renderer change runs every memory and render walk of before. (AS-003)
 - **CI validates every programme's phases**: removing `LayerPass.cpp` broke AvLoop's validator (AV-033 read it), and only
   CI said so. Rule: both programmes' `validate-phase-system.mjs` run before a commit that removes or renames a file. (AS-003)
+- **A drag in px is never on a frame**: a trim dragged to "5 s" ended at 5.01. Rule: timeline edits land on the output's
+  frame grid (after snapping); a walk that drags reads whole frames. (AS-004)

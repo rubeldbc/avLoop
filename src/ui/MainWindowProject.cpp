@@ -392,6 +392,8 @@ void MainWindow::toggleShortcuts() {
          << qMakePair(tr("Clear In / Out"), QStringLiteral("Alt+I / Alt+O"))
          << qMakePair(tr("Zoom: Fit · 100% · in · out"), QStringLiteral("Ctrl+0 · 1 · = · -"))
          << qMakePair(tr("Fit the timeline · In–Out"), QStringLiteral("\\ / Shift+\\"))
+         << qMakePair(tr("Razor · cut at the playhead"), QStringLiteral("C · Ctrl+K"))
+         << qMakePair(tr("Delete a clip · ripple delete"), QStringLiteral("Delete · Shift+Delete"))
          << qMakePair(tr("Shortcut list"), QStringLiteral("F1"));
     new ShortcutOverlay(centralWidget(), rows);
 }

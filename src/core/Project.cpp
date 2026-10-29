@@ -123,8 +123,8 @@ void Project::restore(const ProjectData& data) {
     s.matte = s.matte.clamped();
     if (Clip* m = sv::mainClip(s)) {
         m->effects = m->effects.clamped();
-        s.inOut =
-            timerange::valid(s.inOut, m->start + m->length(), output_.effectiveFps(data.source.fps, data.source.vfr));
+        s.inOut = timerange::valid(s.inOut, std::max(data.source.duration, s.duration()),
+                                   output_.effectiveFps(data.source.fps, data.source.vfr));
     }
     sv::settle(s);
     seq_ = s;
@@ -181,6 +181,10 @@ void Project::sync(bool all) {
     if (all || effectsChanged) emit changed(Aspect::Effects);
     if (all || layersChanged) emit changed(Aspect::Layers);
     emit changed(Aspect::Sequence);
+}
+
+double Project::length() const {
+    return std::max(source_.duration, seq_.duration());
 }
 
 bool Project::avloopShaped() const {

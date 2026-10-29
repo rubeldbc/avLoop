@@ -56,7 +56,7 @@ flexible edit and cutting like hole a video and export as transparent."*
 | `node tools/check-secrets.mjs` | PASS (on its own, exit code 0) |
 | `check-loc.mjs` | PASS: the largest code file `src/core/ClipEffects.cpp`, 425 lines |
 | `validate-phase-system.mjs` (both programmes; CI now runs both) | PASS: 33 phases; PASS: 9 phases |
-| `git push origin main`; CI | see the commit `[AS-003]` and its run |
+| `git push origin main`; CI | pushed `74c61d1`; CI green (run 40956823795, 10 m 28 s) |
 
 ## The walk
 

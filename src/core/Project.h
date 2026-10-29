@@ -84,6 +84,9 @@ public:
     explicit Project(QObject* parent = nullptr);
 
     const SourceInfo& source() const { return source_; }
+    // The time axis (D-034): the main clip's media, or the sequence when its clips run longer — the timeline's length,
+    // the playhead's and In/Out's limits.
+    double length() const;
     const TimeRange& range() const { return range_; }
     // The transform at the playhead: the keyframes' value there, else the one transform (spec §6.2, §6.4).
     const VideoTransform& transform() const { return current_; }

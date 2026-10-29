@@ -20,7 +20,7 @@ read_scope:
   - src/render/SequenceRenderer.cpp
   - src/ui/panels/LayersPanel.cpp
   - src/ui/panels/EffectsPanel.cpp
-  - src/ui/timeline/TrackLanes.cpp
+  - src/ui/timeline/SequenceLanes.cpp
   - spec: §6.4, §11.1, §11.2
 ---
 

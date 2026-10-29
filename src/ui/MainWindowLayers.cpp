@@ -15,8 +15,8 @@
 #include "ui/panels/SidePanel.h"
 #include "ui/theme/Theme.h"
 #include "ui/timeline/PlaybackClock.h"
+#include "ui/timeline/SequenceLanes.h"
 #include "ui/timeline/Timeline.h"
-#include "ui/timeline/TrackLanes.h"
 #include "ui/widgets/Toast.h"
 
 #include <QAction>
@@ -159,11 +159,23 @@ void MainWindow::addLayer(const QString& path) {
 
 void MainWindow::buildLayers() {
     side_->bindLayers(project_);
-    // The tracks (AV-031): lanes above the main video's timeline, on its time scale.
+    // The tracks (AV-031; the sequence's since D-034): lanes above the main video's timeline, on its time scale.
+    lanes_ = new SequenceLanes(project_, timeline_, [this](double t) { seek(t); }, timeline_->parentWidget());
     if (auto* column = qobject_cast<QVBoxLayout*>(timeline_->parentWidget()->layout()))
-        column->insertWidget(
-            column->indexOf(timeline_),
-            new TrackLanes(project_, timeline_, [this](double t) { seek(t); }, timeline_->parentWidget()));
+        column->insertWidget(column->indexOf(timeline_), lanes_);
+    // The Razor (C) — V or another tool leaves it — and Ctrl+K: cut at the playhead, anywhere in the window.
+    auto* razor = new QAction(this);
+    razor->setShortcut(QKeySequence(Qt::Key_C));
+    connect(razor, &QAction::triggered, this, [this] {
+        if (video_) lanes_->setRazor(true);
+    });
+    addAction(razor);
+    auto* cut = new QAction(this);
+    cut->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_K));
+    connect(cut, &QAction::triggered, this, [this] {
+        if (video_) lanes_->cutAtPlayhead();
+    });
+    addAction(cut);
     auto* preview = new LayerPreview(project_, this);
     canvas_->setUnderlay([this, preview](QPainter& p) {
         if (monitor_ && monitor_->active()) return monitor_->paint(p); // the composite holds the layers (D-033)

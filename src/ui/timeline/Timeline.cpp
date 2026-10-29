@@ -64,7 +64,7 @@ int Timeline::thumbnailsMade() const {
 }
 
 double Timeline::duration() const {
-    return timerange::fileEnd(project_->source().duration, fps());
+    return timerange::fileEnd(project_->length(), fps());
 }
 
 Rational Timeline::fps() const {

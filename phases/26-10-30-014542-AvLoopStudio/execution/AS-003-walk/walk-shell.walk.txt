@@ -1,16 +1,16 @@
 walk walk-shell.json: 46 steps
--- D-033: the counter opened — the Project panel holds it, AvLoop's one video on V1, AvLoop's canvas @1443 ms
+-- D-033: the counter opened — the Project panel holds it, AvLoop's one video on V1, AvLoop's canvas @1442 ms
      open samples/counter-640p30.mp4
 PASS waitFor video.state: ready after 0 ms
 PASS expect project.media: 1
 PASS expect sequence.clips: 1
 PASS expect monitor.composite: false
 PASS shot shell-open.png: 1440x860 px
--- Import… a second file: the bin lists both, the new one selected @2861 ms
+-- Import… a second file: the bin lists both, the new one selected @2875 ms
      import 1
 PASS expect project.media: 2
 PASS shot project-panel.png: 200x802 px
--- Insert at 2 s on V1: the counter cut there, the 1080p clip between, the rest pushed right by its 10 s @3443 ms
+-- Insert at 2 s on V1: the counter cut there, the 1080p clip between, the rest pushed right by its 10 s @3451 ms
 PASS expect sequence.clips: 3
 PASS expect sequence.v1: counter-640p30@0.00+0.00 counter-1080p30@2.00+0.00 counter-640p30@12.00+2.00
 PASS expect source.file: D:\Code5\avLoop\samples\counter-640p30.mp4
@@ -19,14 +19,14 @@ PASS expect monitor.composite: true
 -- the Program monitor: at 3 s the inserted clip's 1 s (frame 30), centred in the frame @4326 ms
 PASS shot monitor-composite-3s.png: 938x651 px
 PASS shot monitor-composite-1s.png: 938x651 px
--- Undo: the insert gone, AvLoop's canvas back @6517 ms
+-- Undo: the insert gone, AvLoop's canvas back @6513 ms
 PASS expect sequence.clips: 1
 PASS expect monitor.composite: false
--- Overwrite on V2 at 1 s: a clip on a new track — AvLoop's layer, its lane @6892 ms
+-- Overwrite on V2 at 1 s: a clip on a new track — AvLoop's layer, its lane @6891 ms
 PASS expect sequence.tracks: 2
 PASS expect layers.count: 1
 PASS expect monitor.composite: false
--- the Frame tool: the Rectangle crop's Frame size 1080 × 1920 — the frame, the output @7523 ms
+-- the Frame tool: the Rectangle crop's Frame size 1080 × 1920 — the frame, the output @7565 ms
 PASS expect crop.w: 1080
 PASS expect crop.h: 1920
 PASS expect crop.cx: 320

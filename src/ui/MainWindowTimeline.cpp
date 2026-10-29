@@ -96,7 +96,7 @@ void MainWindow::buildTimeline() {
     key({QKeySequence(Qt::SHIFT | Qt::Key_Backslash), QKeySequence(Qt::Key_Bar)}, [this] { timeline_->fitRange(); });
     auto setRange = [this](auto rule) {
         if (!project_->source().isValid()) return;
-        project_->changeRange(rule(project_->range(), project_->source().duration, project_->outputFps()));
+        project_->changeRange(rule(project_->range(), project_->length(), project_->outputFps()));
     };
     key({QKeySequence(Qt::Key_I)}, [this, setRange] {
         const double t = timeline_->playhead();
@@ -155,7 +155,7 @@ void MainWindow::buildTimeline() {
 }
 
 double MainWindow::fileEnd() const {
-    return timerange::fileEnd(project_->source().duration, project_->outputFps());
+    return timerange::fileEnd(project_->length(), project_->outputFps());
 }
 
 void MainWindow::seek(double t, bool fast) {

@@ -167,7 +167,7 @@ void Project::changeOutput(const OutputSettings& after, const QString& mergeKey)
         SetOutputId, tr("Change the output"), output_, after, [this](const OutputSettings& o) { applyOutput(o); },
         regrid ? QString() : mergeKey));
     if (regrid) {
-        changeRange(timerange::valid(range_, source_.duration, next));
+        changeRange(timerange::valid(range_, length(), next));
         undo_.endMacro();
     }
 }

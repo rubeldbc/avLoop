@@ -1,7 +1,7 @@
 ---
 phase: AS-004
 title: "The timeline editor"
-status: IN_PROGRESS
+status: DONE
 owner_item: 4
 track: A
 checkpoint_id: CP-A1
@@ -15,7 +15,7 @@ requirements: [REQ-AS-004]
 read_scope:
   - phases/26-10-30-014542-AvLoopStudio/control/03_SHAPES_THE_EDITOR.md
   - src/ui/timeline/Timeline.cpp
-  - src/ui/timeline/TrackLanes.cpp
+  - src/ui/timeline/SequenceLanes.cpp
   - src/ui/timeline/TimelinePaint.cpp
   - spec: §3, §6, §11
 ---

@@ -80,7 +80,7 @@ void Timeline::mousePressEvent(QMouseEvent* event) {
     if (drag_ == Drag::Scrub && (clickTool_ == QLatin1String("in") || clickTool_ == QLatin1String("out"))) {
         // The In or Out tool: the click sets it there by the rules of the keys — the frame clicked is the first or
         // the last of the range — and the playhead goes with it.
-        const double d = project_->source().duration;
+        const double d = project_->length();
         project_->changeRange(clickTool_ == QLatin1String("in")
                                   ? timerange::withIn(dragRange_, t, d, fps())
                                   : timerange::withOut(dragRange_, t + timecode::secondsOf(1, fps()), d, fps()));
@@ -103,7 +103,7 @@ void Timeline::mousePressEvent(QMouseEvent* event) {
 
 void Timeline::mouseMoveEvent(QMouseEvent* event) {
     const double x = event->position().x();
-    const double d = project_->source().duration;
+    const double d = project_->length();
     switch (drag_) {
     case Drag::None: {
         const Drag h = hit(event->position());

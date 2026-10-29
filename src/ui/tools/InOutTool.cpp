@@ -38,7 +38,7 @@ public:
         };
         QObject::connect(project_, &Project::changed, row, [refresh](Project::Aspect) { refresh(); });
         QObject::connect(time, &TimeEdit::timeEntered, row, [this](double t) {
-            const double d = project_->source().duration;
+            const double d = project_->length();
             const Rational fps = project_->outputFps();
             project_->changeRange(out_ ? timerange::withOut(project_->range(), t, d, fps)
                                        : timerange::withIn(project_->range(), t, d, fps));

@@ -100,6 +100,17 @@ void MainWindow::buildMonitor() {
         return clips.join(QLatin1Char(' '));
     });
     WalkProbes::add(QStringLiteral("sequence.tracks"), [this] { return int(project_->sequence().tracks.size()); });
+    WalkProbes::add(QStringLiteral("sequence.ends"), [this] { // each track's clips: start–end
+        QStringList tracks;
+        const QList<Track>& all = project_->sequence().tracks;
+        for (qsizetype i = 0; i < all.size(); ++i) {
+            QStringList clips;
+            for (const Clip& c : all[i].clips)
+                clips << QStringLiteral("%1-%2").arg(c.start, 0, 'f', 2).arg(c.end(), 0, 'f', 2);
+            tracks << QStringLiteral("V%1:%2").arg(i + 1).arg(clips.join(QLatin1Char(',')));
+        }
+        return tracks.join(QLatin1Char(' '));
+    });
     WalkProbes::add(QStringLiteral("monitor.composite"), [this] { return monitor_->active(); });
 }
 

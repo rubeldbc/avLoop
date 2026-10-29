@@ -27,6 +27,22 @@ its model, under the UI that is still AvLoop's (RS-7).
   the frame's corner; each layer on its own track; the crop with its shapes the sequence's matte (D-032). A migrated
   file renders byte for byte as before. `avloop-cli sequence <project> [--save x.avloop]` prints it.
 
+### D-034 — The timeline editor (AS-004, AvLoop Studio, 2026-10-30)
+
+- **The tracks on the timeline** are the sequence's (the lanes, AV-031's, now over every clip): V1 at the bottom — the
+  main clip brighter — up to one empty lane above the highest used (V8 at most), each clip a bar with its name and its
+  keys. A track's name sits over the bars; its right click hides, shows, locks or unlocks it (one step).
+- **The Selection**: a click selects a clip (Shift adds or removes; a layer's selection is the Layers section's); a drag
+  moves the selected in time — snapping to In, Out, the playhead and the other clips' ends within 8 px, else on the
+  output's frame grid (Ctrl: no snapping, still a frame) — and to another track where every one fits (refused where it
+  would overlap or the track is locked); an end trims it; Alt+drag copies it ("<name> copy").
+- **The Razor** (C; V, Esc or another tool leaves it): a click cuts the clip there, on a frame. **Ctrl+K** cuts the
+  selected clips at the playhead, else every clip under it on an unlocked track. **Delete** leaves a gap,
+  **Shift+Delete** closes it (the later clips on that track move left). A double-click takes the playhead to the
+  clip's start, or to the key under it. One Undo step a gesture; V1 always keeps a clip (the main video, RS-17).
+- **The time axis** is the project's length — the main clip's media, or the sequence when its clips run longer: the
+  timeline, the transport's total, the playhead's and In/Out's limits (RS-19).
+
 ### D-033 — The editor's shell (AS-003, AvLoop Studio, 2026-10-30)
 
 - **The sequence is the project's truth.** AvLoop's model is a view of it: the main video is the **main clip** (one

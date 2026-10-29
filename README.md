@@ -54,6 +54,11 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   exported and the chosen area becomes a transparent hole in it, its feather softening outward.
   **Frame size** on the rectangle's bar sets the output to 1920 × 1080, 1080 × 1920, 1080 × 1080, 1280 × 720,
   720 × 1280 or 1080 × 1350, centred where the crop is — past the video's edges the frame is transparent.
+- **Edit on the timeline**, as in Premiere Pro: every track V1 … V8 is a lane of clips. Click to select (Shift adds),
+  drag to move in time or to another track (snapping to In, Out, the playhead and other clips; on frames), drag an end
+  to trim, Alt+drag to copy. **C** is the Razor — click a clip to cut it there; **Ctrl+K** cuts at the playhead;
+  **Delete** leaves a gap and **Shift+Delete** closes it. Right-click a track's name to hide or lock it. The timeline
+  runs as long as the sequence.
 - **The Project panel** (left of the canvas), as in Premiere Pro: **Import…** adds videos to the project's media;
   **Insert** puts the selected one at the playhead on the chosen track (V1 … V8) — what is there is cut and the rest
   of the track moves right — and **Overwrite** covers what is there; each one Undo step. A clip is placed centred in the
@@ -253,6 +258,7 @@ Details, rules and the gates: [CONTRIBUTING.md](CONTRIBUTING.md).
 | Timeline: fit the file · fit In–Out · zoom · switch timecode/frames | `\` · `Shift+\` · Ctrl+wheel · double-click the ruler |
 | Keyframe: add or update at the playhead · previous / next · delete the one at the playhead | K · [ / ] · Delete |
 | Keyframe on the timeline: move · copy | drag · Alt+drag |
+| Clips on the timeline: Razor · cut at the playhead · delete · ripple delete | C · Ctrl+K · Delete · Shift+Delete |
 | Save · Save As | Ctrl+S · Ctrl+Shift+S |
 | Settings · the list of shortcuts · the Loop Finder | Ctrl+, · F1 · Ctrl+L |
 

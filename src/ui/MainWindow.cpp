@@ -20,6 +20,7 @@
 #include "ui/preview/PreviewWindow.h"
 #include "ui/theme/IconFactory.h"
 #include "ui/theme/Theme.h"
+#include "ui/timeline/SequenceLanes.h"
 #include "ui/timeline/Timeline.h"
 #include "ui/timeline/Transport.h"
 #include "ui/tools/ToolManager.h"
@@ -355,6 +356,7 @@ void MainWindow::selectTool(const QString& id) {
     for (QAbstractButton* b : toolGroup_->buttons())
         if (b->property("toolId").toString() == id) b->setChecked(true);
     if (tools_) tools_->activate(id);
+    if (lanes_) lanes_->setRazor(false); // any tool leaves the Razor
 }
 
 QString MainWindow::activeTool() const {
