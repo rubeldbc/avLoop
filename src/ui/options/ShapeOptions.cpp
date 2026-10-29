@@ -119,6 +119,7 @@ QWidget* createShapeOptions(Project* project, ShapeDraft* draft, QWidget* parent
                                         QObject::tr("Combine the selected shapes into one"));
     combine->setMenu(createCombineMenu(project, combine));
     combine->setPopupMode(QToolButton::InstantPopup);
+    addAlignTools(row, project);
 
     // The one selected shape, standard: its rectangle and radius are typed here.
     auto single = [project]() -> int {

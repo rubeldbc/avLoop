@@ -1,7 +1,7 @@
 ---
 phase: AV-030
 title: "The timeline layers I — the clips and the composite"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 27
 track: B
 checkpoint_id: CP-B1

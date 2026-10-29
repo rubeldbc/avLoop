@@ -17,6 +17,14 @@
     <file>icons/role-add.svg</file>
     <file>icons/role-keep.svg</file>
     <file>icons/role-exclude.svg</file>
+    <file>icons/align-left.svg</file>
+    <file>icons/align-centre.svg</file>
+    <file>icons/align-right.svg</file>
+    <file>icons/align-top.svg</file>
+    <file>icons/align-middle.svg</file>
+    <file>icons/align-bottom.svg</file>
+    <file>icons/distribute-h.svg</file>
+    <file>icons/distribute-v.svg</file>
     <file>icons/fill.svg</file>
     <file>icons/finder.svg</file>
     <file>icons/fit.svg</file>

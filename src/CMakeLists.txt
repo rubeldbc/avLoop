@@ -3,7 +3,7 @@
 add_library(avloop_core STATIC
     core/AppInfo.h core/AppInfo.cpp core/Rational.h
     core/Geometry.h core/Geometry.cpp core/VideoTransform.h core/VideoTransform.cpp
-    core/CropShape.h core/CropShape.cpp core/MaskShape.h core/MaskShape.cpp core/ShapeCombine.h core/ShapeCombine.cpp core/AspectRatio.h core/AspectRatio.cpp core/Keyframes.h core/Keyframes.cpp
+    core/CropShape.h core/CropShape.cpp core/MaskShape.h core/MaskShape.cpp core/ShapeCombine.h core/ShapeCombine.cpp core/ShapeAlign.h core/ShapeAlign.cpp core/AspectRatio.h core/AspectRatio.cpp core/Keyframes.h core/Keyframes.cpp
     core/Timecode.h core/Timecode.cpp core/TimeRange.h core/TimeRange.cpp
     core/LoopSettings.h core/LoopSettings.cpp core/LoopMap.h core/LoopMap.cpp core/TimeMap.h core/TimeMap.cpp
     core/QualitySettings.h core/QualitySettings.cpp core/ClipEffects.h core/ClipEffects.cpp
@@ -65,7 +65,7 @@ add_library(avloop_ui STATIC
     ui/tools/CropTool.cpp ui/tools/CropHandles.h ui/tools/CropHandles.cpp ui/tools/ShapeTool.cpp ui/tools/PenTool.cpp ui/tools/PathEdit.h ui/tools/PathEdit.cpp ui/tools/ShapeEdit.h
     ui/tools/ShapeEdit.cpp ui/tools/InOutTool.cpp ui/tools/KeyframeTool.cpp
     ui/options/OptionsBar.h ui/options/OptionsBar.cpp ui/options/SelectionOptions.cpp ui/options/ZoomOptions.cpp
-    ui/options/CropOptions.cpp ui/options/ShapeOptions.cpp
+    ui/options/CropOptions.cpp ui/options/ShapeOptions.cpp ui/options/AlignBar.cpp
     ui/widgets/StepSpinBox.h ui/widgets/StepSpinBox.cpp ui/widgets/TimeEdit.h ui/widgets/TimeEdit.cpp
     ui/timeline/Transport.h ui/timeline/Transport.cpp
     ui/timeline/Timeline.h ui/timeline/Timeline.cpp ui/timeline/TimelinePaint.cpp ui/timeline/TimelineInput.cpp

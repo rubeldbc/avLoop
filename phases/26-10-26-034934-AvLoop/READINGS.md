@@ -232,3 +232,8 @@ from `README.md` §3 on 2026-10-29, when the README passed the 300-line ceiling 
     Settings window (saved at once, no Undo) and the Preview's two lists are not "the right-hand side" and keep theirs.
 93. **R-93** A default is a fresh project's value (the structs' own), the groups' resets the same values as one step:
     Crop also removes its shapes and inverse; Loop keeps the range; a bar's reset touches the tool's fields only.
+94. **R-94** "Align tool set for multiple object": the objects are the shapes of item 22 (the video has Fit, Fill and
+    Center); Illustrator's Align — six aligns and two distributes, to the selection or to the frame.
+95. **R-95** "A layer system for multiple objects": the shapes' list as a flat layers panel — order (drag, Up, Down),
+    eye, lock, name, duplicate; no groups or sublayers (not asked).
+96. **R-96** The align tools are buttons on the S bar, no keys; the 54th … 61st icons.

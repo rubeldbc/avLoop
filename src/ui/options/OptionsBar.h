@@ -66,6 +66,8 @@ bool combineSelected(Project* project, int op);
 // Feather and Strength (D-024) set on every selected shape (a value < 0 keeps each one's own), one Undo step.
 void setShapesSoftness(Project* project, double feather, double strength, const QString& mergeKey = {});
 class QMenu* createCombineMenu(Project* project, QWidget* parent);
+// AlignBar.cpp: Align to (Selection, Frame), the six aligns and the two distributes (D-026), on a shape bar.
+void addAlignTools(OptionsRow* row, Project* project);
 // Applies the ratio chosen in a ratio box to the project's crop (one Undo step); Custom… takes the crop's own.
 void applyRatio(Project* project, const QString& id);
 // What walks read of a bar's field: its value while its row is shown, nothing once a tool switch has removed it.

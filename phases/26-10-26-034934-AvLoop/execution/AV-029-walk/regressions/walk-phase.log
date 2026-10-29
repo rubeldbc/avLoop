@@ -1,0 +1,5 @@
+PASSED walk-shell.json (8 s)
+PASSED walk-shapes.json (12 s)
+PASSED walk-combine.json (11 s)
+PASSED walk-soft.json (8 s)
+PHASE WALKS PASSED

@@ -206,6 +206,14 @@ const QStringList& IconFactory::allNames() {
         QStringLiteral("role-add"),
         QStringLiteral("role-keep"),
         QStringLiteral("role-exclude"),
+        QStringLiteral("align-left"),
+        QStringLiteral("align-centre"),
+        QStringLiteral("align-right"),
+        QStringLiteral("align-top"),
+        QStringLiteral("align-middle"),
+        QStringLiteral("align-bottom"),
+        QStringLiteral("distribute-h"),
+        QStringLiteral("distribute-v"),
     };
     // icons:end
     return names;

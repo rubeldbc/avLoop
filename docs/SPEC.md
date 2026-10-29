@@ -6,6 +6,20 @@ Oct 26, 2026 · @rubel
 
 Each phase writes what it delivered under its D-number here, newest first (spec §4; the programme `phases/26-10-26-034934-AvLoop`). Only delivered behaviour; the sections after this one are the owner's specification as written.
 
+### D-026 — The align tools and the shape layers (AV-029, late, 2026-10-30)
+
+- **Align** on the S bar (R-94, R-96): "Align to" Selection (the selected shapes' joined box) or Frame (the crop's, else
+  the video's); Align left, centre, right, top, middle, bottom — two or more selected, or one to the frame — and
+  Distribute horizontally, vertically — three or more: the first and last (by left or top) stay, or go to the frame's
+  edges, those between placed with equal gaps. Shapes move by their bounding boxes, never resize; a locked shape stays;
+  one Undo step a press. Buttons only (no keys). The 54th … 61st icons.
+- **The shape layers** (R-95): the Crop section's list, top first, a layers panel — each row's check box shows or
+  hides the shape (a hidden shape is out of the mask and the dim), a lock icon for a locked one; rows dragged reorder
+  the shapes (the mask's order with them); for the one selected: Name, Visible, Locked, Up, Down, Duplicate ("<name>
+  copy" above it, 10 px across). A locked shape is not picked, moved or Ctrl+A-selected on the canvas; its row still
+  selects it. Each change one Undo step. No groups or sublayers. Probe `shapes.flags` ("vu" shown/unlocked a shape).
+- The file: a shape's `"name"`, `"visible"`, `"locked"` (written since AV-024), version 3.
+
 ### D-025 — The resets (AV-028, late, 2026-10-29)
 
 - **A label's click** resets the control beside it to its default (R-92): every row of the side panel's sections

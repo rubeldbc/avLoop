@@ -1,0 +1,34 @@
+startup: 458 ms
+walk walk-align.json: 62 steps
+-- D-026: three rectangles drawn with S at 100 % (a canvas point lands ½ px in) @1158 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect shapes.count: 3
+PASS shot canvas-before.png: 1200x587 px
+-- Ctrl+A; Align left: all at A's left, none resized; Undo @3329 ms
+PASS expect shapes.summary: rect:add:21,20,60,60;rect:add:21,100,60,80;rect:add:21,40,80,80
+-- Distribute horizontally: the middle one's gaps equal (B at 220.5); Undo @3833 ms
+PASS expect shapes.summary: rect:add:21,20,60,60;rect:add:221,100,60,80;rect:add:421,40,80,80
+PASS shot canvas-distributed.png: 1200x587 px
+-- one shape, To: Frame — centred on the video both ways @4350 ms
+PASS expect shapes.selected: 1
+PASS expect shapes.summary: rect:add:21,20,60,60;rect:add:290,140,60,80;rect:add:421,40,80,80
+-- the layers: rename, duplicate, Up, hide, lock @5368 ms
+PASS expect panel.shapes.rows: Rectangle 3 · Select|Window · Select|Rectangle 1 · Select
+PASS expect shapes.count: 4
+PASS expect shapes.selected: 2
+PASS expect panel.shapes.rows: Rectangle 3 · Select|Window copy · Select|Window · Select|Rectangle 1 · Select
+PASS expect shapes.selected: 3
+PASS expect panel.shapes.rows: Window copy · Select|Rectangle 3 · Select|Window · Select|Rectangle 1 · Select
+PASS expect shapes.flags: vu,vu,vu,hu
+PASS expect shapes.selected: 0
+PASS expect shapes.flags: vl,vu,vu,hu
+PASS expect shapes.selected: 
+PASS shot canvas-layers.png: 1200x587 px
+PASS shot panel-layers.png: 281x684 px
+-- Undo through them: unlocked, shown, down again, one copy fewer, the old name @7929 ms
+PASS expect shapes.flags: vu,vu,vu,hu
+PASS expect shapes.count: 3
+PASS expect panel.shapes.rows: Rectangle 3 · Select|Rectangle 2 · Select|Rectangle 1 · Select
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED

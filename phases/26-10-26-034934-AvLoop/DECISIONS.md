@@ -134,3 +134,6 @@ D-numbers; each is the agent's decision under autonomous mode, open for the owne
 | R-91 | An exact distance transform for custom outlines; the canvas a hint | an exact feather; memory bounded by the output | `READINGS.md`; AV-027 |
 | R-92 | A label's click resets its control through its own edit; positions and read-only rows have none | "Clicking on the text label next to any control should reset its value" | `READINGS.md`; AV-028 |
 | R-93 | Defaults are a fresh project's; group resets one step; the bars reset their tool's fields | "a 'Reset' option, which will reset the settings for that group" | `READINGS.md`; AV-028 |
+| R-94 | The objects are the shapes; six aligns, two distributes, to selection or frame | "align tool set for multiple object" | `READINGS.md`; AV-029 |
+| R-95 | A flat layers panel: order, eye, lock, name, duplicate | "a layer system for multiple objects" | `READINGS.md`; AV-029 |
+| R-96 | Buttons on the S bar; icons 54 … 61 | Illustrator's panel, no keys asked | `READINGS.md`; AV-029 |

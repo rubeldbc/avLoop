@@ -46,7 +46,7 @@ should include a right-click context menu with a 'Reset' option, which will rese
 | `node control/phase-tools/check-loc.mjs` | PASS: 305 code files, none over 600 lines (the largest: src/core/ClipEffects.cpp, 425 lines) |
 | `node control/phase-tools/validate-phase-system.mjs` | PASS: 31 phases, 34 requirement ids |
 | README pictures | not retaken: the window looks as before (the labels' cursor shows on hover) |
-| AV-027's CI run | CI_RESULT |
+| AV-027's CI run | green, 7 m 1 s (run 40926746034) |
 
 ## The walk
 

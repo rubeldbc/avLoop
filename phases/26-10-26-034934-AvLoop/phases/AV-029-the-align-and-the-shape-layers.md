@@ -1,7 +1,7 @@
 ---
 phase: AV-029
 title: "The align tools and the shape layers"
-status: IN_PROGRESS
+status: DONE
 owner_item: 26
 track: B
 checkpoint_id: CP-B1

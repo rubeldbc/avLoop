@@ -438,3 +438,11 @@ end of its section.
 - **A field's name is the bar's, not the tool's**: `OptionsRow::addNumber("scale")` is `options.scale`, while a crop
   bar's are `options.<kind>.<field>` because their names carry the kind. Rule: a walk takes a bar field's name from its
   `addNumber` call. (AV-028)
+
+## The align tools and the shape layers (late)
+
+- **A click on a selected shape keeps the selection** (so several can be dragged together): a walk that meant to pick
+  one of three selected kept all three. Rule: a walk presses Esc before a click that should select one alone. (AV-029)
+- **The memory suite can fail without a word under load**: `avloop-memory` failed once right after five GUI walks,
+  printing nothing, and passed alone and in the next full run. Rule: a silent failure of a measuring suite is re-run,
+  alone and then whole, before blaming the change — and written in the record either way. (AV-029)

@@ -1,6 +1,7 @@
 // The shapes' model and the Shape tool's geometry (D-022): outlines, the file's form, a freehand outline simplified,
 // names, hit-testing, the walks' summary.
 #include "core/MaskShape.h"
+#include "core/ShapeAlign.h"
 #include "core/ShapeCombine.h"
 #include "ui/tools/PathEdit.h"
 #include "ui/tools/ShapeEdit.h"
@@ -156,6 +157,44 @@ private slots:
         QCOMPARE(three.size(), 2);
         QCOMPARE(at, 0);
         QCOMPARE(three[1], a);
+    }
+    // Align and the layers (D-026): three boxes A (0, 0, 10 × 10), B (40, 20, 20 × 20), C (100, 50, 10 × 30).
+    void alignAndLayers() {
+        using shapealign::Align;
+        const QList<MaskShape> s = {
+            shapeedit::standard(ShapeDraft::Kind::Rect, MaskShape::Role::Add, QRectF(0, 0, 10, 10)),
+            shapeedit::standard(ShapeDraft::Kind::Rect, MaskShape::Role::Add, QRectF(40, 20, 20, 20)),
+            shapeedit::standard(ShapeDraft::Kind::Rect, MaskShape::Role::Add, QRectF(100, 50, 10, 30))};
+        const QList<int> all = {0, 1, 2};
+        QCOMPARE(shapealign::selectionBounds(s, all), QRectF(0, 0, 110, 80));
+        QList<MaskShape> a = shapealign::aligned(s, all, Align::Left);
+        QCOMPARE(a[1].rect.left(), 0.0);
+        QCOMPARE(a[2].rect.left(), 0.0);
+        QCOMPARE(a[1].rect.size(), QSizeF(20, 20)); // moved, never resized
+        a = shapealign::aligned(s, all, Align::Bottom);
+        QCOMPARE(a[0].rect.bottom(), 80.0);
+        a = shapealign::aligned(s, all, Align::Centre);
+        QCOMPARE(a[0].rect.center().x(), 55.0);
+        a = shapealign::aligned(s, {1}, Align::Middle, QRectF(0, 0, 640, 360)); // one shape to the frame
+        QCOMPARE(a[1].rect.center().y(), 180.0);
+        QCOMPARE(a[0], s[0]);
+        QList<MaskShape> locked = s;
+        locked[2].locked = true;
+        QCOMPARE(shapealign::aligned(locked, all, Align::Top)[2].rect.top(), 50.0); // a locked shape stays
+        // Distribute: A and C stay, B's gaps equal — (110 − 10 − 20 − 10) / 2 = 35 → B at 45.
+        const QList<MaskShape> d = shapealign::distributed(s, all, shapealign::Spread::Horizontal);
+        QCOMPARE(d[1].rect.left(), 45.0);
+        QCOMPARE(d[0].rect.left(), 0.0);
+        QCOMPARE(d[2].rect.left(), 100.0);
+        QCOMPARE(shapealign::distributed(s, {0, 1}, shapealign::Spread::Horizontal), s); // two: nothing
+        // The layers: a move, a copy above its original.
+        QCOMPARE(shapealign::moved(s, 0, 2)[2], s[0]);
+        MaskShape named = s[1];
+        named.name = QStringLiteral("Rectangle 2");
+        const QList<MaskShape> dup = shapealign::duplicated({s[0], named}, 1);
+        QCOMPARE(dup.size(), 3);
+        QCOMPARE(dup[2].name, QStringLiteral("Rectangle 2 copy"));
+        QCOMPARE(dup[2].rect.topLeft(), QPointF(50, 30));
     }
     void joins() {
         using R = MaskShape::Role;

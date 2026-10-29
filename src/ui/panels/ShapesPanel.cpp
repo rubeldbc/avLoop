@@ -1,7 +1,10 @@
 // The Crop section's Shapes (D-022): the shapes inside the frame, top first, each "Rectangle 1 · Select"; a row clicked
 // selects the shape (Shift or Ctrl add), the same selection as the Shape tool's; the selected shapes' Role and Delete;
-// Combine (D-023) with its op — Unite, Minus front, Intersect, Exclude — for two or more; Feather and Strength (D-024).
+// Combine (D-023) with its op — Unite, Minus front, Intersect, Exclude — for two or more; Feather and Strength (D-024);
+// the layers (D-026): each row's check box shows or hides it, a drag reorders; Name, Visible, Locked, Up, Down,
+// Duplicate for the one selected.
 #include "core/Project.h"
+#include "core/ShapeAlign.h"
 #include "core/ShapeCombine.h"
 #include "ui/WalkRunner.h"
 #include "ui/options/OptionsBar.h"
@@ -12,8 +15,11 @@
 #include "ui/widgets/ResetLabel.h"
 #include "ui/widgets/StepSpinBox.h"
 
+#include <QCheckBox>
 #include <QComboBox>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
 
@@ -76,7 +82,38 @@ void SidePanel::bindShapes(Project* project) {
     list->setSelectionMode(QAbstractItemView::ExtendedSelection);
     list->setFixedHeight(112);
     list->setIconSize(QSize(16, 16));
+    list->setDragDropMode(QAbstractItemView::InternalMove); // a drag reorders the layers (D-026)
+    list->setToolTip(tr("Top first. Drag to reorder; the check box shows or hides a shape"));
     s->addWide(list);
+    // The layer's own rows (D-026): its name, shown or hidden, locked; Up, Down, Duplicate.
+    auto* name = new QLineEdit(body);
+    name->setObjectName(QStringLiteral("panel.shapes.name"));
+    s->addRow(tr("Name"), name);
+    auto* flags = new QWidget(body);
+    auto* flagsRow = new QHBoxLayout(flags);
+    flagsRow->setContentsMargins(0, 0, 0, 0);
+    auto* shown = new QCheckBox(tr("Visible"), flags);
+    shown->setObjectName(QStringLiteral("panel.shapes.visible"));
+    auto* locked = new QCheckBox(tr("Locked"), flags);
+    locked->setObjectName(QStringLiteral("panel.shapes.locked"));
+    locked->setToolTip(tr("A locked shape is not picked or moved on the canvas"));
+    flagsRow->addWidget(shown);
+    flagsRow->addWidget(locked);
+    flagsRow->addStretch(1);
+    s->addRow(QString(), flags);
+    auto* order = new QWidget(body);
+    auto* orderRow = new QHBoxLayout(order);
+    orderRow->setContentsMargins(0, 0, 0, 0);
+    orderRow->setSpacing(4);
+    auto* up = new QPushButton(tr("Up"), order);
+    up->setObjectName(QStringLiteral("panel.shapes.up"));
+    auto* down = new QPushButton(tr("Down"), order);
+    down->setObjectName(QStringLiteral("panel.shapes.down"));
+    auto* duplicate = new QPushButton(tr("Duplicate"), order);
+    duplicate->setObjectName(QStringLiteral("panel.shapes.duplicate"));
+    for (QPushButton* b : {up, down, duplicate})
+        orderRow->addWidget(b);
+    s->addRow(QString(), order);
     QComboBox* role = createRoleBox(body);
     role->setObjectName(QStringLiteral("panel.shapes.role"));
     s->addRow(tr("Role"), role);
@@ -114,15 +151,31 @@ void SidePanel::bindShapes(Project* project) {
         list->clear();
         for (qsizetype i = shapes.size() - 1; i >= 0; --i) {
             const MaskShape& m = shapes[i];
-            auto* item = new QListWidgetItem(IconFactory::icon(kindIcon(m.kind)),
+            auto* item = new QListWidgetItem(IconFactory::icon(m.locked ? QStringLiteral("lock") : kindIcon(m.kind)),
                                              QStringLiteral("%1 · %2%3").arg(m.name, roleWord(m.role), soft(m)), list);
+            item->setFlags(item->flags() | Qt::ItemIsUserCheckable | Qt::ItemIsDragEnabled);
+            item->setFlags(item->flags() & ~Qt::ItemIsDropEnabled);
+            item->setCheckState(m.visible ? Qt::Checked : Qt::Unchecked);
+            item->setData(Qt::UserRole, int(i));
             item->setSelected(selected.contains(int(i)));
         }
         hint->setVisible(shapes.isEmpty());
         list->setVisible(!shapes.isEmpty());
-        for (QWidget* w :
-             s->row(role) + s->row(feather) + s->row(strength) + s->row(remove) + s->row(op) + s->row(combine))
+        for (QWidget* w : s->row(role) + s->row(feather) + s->row(strength) + s->row(remove) + s->row(op) +
+                              s->row(combine) + s->row(name) + s->row(flags) + s->row(order))
             w->setVisible(!shapes.isEmpty());
+        const bool one = selected.size() == 1;
+        for (QWidget* w : {static_cast<QWidget*>(name), static_cast<QWidget*>(flags), static_cast<QWidget*>(order)})
+            w->setEnabled(one);
+        if (one) {
+            const MaskShape& m = shapes[selected.first()];
+            if (!name->hasFocus()) name->setText(m.name);
+            const QSignalBlocker b1(shown), b2(locked);
+            shown->setChecked(m.visible);
+            locked->setChecked(m.locked);
+            up->setEnabled(selected.first() < shapes.size() - 1);
+            down->setEnabled(selected.first() > 0);
+        }
         role->setEnabled(!selected.isEmpty());
         op->setEnabled(selected.size() >= 2);
         feather->setEnabled(!selected.isEmpty());
@@ -148,6 +201,62 @@ void SidePanel::bindShapes(Project* project) {
         project->setSelectedShapes(chosen);
     });
     connect(role, &QComboBox::activated, this, [=] { setShapesRole(project, role->currentData().toInt()); });
+    // The layers (D-026): each change one Undo step.
+    auto editOne = [project](auto change) {
+        const QList<int> sel = project->selectedShapes();
+        if (sel.size() != 1) return;
+        CropShape c = project->crop();
+        change(c.shapes[sel.first()]);
+        if (!(c == project->crop())) project->changeCrop(c);
+    };
+    connect(name, &QLineEdit::editingFinished, this, [=] {
+        const QString text = name->text().trimmed();
+        if (!text.isEmpty()) editOne([text](MaskShape& m) { m.name = text; });
+    });
+    connect(shown, &QCheckBox::clicked, this, [=](bool on) { editOne([on](MaskShape& m) { m.visible = on; }); });
+    connect(locked, &QCheckBox::clicked, this, [=](bool on) { editOne([on](MaskShape& m) { m.locked = on; }); });
+    connect(list, &QListWidget::itemChanged, this, [=](QListWidgetItem* item) {
+        const int i = item->data(Qt::UserRole).toInt();
+        CropShape c = project->crop();
+        if (i < 0 || i >= c.shapes.size()) return;
+        c.shapes[i].visible = item->checkState() == Qt::Checked;
+        if (!(c == project->crop())) project->changeCrop(c);
+    });
+    auto move = [project](int from, int to) {
+        CropShape c = project->crop();
+        c.shapes = shapealign::moved(c.shapes, from, to);
+        if (c == project->crop()) return;
+        project->setSelectedShapes({to});
+        project->changeCrop(c);
+    };
+    connect(up, &QPushButton::clicked, this, [=] {
+        if (const QList<int> sel = project->selectedShapes(); sel.size() == 1) move(sel.first(), sel.first() + 1);
+    });
+    connect(down, &QPushButton::clicked, this, [=] {
+        if (const QList<int> sel = project->selectedShapes(); sel.size() == 1) move(sel.first(), sel.first() - 1);
+    });
+    connect(duplicate, &QPushButton::clicked, this, [=] {
+        const QList<int> sel = project->selectedShapes();
+        if (sel.size() != 1) return;
+        CropShape c = project->crop();
+        c.shapes = shapealign::duplicated(c.shapes, sel.first());
+        if (c == project->crop()) return;
+        project->setSelectedShapes({sel.first() + 1});
+        project->changeCrop(c);
+    });
+    // A row dragged: the list's new order (top first) is the shapes' order reversed.
+    connect(list->model(), &QAbstractItemModel::rowsMoved, this, [=] {
+        CropShape c = project->crop();
+        QList<MaskShape> next;
+        for (int r = list->count() - 1; r >= 0; --r) {
+            const int i = list->item(r)->data(Qt::UserRole).toInt();
+            if (i >= 0 && i < c.shapes.size()) next.append(c.shapes[i]);
+        }
+        if (next.size() != c.shapes.size()) return;
+        c.shapes = next;
+        project->setSelectedShapes({});
+        if (!(c == project->crop())) project->changeCrop(c);
+    });
     connect(feather, &StepSpinBox::valueChanged, this,
             [=](double v) { setShapesSoftness(project, v, -1, QStringLiteral("field:panel.shapes.feather")); });
     connect(strength, &StepSpinBox::valueChanged, this,
@@ -168,6 +277,13 @@ void SidePanel::bindShapes(Project* project) {
         return ids.join(QLatin1Char(','));
     });
     WalkProbes::add(QStringLiteral("shapes.summary"), [project] { return shapeedit::summary(project->crop().shapes); });
+    // Each shape's layer flags (D-026): "v" shown or "h" hidden, then "l" locked or "u", "," between.
+    WalkProbes::add(QStringLiteral("shapes.flags"), [project] {
+        QStringList parts;
+        for (const MaskShape& m : project->crop().shapes)
+            parts << QStringLiteral("%1%2").arg(m.visible ? 'v' : 'h').arg(m.locked ? 'l' : 'u');
+        return parts.join(QLatin1Char(','));
+    });
     // Each shape's feather and strength, "f/s" a shape, ";" between (D-024).
     WalkProbes::add(QStringLiteral("shapes.soft"), [project] {
         QStringList parts;
