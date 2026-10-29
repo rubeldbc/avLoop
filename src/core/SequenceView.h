@@ -32,6 +32,11 @@ void setLayers(Sequence& s, const QList<VideoLayer>& layers);
 // The export frame (AvLoop's): the matte's rectangle, else the main clip where it stands at In, else the old frame.
 QRectF frameOf(const Sequence& s);
 
+// Whether the composite may leave part of `frame` clear between In and Out (Alpha: Auto, D-037): V1 hidden, a gap on
+// V1, a V1 clip that does not cover the frame (at its place or any key's), or one with a mask, an opacity under 100 %
+// (its own, a key's or its clip effects'). Clips above an opaque, covering V1 leave nothing clear.
+bool leavesClear(const Sequence& s, const QRectF& frame);
+
 // A clip's masks between its own px and the scene's, where it stands at its own time `own`: scene = its rectangle's
 // top-left + own px × its scale (flips aside; D-032, D-036).
 QList<MaskShape> masksToScene(const Clip& c, double own);

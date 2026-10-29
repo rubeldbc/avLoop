@@ -62,3 +62,6 @@ Each is built as read and open for the owner's veto (`OWNER-ACTIONS.md`; `DECISI
     own px — Premiere's masks ride the clip's motion. With no clip selected the shape tools stay the crop's (AvLoop's
     frame-wide shapes, the matte), so every AvLoop shape walk holds.
 23. **RS-23** (AS-006) A mask is mapped by the clip's place and scale, its flips aside (as the composite, D-032).
+24. **RS-24** (AS-007) RS-8 refined: a new project's loop mode stays AvLoop's Crossfade (the owner's loops, and every
+    AvLoop walk's); a sequence is exported as cut by the Loop section's mode **None** (D-020), which the export walk
+    uses. Alpha: Auto asks the composite too (D-037).

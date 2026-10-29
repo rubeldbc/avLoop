@@ -1,7 +1,7 @@
 ---
 phase: AS-008
 title: "The project"
-status: NOT_STARTED
+status: IN_PROGRESS
 owner_item: 8
 track: A
 checkpoint_id: CP-A1

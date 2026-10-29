@@ -27,6 +27,16 @@ its model, under the UI that is still AvLoop's (RS-7).
   the frame's corner; each layer on its own track; the crop with its shapes the sequence's matte (D-032). A migrated
   file renders byte for byte as before. `avloop-cli sequence <project> [--save x.avloop]` prints it.
 
+### D-037 — The export (AS-007, AvLoop Studio, 2026-10-30)
+
+- **The sequence exported**: In → Out of the sequence (a loop of it by the Loop section's mode; **None** exports it as
+  cut) through the composite (D-032) in every format — WebM VP9 and VP8 with alpha, APNG, MOV ProRes 4444, GIF (1-bit),
+  MP4 (the Background behind) —, by Export, the batch and `avloop-cli export`; each file checked as AvLoop's.
+- **Alpha: Auto** is on also where the composite can leave the frame clear between In and Out: V1 hidden, a gap on V1,
+  a V1 clip not covering the frame (at its place or a key's), or one with a mask or an opacity under 100 % (its own, a
+  key's, its clip effects'). Clips above an opaque, covering V1 leave nothing clear. The Output section says the same.
+- The loop mode of a new project stays AvLoop's Crossfade (RS-24).
+
 ### D-036 — The masks on the monitor (AS-006, AvLoop Studio, 2026-10-30)
 
 - **The Shape (S) and Pen (P) tools draw on the selected clip**: with a clip selected, every shape tool — drawing, the

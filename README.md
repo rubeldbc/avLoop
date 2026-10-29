@@ -54,6 +54,9 @@ frame rate and quality, and a preview that shows exactly what will be exported. 
   exported and the chosen area becomes a transparent hole in it, its feather softening outward.
   **Frame size** on the rectangle's bar sets the output to 1920 × 1080, 1080 × 1920, 1080 × 1080, 1280 × 720,
   720 × 1280 or 1080 × 1350, centred where the crop is — past the video's edges the frame is transparent.
+- **Export a sequence with transparency**: set the Loop mode to **None** to export In → Out as cut; where a mask
+  cuts a hole, nothing covers the frame or a clip is faded, Alpha: Auto turns transparency on — WebM VP9/VP8,
+  ProRes 4444, APNG and GIF keep it, MP4 puts the Background behind.
 - **Edit on the timeline**, as in Premiere Pro: every track V1 … V8 is a lane of clips. Click to select (Shift adds),
   drag to move in time or to another track (snapping to In, Out, the playhead and other clips; on frames), drag an end
   to trim, Alt+drag to copy. **C** is the Razor — click a clip to cut it there; **Ctrl+K** cuts at the playhead;

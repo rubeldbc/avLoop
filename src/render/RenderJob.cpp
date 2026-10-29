@@ -1,6 +1,7 @@
 #include "render/RenderJob.h"
 
 #include "core/Geometry.h"
+#include "core/SequenceView.h"
 #include "core/TimeMap.h"
 #include "render/SequenceRenderer.h"
 
@@ -45,7 +46,10 @@ RenderJob RenderJob::of(const ProjectData& p, const media::MediaInfo& source) {
     const bool needed = see || std::any_of(extremes.begin(), extremes.end(), [&](const VideoTransform& t) {
                             return geometry::needsAlpha(p.crop, t, video, source.hasAlpha);
                         });
-    job.alpha = formatHasAlpha(p.output.format) && (p.output.alpha == A::On || (p.output.alpha == A::Auto && needed));
+    // A sequence beyond one plain clip: also where the composite leaves the frame clear (D-037).
+    const bool clear = job.composite && sequenceview::leavesClear(job.sequence, job.frame);
+    job.alpha = formatHasAlpha(p.output.format) &&
+                (p.output.alpha == A::On || (p.output.alpha == A::Auto && (needed || clear)));
     job.background = QColor(p.output.background);
     job.plan = LoopPlan::of(job.loop, job.range.in, job.range.out, job.fps);
     // Decode no larger than the output needs: the display size × min(1, effective scale), long side ≤ 1920 (R-16).

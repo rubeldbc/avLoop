@@ -222,6 +222,7 @@ bool Project::outputAlpha() const {
     if (!formatHasAlpha(output_.format)) return false; // MP4: the Background under
     if (output_.alpha != A::Auto) return output_.alpha == A::On;
     if (effects_.on && effects_.opacity < 100) return true; // the clip made see-through
+    if (sv::leavesClear(seq_, seq_.frame)) return true;     // the composite leaves part clear (D-037)
     // Auto: alpha when the video leaves the output partly clear at any keyframe (between them it never goes further).
     for (const VideoTransform& t : keyframes::extremes(keyframes_, transform_))
         if (geometry::needsAlpha(crop_, t, source_.size(), source_.hasAlpha)) return true;

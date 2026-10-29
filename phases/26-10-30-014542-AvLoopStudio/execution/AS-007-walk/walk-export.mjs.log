@@ -1,0 +1,32 @@
+PASS webm-vp9: exported and checked by the app: PASS export …\cut-webm-vp9.webm: 640x360, 60 frames at 30/1, 125372 bytes, 1 pass(es), 1.00 s, libvpx-vp9, CPU
+PASS webm-vp9: vp9 640×360, 60 frames (In 0 → Out 2 s, as cut), no audio: vp9 640×360 60 frames yuv420p
+PASS webm-vp9: the cut — frame 15 at 0.5 s, the counter's 165 at 1.5 s: 15 | 165
+PASS webm-vp9: Auto alpha — the hole clear at 1.5 s, the rest opaque; no hole at 0.5 s: 0 | 255 | 255
+PASS webm-vp9: V2 seen in its corner: 251,0,0 vs 252,252,0
+PASS webm-vp8: exported and checked by the app: PASS export …\cut-webm-vp8.webm: 640x360, 60 frames at 30/1, 230718 bytes, 1 pass(es), 0.45 s, libvpx, CPU
+PASS webm-vp8: vp8 640×360, 60 frames (In 0 → Out 2 s, as cut), no audio: vp8 640×360 60 frames yuv420p
+PASS webm-vp8: the cut — frame 15 at 0.5 s, the counter's 165 at 1.5 s: 15 | 165
+PASS webm-vp8: Auto alpha — the hole clear at 1.5 s, the rest opaque; no hole at 0.5 s: 0 | 255 | 255
+PASS webm-vp8: V2 seen in its corner: 252,0,0 vs 252,252,0
+PASS apng: exported and checked by the app: PASS export …\cut-apng.apng: 640x360, 60 frames at 30/1, 2192165 bytes, 1 pass(es), 2.01 s, apng, CPU
+PASS apng: apng 640×360, 60 frames (In 0 → Out 2 s, as cut), no audio: apng 640×360 60 frames rgba
+PASS apng: the cut — frame 15 at 0.5 s, the counter's 165 at 1.5 s: 15 | 165
+PASS apng: Auto alpha — the hole clear at 1.5 s, the rest opaque; no hole at 0.5 s: 0 | 255 | 255
+PASS apng: V2 seen in its corner: 254,0,0 vs 253,253,0
+PASS mov-prores: exported and checked by the app: PASS export …\cut-mov-prores.mov: 640x360, 60 frames at 30/1, 6232849 bytes, 1 pass(es), 1.15 s, prores_ks, CPU
+PASS mov-prores: prores 640×360, 60 frames (In 0 → Out 2 s, as cut), no audio: prores 640×360 60 frames yuva444p12le
+PASS mov-prores: the cut — frame 15 at 0.5 s, the counter's 165 at 1.5 s: 15 | 165
+PASS mov-prores: Auto alpha — the hole clear at 1.5 s, the rest opaque; no hole at 0.5 s: 0 | 255 | 255
+PASS mov-prores: V2 seen in its corner: 254,0,0 vs 253,253,0
+PASS gif: exported and checked by the app: PASS export …\cut-gif.gif: 640x360, 60 frames at 30/1, 1280840 bytes, 2 pass(es), 0.81 s, gif, CPU
+PASS gif: gif 640×360, 60 frames (In 0 → Out 2 s, as cut), no audio: gif 640×360 60 frames bgra
+PASS gif: the cut — frame 15 at 0.5 s, the counter's 165 at 1.5 s: 15 | 165
+PASS gif: Auto alpha — the hole clear at 1.5 s, the rest opaque; no hole at 0.5 s: 0 | 255 | 255
+PASS gif: V2 seen in its corner: 250,1,1 vs 252,250,1
+PASS mp4-h264: exported and checked by the app: PASS export …\cut-mp4-h264.mp4: 640x360, 60 frames at 30/1, 321848 bytes, 1 pass(es), 0.48 s, h264_mf, CPU
+PASS mp4-h264: h264 640×360, 60 frames (In 0 → Out 2 s, as cut), no audio: h264 640×360 60 frames yuv420p
+PASS mp4-h264: the cut — frame 15 at 0.5 s, the counter's 165 at 1.5 s: 15 | 165
+PASS mp4-h264: no alpha — the hole the Background (#ff00ff): 253,0,253
+PASS mp4-h264: V2 seen in its corner: 255,0,1 vs 254,252,0
+PASS the VP9 file's frame at 1.5 s kept as a picture: export-vp9-1.5s.png
+WALK PASSED

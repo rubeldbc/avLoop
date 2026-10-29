@@ -1,0 +1,12 @@
+PASS the main video at (100, 125): the red bar: 253,0,0,255
+PASS the layer there: its green bar (its own x 200) over it: 0,255,1,255
+PASS beside the layer: the main video, as it was: 254,0,253,255
+PASS Opacity 50 %: half the layer over the main video: 127,128,1,255
+PASS hidden: the main video alone, byte for byte: equal
+PASS not yet started (starts at 5 s): byte for byte: equal
+PASS a file without "layers": byte for byte: equal
+PASS the GPU and the CPU: the same picture: max diff 0
+PASS inside a crop's ellipse only: its corner clear, the layer kept: 0; 0,255,1,255
+PASS exported: 60 frames with the layer: PASS export …\over.webm: 640x360, 60 frames at 30/1, 273367 bytes, 1 pass(es), 0.89 s, libvpx-vp9, CPU
+PASS the file's first frame: the layer's green at (100, 125): 0,254,0,255
+WALK PASSED

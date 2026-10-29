@@ -299,6 +299,32 @@ private slots:
         p.changeLayers({});
         QCOMPARE(p.selectedClip(), 0); // the selected clip gone: none
     }
+    // Alpha: Auto from the composite (D-037): what can leave the frame clear, and what cannot.
+    void leavesClear() {
+        Sequence s = twoTracks();
+        s.inOut = {0, 4};
+        QVERIFY(se::insert(s, 0, 0, media(4)));
+        const QRectF frame(0, 0, 640, 360);
+        QVERIFY(!sv::leavesClear(s, frame)); // one opaque clip over the whole frame
+        Sequence top = s;
+        Clip layer = media(4);
+        layer.masks = {MaskShape{}};
+        layer.opacity = 30;
+        QVERIFY(se::insert(top, 1, 0, layer));
+        QVERIFY(!sv::leavesClear(top, frame)); // V1 below it, opaque
+        Sequence gap = s;
+        gap.inOut = {0, 5};
+        QVERIFY(sv::leavesClear(gap, frame)); // V1 ends at 4
+        Sequence masked = s;
+        masked.tracks[0].clips[0].masks = {MaskShape{}};
+        QVERIFY(sv::leavesClear(masked, frame));
+        Sequence faded = s;
+        faded.tracks[0].clips[0].keys = {{0, 320, 180, 1, 100, false}, {2, 320, 180, 1, 60, false}};
+        QVERIFY(sv::leavesClear(faded, frame));
+        Sequence moved = s;
+        moved.tracks[0].clips[0].keys = {{0, 320, 180, 1, 100, false}, {2, 400, 180, 1, 100, false}};
+        QVERIFY(sv::leavesClear(moved, frame)); // at its second key it leaves the left edge
+    }
     // Keys over sequence time on a clip that starts later: own = In + (t − start).
     void keysOverSequenceTime() {
         Clip c = media(10);

@@ -152,6 +152,27 @@ QList<MaskShape> mapped(const QList<MaskShape>& masks, const std::function<QPoin
 
 } // namespace
 
+bool leavesClear(const Sequence& s, const QRectF& frame) {
+    if (s.tracks.isEmpty() || !s.tracks[0].visible) return true;
+    const QRectF inner = frame.adjusted(0.5, 0.5, -0.5, -0.5); // half a px of rounding allowed
+    double covered = s.inOut.in;
+    for (const Clip& c : s.tracks[0].clips) {
+        if (c.end() <= s.inOut.in + 1e-6 || c.start >= s.inOut.out - 1e-6) continue;
+        if (!c.enabled || c.start > covered + 1e-6) return true; // a gap
+        covered = std::max(covered, c.end());
+        if (maskshapes::anyVisible(c.masks) || c.opacity < 100 || (c.effects.on && c.effects.opacity < 100))
+            return true;
+        QList<VideoTransform> places{c.transform};
+        for (const LayerKey& k : c.keys) {
+            if (k.opacity < 100) return true;
+            places << c.look(k.t).transform;
+        }
+        for (const VideoTransform& t : places)
+            if (!t.rect(c.size).contains(inner)) return true;
+    }
+    return covered < s.inOut.out - 1e-6;
+}
+
 QList<MaskShape> masksToScene(const Clip& c, double own) {
     const QRectF r = c.rectAt(own);
     const double k = c.size.width() > 0 ? r.width() / c.size.width() : 1.0;

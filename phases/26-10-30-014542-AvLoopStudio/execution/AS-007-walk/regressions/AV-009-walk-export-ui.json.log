@@ -1,0 +1,105 @@
+startup: 734 ms
+walk walk-export-ui.json: 105 steps
+-- no video: Export disabled, with the reason @1436 ms
+PASS expect export.enabled: false
+PASS expect export.reason: Open a video to export it
+-- a 3 s Crossfade loop of the counter, an Ellipse with Feather @1677 ms
+     open samples/counter-640p30.mp4
+PASS waitFor video.state: ready after 0 ms
+PASS expect export.enabled: true
+PASS expect export.reason: 
+PASS expect export.defaultName: counter-640p30_loop_640x360.webm
+-- Output: Size — Crop, Long side, Custom with and without the lock, the 1920 limit @3470 ms
+PASS expect output.sizeMode: crop
+PASS expect output.size: 640x360
+PASS expect output.size: 256x144
+PASS expect crop.output: 640x360
+PASS expect output.size: 256x144
+PASS expect output.size: 500x282
+PASS expect output.size: 500x300
+PASS expect output.size: 1920x144
+PASS expect output.note: Limited to 1920 px on the long side: 1920×144
+PASS shot output-panel.png: 309x260 px
+PASS expect output.size: 640x360
+PASS expect output.note: 
+-- Output: Alpha Auto (on: the ellipse leaves corners clear), Off with a Background, Format VP8 @5909 ms
+PASS expect output.alpha: on
+PASS expect output.alpha: off
+PASS expect output.background: #ff00ff
+PASS expect output.alpha: on
+PASS expect output.format: webm-vp8
+-- Quality: a preset's values, typed into Custom, back to Medium; the size estimate @7164 ms
+PASS expect quality.crf: 24
+PASS expect quality.preset: custom
+PASS expect quality.crf: 33
+PASS expect quality.crf: 31
+PASS waitFor quality.estimate: ~0.30 MB after 1550 ms
+PASS expect quality.estimate: ~0.30 MB
+PASS shot quality-panel.png: 309x152 px
+-- Export: the loop written, checked, the toast with the OBS tip (once a session) @10423 ms
+     exportTo D:/Code5/avLoop/phases/26-10-26-034934-AvLoop/execution/AV-009-walk/export-a.webm
+PASS expect export.enabled: false
+PASS waitFor export.state: done after 850 ms
+PASS expect export.verify: 
+PASS expect export.leftovers: file
+PASS expect export.enabled: true
+PASS expect toast.text: Exported 640×360 · 2.50 s · 0.28 MB
+OBS: Media Source → Loop on · Use hardware decoding off (keeps transparency)
+PASS expect toast.text: Exported 640×360 · 2.50 s · 0.28 MB
+OBS: Media Source → Loop on · Use hardware decoding off (keeps transparency)
+PASS shot export-toast.png: 1400x730 px
+     exportTo D:/Code5/avLoop/phases/26-10-26-034934-AvLoop/execution/AV-009-walk/export-b.webm
+PASS waitFor export.state: done after 950 ms
+PASS expect toast.text: Exported 640×360 · 2.50 s · 0.28 MB
+PASS expect toast.text: Exported 640×360 · 2.50 s · 0.28 MB
+-- Cancel: the progress in the status bar, then nothing left behind @14646 ms
+     exportTo D:/Code5/avLoop/phases/26-10-26-034934-AvLoop/execution/AV-009-walk/export-cancel.webm
+PASS waitFor export.done: 25 after 0 ms
+PASS expect export.text: Exporting 29/75 · 38% · 97 fps · ETA 0:01
+PASS expect export.text: Exporting 33/75 · 44% · 78 fps · ETA 0:01
+PASS shot export-bar.png: 470x17 px
+PASS waitFor export.state: cancelled after 0 ms
+PASS expect export.leftovers: none
+PASS expect toast.text: Export cancelled
+-- Closing during an export asks first: No keeps it running, Yes cancels it @16239 ms
+     exportTo D:/Code5/avLoop/phases/26-10-26-034934-AvLoop/execution/AV-009-walk/export-quit.webm
+PASS waitFor export.done: 25 after 50 ms
+     answer no
+     closeWindow: stays open
+PASS expect question.last: Export in progress — cancel and quit?
+PASS expect export.state: running
+     answer yes
+     closeWindow: stays open
+PASS waitFor export.state: cancelled after 0 ms
+PASS expect export.leftovers: none
+-- A crop entirely outside the video: Export asks first (spec §12.2) @17923 ms
+PASS expect status.notice: Output is fully transparent
+     answer no
+     exportTo D:/Code5/avLoop/phases/26-10-26-034934-AvLoop/execution/AV-009-walk/export-clear.webm
+PASS expect question.last: The output is fully transparent. Export it anyway?
+PASS expect export.state: cancelled
+PASS expect status.notice: 
+PASS the owner's focus untouched: another program holds the focus
+WALK PASSED
+[libvpx-vp9 @ 000001f01d001500] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001f01d001500] v1.16.0
+[libvpx-vp9 @ 000001f01d001500] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001f01d001500] v1.16.0
+[libvpx-vp9 @ 000001f01d0023c0] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001f01d0023c0] v1.16.0
+[libvpx-vp9 @ 000001f01d001500] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001f01d001500] v1.16.0
+[libvpx-vp9 @ 000001f01d001500] v1.16.0
+[libvpx-vp9 @ 000001f01d001500] v1.16.0
+[libvpx-vp9 @ 000001f01d001140] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001f01d001140] v1.16.0
+[libvpx-vp9 @ 000001f0c25ca8c0] v1.16.0
+[libvpx-vp9 @ 000001f0c25ca8c0] v1.16.0
+[libvpx-vp9 @ 000001f01d001c40] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001f01d001c40] v1.16.0
+[libvpx-vp9 @ 000001f01d001140] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001f01d001140] v1.16.0
+[libvpx-vp9 @ 000001f01d001140] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001f01d001140] v1.16.0
+[libvpx-vp9 @ 000001f0cf23ac00] Application has requested 32 threads. Using a thread count greater than 16 is not recommended.
+[libvpx-vp9 @ 000001f0cf23ac00] v1.16.0
